@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>B.E.A.T. Smart City Map</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script>
+    // 1. Paste your free Mapbox access token here
+    mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN';
+    
+    // 2. Create the Map
+    const map = new mapboxgl.Map({
+        container: 'map', // The ID of the div above
+        style: 'mapbox://styles/mapbox/dark-v11', // Dark mode for admin dashboard
+        center: [121.0825, 14.5764], // Coordinates for Pasig
+        zoom: 12.5 
+    });
+
+    // 3. Draw the Barangay Boundaries when the map loads
+    map.on('load', () => {
+        map.addSource('pasig-barangays', {
+            type: 'geojson',
+            data: './pasig_boundaries.geojson' // Points to Rishied's file right next to this HTML file
+        });
+
+        map.addLayer({
+            'id': 'barangay-borders',
+            'type': 'line',
+            'source': 'pasig-barangays',
+            'paint': {
+                'line-color': '#00ff00', // Neon green borders
+                'line-width': 2
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
