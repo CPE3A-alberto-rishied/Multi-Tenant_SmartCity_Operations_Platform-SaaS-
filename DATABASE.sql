@@ -26,4 +26,5 @@ CREATE TABLE audit_logs (
     details TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    
 );
