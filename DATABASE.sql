@@ -11,9 +11,19 @@ CREATE TABLE users (
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role ENUM('Main Admin', 'Staff Admin') NOT NULL, -- Restricted to 2 roles
-    dept_id INT, -- Foreign key to the departments table
-    status ENUM('Active', 'Disabled') DEFAULT 'Active', [cite: 77]
+    role ENUM('Main Admin', 'Staff Admin') NOT NULL, 
+    dept_id INT, 
+    status ENUM('Active', 'Disabled') DEFAULT 'Active', 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (dept_id) REFERENCES departments(dept_id) ON DELETE SET NULL
+);
+
+-- Table for Audit Logs 
+CREATE TABLE audit_logs (
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    action VARCHAR(255) NOT NULL,
+    details TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
