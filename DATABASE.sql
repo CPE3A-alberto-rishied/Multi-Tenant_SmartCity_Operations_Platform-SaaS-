@@ -28,3 +28,14 @@ CREATE TABLE audit_logs (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
     
 );
+
+-- Table for Incident Reports
+CREATE TABLE incidents (
+    report_id int AUTO_INCREMENT PRIMARY KEY,
+    reporter_name VARCHAR(255) NOT NULL,
+    reporter_email VARCHAR(255) NOT NULL,
+    report_subject VARCHAR(255) NOT NULL,
+    contact_number VARCHAR(20),
+    report_location TEXT NOT NULL,
+    report_description TEXT NOT NULL
+);
