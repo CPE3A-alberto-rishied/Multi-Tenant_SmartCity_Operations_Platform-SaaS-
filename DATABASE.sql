@@ -29,6 +29,7 @@ CREATE TABLE audit_logs (
     
 );
 
+-- Table for Incident Reports
 CREATE TABLE incidents (
     report_id int AUTO_INCREMENT PRIMARY KEY,
     reporter_name VARCHAR(255) NOT NULL,
