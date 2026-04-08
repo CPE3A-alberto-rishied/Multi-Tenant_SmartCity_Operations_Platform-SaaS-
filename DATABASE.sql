@@ -28,3 +28,22 @@ CREATE TABLE audit_logs (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
     
 );
+
+CREATE TABLE incidents (
+    report_id int AUTO_INCREMENT PRIMARY KEY,
+    reporter_name VARCHAR(255) NOT NULL,
+    reporter_email VARCHAR(255) NOT NULL,
+    report_subject VARCHAR(255) NOT NULL,
+    contact_number VARCHAR(20),
+    report_location TEXT NOT NULL,
+    report_description TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS staff_accounts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    status ENUM('active', 'locked') DEFAULT 'active'
+);
