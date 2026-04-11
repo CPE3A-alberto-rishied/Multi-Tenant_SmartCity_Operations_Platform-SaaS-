@@ -39,3 +39,12 @@ CREATE TABLE incidents (
     report_location TEXT NOT NULL,
     report_description TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS staff_accounts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    status ENUM('active', 'locked') DEFAULT 'active'
+);
