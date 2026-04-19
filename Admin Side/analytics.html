@@ -1,95 +1,96 @@
 <!doctype html>
 <html lang="en" class="h-full">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BEAT – Analytics & Audit</title>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BEAT - Analytics & Audit</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-
-  <!-- ✅ GOOGLE FONTS -->
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="css/styles2.css">
-
-  <!-- ✅ FORCE FONT CONSISTENCY -->
-  <style>
-    body {
-      font-family: 'DM Sans', sans-serif;
+ <style>
+    body { font-family: 'DM Sans', sans-serif !important; }
+    
+    /* SIDEBAR */
+    .sidebar { width: 260px !important; flex-shrink: 0 !important; }
+    
+    .sidebar-item { 
+      display: flex !important; align-items: center !important; gap: 12px !important;
+      padding: 12px 18px !important; font-size: 14.5px !important; 
+      font-weight: 500 !important; color: #94a3b8 !important;
+      text-decoration: none !important; border-left: 3px solid transparent !important;
     }
-    .font-mono {
-      font-family: 'Space Mono', monospace;
+    .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
+    .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
+    .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
+    
+    /* USER FOOTER FIXED */
+    .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
+    .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
+    .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
+    .settings-link { color: #94a3b8; transition: color 0.2s; display: flex; align-items: center; }
+    .settings-link:hover { color: #3b82f6; }
+
+    .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
+    
+    /* Input Styling */
+    .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 8px 12px; transition: all 0.2s; }
+    .modal-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
+    .input-error { border-color: #ef4444 !important; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important; }
+    
+    /* AUTOFILL FIX */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus, 
+    input:-webkit-autofill:active,
+    select:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0px 1000px #1e2536 inset !important;
+        -webkit-text-fill-color: #ffffff !important;
+        caret-color: white !important;
+        transition: background-color 5000s ease-in-out 0s;
     }
   </style>
 </head>
-
-<body class="h-full">
-<div class="flex h-full">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar flex flex-col">
-    <div class="p-5 border-b" style="border-color:var(--border)">
+<body class="h-full flex bg-[#0a0e1a]">
+  <aside id="sidebar" class="sidebar flex flex-col h-full border-r border-gray-800/50" style="background:var(--surface)">
+    <div class="h-[76px] px-5 flex items-center border-b shrink-0" style="border-color:var(--border)">
       <div class="flex items-center gap-3">
-        <div style="background:var(--accent);width:36px;height:36px;border-radius:10px"
-             class="flex items-center justify-center font-bold text-white text-sm font-mono">
-          B
-        </div>
-        <div>
-          <div class="font-bold text-lg">BEAT</div>
-          <div style="color:var(--text-dim);font-size:11px">Admin Control Center</div>
+        <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
+        <div class="flex flex-col justify-center">
+          <div class="logo-text font-bold text-lg text-white tracking-widest leading-none mb-1">BEAT</div>
+          <div style="color:var(--text-dim); font-size:11px" class="leading-none">Admin Control Center</div>
         </div>
       </div>
     </div>
-
     <nav class="flex-1 py-4 overflow-y-auto">
-      <a href="dashboard.html" class="sidebar-item" style="text-decoration:none;">
-        <i data-lucide="layout-dashboard" style="width:18px;height:18px;"></i>
-        <span>Dashboard Overview</span>
-      </a>
-
-      <a href="manage_admin.html" class="sidebar-item" style="text-decoration:none;">
-        <i data-lucide="users" style="width:18px;height:18px;"></i>
-        <span>Manage Admins</span>
-      </a>
-
-      <a href="reports.html" class="sidebar-item" style="text-decoration:none;">
-        <i data-lucide="alert-triangle" style="width:18px;height:18px;"></i>
-        <span>Public Reports</span>
-      </a>
-
-      <a href="announcements.html" class="sidebar-item" style="text-decoration:none;">
-        <i data-lucide="megaphone" style="width:18px;height:18px;"></i>
-        <span>Announcement Manager</span>
-      </a>
-
-      <a href="traffic.html" class="sidebar-item" style="text-decoration:none;">
-        <i data-lucide="car" style="width:18px;height:18px;"></i>
-        <span>Traffic and Road Control</span>
-      </a>
-
-      <a href="analytics.html" class="sidebar-item active" style="text-decoration:none;">
-        <i data-lucide="bar-chart-3" style="width:18px;height:18px;"></i>
-        <span>Analytics & Audit</span>
-      </a>
+      <a href="dashboard.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+      <a href="manage_admin.html" class="sidebar-item"><i data-lucide="users"></i><span>Manage Admins</span></a>
+      <a href="reports.html" class="sidebar-item"><i data-lucide="alert-triangle"></i><span>Public Reports</span></a>
+      <a href="announcements.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+      <a href="traffic.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
+      <a href="analytics.html" class="sidebar-item active"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
     </nav>
     
-<div class="p-5 border-t mt-auto" style="border-color:var(--border)">
-  <button
-    class="btn btn-ghost w-full justify-center text-sm"
-    style="padding:8px;"
-    onclick="doLogout()">
-    <i data-lucide="log-out" style="width:16px;height:16px"></i>
-    Logout
-  </button>
-</div>
-
+    <div class="user-footer">
+      <div class="flex items-center justify-between mb-5">
+        <div class="flex items-center gap-3">
+          <div id="nav-avatar" style="background:#2563eb; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">MA</div>
+          <div>
+            <div class="user-footer-name">Main Admin</div>
+            <div class="user-footer-sub">System Administrator</div>
+          </div>
+        </div>
+        <a href="profile.html" class="settings-link"><i data-lucide="settings" style="width:18px; height:18px"></i></a>
+      </div>
+      <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
+        <i data-lucide="log-out" style="width:16px; height:16px"></i> Logout
+      </button>
+    </div>
   </aside>
 
-  <!-- MAIN -->
   <main class="flex-1 overflow-y-auto">
-    <header class="px-8 py-5 border-b" style="border-color:var(--border);background:var(--surface)">
-      <h1 class="text-xl font-semibold flex items-center gap-2">
+    <header class="px-8 h-[76px] flex items-center border-b shrink-0" style="border-color:var(--border);background:var(--surface)">
+      <h1 class="text-xl font-semibold flex items-center gap-2 text-white">
         <i data-lucide="bar-chart-3"></i>
         Analytics & Audit
       </h1>
@@ -97,8 +98,8 @@
 
     <div class="p-8 grid grid-cols-1 lg:grid-cols-2 gap-6 animate-in">
 
-      <div class="card">
-        <h3 class="font-semibold mb-4 flex items-center gap-2">
+      <div class="card border border-gray-800/50 rounded-xl p-6 shadow-sm" style="background:var(--surface)">
+        <h3 class="font-semibold mb-4 flex items-center gap-2 text-white">
           <i data-lucide="scroll-text" style="color:var(--accent)"></i>
           Audit Trail
         </h3>
@@ -109,27 +110,26 @@
         </ul>
       </div>
 
-      <div class="card">
-        <h3 class="font-semibold mb-4 flex items-center gap-2">
+      <div class="card border border-gray-800/50 rounded-xl p-6 shadow-sm" style="background:var(--surface)">
+        <h3 class="font-semibold mb-4 flex items-center gap-2 text-white">
           <i data-lucide="activity" style="color:var(--accent)"></i>
           Reports Overview
         </h3>
 
         <div class="flex items-end gap-3 h-40">
-          <div class="chart-bar flex-1" style="height:40%"></div>
-          <div class="chart-bar flex-1" style="height:65%"></div>
-          <div class="chart-bar flex-1" style="height:50%"></div>
-          <div class="chart-bar flex-1" style="height:80%"></div>
+          <div class="chart-bar flex-1" style="height:40%; background:var(--accent); border-radius:4px"></div>
+          <div class="chart-bar flex-1" style="height:65%; background:var(--accent); border-radius:4px"></div>
+          <div class="chart-bar flex-1" style="height:50%; background:var(--accent); border-radius:4px"></div>
+          <div class="chart-bar flex-1" style="height:80%; background:var(--accent); border-radius:4px"></div>
         </div>
       </div>
-
     </div>
   </main>
-</div>
 
 <script src="js/app.js"></script>
 <script>
   lucide.createIcons();
+  function doLogout() { window.location.href = 'admin.html'; }
 </script>
 </body>
 </html>

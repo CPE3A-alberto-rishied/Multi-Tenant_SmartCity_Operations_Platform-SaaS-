@@ -47,9 +47,15 @@ function renderCal() {
         grid.appendChild(d);
     }
     
+    // --- FIX: Get the exact real-time date to check against ---
+    const realToday = new Date();
+
     for (let i = 1; i <= daysInMonth; i++) {
         const d = document.createElement('div');
-        const isTodayHighlight = i === 5 && m === 3 && y === 2026; 
+        
+        // --- FIX: Dynamically checks if the loop date matches today's real date ---
+        const isTodayHighlight = i === realToday.getDate() && m === realToday.getMonth() && y === realToday.getFullYear(); 
+        
         d.className = 'cal-day' + (isTodayHighlight ? ' today' : '');
         d.textContent = i;
         grid.appendChild(d);
@@ -103,4 +109,4 @@ function closeModal() {
     }
 }
 
-if (window.lucide) lucide.createIcons();    
+if (window.lucide) lucide.createIcons();
