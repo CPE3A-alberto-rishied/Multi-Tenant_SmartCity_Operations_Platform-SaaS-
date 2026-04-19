@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BEAT – Dashboard Overview</title>
 
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BEAT - Dashboard Overview</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
 
@@ -20,13 +17,6 @@
     /* SIDEBAR CSS */
     .sidebar { width: 260px !important; flex-shrink: 0 !important; }
     
- <style>
-    body { font-family: 'DM Sans', sans-serif !important; }
-    
-    /* SIDEBAR */
-    .sidebar { width: 260px !important; flex-shrink: 0 !important; }
-    
-    /* ✅ PERFECT SIZING: 14.5px text, 20px icons, clean padding */
     .sidebar-item { 
       display: flex !important; align-items: center !important; gap: 12px !important;
       padding: 12px 18px !important; font-size: 14.5px !important; 
@@ -60,54 +50,9 @@
           <div class="logo-text font-bold text-lg text-white tracking-widest leading-none mb-1">BEAT</div>
           <div style="color:var(--text-dim); font-size:11px" class="leading-none">Admin Control Center</div>
         </div>
-    .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; }
-    .hidden { display: none !important; }
-    .modal-card { background: #151b2d; border: 1px solid #2d3748; border-radius: 1.25rem; }
-    
-    /* Input Styling */
-    .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 8px 12px; transition: all 0.2s; }
-    .modal-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
-    .input-error { border-color: #ef4444 !important; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important; }
-    
-    /* ✅ ULTIMATE AUTOFILL FIX: Prevents browser from turning inputs black/transparent */
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover, 
-    input:-webkit-autofill:focus, 
-    input:-webkit-autofill:active,
-    select:-webkit-autofill {
-        -webkit-box-shadow: 0 0 0px 1000px #1e2536 inset !important;
-        -webkit-text-fill-color: #ffffff !important;
-        caret-color: white !important;
-        transition: background-color 5000s ease-in-out 0s;
-    }
-    
-    /* CUSTOM SELECT ARROW */
-    select { 
-      appearance: none; 
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); 
-      background-repeat: no-repeat; 
-      background-position: right 0.75rem center; 
-      background-size: 1em; 
-      padding-right: 2.5rem !important;
-    }
-
-    /* Tables & Toggles */
-    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #374151; transition: .4s; border-radius: 24px; }
-    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-    input:checked + .slider { background-color: #22c55e; }
-    input:checked + .slider:before { transform: translateX(20px); }
-  </style>
-</head>
-<body class="h-full flex bg-[#0a0e1a]">
-  <aside id="sidebar" class="sidebar flex flex-col h-full">
-    <div class="p-5 border-b" style="border-color:var(--border)">
-      <div class="flex items-center gap-3">
-        <div style="background:var(--accent);width:36px;height:36px;border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
-        <div><div class="font-bold text-lg tracking-widest text-white">BEAT</div><div style="color:var(--text-dim);font-size:11px">Admin Control Center</div></div>
       </div>
     </div>
+    
     <nav class="flex-1 py-4 overflow-y-auto">
       <a href="dashboard.html" class="sidebar-item active"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
       <a href="manage_admin.html" class="sidebar-item"><i data-lucide="users"></i><span>Manage Admins</span></a>
@@ -276,18 +221,5 @@
   lucide.createIcons();
   function doLogout() { window.location.href = 'admin.html'; }
 </script>
-    <div class="p-5 border-t mt-auto" style="border-color:var(--border)">
-      <div class="flex items-center justify-between mb-5">
-        <div class="flex items-center gap-3">
-          <div id="nav-avatar" style="background:#2563eb;width:42px;height:42px;border-radius:50%;background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm">MA</div>
-          <div><div class="text-sm font-bold text-white">Main Admin</div><div style="color:#94a3b8;font-size:11px">System Administrator</div></div>
-        </div>
-        <a href="profile.html" class="text-[#94a3b8] hover:text-blue-500 transition-colors"><i data-lucide="settings" style="width:18px;height:18px"></i></a>
-      </div>
-      <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white"><i data-lucide="log-out" style="width:16px;height:16px"></i> Logout</button>
-    </div>
-  </aside>
-  <main class="flex-1 overflow-y-auto"><header class="px-8 py-5 border-b" style="border-color:var(--border);background:var(--surface)"><h1 class="text-xl font-semibold text-white">Dashboard Overview</h1></header><div class="p-8 animate-in"><div class="card w-64"><div style="color:var(--text-dim);font-size:12px;font-weight:600;text-transform:uppercase">ACTIVE INCIDENTS</div><div id="dash-active-incidents" class="font-bold text-4xl" style="color:var(--danger)">0</div><div style="color:var(--text-dim);font-size:13px">Live count</div></div></div></main>
-  <script src="js/app.js"></script><script>document.addEventListener('DOMContentLoaded', () => { populateDashboard(); lucide.createIcons(); });</script>
 </body>
 </html>
