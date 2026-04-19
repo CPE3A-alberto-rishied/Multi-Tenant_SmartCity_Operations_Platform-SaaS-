@@ -17,6 +17,9 @@
     .otp-input:focus { border-color: #2563eb; box-shadow: 0 0 10px rgba(37, 99, 235, 0.2); }
     .otp-input.input-error { border-color: #ef4444 !important; box-shadow: 0 0 12px rgba(239, 68, 68, 0.35) !important; }
     input:read-only { color: #64748b; cursor: not-allowed; background: rgba(30, 37, 54, 0.5); }
+    
+    /* Center Badge Container */
+    .badge-stack { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 16px; }
   </style>
 </head>
 <body class="h-full flex bg-[#0a0e1a]">
@@ -38,12 +41,7 @@
       <div style="background:#2563eb; width:48px; height:48px; border-radius:50%; margin:0 auto 20px" class="flex items-center justify-center text-white"><i data-lucide="shield-check"></i></div>
       <h2 class="text-white font-bold text-xl mb-2">Security Verification</h2>
       <div class="flex justify-between gap-2 mb-2">
-        <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 0)">
-        <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 1)">
-        <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 2)">
-        <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 3)">
-        <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 4)">
-        <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 5)">
+        <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 0)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 1)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 2)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 3)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 4)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 5)">
       </div>
       <p id="otp-error" class="text-red-500 text-xs hidden mb-6">Enter all 6 digits</p>
       <button onclick="confirmChanges()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl">Confirm Updates</button>
@@ -84,8 +82,8 @@
     <div class="p-5 border-t mt-auto" style="border-color:var(--border)">
         <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
-                <div id="nav-avatar" style="background:#2563eb;width:42px;height:42px;border-radius:50%;background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">MA</div>
-                <div><div class="text-sm font-bold text-white">Main Admin</div><div style="color:#94a3b8;font-size:11px">System Administrator</div></div>
+                <div id="nav-avatar" style="background:#2563eb;width:42px;height:42px;border-radius:50%;background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">TR</div>
+                <div><div class="text-sm font-bold text-white">Thara D. Del Rosario</div><div style="color:#94a3b8;font-size:11px">System Administrator</div></div>
             </div>
             <a href="profile.html" class="text-blue-500"><i data-lucide="settings" style="width:18px;height:18px"></i></a>
         </div>
@@ -104,7 +102,7 @@
       <div class="profile-card rounded-2xl p-10 flex flex-col items-center">
         
         <div class="relative group mb-6">
-          <div id="profile-display" style="background:#2563eb;width:140px;height:140px;border-radius:50%;background-size:cover;background-position:center;" class="flex items-center justify-center text-white text-5xl font-bold border-4 border-[#1e2536] shadow-2xl">MA</div>
+          <div id="profile-display" style="background:#2563eb;width:140px;height:140px;border-radius:50%;background-size:cover;background-position:center;" class="flex items-center justify-center text-white text-5xl font-bold border-4 border-[#1e2536] shadow-2xl">TR</div>
           <label for="avatar-input" class="absolute bottom-1 right-1 bg-blue-600 p-2.5 rounded-full cursor-pointer border-2 border-[#1e2536]">
             <i data-lucide="camera" class="text-white w-5 h-5"></i>
             <input type="file" id="avatar-input" class="hidden" accept="image/*" onchange="previewAvatar(this)">
@@ -112,10 +110,12 @@
         </div>
 
         <div class="text-center mb-10">
-          <h2 class="text-white text-2xl font-bold">Main Admin</h2>
-          <div class="flex gap-4 mt-2 justify-center">
-            <span class="text-[11px] font-bold tracking-widest bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full uppercase">ID: 2026-0001</span>
-            <span class="text-[11px] font-bold tracking-widest bg-gray-700 text-[#94a3b8] px-3 py-1 rounded-full lowercase">admin@beat.gov.ph</span>
+          <h2 class="text-white text-2xl font-bold">Thara D. Del Rosario</h2>
+          
+          <div class="badge-stack">
+            <span class="text-[11px] font-bold tracking-widest bg-purple-600/20 text-purple-400 px-3 py-1.5 rounded-full uppercase w-max">Dept: College of Engineering</span>
+            <span class="text-[11px] font-bold tracking-widest bg-blue-600/20 text-blue-400 px-3 py-1.5 rounded-full uppercase w-max">ID: 2026-0001</span>
+            <span class="text-[11px] font-bold tracking-widest bg-gray-700 text-[#94a3b8] px-3 py-1.5 rounded-full lowercase w-max">thara@beat.gov.ph</span>
           </div>
         </div>
 
@@ -123,11 +123,11 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label class="block text-[11px] font-bold mb-2 tracking-wider text-[#94a3b8]">USERNAME</label>
-              <input type="text" id="prof-username" value="Main_Admin" data-original="Main_Admin" class="w-full bg-[#1e2536] text-white p-3 rounded-lg border border-gray-700 outline-none focus:border-blue-500">
+              <input type="text" id="prof-username" value="Thara_DelRosario" data-original="Thara_DelRosario" class="w-full bg-[#1e2536] text-white p-3 rounded-lg border border-gray-700 outline-none focus:border-blue-500">
             </div>
             <div>
               <label class="block text-[11px] font-bold mb-2 tracking-wider text-[#94a3b8]">EMAIL ADDRESS (READ-ONLY)</label>
-              <input type="email" value="admin@beat.gov.ph" class="w-full bg-[#1e2536] text-white p-3 rounded-lg border border-gray-700 outline-none" readonly>
+              <input type="email" value="thara@beat.gov.ph" class="w-full bg-[#1e2536] text-white p-3 rounded-lg border border-gray-700 outline-none" readonly>
             </div>
           </div>
 
@@ -186,9 +186,7 @@
       const avatarChanged = document.getElementById('profile-form').dataset.changed === 'true';
 
       const hasChanges = (username.value !== username.getAttribute('data-original')) || 
-                        (currPass !== "") || 
-                        (newPass !== "") || 
-                        avatarChanged;
+                        (currPass !== "") || (newPass !== "") || avatarChanged;
 
       if (!hasChanges) {
         document.getElementById('no-changes-modal').classList.remove('hidden');
@@ -198,11 +196,7 @@
     }
 
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-
-    function proceedToVerify() {
-      closeModal('confirm-modal');
-      document.getElementById('verify-modal').classList.remove('hidden');
-    }
+    function proceedToVerify() { closeModal('confirm-modal'); document.getElementById('verify-modal').classList.remove('hidden'); }
 
     function handleOtp(input, index) {
       const inputs = document.querySelectorAll('.otp-input');
