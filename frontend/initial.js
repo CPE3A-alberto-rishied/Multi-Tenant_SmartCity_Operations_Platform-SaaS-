@@ -74,8 +74,7 @@ async function submitReport(event) {
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
-    // REPLACE THIS URL with your actual Render URL (e.g., https://beat-pasig-api.onrender.com)
-    const API_URL = 'https://beat-pasig-api.onrender.com/api/report';
+    const API_URL = 'https://beat-pasig-api.onrender.com';
 
     try {
         const response = await fetch(API_URL, {
