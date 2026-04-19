@@ -20,6 +20,68 @@
     
     /* Center Badge Container */
     .badge-stack { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 16px; }
+        body { font-family: 'DM Sans', sans-serif !important; }
+    
+    /* SIDEBAR */
+    .sidebar { width: 260px !important; flex-shrink: 0 !important; }
+    
+    /* ✅ PERFECT SIZING: 14.5px text, 20px icons, clean padding */
+    .sidebar-item { 
+      display: flex !important; align-items: center !important; gap: 12px !important;
+      padding: 12px 18px !important; font-size: 14.5px !important; 
+      font-weight: 500 !important; color: #94a3b8 !important;
+      text-decoration: none !important; border-left: 3px solid transparent !important;
+    }
+    .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
+    .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
+    .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
+    
+    /* USER FOOTER FIXED */
+    .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
+    .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
+    .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
+    .settings-link { color: #94a3b8; transition: color 0.2s; display: flex; align-items: center; }
+    .settings-link:hover { color: #3b82f6; }
+
+    .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; }
+    .hidden { display: none !important; }
+    .modal-card { background: #151b2d; border: 1px solid #2d3748; border-radius: 1.25rem; }
+    
+    /* Input Styling */
+    .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 8px 12px; transition: all 0.2s; }
+    .modal-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
+    .input-error { border-color: #ef4444 !important; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important; }
+    
+    /* ✅ ULTIMATE AUTOFILL FIX: Prevents browser from turning inputs black/transparent */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus, 
+    input:-webkit-autofill:active,
+    select:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0px 1000px #1e2536 inset !important;
+        -webkit-text-fill-color: #ffffff !important;
+        caret-color: white !important;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+    
+    /* CUSTOM SELECT ARROW */
+    select { 
+      appearance: none; 
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); 
+      background-repeat: no-repeat; 
+      background-position: right 0.75rem center; 
+      background-size: 1em; 
+      padding-right: 2.5rem !important;
+    }
+
+    /* Tables & Toggles */
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #374151; transition: .4s; border-radius: 24px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: #22c55e; }
+    input:checked + .slider:before { transform: translateX(20px); }
   </style>
 </head>
 <body class="h-full flex bg-[#0a0e1a]">
@@ -83,7 +145,7 @@
         <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
                 <div id="nav-avatar" style="background:#2563eb;width:42px;height:42px;border-radius:50%;background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">TR</div>
-                <div><div class="text-sm font-bold text-white">Thara D. Del Rosario</div><div style="color:#94a3b8;font-size:11px">System Administrator</div></div>
+                <div><div class="text-sm font-bold text-white">Main Admin</div><div style="color:#94a3b8;font-size:11px">System Administrator</div></div>
             </div>
             <a href="profile.html" class="text-blue-500"><i data-lucide="settings" style="width:18px;height:18px"></i></a>
         </div>
