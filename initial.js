@@ -68,23 +68,13 @@ function prevMonth() { curDate.setMonth(curDate.getMonth() - 1); renderCal(); }
 function nextMonth() { curDate.setMonth(curDate.getMonth() + 1); renderCal(); }
 renderCal();
 
-async function submitReport(e) {
-    e.preventDefault();
-    const form = e.target;
+async function submitReport(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
     
-    if (!form.checkValidity()) {
-        form.classList.add('was-validated');
-        return; 
-    }
-    
-    const data = {
-        name: form.querySelector('input[placeholder="Full name"]').value,
-        email: form.querySelector('input[type="email"]').value,
-        subject: form.querySelector('input[placeholder*="Broken street light"]').value,
-        contact: form.querySelector('input[type="tel"]').value,
-        address: form.querySelector('input[placeholder="Street address or landmark"]').value,
-        description: form.querySelector('textarea').value
-    };
+    // Convert FormData to JSON
+    const data = Object.fromEntries(formData.entries());
 
     try {
         const response = await fetch('http://localhost:3000/api/report', {
@@ -94,13 +84,17 @@ async function submitReport(e) {
         });
 
         const result = await response.json();
+        
         if (result.success) {
-            document.getElementById('success-modal').classList.add('active'); //
+            // Trigger your Success Modal defined in report.html
+            document.getElementById('success-modal').classList.add('active');
             form.reset();
-            form.classList.remove('was-validated');
+        } else {
+            alert('Something went wrong. Please try again.');
         }
-    } catch (err) {
-        console.error("Connection failed:", err);
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Could not connect to the server.');
     }
 }
 
