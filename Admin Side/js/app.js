@@ -1,135 +1,317 @@
-// ====== MOCK DATA ======
-const mockData = {
-    incidents: [
-        { id: 1, subject: "Flooding", reporter: "Juan Dela Cruz", location: "C5 Road", status: "Forwarded" },
-        { id: 2, subject: "Broken Light", reporter: "Maria Clara", location: "Ortigas Ave", status: "New" }
-    ],
-    admins: [
-        { username: "Main_Admin", role: "Main Admin", dept: "All", status: "Active", email: "admin@beat.gov.ph" },
-        { username: "Traffic_Staff_1", role: "Staff", dept: "Traffic", status: "Active", email: "staff@beat.gov.ph" }
-    ],
-    roads: [
-        { id: 1, name: "C5 Northbound", segment: "Bagong Ilog – Rosario", status: "green" },
-        { id: 2, name: "C5 Southbound", segment: "Rosario – Bagong Ilog", status: "red" }
-    ],
-    logs: [
-        { time: "10:05 AM", user: "Main_Admin", action: "System Login", target: "Admin Dashboard" }
-    ]
-};
-
-// ====== AUTHENTICATION ======
-function handleLogin(e) {
-    e.preventDefault();
-    // Redirect to dashboard on successful login
-    window.location.href = 'dashboard.html';
+// ====== UI & NAVIGATION ======
+function openModal(id) { 
+    const modal = document.getElementById(id);
+    if (modal) modal.classList.remove('hidden'); 
 }
 
-function doLogout() {
-    // Redirect back to login page
-    window.location.href = 'admin.html';
+function closeModal(id) { 
+    const modal = document.getElementById(id);
+    if (modal) modal.classList.add('hidden'); 
 }
 
-function toggleSidebar() {
-    const s = document.getElementById('sidebar');
-    if (s.style.transform === 'translateX(-100%)') {
-        s.style.transform = '';
-        s.style.position = '';
-    } else {
-        s.style.transform = 'translateX(-100%)';
-        s.style.position = 'absolute';
-        s.style.zIndex = '50';
+function doLogout() { 
+    window.location.href = 'admin.html'; 
+}
+
+// ====== DATA & REFRESH ======
+let departments = []; 
+let currentFilter = "All Departments";
+let mockData = { admins: [] }; 
+
+function checkDeptBeforeStaff() {
+    if (departments.length === 0) { openModal('no-dept-modal'); } 
+    else { openModal('add-staff-modal'); }
+}
+
+function handleSort(val) {
+    currentFilter = val;
+    const deleteBtn = document.getElementById('delete-dept-btn');
+    if (val !== "All Departments") {
+        deleteBtn.classList.remove('hidden');
+        document.getElementById('delete-dept-title').innerText = `Delete ${val}?`;
+        const count = mockData.admins.filter(a => a.dept === val).length;
+        document.getElementById('delete-dept-desc').innerText = `This will remove the department AND delete all ${count} associated staff member(s).`;
+    } else { 
+        deleteBtn.classList.add('hidden'); 
     }
+    populateAdmins();
 }
 
-// ====== DATA INJECTION FUNCTIONS ======
-function populateDashboard() {
-    const activeEl = document.getElementById('dash-active-incidents');
-    if(activeEl) activeEl.innerText = mockData.incidents.length;
+function updateDepartmentDropdowns() {
+    const filterSelect = document.getElementById('dept-filter');
+    const modalSelect = document.getElementById('staff-dept');
+    if (filterSelect) filterSelect.innerHTML = `<option>All Departments</option>` + departments.map(d => `<option value="${d}">${d}</option>`).join('');
     
-    const staffEl = document.getElementById('dash-active-staff');
-    if(staffEl) staffEl.innerText = mockData.admins.length;
-
-    const feedEl = document.getElementById('dash-activity-feed');
-    if(feedEl) {
-        feedEl.innerHTML = mockData.logs.map(l => `
-            <div class="flex items-center gap-4 py-3 border-b" style="border-color:var(--border)">
-              <span class="font-mono text-sm" style="color:var(--text-dim);min-width:75px">${l.time}</span>
-              <span class="badge badge-blue" style="min-width:110px;text-align:center">${l.user}</span>
-              <span style="color:var(--text-dim);font-size:14px">${l.action}</span>
-              <span class="font-semibold text-sm ml-auto text-right">${l.target}</span>
-            </div>
-        `).join('');
-    }
+    if (modalSelect) modalSelect.innerHTML = `<option value="" disabled selected>Select Department</option>` + departments.map(d => `<option value="${d}">${d}</option>`).join('');
 }
 
 function populateAdmins() {
-    const tbody = document.getElementById('admin-table-body');
-    if(!tbody) return;
-    tbody.innerHTML = mockData.admins.map(a => `
-        <tr>
-            <td class="font-semibold">${a.username}</td>
-            <td style="color:var(--text-dim);font-size:13px">${a.email}</td>
-            <td><span class="badge badge-purple">${a.role}</span></td>
-            <td>${a.dept}</td>
-            <td><span class="badge badge-green">${a.status}</span></td>
-        </tr>
-    `).join('');
+    const activeTbody = document.getElementById('active-admin-table-body');
+    const disabledTbody = document.getElementById('disabled-admin-table-body');
+    if(!activeTbody || !disabledTbody) return;
+
+    let adminsToDisplay = mockData.admins;
+    if (currentFilter !== "All Departments") {
+        adminsToDisplay = mockData.admins.filter(a => a.dept === currentFilter);
+    }
+
+    const activeAdmins = adminsToDisplay.filter(a => a.status === "Active");
+    const disabledAdmins = adminsToDisplay.filter(a => a.status !== "Active");
+
+    activeTbody.innerHTML = activeAdmins.map(a => `
+        <tr class="border-b border-gray-800/50 hover:bg-white/5 transition-colors">
+            <td class="px-4 py-4 w-10"></td> 
+            <td class="font-bold py-4 px-4 text-white">${a.username}</td>
+            <td class="text-[#94a3b8]">${a.id}</td>
+            <td class="text-[#94a3b8]">${a.email}</td>
+            <td class="text-[#94a3b8]">${a.dept}</td>
+            <td><span class="bg-green-500/20 text-green-500 px-3 py-1 rounded-full text-[10px] font-bold">Active</span></td>
+            <td><label class="switch"><input type="checkbox" checked onchange="handleStatusToggle(this, '${a.username}')"><span class="slider"></span></label></td>
+        </tr>`).join('');
+        
+    disabledTbody.innerHTML = disabledAdmins.map(a => `
+        <tr class="hover:bg-white/5 opacity-60">
+            <td class="px-4 py-4 w-10"><i data-lucide="trash-2" class="w-4 h-4 text-red-500/60 hover:text-red-500 cursor-pointer transition-colors"></i></td>
+            <td class="font-bold py-4 px-4 text-white">${a.username}</td>
+            <td class="text-[#94a3b8]">${a.id}</td>
+            <td class="text-[#94a3b8]">${a.email}</td>
+            <td class="text-[#94a3b8]">${a.dept}</td>
+            <td><span class="bg-yellow-500/10 text-yellow-500/70 px-3 py-1 rounded-full text-[10px] font-bold">Disabled</span></td>
+            <td><label class="switch"><input type="checkbox" onchange="handleStatusToggle(this, '${a.username}')"><span class="slider"></span></label></td>
+        </tr>`).join('');
+    
+    if (window.lucide) lucide.createIcons(); 
 }
 
-// Add this to your mockData object if it isn't there already
-mockData.announcements = [
-    { id: 1, title: "C5 Road Maintenance", author: "Main_Admin", category: "Road Work", date: "Today 10:00 AM", content: "Expect heavy traffic due to drainage repairs." },
-    { id: 2, title: "Power Interruption", author: "Staff", category: "Power Interruption", date: "Yesterday 2:00 PM", content: "Meralco advisory for Kapitolyo area." }
-];
-
-// Add these functions anywhere in app.js
-function populateAnnouncements() {
-    const grid = document.getElementById('announcements-grid');
-    if(!grid) return;
-    grid.innerHTML = mockData.announcements.map(a => `
-        <div class="card hover:opacity-90 transition-opacity cursor-pointer">
-            <div class="flex items-start justify-between mb-4 gap-2">
-                <div class="flex-1">
-                    <h4 class="font-semibold text-base mb-1">${a.title}</h4>
-                    <div style="color:var(--text-dim);font-size:12px;">
-                        ${a.date} · By ${a.author}
-                    </div>
-                </div>
-                <span class="badge badge-blue" style="white-space:nowrap">${a.category}</span>
-            </div>
-            <p style="color:var(--text-dim);font-size:14px;line-height:1.6;">${a.content}</p>
-        </div>
-    `).join('');
+// ====== CREATION & DELETION LOGIC ======
+function executeDeleteDept() {
+    mockData.admins = mockData.admins.filter(a => a.dept !== currentFilter);
+    departments = departments.filter(d => d !== currentFilter);
+    currentFilter = "All Departments";
+    const filterEl = document.getElementById('dept-filter');
+    if (filterEl) filterEl.value = "All Departments";
+    document.getElementById('delete-dept-btn').classList.add('hidden');
+    updateDepartmentDropdowns();
+    populateAdmins();
+    closeModal('delete-dept-modal');
 }
 
-function populateTraffic() {
-    const tbody = document.getElementById('roads-table-body');
-    if(!tbody) return;
-    const statusColors = {green:'#10B981', yellow:'#F59E0B', red:'#EF4444'};
-    const statusLabels = {green:'Open', yellow:'Slow', red:'Heavy'};
-
-    tbody.innerHTML = mockData.roads.map(r => `
-        <tr>
-            <td class="font-semibold" style="padding:16px 14px">${r.name}</td>
-            <td style="color:var(--text-dim);padding:16px 14px">${r.segment}</td>
-            <td style="padding:16px 14px">
-              <span class="badge" style="background:${statusColors[r.status]}20;color:${statusColors[r.status]};padding:6px 12px">
-                ${statusLabels[r.status]}
-              </span>
-            </td>
-        </tr>
-    `).join('');
+function validateAddStaff() {
+    const name = document.getElementById('staff-name'), 
+          id = document.getElementById('staff-id'), 
+          email = document.getElementById('staff-email'), 
+          pass = document.getElementById('staff-pass'),
+          dept = document.getElementById('staff-dept'); 
+          
+    let isValid = true;
+    
+    if (!name.value.trim()) { name.classList.add('input-error'); document.getElementById('name-error').classList.remove('hidden'); isValid = false; }
+    if (!id.value.trim()) { id.classList.add('input-error'); document.getElementById('id-error').classList.remove('hidden'); isValid = false; }
+    if (!email.value.trim()) { email.classList.add('input-error'); document.getElementById('email-error').classList.remove('hidden'); isValid = false; }
+    if (pass.value.length < 8) { pass.classList.add('input-error'); document.getElementById('pass-error').classList.remove('hidden'); isValid = false; }
+    if (!dept.value) { dept.classList.add('input-error'); document.getElementById('dept-select-error').classList.remove('hidden'); isValid = false; }
+    
+    if (isValid) openModal('confirm-staff-modal');
 }
 
-function populateAnalytics() {
-    const container = document.getElementById('barangay-chart-container');
-    if(!container) return;
-    const maxCount = Math.max(...mockData.locations.map(l => l.count));
-    container.innerHTML = mockData.locations.map(loc => `
-        <div class="flex flex-col items-center flex-1">
-            <div class="text-xs font-mono font-bold mb-2">${loc.count}</div>
-            <div class="chart-bar w-full" style="height:${(loc.count/maxCount)*180}px;background:var(--accent);border-radius:6px 6px 0 0"></div>
-            <div class="text-center mt-3" style="font-size:11px;color:var(--text-dim);font-weight:500">${loc.name}</div>
-        </div>
-    `).join('');
+function executeAddStaff() {
+    const newUser = {
+        username: document.getElementById('staff-name').value,
+        id: document.getElementById('staff-id').value,
+        email: document.getElementById('staff-email').value,
+        dept: document.getElementById('staff-dept').value,
+        status: "Active"
+    };
+    mockData.admins.push(newUser);
+    clearAndCloseStaff(); 
+    closeModal('confirm-staff-modal'); 
+    populateAdmins();
 }
+
+function validateCreateDept() {
+    const input = document.getElementById('new-dept-name');
+    if (!input.value.trim()) { input.classList.add('input-error'); document.getElementById('dept-error').classList.remove('hidden'); return; }
+    openModal('confirm-dept-modal');
+}
+
+function executeCreateDept() {
+    const name = document.getElementById('new-dept-name').value.trim();
+    if (name && !departments.includes(name)) { departments.push(name); updateDepartmentDropdowns(); }
+    clearAndCloseDept(); 
+    closeModal('confirm-dept-modal');
+}
+
+function clearAndCloseStaff() {
+    ['staff-name', 'staff-id', 'staff-email', 'staff-pass', 'staff-dept'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (el.tagName === 'SELECT') el.value = "";
+            else el.value = "";
+        }
+        let errId = id === 'staff-pass' ? 'pass-error' : id === 'staff-dept' ? 'dept-select-error' : id.split('-')[1] + '-error';
+        clearError(id, errId);
+    });
+    closeModal('add-staff-modal');
+}
+
+function clearAndCloseDept() {
+    const input = document.getElementById('new-dept-name');
+    if (input) input.value = "";
+    clearError('new-dept-name', 'dept-error');
+    closeModal('new-dept-modal');
+}
+
+function clearError(inputId, errorId) {
+    const input = document.getElementById(inputId);
+    const error = document.getElementById(errorId);
+    if (input) input.classList.remove('input-error');
+    if (error) error.classList.add('hidden');
+}
+
+// ====== STATUS TOGGLE FLOW ======
+let pendingToggle = null;
+let currentTargetUser = "";
+
+function handleStatusToggle(checkbox, userName) {
+    pendingToggle = checkbox;
+    currentTargetUser = userName;
+    if (!checkbox.checked) {
+        document.getElementById('disable-title').innerText = `Disable ${userName}?`;
+        openModal('disable-modal');
+        checkbox.checked = true;
+    } else {
+        document.getElementById('enable-title').innerText = `Enable ${userName}?`;
+        openModal('enable-modal');
+        checkbox.checked = false;
+    }
+}
+
+function confirmStatusChange(isEnabling) {
+    if (pendingToggle) {
+        const user = mockData.admins.find(u => u.username === currentTargetUser);
+        if (user) {
+            user.status = isEnabling ? "Active" : "Disabled";
+            populateAdmins(); 
+        }
+        closeModal(isEnabling ? 'enable-modal' : 'disable-modal');
+    }
+}
+
+function cancelStatusChange() { 
+    closeModal('enable-modal'); 
+    closeModal('disable-modal'); 
+    pendingToggle = null; 
+}
+
+// ==========================================
+// AUTHENTICATION SCREEN LOGIC (admin.html)
+// ==========================================
+
+function handleLogin(e) {
+    e.preventDefault(); 
+    const user = document.getElementById('login-user');
+    const pass = document.getElementById('login-pass');
+    let valid = true;
+
+    if (user && !user.value.trim()) {
+        user.classList.add('input-error');
+        document.getElementById('user-error').classList.remove('hidden');
+        valid = false;
+    }
+    if (pass && !pass.value.trim()) {
+        pass.classList.add('input-error');
+        document.getElementById('pass-error').classList.remove('hidden');
+        valid = false;
+    }
+
+    if (valid && user && pass) {
+        document.getElementById('login-card').classList.add('hidden');
+        document.getElementById('verify-card').classList.remove('hidden');
+    }
+}
+
+function handleReset(e) {
+    e.preventDefault(); 
+    const email = document.getElementById('reset-email');
+    let valid = true;
+
+    if (email && (!email.value.trim() || !email.value.includes('@'))) {
+        email.classList.add('input-error');
+        document.getElementById('reset-error').classList.remove('hidden');
+        valid = false;
+    }
+
+    if (valid && email) {
+        document.getElementById('success-popup').classList.remove('hidden');
+    }
+}
+
+function handleVerify(e) {
+    e.preventDefault();
+    const inputs = document.querySelectorAll('.otp-input');
+    let valid = true;
+    
+    inputs.forEach(input => {
+        if (!input.value.trim()) {
+            input.classList.add('input-error');
+            valid = false;
+        }
+    });
+
+    if (!valid) {
+        document.getElementById('verify-error').classList.remove('hidden');
+    } else {
+        window.location.href = "dashboard.html";
+    }
+}
+
+function handleOtp(input, index) {
+    const inputs = document.querySelectorAll('.otp-input');
+    input.classList.remove('input-error');
+    const err = document.getElementById('verify-error');
+    if(err) err.classList.add('hidden');
+    
+    if (input.value.length === 1 && index < inputs.length - 1) {
+        inputs[index + 1].focus();
+    }
+}
+
+function handleOtpBack(e, index) {
+    const inputs = document.querySelectorAll('.otp-input');
+    if (e.key === 'Backspace' && index > 0 && !inputs[index].value) {
+        inputs[index - 1].focus();
+    }
+}
+
+function showResetScreen() {
+    document.getElementById('login-card').classList.add('hidden');
+    document.getElementById('reset-card').classList.remove('hidden');
+}
+
+function showLoginScreen() {
+    const resetCard = document.getElementById('reset-card');
+    const verifyCard = document.getElementById('verify-card');
+    const loginCard = document.getElementById('login-card');
+    
+    if(resetCard) resetCard.classList.add('hidden');
+    if(verifyCard) verifyCard.classList.add('hidden');
+    if(loginCard) loginCard.classList.remove('hidden');
+}
+
+function showResentPopup(e) {
+    if(e) e.preventDefault(); 
+    const popup = document.getElementById('resent-popup');
+    if(popup) popup.classList.remove('hidden');
+}
+
+function closePopup(popupId) { 
+    const popup = document.getElementById(popupId);
+    if(popup) popup.classList.add('hidden'); 
+}
+
+// ====== PAGE LOAD ======
+document.addEventListener('DOMContentLoaded', () => { 
+    updateDepartmentDropdowns(); 
+    populateAdmins(); 
+    if(window.lucide) lucide.createIcons();
+});

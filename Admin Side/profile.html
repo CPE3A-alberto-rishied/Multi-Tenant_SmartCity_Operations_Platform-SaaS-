@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BEAT - Admin Profile</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles2.css">
+  <style>
+    .sidebar-item { font-size: 14px !important; }
+    .profile-card { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(16px); border: 1px solid var(--border); }
+    .hidden { display: none !important; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.9); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 100; }
+    .otp-input { width: 42px; height: 50px; background: #1e2536; color: white; text-align: center; font-size: 1.25rem; font-weight: bold; border-radius: 8px; border: 1.5px solid #374151; outline: none; transition: all 0.2s; }
+    .otp-input:focus { border-color: #2563eb; box-shadow: 0 0 10px rgba(37, 99, 235, 0.2); }
+    .otp-input.input-error { border-color: #ef4444 !important; box-shadow: 0 0 12px rgba(239, 68, 68, 0.35) !important; }
+    input:read-only { color: #64748b; cursor: not-allowed; background: rgba(30, 37, 54, 0.5); }
+    
+    /* Center Badge Container */
+    .badge-stack { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 16px; }
+  </style>
+</head>
+<body class="h-full flex bg-[#0a0e1a]">
+  
+  <div id="confirm-modal" class="modal-overlay hidden">
+    <div class="card" style="width:400px; text-align:center; padding:2rem; border-radius:1rem;">
+      <div style="background:var(--warn); width:48px; height:48px; border-radius:50%; margin:0 auto 20px" class="flex items-center justify-center text-black"><i data-lucide="alert-circle"></i></div>
+      <h2 class="text-white font-bold text-xl mb-2">Update Account?</h2>
+      <p style="color:#94a3b8; font-size:14px; margin-bottom:24px">Confirm changes to username or password? Verification is required.</p>
+      <div class="flex gap-3">
+        <button onclick="closeModal('confirm-modal')" class="flex-1 bg-gray-700 text-white font-bold py-2.5 rounded-lg">Cancel</button>
+        <button onclick="proceedToVerify()" class="flex-1 bg-blue-600 text-white font-bold py-2.5 rounded-lg">Proceed</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="verify-modal" class="modal-overlay hidden">
+    <div class="card" style="width:420px; text-align:center; padding:2.5rem; border-radius:1rem;">
+      <div style="background:#2563eb; width:48px; height:48px; border-radius:50%; margin:0 auto 20px" class="flex items-center justify-center text-white"><i data-lucide="shield-check"></i></div>
+      <h2 class="text-white font-bold text-xl mb-2">Security Verification</h2>
+      <div class="flex justify-between gap-2 mb-2">
+        <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 0)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 1)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 2)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 3)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 4)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 5)">
+      </div>
+      <p id="otp-error" class="text-red-500 text-xs hidden mb-6">Enter all 6 digits</p>
+      <button onclick="confirmChanges()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl">Confirm Updates</button>
+    </div>
+  </div>
+
+  <div id="success-modal" class="modal-overlay hidden">
+    <div class="card" style="width:400px; text-align:center; padding:2rem; border-radius:1rem;">
+      <div style="background:var(--success); width:48px; height:48px; border-radius:50%; margin:0 auto 20px" class="flex items-center justify-center text-white"><i data-lucide="check-circle"></i></div>
+      <h2 class="text-white font-bold text-xl mb-2">Changes Successful</h2>
+      <button onclick="closeModal('success-modal')" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-lg">Got it</button>
+    </div>
+  </div>
+
+  <div id="no-changes-modal" class="modal-overlay hidden">
+    <div class="card" style="width:400px; text-align:center; padding:2rem; border-radius:1rem;">
+      <div style="background:var(--warn); width:48px; height:48px; border-radius:50%; margin:0 auto 20px" class="flex items-center justify-center text-black"><i data-lucide="info"></i></div>
+      <h2 class="text-white font-bold text-xl mb-2">No Changes Detected</h2>
+      <button onclick="closeModal('no-changes-modal')" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-lg">Dismiss</button>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar flex flex-col h-full">
+    <div class="p-5 border-b" style="border-color:var(--border)">
+        <div class="flex items-center gap-3">
+            <div style="background:var(--accent);width:36px;height:36px;border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
+            <div><div class="font-bold text-lg text-white">BEAT</div><div style="color:var(--text-dim);font-size:11px">Admin Control Center</div></div>
+        </div>
+    </div>
+    <nav class="flex-1 py-4 overflow-y-auto">
+        <a href="dashboard.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+        <a href="manage_admin.html" class="sidebar-item"><i data-lucide="users"></i><span>Manage Admins</span></a>
+        <a href="reports.html" class="sidebar-item"><i data-lucide="alert-triangle"></i><span>Public Reports</span></a>
+        <a href="announcements.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+        <a href="traffic.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
+        <a href="analytics.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
+    </nav>
+    <div class="p-5 border-t mt-auto" style="border-color:var(--border)">
+        <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-3">
+                <div id="nav-avatar" style="background:#2563eb;width:42px;height:42px;border-radius:50%;background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">TR</div>
+                <div><div class="text-sm font-bold text-white">Thara D. Del Rosario</div><div style="color:#94a3b8;font-size:11px">System Administrator</div></div>
+            </div>
+            <a href="profile.html" class="text-blue-500"><i data-lucide="settings" style="width:18px;height:18px"></i></a>
+        </div>
+        <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
+            <i data-lucide="log-out" style="width:18px;height:18px"></i> Logout
+        </button>
+    </div>
+  </aside>
+
+  <main class="flex-1 overflow-y-auto flex flex-col items-center">
+    <header class="w-full px-8 py-5 border-b" style="border-color:var(--border);background:var(--surface)">
+      <h1 class="text-xl font-semibold text-white flex items-center gap-2"><i data-lucide="user"></i>Admin Profile</h1>
+    </header>
+
+    <div class="p-8 animate-in w-full max-w-2xl">
+      <div class="profile-card rounded-2xl p-10 flex flex-col items-center">
+        
+        <div class="relative group mb-6">
+          <div id="profile-display" style="background:#2563eb;width:140px;height:140px;border-radius:50%;background-size:cover;background-position:center;" class="flex items-center justify-center text-white text-5xl font-bold border-4 border-[#1e2536] shadow-2xl">TR</div>
+          <label for="avatar-input" class="absolute bottom-1 right-1 bg-blue-600 p-2.5 rounded-full cursor-pointer border-2 border-[#1e2536]">
+            <i data-lucide="camera" class="text-white w-5 h-5"></i>
+            <input type="file" id="avatar-input" class="hidden" accept="image/*" onchange="previewAvatar(this)">
+          </label>
+        </div>
+
+        <div class="text-center mb-10">
+          <h2 class="text-white text-2xl font-bold">Thara D. Del Rosario</h2>
+          
+          <div class="badge-stack">
+            <span class="text-[11px] font-bold tracking-widest bg-purple-600/20 text-purple-400 px-3 py-1.5 rounded-full uppercase w-max">Dept: College of Engineering</span>
+            <span class="text-[11px] font-bold tracking-widest bg-blue-600/20 text-blue-400 px-3 py-1.5 rounded-full uppercase w-max">ID: 2026-0001</span>
+            <span class="text-[11px] font-bold tracking-widest bg-gray-700 text-[#94a3b8] px-3 py-1.5 rounded-full lowercase w-max">thara@beat.gov.ph</span>
+          </div>
+        </div>
+
+        <form id="profile-form" onsubmit="handleInitialSave(event)" class="w-full space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-[11px] font-bold mb-2 tracking-wider text-[#94a3b8]">USERNAME</label>
+              <input type="text" id="prof-username" value="Thara_DelRosario" data-original="Thara_DelRosario" class="w-full bg-[#1e2536] text-white p-3 rounded-lg border border-gray-700 outline-none focus:border-blue-500">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold mb-2 tracking-wider text-[#94a3b8]">EMAIL ADDRESS (READ-ONLY)</label>
+              <input type="email" value="thara@beat.gov.ph" class="w-full bg-[#1e2536] text-white p-3 rounded-lg border border-gray-700 outline-none" readonly>
+            </div>
+          </div>
+
+          <hr class="border-gray-800 my-4">
+
+          <div class="space-y-4">
+            <h3 class="text-white font-bold text-sm flex items-center gap-2"><i data-lucide="lock" class="w-4 h-4 text-blue-500"></i> Password Updates</h3>
+            <div>
+              <label class="block text-[11px] font-bold mb-2 tracking-wider text-[#94a3b8]">CURRENT PASSWORD</label>
+              <input type="password" id="curr-pass" placeholder="Verify with current password" class="w-full bg-[#1e2536] text-white p-3 rounded-lg border border-gray-700 outline-none focus:border-blue-500">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-[11px] font-bold mb-2 tracking-wider text-[#94a3b8]">NEW PASSWORD</label>
+                <input type="password" id="new-pass" placeholder="New password" class="w-full bg-[#1e2536] text-white p-3 rounded-lg border border-gray-700 outline-none focus:border-blue-500">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold mb-2 tracking-wider text-[#94a3b8]">CONFIRM PASSWORD</label>
+                <input type="password" id="conf-pass" placeholder="Confirm password" class="w-full bg-[#1e2536] text-white p-3 rounded-lg border border-gray-700 outline-none focus:border-blue-500">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all mt-4">
+            Update Profile
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script>
+    lucide.createIcons();
+    
+    function previewAvatar(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const url = e.target.result;
+          document.getElementById('profile-display').style.backgroundImage = `url(${url})`;
+          document.getElementById('profile-display').textContent = '';
+          document.getElementById('nav-avatar').style.backgroundImage = `url(${url})`;
+          document.getElementById('nav-avatar').textContent = '';
+          document.getElementById('profile-form').dataset.changed = 'true';
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function handleInitialSave(e) {
+      e.preventDefault();
+      const username = document.getElementById('prof-username');
+      const currPass = document.getElementById('curr-pass').value;
+      const newPass = document.getElementById('new-pass').value;
+      const avatarChanged = document.getElementById('profile-form').dataset.changed === 'true';
+
+      const hasChanges = (username.value !== username.getAttribute('data-original')) || 
+                        (currPass !== "") || (newPass !== "") || avatarChanged;
+
+      if (!hasChanges) {
+        document.getElementById('no-changes-modal').classList.remove('hidden');
+      } else {
+        document.getElementById('confirm-modal').classList.remove('hidden');
+      }
+    }
+
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+    function proceedToVerify() { closeModal('confirm-modal'); document.getElementById('verify-modal').classList.remove('hidden'); }
+
+    function handleOtp(input, index) {
+      const inputs = document.querySelectorAll('.otp-input');
+      inputs.forEach(i => i.classList.remove('input-error'));
+      document.getElementById('otp-error').classList.add('hidden');
+      if (input.value.length === 1 && index < inputs.length - 1) inputs[index + 1].focus();
+    }
+
+    function confirmChanges() {
+      const inputs = document.querySelectorAll('.otp-input');
+      let code = "";
+      inputs.forEach(i => code += i.value);
+
+      if (code.length < 6) {
+        inputs.forEach(i => i.classList.add('input-error'));
+        document.getElementById('otp-error').classList.remove('hidden');
+      } else {
+        document.getElementById('verify-modal').classList.add('hidden');
+        document.getElementById('success-modal').classList.remove('hidden');
+        document.getElementById('profile-form').dataset.changed = 'false';
+        const username = document.getElementById('prof-username');
+        username.setAttribute('data-original', username.value);
+        document.getElementById('curr-pass').value = "";
+        document.getElementById('new-pass').value = "";
+        document.getElementById('conf-pass').value = "";
+      }
+    }
+  </script>
+</body>
+</html>

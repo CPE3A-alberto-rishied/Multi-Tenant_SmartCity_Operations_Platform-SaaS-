@@ -1,75 +1,106 @@
 <!doctype html>
 <html lang="en" class="h-full">
- <head>
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BEAT - Traffic</title>
+  <title>BEAT - Traffic and Road Control</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
- </head>
- <body class="h-full">
-  <div class="flex h-full">
-   
-   <aside id="sidebar" class="sidebar flex flex-col">
+ <style>
+    body { font-family: 'DM Sans', sans-serif !important; }
+    
+    /* SIDEBAR */
+    .sidebar { width: 260px !important; flex-shrink: 0 !important; }
+    
+    /* ✅ PERFECT SIZING: 14.5px text, 20px icons, clean padding */
+    .sidebar-item { 
+      display: flex !important; align-items: center !important; gap: 12px !important;
+      padding: 12px 18px !important; font-size: 14.5px !important; 
+      font-weight: 500 !important; color: #94a3b8 !important;
+      text-decoration: none !important; border-left: 3px solid transparent !important;
+    }
+    .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
+    .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
+    .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
+    
+    /* USER FOOTER FIXED */
+    .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
+    .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
+    .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
+    .settings-link { color: #94a3b8; transition: color 0.2s; display: flex; align-items: center; }
+    .settings-link:hover { color: #3b82f6; }
+
+    .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; }
+    .hidden { display: none !important; }
+    .modal-card { background: #151b2d; border: 1px solid #2d3748; border-radius: 1.25rem; }
+    
+    /* Input Styling */
+    .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 8px 12px; transition: all 0.2s; }
+    .modal-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
+    .input-error { border-color: #ef4444 !important; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important; }
+    
+    /* ✅ ULTIMATE AUTOFILL FIX: Prevents browser from turning inputs black/transparent */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus, 
+    input:-webkit-autofill:active,
+    select:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0px 1000px #1e2536 inset !important;
+        -webkit-text-fill-color: #ffffff !important;
+        caret-color: white !important;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+    
+    /* CUSTOM SELECT ARROW */
+    select { 
+      appearance: none; 
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); 
+      background-repeat: no-repeat; 
+      background-position: right 0.75rem center; 
+      background-size: 1em; 
+      padding-right: 2.5rem !important;
+    }
+
+    /* Tables & Toggles */
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #374151; transition: .4s; border-radius: 24px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: #22c55e; }
+    input:checked + .slider:before { transform: translateX(20px); }
+  </style>
+</head>
+<body class="h-full flex bg-[#0a0e1a]">
+  <aside id="sidebar" class="sidebar flex flex-col h-full">
     <div class="p-5 border-b" style="border-color:var(--border)">
-     <div class="flex items-center gap-3">
-      <div style="background:var(--accent);width:36px;height:36px;border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
-      <div>
-       <div class="font-bold text-lg tracking-widest">BEAT</div>
-       <div style="color:var(--text-dim);font-size:11px">Admin Control Center</div>
+      <div class="flex items-center gap-3">
+        <div style="background:var(--accent);width:36px;height:36px;border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
+        <div><div class="font-bold text-lg tracking-widest text-white">BEAT</div><div style="color:var(--text-dim);font-size:11px">Admin Control Center</div></div>
       </div>
-     </div>
     </div>
-    
     <nav class="flex-1 py-4 overflow-y-auto">
-      <a href="dashboard.html" class="sidebar-item" style="text-decoration:none;"><i data-lucide="layout-dashboard" style="width:18px;height:18px;flex-shrink:0;"></i><span>Dashboard Overview</span></a>
-      <a href="manage_admin.html" class="sidebar-item" style="text-decoration:none;"><i data-lucide="users" style="width:18px;height:18px;flex-shrink:0;"></i><span>Manage Admins</span></a>
-      <a href="reports.html" class="sidebar-item" style="text-decoration:none;"><i data-lucide="alert-triangle" style="width:18px;height:18px;flex-shrink:0;"></i><span>Public Reports</span></a>
-      <a href="announcements.html" class="sidebar-item" style="text-decoration:none;"><i data-lucide="megaphone" style="width:18px;height:18px;flex-shrink:0;"></i><span>Announcement Manager</span></a>
-      <a href="traffic.html" class="sidebar-item active" style="text-decoration:none;"><i data-lucide="car" style="width:18px;height:18px;flex-shrink:0;"></i><span>Traffic and Road Control</span></a>
-      <a href="analytics.html" class="sidebar-item" style="text-decoration:none;"><i data-lucide="bar-chart-3" style="width:18px;height:18px;flex-shrink:0;"></i><span>Analytics & Audit</span></a>
+      <a href="dashboard.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+      <a href="manage_admin.html" class="sidebar-item"><i data-lucide="users"></i><span>Manage Admins</span></a>
+      <a href="reports.html" class="sidebar-item"><i data-lucide="alert-triangle"></i><span>Public Reports</span></a>
+      <a href="announcements.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+      <a href="traffic.html" class="sidebar-item active"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
+      <a href="analytics.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
     </nav>
-
     <div class="p-5 border-t mt-auto" style="border-color:var(--border)">
-     <button class="btn btn-ghost w-full justify-center text-sm" style="padding: 8px;" onclick="doLogout()"><i data-lucide="log-out" style="width:16px;height:16px"></i> Logout</button>
-    </div>
-   </aside>
-
-   <main class="flex-1 overflow-y-auto h-full flex flex-col">
-    <header class="flex items-center justify-between px-8 py-5 border-b" style="border-color:var(--border);background:var(--surface)">
-     <div class="flex items-center gap-3">
-      <button class="btn-ghost btn btn-sm lg:hidden" onclick="toggleSidebar()"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
-      <h1 class="font-semibold text-xl">Traffic and Road Control</h1>
-     </div>
-    </header>
-    
-    <div class="p-8 flex-1 animate-in">
-      <div class="card">
-        <h3 class="font-semibold flex items-center gap-2 mb-4">
-          <i data-lucide="traffic-cone" style="width:16px;height:16px;color:var(--warn)"></i> Master Road List
-        </h3>
-        <div style="overflow-x:auto">
-          <table>
-            <thead>
-              <tr><th>Road Name</th><th>Segment</th><th>Status</th></tr>
-            </thead>
-            <tbody id="roads-table-body">
-               </tbody>
-          </table>
+      <div class="flex items-center justify-between mb-5">
+        <div class="flex items-center gap-3">
+          <div id="nav-avatar" style="background:#2563eb;width:42px;height:42px;border-radius:50%;background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">MA</div>
+          <div><div class="text-sm font-bold text-white">Main Admin</div><div style="color:#94a3b8;font-size:11px">System Administrator</div></div>
         </div>
+        <a href="profile.html" class="text-[#94a3b8] hover:text-blue-500 transition-colors"><i data-lucide="settings" style="width:18px;height:18px"></i></a>
       </div>
+      <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white"><i data-lucide="log-out" style="width:16px;height:16px"></i> Logout</button>
     </div>
-   </main>
-  </div>
-
-  <script src="js/app.js"></script>
-  <script>
-      document.addEventListener('DOMContentLoaded', () => {
-          populateTraffic();
-          lucide.createIcons();
-      });
-  </script>
- </body>
+  </aside>
+  <main class="flex-1 overflow-y-auto"><header class="px-8 py-5 border-b" style="border-color:var(--border);background:var(--surface)"><h1 class="text-xl font-semibold text-white flex items-center gap-2"><i data-lucide="car"></i>Traffic and Road Control</h1></header><div class="p-8 animate-in"><div class="card"><h3 class="font-semibold flex items-center gap-2 mb-4"><i data-lucide="traffic-cone" style="color:var(--warn)"></i> Master Road List</h3><div style="overflow-x:auto"><table><thead><tr><th>Road Name</th><th>Segment</th><th>Status</th></tr></thead><tbody id="roads-table-body"></tbody></table></div></div></div></main>
+  <script src="js/app.js"></script><script>document.addEventListener('DOMContentLoaded', () => { populateTraffic(); lucide.createIcons(); });</script>
+</body>
 </html>
