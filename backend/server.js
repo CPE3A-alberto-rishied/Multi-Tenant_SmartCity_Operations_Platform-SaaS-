@@ -8,12 +8,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 1. Connect to MongoDB Cloud
+// 1. CLOUD DATABASE CONNECTION
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('✅ BEAT Cloud Connected'))
-    .catch(err => console.error('❌ MongoDB Connection Error:', err));
+    .catch(err => console.error('❌ MongoDB Error:', err));
 
-// 2. Define the Report Schema
+// 2. SCHEMA & MODEL
 const reportSchema = new mongoose.Schema({
     reporter_name: String,
     reporter_email: String,
@@ -24,38 +24,23 @@ const reportSchema = new mongoose.Schema({
     status: { type: String, default: 'Pending' },
     createdAt: { type: Date, default: Date.now }
 });
-
 const Report = mongoose.model('Report', reportSchema);
 
-// 3. Nodemailer Configuration
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+// 3. HOME ROUTE (Prevents "Cannot GET /" error)
+app.get('/', (req, res) => {
+    res.send('🚀 BEAT Pasig API is live and operational.');
 });
 
-// 4. The Integration Route
+// 4. THE POST ROUTE
 app.post('/api/report', async (req, res) => {
     try {
-        // Save to MongoDB Cloud
         const newReport = new Report(req.body);
         await newReport.save();
-
-        // Send Email via Nodemailer
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: process.env.ADMIN_EMAIL,
-            subject: `🚨 New BEAT Report: ${req.body.report_subject}`,
-            html: `<h3>New Incident Logged</h3>
-                   <p><strong>From:</strong> ${req.body.reporter_name}</p>
-                   <p><strong>Location:</strong> ${req.body.report_location}</p>
-                   <p><strong>Details:</strong> ${req.body.report_description}</p>`
-        };
-
-        await transporter.sendMail(mailOptions);
-        res.status(200).json({ success: true, message: 'Report saved and email sent!' });
+        res.status(200).json({ success: true });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
 });
 
-app.listen(process.env.PORT, () => console.log(`🚀 Server on port ${process.env.PORT}`));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
