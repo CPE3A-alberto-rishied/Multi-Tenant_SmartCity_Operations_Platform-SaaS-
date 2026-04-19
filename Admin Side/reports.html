@@ -89,18 +89,68 @@
       <a href="traffic.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
       <a href="analytics.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
     </nav>
-    <div class="p-5 border-t mt-auto" style="border-color:var(--border)">
-      <div class="flex items-center justify-between mb-5">
-        <div class="flex items-center gap-3">
-          <div id="nav-avatar" style="background:#2563eb;width:42px;height:42px;border-radius:50%;background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm">MA</div>
-          <div><div class="text-sm font-bold text-white">Main Admin</div><div style="color:#94a3b8;font-size:11px">System Administrator</div></div>
+    
+<div class="p-5 border-t mt-auto" style="border-color:var(--border)">
+  <button
+    class="btn btn-ghost w-full justify-center text-sm"
+    style="padding:8px;"
+    onclick="doLogout()">
+    <i data-lucide="log-out" style="width:16px;height:16px"></i>
+    Logout
+  </button>
+</div>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="flex-1 overflow-y-auto">
+    <header class="px-8 py-5 border-b"
+            style="border-color:var(--border);background:var(--surface)">
+      <h1 class="text-xl font-semibold flex items-center gap-2">
+        <i data-lucide="file-text"></i>
+        Public Reports
+      </h1>
+    </header>
+
+    <div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-6 animate-in">
+
+      <div class="card">
+        <div class="flex items-center gap-3 mb-3">
+          <i data-lucide="flame" style="color:var(--danger)"></i>
+          <h3 class="font-semibold">Fire Incident</h3>
+        </div>
+        <p style="font-size:13px;color:var(--text-dim)">
+          Fire outbreak reported in Barangay Rosario.
+        </p>
+        <span class="badge badge-red mt-3 inline-block">Critical</span>
+      </div>
+
+      <div class="card">
+        <div class="flex items-center gap-3 mb-3">
+          <i data-lucide="car-crash" style="color:var(--warn)"></i>
+          <h3 class="font-semibold">Road Accident</h3>
+        </div>
+        <p style="font-size:13px;color:var(--text-dim)">
+          Traffic collision on McArthur Highway.
+        </p>
+        <span class="badge badge-yellow mt-3 inline-block">Medium</span>
+      </div>
+
+      <div class="card">
+        <div class="flex items-center gap-3 mb-3">
+          <i data-lucide="droplet" style="color:var(--accent-light)"></i>
+          <h3 class="font-semibold">Flooding</h3>
         </div>
         <a href="profile.html" class="text-[#94a3b8] hover:text-blue-500 transition-colors"><i data-lucide="settings" style="width:18px;height:18px"></i></a>
       </div>
       <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white"><i data-lucide="log-out" style="width:16px;height:16px"></i> Logout</button>
     </div>
-  </aside>
-  <main class="flex-1 overflow-y-auto"><header class="px-8 py-5 border-b" style="border-color:var(--border);background:var(--surface)"><h1 class="text-xl font-semibold text-white">Public Reports</h1></header><div class="p-8 animate-in"><div class="text-white">Active reports content goes here.</div></div></main>
-  <script src="js/app.js"></script><script>lucide.createIcons();</script>
+  </main>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  lucide.createIcons();
+</script>
 </body>
 </html>

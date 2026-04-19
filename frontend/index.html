@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BEAT | Pasig City Dashboard</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="initial.css">
+    <style>
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .feed-item-box {
+            display: flex !important;
+            align-items: center !important;
+            padding: 18px 24px !important;
+            gap: 12px !important;
+            cursor: default !important;
+            transform: none !important;
+            transition: none !important;
+        }
+        
+        .feed-item-box:hover {
+            background: rgba(10,22,40,0.85) !important;
+            border-color: rgba(26,86,219,0.25) !important;
+            transform: none !important;
+        }
+
+        .feed-category {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            min-width: 100px;
+        }
+
+        .feed-sep {
+            color: rgba(26, 86, 219, 0.5);
+            font-weight: 300;
+            margin: 0 4px;
+        }
+
+        .btn-primary, .btn-outline {
+            transition: all 0.25s ease-in-out !important;
+        }
+
+        .btn-primary:hover {
+            background: var(--blue-light) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(26, 86, 219, 0.4);
+        }
+
+        .btn-outline:hover {
+            background: rgba(96, 165, 250, 0.1) !important;
+            border-color: var(--accent) !important;
+            transform: translateY(-2px);
+            color: var(--white) !important;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-full overflow-auto">
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-text" style="cursor:pointer;" onclick="window.location.href='index.html'">
+                B<span class="logo-dot">E</span>AT
+            </div>
+            <nav style="display:flex; gap:28px; align-items:center;" class="hidden md:flex">
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="map.html" class="nav-link">Map</a>
+                <a href="report.html" class="nav-link">Report</a>
+                <a href="news.html" class="nav-link">News</a>
+                <a href="about.html" class="nav-link">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="ticker-wrap">
+        <div class="ticker-inner">
+            <span class="ticker-item">🔵 Community Patrol Active Tonight <span class="ticker-sep">|</span></span>
+            <span class="ticker-item">📣 Town Hall Meeting — Saturday 9:00 AM <span class="ticker-sep">|</span></span>
+            <span class="ticker-item">⚠️ Road Closure on Main Ave Until Friday <span class="ticker-sep">|</span></span>
+            <span class="ticker-item">✅ New Safe Zone Established — Downtown Park <span class="ticker-sep">|</span></span>
+            <span class="ticker-item">📋 Monthly Report Published — View Now <span class="ticker-sep">|</span></span>
+            <span class="ticker-item">🔵 Community Patrol Active Tonight <span class="ticker-sep">|</span></span>
+        </div>
+    </div>
+
+    <main style="flex:1;">
+        <div id="page-home" class="hero-bg" style="display: block;">
+            <div class="grid-overlay"></div>
+            
+            <section style="padding: 60px 24px 80px 24px; position:relative; z-index:1;">
+                <div style="max-width:1200px; margin:0 auto;">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:flex-start;" class="hero-grid">
+                        <div>
+                            <div class="section-label" style="margin-bottom:12px;">Broadcast of Events, Alerts, & Traffic</div>
+                            <h1 class="section-title" style="font-size:clamp(3rem,6vw,5.5rem); line-height:0.95; margin:0 0 20px;">
+                                <span id="hero-title">BEAT</span><br>
+                                <span style="color:var(--blue);">KEEPING</span><br>
+                                <span>YOU SAFE</span>
+                            </h1>
+                            <div class="blue-line" style="margin-bottom:20px;"></div>
+                            <p id="hero-tagline" style="color:var(--gray); font-size:1rem; line-height:1.6; max-width:420px; margin-bottom:28px;">Your trusted neighborhood watch platform. Stay informed, stay safe, and connect with your community in real time.</p>
+                            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                                <button class="btn-primary" onclick="window.location.href='report.html'">Submit a Report</button>
+                                <button class="btn-outline" onclick="window.location.href='map.html'">View Live Map</button>
+                            </div>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:16px;">
+                            <div class="widget-card" style="padding: 24px 28px;">
+                                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                                    <div class="clock-date-label">Current Time</div>
+                                    <i data-lucide="clock" style="width:16px;height:16px;color:var(--blue);"></i>
+                                </div>
+                                <div style="display:flex; align-items:flex-end; gap:10px;">
+                                    <div class="clock-display" id="clock-time">12:00:00</div>
+                                    <div class="clock-ampm" id="clock-ampm" style="margin-bottom:10px;">AM</div>
+                                </div>
+                                <div style="color:var(--gray); font-size:0.85rem; margin-top:4px;" id="clock-full-date">Loading...</div>
+                            </div>
+                            <div class="widget-card" style="padding: 20px 28px 12px 28px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                                    <div>
+                                        <div class="clock-date-label">Calendar</div>
+                                        <div id="cal-month-label" style="font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:0.05em; color:var(--white);">APRIL 2026</div>
+                                    </div>
+                                    <div style="display:flex; gap:8px;">
+                                        <button onclick="prevMonth()" class="cal-nav-btn"><i data-lucide="chevron-left" style="width:14px;height:14px;"></i></button>
+                                        <button onclick="nextMonth()" class="cal-nav-btn"><i data-lucide="chevron-right" style="width:14px;height:14px;"></i></button>
+                                    </div>
+                                </div>
+                                <div style="display:grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 6px;">
+                                    <div class="cal-header">SUN</div><div class="cal-header">MON</div><div class="cal-header">TUE</div>
+                                    <div class="cal-header">WED</div><div class="cal-header">THU</div><div class="cal-header">FRI</div>
+                                    <div class="cal-header">SAT</div>
+                                </div>
+                                <div id="cal-grid" style="display:grid; grid-template-columns: repeat(7, 1fr); gap: 2px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="py-16" style="padding-left: 24px; padding-right: 24px; position:relative; z-index:1;">
+                <div style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns: 1.2fr 1fr; gap:60px;" class="hero-grid">
+                    <div>
+                        <div class="section-label" style="margin-bottom:8px;">Operational Framework</div>
+                        <h2 class="section-title" style="font-size:2.5rem; margin-bottom:12px;">URBAN VIGILANCE & RESPONSE</h2>
+                        <div class="blue-line" style="margin-bottom:24px;"></div>
+                        <div style="display:flex; flex-direction:column; gap:28px;">
+                            <div style="display:flex; gap:20px; align-items:flex-start;">
+                                <div class="step-num" style="font-family:'Bebas Neue'; font-size:2rem; color:var(--blue); opacity:0.5;">01</div>
+                                <div>
+                                    <h4 style="font-weight:700; color:white; margin-bottom:4px; font-family:'Barlow Condensed'; text-transform:uppercase;">REAL-TIME MONITORING</h4>
+                                    <p style="color:var(--gray); font-size:0.95rem; line-height:1.5;">Our dispatch teams monitor neighborhood activity 24/7 using geo-tagging technology.</p>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:20px; align-items:flex-start;">
+                                <div class="step-num" style="font-family:'Bebas Neue'; font-size:2rem; color:var(--blue); opacity:0.5;">02</div>
+                                <div>
+                                    <h4 style="font-weight:700; color:white; margin-bottom:4px; font-family:'Barlow Condensed'; text-transform:uppercase;">ANONYMOUS REPORTING</h4>
+                                    <p style="color:var(--gray); font-size:0.95rem; line-height:1.5;">Submit concerns or evidence without fear. Your privacy is protected by our secure encryption.</p>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:20px; align-items:flex-start;">
+                                <div class="step-num" style="font-family:'Bebas Neue'; font-size:2rem; color:var(--blue); opacity:0.5;">03</div>
+                                <div>
+                                    <h4 style="font-weight:700; color:white; margin-bottom:4px; font-family:'Barlow Condensed'; text-transform:uppercase;">INSTANT ALERTS</h4>
+                                    <p style="color:var(--gray); font-size:0.95rem; line-height:1.5;">Receive push notifications for road closures, weather warnings, and local safety drills.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="section-label" style="margin-bottom:8px;">Today's Real-time Metrics</div>
+                        <h2 class="section-title" style="font-size:2rem; margin-bottom:32px;">CITY LIVE STATUS</h2>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                            <div class="stat-box enlarged-card">
+                                <i data-lucide="thermometer" class="stat-icon-large" style="color:#facc15;"></i>
+                                <div class="stat-content-wrap">
+                                    <div class="stat-num-large">29°C</div>
+                                    <div class="stat-lbl-large">Temperature</div>
+                                </div>
+                            </div>
+                            <div class="stat-box enlarged-card">
+                                <i data-lucide="car" class="stat-icon-large" style="color:#facc15;"></i>
+                                <div class="stat-content-wrap">
+                                    <div class="stat-num-large">MODERATE</div>
+                                    <div class="stat-lbl-large">Traffic</div>
+                                </div>
+                            </div>
+                            <div class="stat-box enlarged-card">
+                                <i data-lucide="sun" class="stat-icon-large" style="color:#fbbf24;"></i>
+                                <div class="stat-content-wrap">
+                                    <div class="stat-num-large">SUNNY</div>
+                                    <div class="stat-lbl-large">Forecast</div>
+                                </div>
+                            </div>
+                            <div class="stat-box enlarged-card">
+                                <i data-lucide="shield-alert" class="stat-icon-large" style="color:#facc15;"></i>
+                                <div class="stat-content-wrap">
+                                    <div class="stat-num-large">12</div>
+                                    <div class="stat-lbl-large">Incidents</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="py-12" style="padding-left: 24px; padding-right: 24px; position:relative; z-index:1;">
+                <div style="max-width:1200px; margin:0 auto;">
+                    <div class="section-label" style="margin-bottom:8px; text-align:center;">Predictive Analysis</div>
+                    <h2 class="section-title" style="font-size:2.5rem; margin-bottom:12px; text-align:center;">WEEKLY WEATHER FORECAST</h2>
+                    <div class="blue-line" style="margin:0 auto 40px;"></div>
+                    
+                    <div style="display:grid; grid-template-columns: repeat(7, 1fr); gap:12px;">
+                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #fbbf24;">
+                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">MON</div>
+                            <i data-lucide="sun" style="width: 24px; height: 24px; color: #fbbf24; margin: 0 auto 10px;"></i>
+                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">31°C</div>
+                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">SUNNY</div>
+                        </div>
+                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #fbbf24;">
+                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">TUE</div>
+                            <i data-lucide="sun" style="width: 24px; height: 24px; color: #fbbf24; margin: 0 auto 10px;"></i>
+                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">32°C</div>
+                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">CLEAR</div>
+                        </div>
+                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #8899bb;">
+                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">WED</div>
+                            <i data-lucide="cloud" style="width: 24px; height: 24px; color: #8899bb; margin: 0 auto 10px;"></i>
+                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">29°C</div>
+                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">CLOUDY</div>
+                        </div>
+                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #3b7de8;">
+                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">THU</div>
+                            <i data-lucide="cloud-rain" style="width: 24px; height: 24px; color: #3b7de8; margin: 0 auto 10px;"></i>
+                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">27°C</div>
+                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">SHOWERS</div>
+                        </div>
+                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #3b7de8;">
+                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">FRI</div>
+                            <i data-lucide="cloud-lightning" style="width: 24px; height: 24px; color: #3b7de8; margin: 0 auto 10px;"></i>
+                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">26°C</div>
+                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">STORM</div>
+                        </div>
+                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #8899bb;">
+                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">SAT</div>
+                            <i data-lucide="cloud-sun" style="width: 24px; height: 24px; color: #fbbf24; margin: 0 auto 10px;"></i>
+                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">28°C</div>
+                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">PARTLY</div>
+                        </div>
+                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #fbbf24;">
+                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">SUN</div>
+                            <i data-lucide="sun" style="width: 24px; height: 24px; color: #fbbf24; margin: 0 auto 10px;"></i>
+                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">30°C</div>
+                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">SUNNY</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div style="height: 40px;"></div>
+
+            <section class="py-12" style="padding-left: 24px; padding-right: 24px; position:relative; z-index:1;">
+                <div style="max-width:1200px; margin:0 auto;">
+                    <div class="section-label" style="margin-bottom:8px; text-align:center;">Live Intelligence</div>
+                    <h2 class="section-title" style="font-size:2.5rem; margin-bottom:12px; text-align:center;">NEWS FLASH</h2>
+                    <div class="blue-line" style="margin:0 auto 40px;"></div>
+                    
+                    <div style="max-width: 850px; margin: 0 auto;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding: 0 10px;">
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <div style="width:10px; height:10px; border-radius:50%; background:#ef4444; box-shadow:0 0 10px #ef4444; animation: pulse 2s infinite;"></div>
+                                <span style="font-family:'Barlow Condensed'; font-weight:700; color:var(--accent); letter-spacing: 0.05em;">LIVE ACTIVITY FEED</span>
+                            </div>
+                            <span style="color:var(--gray); font-size:0.75rem; font-weight: 600;">OPERATIONAL: 24/7 ONLINE</span>
+                        </div>
+
+                        <div style="display:flex; flex-direction:column; gap:12px;">
+                            <div class="widget-card feed-item-box">
+                                <span class="feed-category" style="color: #fb923c;">ROAD WORK</span>
+                                <span class="feed-sep">|</span>
+                                <div style="flex-grow: 1; display: flex; align-items: center; justify-content: space-between;">
+                                    <span style="color:var(--white); font-size:1rem;">Street light outage reported in <span style="color:var(--accent); font-weight: 600;">Zone 4</span></span>
+                                    <span style="font-family:'Barlow Condensed'; font-weight: 700; color:var(--gray); font-size: 0.85rem; margin-left: 20px;">10:42 AM</span>
+                                </div>
+                            </div>
+                            <div class="widget-card feed-item-box">
+                                <span class="feed-category" style="color: #22c55e;">SECURITY</span>
+                                <span class="feed-sep">|</span>
+                                <div style="flex-grow: 1; display: flex; align-items: center; justify-content: space-between;">
+                                    <span style="color:var(--white); font-size:1rem;">Patrol unit <span style="color:var(--accent); font-weight: 600;">ALPHA-9</span> finished rounds</span>
+                                    <span style="font-family:'Barlow Condensed'; font-weight: 700; color:var(--gray); font-size: 0.85rem; margin-left: 20px;">09:15 AM</span>
+                                </div>
+                            </div>
+                            <div class="widget-card feed-item-box">
+                                <span class="feed-category" style="color: var(--blue);">TRAFFIC</span>
+                                <span class="feed-sep">|</span>
+                                <div style="flex-grow: 1; display: flex; align-items: center; justify-content: space-between;">
+                                    <span style="color:var(--white); font-size:1rem;">Traffic congestion cleared at <span style="color:var(--accent); font-weight: 600;">C5 Interchange</span></span>
+                                    <span style="font-family:'Barlow Condensed'; font-weight: 700; color:var(--gray); font-size: 0.85rem; margin-left: 20px;">08:30 AM</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 40px;">
+                            <button class="btn-primary" style="padding: 12px 36px;" onclick="window.location.href='news.html'">VIEW ALL ACTIVITY</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="py-16" style="padding-left: 24px; padding-right: 24px; position:relative; z-index:1;">
+                <div style="max-width:1200px; margin:0 auto; text-align:center;">
+                    <div class="section-label" style="margin-bottom:8px;">Emergency Response</div>
+                    <h2 class="section-title" style="font-size:2.5rem; margin-bottom:12px;">OFFICIAL PASIG CITY HOTLINES</h2>
+                    <div class="blue-line" style="margin:0 auto 48px;"></div>
+                    
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:20px; text-align:left;">
+                        <div class="widget-card" style="padding:24px; border-left: 4px solid #ef4444;">
+                            <div style="display:flex; align-items:center; gap:15px; margin-bottom:12px;">
+                                <div style="background:rgba(239,68,68,0.1); padding:10px; border-radius:8px;"><i data-lucide="phone-forwarded" style="width:24px; height:24px; color:#ef4444;"></i></div>
+                                <div style="font-family:'Bebas Neue'; font-size:1.6rem; color:white;">PASIG R.E.D.</div>
+                            </div>
+                            <p style="font-size:0.85rem; color:var(--gray); margin-bottom:12px; line-height:1.4;"><strong>Rescue Dispatch:</strong> Primary emergency line for disasters.</p>
+                            <div style="color:var(--accent); font-weight:700; font-size:1.2rem; margin-top:8px;">8643-0000</div>
+                        </div>
+                        <div class="widget-card" style="padding:24px; border-left: 4px solid #60a5fa;">
+                            <div style="display:flex; align-items:center; gap:15px; margin-bottom:12px;">
+                                <div style="background:rgba(96,165,250,0.1); padding:10px; border-radius:8px;"><i data-lucide="phone" style="width:24px; height:24px; color:#60a5fa;"></i></div>
+                                <div style="font-family:'Bebas Neue'; font-size:1.6rem; color:white;">#PASIG</div>
+                            </div>
+                            <p style="font-size:0.85rem; color:var(--gray); margin-bottom:12px; line-height:1.4;"><strong>Direct Mobile:</strong> Quick-dial hotline for mobile reporting.</p>
+                            <div style="color:var(--accent); font-weight:700; font-size:1.2rem; margin-top:8px;">#72744</div>
+                        </div>
+                        <div class="widget-card" style="padding:24px; border-left: 4px solid #ef4444;">
+                            <div style="display:flex; align-items:center; gap:15px; margin-bottom:12px;">
+                                <div style="background:rgba(239,68,68,0.1); padding:10px; border-radius:8px;"><i data-lucide="flame" style="width:24px; height:24px; color:#ef4444;"></i></div>
+                                <div style="font-family:'Bebas Neue'; font-size:1.6rem; color:white;">BFP PASIG</div>
+                            </div>
+                            <p style="font-size:0.85rem; color:var(--gray); margin-bottom:12px; line-height:1.4;"><strong>Fire Bureau:</strong> Bureau for fire incidents and safety.</p>
+                            <div style="color:var(--accent); font-weight:700; font-size:1.2rem; margin-top:8px;">8641-2815</div>
+                        </div>
+                        <div class="widget-card" style="padding:24px; border-left: 4px solid var(--blue);">
+                            <div style="display:flex; align-items:center; gap:15px; margin-bottom:12px;">
+                                <div style="background:rgba(26,86,219,0.1); padding:10px; border-radius:8px;"><i data-lucide="shield-check" style="width:24px; height:24px; color:var(--blue);"></i></div>
+                                <div style="font-family:'Bebas Neue'; font-size:1.6rem; color:white;">PASIG PNP</div>
+                            </div>
+                            <p style="font-size:0.85rem; color:var(--gray); margin-bottom:12px; line-height:1.4;"><strong>Police:</strong> Law enforcement and crimes in progress.</p>
+                            <div style="color:var(--accent); font-weight:700; font-size:1.2rem; margin-top:8px;">8477-7953</div>
+                        </div>
+                        <div class="widget-card" style="padding:24px; border-left: 4px solid #facc15;">
+                            <div style="display:flex; align-items:center; gap:15px; margin-bottom:12px;">
+                                <div style="background:rgba(250,204,21,0.1); padding:10px; border-radius:8px;"><i data-lucide="help-circle" style="width:24px; height:24px; color:#facc15;"></i></div>
+                                <div style="font-family:'Bebas Neue'; font-size:1.6rem; color:white;">CITY HALL</div>
+                            </div>
+                            <p style="font-size:0.85rem; color:var(--gray); margin-bottom:12px; line-height:1.4;"><strong>Trunkline:</strong> Connect to all City Hall departments.</p>
+                            <div style="color:var(--accent); font-weight:700; font-size:1.2rem; margin-top:8px;">8643-1111</div>
+                        </div>
+                        <div class="widget-card" style="padding:24px; border-left: 4px solid #22c55e;">
+                            <div style="display:flex; align-items:center; gap:15px; margin-bottom:12px;">
+                                <div style="background:rgba(34,197,94,0.1); padding:10px; border-radius:8px;"><i data-lucide="hospital" style="width:24px; height:24px; color:#22c55e;"></i></div>
+                                <div style="font-family:'Bebas Neue'; font-size:1.6rem; color:white;">HEALTH DEPT</div>
+                            </div>
+                            <p style="font-size:0.85rem; color:var(--gray); margin-bottom:12px; line-height:1.4;"><strong>City Health:</strong> Programs, vaccines, and public health.</p>
+                            <div style="color:var(--accent); font-weight:700; font-size:1.2rem; margin-top:8px;">8643-1111</div>
+                        </div>
+                        <div class="widget-card" style="padding:24px; border-left: 4px solid #fb923c;">
+                            <div style="display:flex; align-items:center; gap:15px; margin-bottom:12px;">
+                                <div style="background:rgba(251,146,60,0.1); padding:10px; border-radius:8px;"><i data-lucide="truck" style="width:24px; height:24px; color:#fb923c;"></i></div>
+                                <div style="font-family:'Bebas Neue'; font-size:1.6rem; color:white;">TPMO TRAFFIC</div>
+                            </div>
+                            <p style="font-size:0.85rem; color:var(--gray); margin-bottom:12px; line-height:1.4;"><strong>Traffic Management:</strong> Road violations and illegal parking.</p>
+                            <div style="color:var(--accent); font-weight:700; font-size:1.2rem; margin-top:8px;">8643-0000</div>
+                        </div>
+                        <div class="widget-card" style="padding:24px; border-left: 4px solid #a855f7;">
+                            <div style="display:flex; align-items:center; gap:15px; margin-bottom:12px;">
+                                <div style="background:rgba(168,85,247,0.1); padding:10px; border-radius:8px;"><i data-lucide="users" style="width:24px; height:24px; color:#a855f7;"></i></div>
+                                <div style="font-family:'Bebas Neue'; font-size:1.6rem; color:white;">SOCIAL WELFARE</div>
+                            </div>
+                            <p style="font-size:0.85rem; color:var(--gray); margin-bottom:12px; line-height:1.4;"><strong>P.C.S.W.D.O.:</strong> Child protection and social services.</p>
+                            <div style="color:var(--accent); font-weight:700; font-size:1.2rem; margin-top:8px;">8643-1111</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer-bg" style="padding: 60px 24px 20px;">
+        <div style="max-width:1200px; margin:0 auto;">
+            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:48px; margin-bottom:48px;" class="footer-grid">
+                <div>
+                    <div class="logo-text" style="font-size:1.8rem; margin-bottom:16px;">B<span class="logo-dot">E</span>AT</div>
+                    <p style="color:var(--gray); font-size:0.95rem; line-height:1.7; max-width:320px;">Your trusted neighborhood watch platform. Keeping communities safe through real-time updates.</p>
+                </div>
+                <div>
+                    <div class="section-label" style="margin-bottom:8px;">Navigate</div>
+                    <div class="blue-line" style="margin-bottom:20px;"></div>
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        <a href="index.html" class="nav-link">Home</a>
+                        <a href="map.html" class="nav-link">Live Map</a>
+                        <a href="report.html" class="nav-link">Report</a>
+                        <a href="news.html" class="nav-link">News</a>
+                        <a href="about.html" class="nav-link">About</a>
+                    </div>
+                </div>
+                <div>
+                    <div class="section-label" style="margin-bottom:8px;">Contact</div>
+                    <div class="blue-line" style="margin-bottom:20px;"></div>
+                    <div style="display:flex; flex-direction:column; gap:16px;">
+                        <div class="contact-item"><i data-lucide="phone" style="width:14px; height:14px; color:var(--blue);"></i> (555) 100-BEAT</div>
+                        <div class="contact-item"><i data-lucide="mail" style="width:14px; height:14px; color:var(--blue);"></i> hello@beatwatch.org</div>
+                        <div class="contact-item"><i data-lucide="map-pin" style="width:14px; height:14px; color:var(--blue);"></i> Pasig City, PH</div>
+                    </div>
+                </div>
+            </div>
+            <div style="border-top:1px solid rgba(26,86,219,0.1); padding-top:24px; text-align:center;">
+                <p id="footer-copy" style="color:rgba(136,153,187,0.4); font-size:0.8rem;">© 2026 BEAT — Block Enforcement & Alert Team. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="initial.js"></script>
+    <script>if (window.lucide) lucide.createIcons();</script>
+</body>
+</html>

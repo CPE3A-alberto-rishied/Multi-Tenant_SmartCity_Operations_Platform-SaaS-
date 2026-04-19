@@ -1,0 +1,112 @@
+function updateClock() {
+    const now = new Date();
+    let h = now.getHours();
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const s = String(now.getSeconds()).padStart(2, '0');
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    const clockTime = document.getElementById('clock-time');
+    const clockAmPm = document.getElementById('clock-ampm');
+    const clockFullDate = document.getElementById('clock-full-date');
+    if (clockTime) clockTime.textContent = `${String(h).padStart(2, '0')}:${m}:${s}`;
+    if (clockAmPm) clockAmPm.textContent = ampm;
+    const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+    if (clockFullDate) clockFullDate.textContent = now.toLocaleDateString('en-US', options);
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+function showPage(page) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+    const target = document.getElementById('page-' + page);
+    if (target) target.classList.add('active');
+    const nav = document.getElementById('nav-' + page);
+    if (nav) nav.classList.add('active');
+}
+
+let curDate = new Date();
+function renderCal() {
+    const grid = document.getElementById('cal-grid');
+    const label = document.getElementById('cal-month-label');
+    if (!grid || !label) return;
+    grid.innerHTML = '';
+    const m = curDate.getMonth();
+    const y = curDate.getFullYear();
+    const months = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+    label.textContent = `${months[m]} ${y}`;
+
+    const firstDay = new Date(y, m, 1).getDay();
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+        const d = document.createElement('div');
+        d.className = 'cal-day other-month';
+        d.style.visibility = 'hidden'; 
+        grid.appendChild(d);
+    }
+    
+    // --- FIX: Get the exact real-time date to check against ---
+    const realToday = new Date();
+
+    for (let i = 1; i <= daysInMonth; i++) {
+        const d = document.createElement('div');
+        
+        // --- FIX: Dynamically checks if the loop date matches today's real date ---
+        const isTodayHighlight = i === realToday.getDate() && m === realToday.getMonth() && y === realToday.getFullYear(); 
+        
+        d.className = 'cal-day' + (isTodayHighlight ? ' today' : '');
+        d.textContent = i;
+        grid.appendChild(d);
+    }
+    
+    const totalCurrentCells = firstDay + daysInMonth;
+    const remainingInRow = (7 - (totalCurrentCells % 7)) % 7;
+    for (let i = 1; i <= remainingInRow; i++) {
+        const d = document.createElement('div');
+        d.className = 'cal-day other-month';
+        d.style.visibility = 'hidden';
+        grid.appendChild(d);
+    }
+}
+function prevMonth() { curDate.setMonth(curDate.getMonth() - 1); renderCal(); }
+function nextMonth() { curDate.setMonth(curDate.getMonth() + 1); renderCal(); }
+renderCal();
+
+async function submitReport(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    const API_URL = 'https://beat-pasig-api.onrender.com';
+
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            document.getElementById('success-modal').style.display = 'flex'; // Shows your Green Modal
+            form.reset();
+        } else {
+            alert("Error submitting report.");
+        }
+    } catch (error) {
+        console.error("Connection Error:", error);
+        alert("Could not reach the BEAT server. Check your connection.");
+    }
+}
+
+function closeModal() {
+    const modal = document.getElementById('success-modal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+if (window.lucide) lucide.createIcons();

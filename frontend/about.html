@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BEAT | About the System</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="initial.css">
+    <style>
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
+        /* Tightened spacing */
+        .section-spacer { padding-top: 60px; padding-bottom: 60px; }
+    </style>
+</head>
+<body class="flex flex-col h-full overflow-auto">
+    
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-text" style="cursor:pointer;" onclick="window.location.href='index.html'">
+                B<span class="logo-dot">E</span>AT
+            </div>
+            <nav style="display:flex; gap:28px; align-items:center;" class="hidden md:flex">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="map.html" class="nav-link">Map</a>
+                <a href="report.html" class="nav-link">Report</a>
+                <a href="news.html" class="nav-link">News</a>
+                <a href="about.html" class="nav-link active">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <main style="flex:1; display:flex; flex-direction:column;">
+        <div class="internal-page-bg" style="flex:1;">
+            <div class="grid-overlay"></div>
+            
+            <div style="position:relative; z-index:1; padding: 20px 24px; min-height: 85vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <div style="max-width:1100px; margin:0 auto; text-align:center;">
+                    <div class="section-label" style="letter-spacing: 0.3em; color:var(--blue); margin-bottom: 8px;">SaaS ARCHITECTURE</div>
+                    <h1 class="section-title" style="font-size:clamp(2.5rem, 6vw, 5rem); line-height:1; margin:0 0 24px;">
+                        B.E.A.T. PASIG<br>COMMUNITY INTELLIGENCE
+                    </h1>
+                    <p style="color:var(--gray); font-size:1.1rem; max-width:900px; margin:0 auto; line-height:1.7; opacity:0.9;">
+                        The Broadcast of Events, Alerts, & Traffic (B.E.A.T.) is a centralized software-as-a-service platform engineered to bridge the gap between Pasig City residents and emergency responders. By utilizing high-integrity data logistics and a distributed reporting framework, the system transforms community vigilance into actionable, real-time intelligence for city-wide administration.
+                    </p>
+                    
+                    <div style="margin-top: 50px; animation: bounce 2s infinite;">
+                        <i data-lucide="chevron-down" style="color:var(--blue); margin: 0 auto; width: 32px; height: 32px;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-spacer" style="position:relative; z-index:1; padding-left: 24px; padding-right: 24px;">
+                <div style="max-width:1200px; margin:0 auto;">
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:30px;">
+                        <div class="widget-card" style="padding:40px; text-align:left; border-left:4px solid var(--blue);">
+                            <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                                <i data-lucide="target" style="color:var(--blue); width:28px; height:28px;"></i>
+                                <h2 style="font-family:'Bebas Neue'; font-size:2.2rem; color:white; letter-spacing:0.05em;">MISSION</h2>
+                            </div>
+                            <p style="color:var(--gray); line-height:1.6;">To build a secure, high-integrity reporting pipeline that ensures community concerns reach the Pasig Command Center with zero latency.</p>
+                        </div>
+                        <div class="widget-card" style="padding:40px; text-align:left; border-left:4px solid var(--blue);">
+                            <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                                <i data-lucide="eye" style="color:var(--blue); width:28px; height:28px;"></i>
+                                <h2 style="font-family:'Bebas Neue'; font-size:2.2rem; color:white; letter-spacing:0.05em;">VISION</h2>
+                            </div>
+                            <p style="color:var(--gray); line-height:1.6;">To set the standard for smart-city safety initiatives, leveraging advanced engineering to cultivate a safer, more connected urban environment.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-spacer" style="position:relative; z-index:1; padding-left: 24px; padding-right: 24px;">
+                <div style="max-width:1200px; margin:0 auto;">
+                    <div class="section-label" style="color:var(--blue); text-align: center; margin-bottom: 8px;">SYSTEM CAPABILITIES</div>
+                    <h2 class="section-title" style="font-size:3rem; margin-bottom:40px; text-align: center;">CORE FEATURES</h2>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:20px;">
+                        <div class="widget-card" style="padding:30px;">
+                            <i data-lucide="shield-alert" style="color:var(--blue); margin-bottom:15px;"></i>
+                            <h4 style="font-family:'Barlow Condensed'; font-weight:700; color:white; font-size:1.3rem; margin-bottom:8px; text-transform:uppercase;">Incident Reporting</h4>
+                            <p style="font-size:0.9rem; color:var(--gray);">Encrypted submission portal for reporting public hazards and security concerns directly to authorities.</p>
+                        </div>
+                        <div class="widget-card" style="padding:30px;">
+                            <i data-lucide="map-pin" style="color:var(--blue); margin-bottom:15px;"></i>
+                            <h4 style="font-family:'Barlow Condensed'; font-weight:700; color:white; font-size:1.3rem; margin-bottom:8px; text-transform:uppercase;">Geo-Tagged Alerts</h4>
+                            <p style="font-size:0.9rem; color:var(--gray);">Precise location-based broadcasting that ensures residents receive time-sensitive alerts for their specific zone.</p>
+                        </div>
+                        <div class="widget-card" style="padding:30px;">
+                            <i data-lucide="activity" style="color:var(--blue); margin-bottom:15px;"></i>
+                            <h4 style="font-family:'Barlow Condensed'; font-weight:700; color:white; font-size:1.3rem; margin-bottom:8px; text-transform:uppercase;">Live Status Feed</h4>
+                            <p style="font-size:0.9rem; color:var(--gray);">A centralized dashboard monitoring city metrics, weather conditions, and community patrol updates.</p>
+                        </div>
+                        <div class="widget-card" style="padding:30px;">
+                            <i data-lucide="database" style="color:var(--blue); margin-bottom:15px;"></i>
+                            <h4 style="font-family:'Barlow Condensed'; font-weight:700; color:white; font-size:1.3rem; margin-bottom:8px; text-transform:uppercase;">Secure Data Logs</h4>
+                            <p style="font-size:0.9rem; color:var(--gray);">High-integrity relational database management ensuring all community reports are securely archived and trackable.</p>
+                        </div>
+                        <div class="widget-card" style="padding:30px;">
+                            <i data-lucide="smartphone" style="color:var(--blue); margin-bottom:15px;"></i>
+                            <h4 style="font-family:'Barlow Condensed'; font-weight:700; color:white; font-size:1.3rem; margin-bottom:8px; text-transform:uppercase;">Mobile Optimization</h4>
+                            <p style="font-size:0.9rem; color:var(--gray);">Fully responsive interface designed for rapid reporting on-the-go across all mobile and tablet devices.</p>
+                        </div>
+                        <div class="widget-card" style="padding:30px;">
+                            <i data-lucide="clock" style="color:var(--blue); margin-bottom:15px;"></i>
+                            <h4 style="font-family:'Barlow Condensed'; font-weight:700; color:white; font-size:1.3rem; margin-bottom:8px; text-transform:uppercase;">24/7 Availability</h4>
+                            <p style="font-size:0.9rem; color:var(--gray);">Automated system uptime monitoring to ensure the command interface remains operational at all times.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-spacer" style="position:relative; z-index:1; padding-left: 24px; padding-right: 24px;">
+                <div style="max-width:1200px; margin:0 auto;">
+                    <div class="section-label" style="color:var(--blue); text-align: center; margin-bottom: 8px;">DEVELOPMENT TEAM</div>
+                    <h2 class="section-title" style="font-size:3rem; margin-bottom:40px; text-align: center;">THE ENGINEERING BOARD</h2>
+                    <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:15px;" class="hero-grid">
+                        <div class="widget-card" style="padding:25px 10px; text-align:center;">
+                            <div style="width:90px; height:90px; border-radius:50%; overflow:hidden; margin:0 auto 15px; border:2px solid var(--blue);">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?fit=crop&w=200&h=200" alt="Alberto" style="width:100%; height:100%; object-fit:cover;">
+                            </div>
+                            <h4 style="font-family:'Bebas Neue'; font-size:1.3rem; color:white; line-height:1.1;">RISHIED S.<br>ALBERTO</h4>
+                            <p style="font-size:0.65rem; color:var(--blue); font-weight:700; margin-top:5px; text-transform:uppercase;">Computer Engineer</p>
+                        </div>
+                        <div class="widget-card" style="padding:25px 10px; text-align:center;">
+                            <div style="width:90px; height:90px; border-radius:50%; overflow:hidden; margin:0 auto 15px; border:2px solid var(--blue);">
+                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?fit=crop&w=200&h=200" alt="Atibagos" style="width:100%; height:100%; object-fit:cover;">
+                            </div>
+                            <h4 style="font-family:'Bebas Neue'; font-size:1.3rem; color:white; line-height:1.1;">RAFAEL PHILIP S.<br>ATIBAGOS</h4>
+                            <p style="font-size:0.65rem; color:var(--blue); font-weight:700; margin-top:5px; text-transform:uppercase;">Computer Engineer</p>
+                        </div>
+                        <div class="widget-card" style="padding:25px 10px; text-align:center;">
+                            <div style="width:90px; height:90px; border-radius:50%; overflow:hidden; margin:0 auto 15px; border:2px solid var(--blue);">
+                                <img src="2x2_DEL ROSARIO.png" alt="Del Rosario" style="width:100%; height:100%; object-fit:cover;">
+                            </div>
+                            <h4 style="font-family:'Bebas Neue'; font-size:1.3rem; color:white; line-height:1.1;">THARA D.<br>DEL ROSARIO</h4>
+                            <p style="font-size:0.65rem; color:var(--blue); font-weight:700; margin-top:5px; text-transform:uppercase;">Computer Engineer</p>
+                        </div>
+                        <div class="widget-card" style="padding:25px 10px; text-align:center;">
+                            <div style="width:90px; height:90px; border-radius:50%; overflow:hidden; margin:0 auto 15px; border:2px solid var(--blue);">
+                                <img src="2x2_Migallos.png" alt="Migallos" style="width:100%; height:100%; object-fit:cover;">
+                            </div>
+                            <h4 style="font-family:'Bebas Neue'; font-size:1.3rem; color:white; line-height:1.1;">ARVIN N.<br>MIGALLOS</h4>
+                            <p style="font-size:0.65rem; color:var(--blue); font-weight:700; margin-top:5px; text-transform:uppercase;">Computer Engineer</p>
+                        </div>
+                        <div class="widget-card" style="padding:25px 10px; text-align:center;">
+                            <div style="width:90px; height:90px; border-radius:50%; overflow:hidden; margin:0 auto 15px; border:2px solid var(--blue);">
+                                <img src="id 2x2.png" alt="Trinidad" style="width:100%; height:100%; object-fit:cover;">
+                            </div>
+                            <h4 style="font-family:'Bebas Neue'; font-size:1.3rem; color:white; line-height:1.1;">JEFHANIE BIANCA P.<br>TRINIDAD</h4>
+                            <p style="font-size:0.65rem; color:var(--blue); font-weight:700; margin-top:5px; text-transform:uppercase;">Computer Engineer</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer-bg" style="padding: 60px 24px 20px;">
+        <div style="max-width:1200px; margin:0 auto;">
+            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:48px; margin-bottom:48px;" class="footer-grid">
+                <div>
+                    <div class="logo-text" style="font-size:1.8rem; margin-bottom:16px;">B<span class="logo-dot">E</span>AT</div>
+                    <p style="color:var(--gray); font-size:0.95rem; line-height:1.7; max-width:320px;">Your trusted neighborhood watch platform. Keeping communities safe through real-time updates.</p>
+                </div>
+                <div>
+                    <div class="section-label" style="margin-bottom:8px;">Navigate</div>
+                    <div class="blue-line" style="margin-bottom:20px;"></div>
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        <a href="index.html" class="nav-link">Home</a>
+                        <span class="nav-link">Live Map</span>
+                        <a href="report.html" class="nav-link">Report</a>
+                        <a href="news.html" class="nav-link">News</a>
+                        <a href="about.html" class="nav-link">About</a>
+                    </div>
+                </div>
+                <div>
+                    <div class="section-label" style="margin-bottom:8px;">Contact</div>
+                    <div class="blue-line" style="margin-bottom:20px;"></div>
+                    <div style="display:flex; flex-direction:column; gap:16px;">
+                        <div class="contact-item"><i data-lucide="phone" style="width:14px; height:14px; color:var(--blue);"></i> (555) 100-BEAT</div>
+                        <div class="contact-item"><i data-lucide="mail" style="width:14px; height:14px; color:var(--blue);"></i> hello@beatwatch.org</div>
+                        <div class="contact-item"><i data-lucide="map-pin" style="width:14px; height:14px; color:var(--blue);"></i> Pasig City, PH</div>
+                    </div>
+                </div>
+            </div>
+            <div style="border-top:1px solid rgba(26,86,219,0.1); padding-top:24px; text-align:center;">
+                <p id="footer-copy" style="color:rgba(136,153,187,0.4); font-size:0.8rem;">© 2026 BEAT — Block Enforcement & Alert Team. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>if (window.lucide) lucide.createIcons();</script>
+</body>
+</html>

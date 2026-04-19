@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BEAT | Report An Incident</title>
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="initial.css">
+</head>
+<body class="flex flex-col h-full overflow-auto">
+    
+    <header style="background: rgba(5,10,20,0.97); border-bottom: 1px solid rgba(26,86,219,0.25); position:sticky; top:0; z-index:100; backdrop-filter:blur(12px);">
+        <div style="max-width:1200px; margin:0 auto; padding: 0 24px; display:flex; align-items:center; justify-content:space-between; height:64px;">
+            <div class="logo-text" style="cursor:pointer;" onclick="window.location.href='index.html'">B<span class="logo-dot">E</span>AT</div>
+            <nav style="display:flex; gap:28px; align-items:center;" class="hidden md:flex">
+                <a href="index.html" class="nav-link">HOME</a>
+                <a href="map.html" class="nav-link">Map</a>
+                <a href="report.html" class="nav-link active">REPORT</a>
+                <a href="news.html" class="nav-link">NEWS</a>
+                <a href="about.html" class="nav-link">ABOUT</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="ticker-wrap" style="padding: 6px 0; position: relative; z-index: 2;">
+        <div class="ticker-inner">
+            <span class="ticker-item">🔵 B.E.A.T. PASIG SYSTEM FULLY OPERATIONAL <span class="ticker-sep">|</span></span>
+            <span class="ticker-item">📣 Town Hall Meeting — Saturday 9:00 AM <span class="ticker-sep">|</span></span>
+            <span class="ticker-item">⚠️ Road Closure on Main Ave Until Friday <span class="ticker-sep">|</span></span>
+            <span class="ticker-item">✅ New Safe Zone Established — Downtown Park <span class="ticker-sep">|</span></span>
+            <span class="ticker-item">📋 Monthly Report Published — View Now <span class="ticker-sep">|</span></span>
+            <span class="ticker-item">🔵 B.E.A.T. PASIG SYSTEM FULLY OPERATIONAL <span class="ticker-sep">|</span></span>
+        </div>
+    </div>
+
+    <main style="flex:1; display:flex; flex-direction:column;">
+        <div class="internal-page-bg" style="flex:1;">
+            <div class="grid-overlay"></div>
+            
+            <div style="position:relative; z-index:1; padding: 60px 24px;">
+                <div style="max-width:850px; margin:0 auto;">
+                    <div class="section-label">WE HEAR YOU</div>
+                    <h1 class="section-title" style="font-size:3.5rem; margin-bottom:4px; text-transform: uppercase;">REPORT YOUR CONCERN</h1>
+                    <div class="blue-line" style="margin-bottom:20px;"></div>
+                    <p style="color:var(--gray); font-size:0.95rem; margin-bottom:40px; opacity: 0.8;">Your report helps keep the community safe. All submissions are reviewed within 24 hours.</p>
+
+                    <form id="report-form" class="flex flex-col gap-8" novalidate onsubmit="submitReport(event)">
+                        <div class="form-grid">
+                            <div>
+                                <label class="report-field-label">YOUR NAME</label>
+                                <input name="reporter_name" class="report-field-input" type="text" placeholder="Full name" required>
+                            </div>
+                            <div>
+                                <label class="report-field-label">EMAIL ADDRESS</label>
+                                <input name="reporter_email" class="report-field-input" type="email" placeholder="email@example.com" required>
+                                <div class="invalid-feedback">Enter a valid email</div>
+                            </div>
+                        </div>
+                        <div class="form-grid">
+                            <div>
+                                <label class="report-field-label">SUBJECT OF THE REPORT</label>
+                                <input name="report_subject" class="report-field-input" type="text" placeholder="e.g. Broken street light, Traffic obstruction" required>
+                            </div>
+                            <div>
+                                <label class="report-field-label">CONTACT NUMBER</label>
+                                <input name="contact_number" class="report-field-input" type="tel" pattern="[0-9]+" placeholder="e.g. 09123456789" required>
+                                <div class="invalid-feedback">Input numbers only</div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="report-field-label">LOCATION / ADDRESS OF THE ISSUE</label>
+                            <input name="report_location" class="report-field-input" type="text" placeholder="Street address or landmark" required>
+                        </div>
+                        <div>
+                            <label class="report-field-label">DESCRIPTION</label>
+                            <textarea name="report_description" class="report-field-input" rows="6" placeholder="Describe the incident in detail..." required></textarea>
+                        </div>
+                        <div style="display:flex; gap:16px;">
+                            <button type="submit" class="btn-primary">SUBMIT REPORT</button>
+                            <button type="button" class="btn-outline" onclick="document.getElementById('report-form').classList.remove('was-validated'); document.getElementById('report-form').reset();">CLEAR FORM</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer-bg" style="padding: 60px 24px 20px;">
+        <div style="max-width:1200px; margin:0 auto;">
+            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:48px; margin-bottom:48px;" class="footer-grid">
+                <div>
+                    <div class="logo-text" style="font-size:1.8rem; margin-bottom:16px;">B<span class="logo-dot">E</span>AT</div>
+                    <p id="footer-tagline" style="color:var(--gray); font-size:0.95rem; line-height:1.7; max-width:320px;">Your trusted neighborhood watch platform. Keeping communities safe through real-time updates.</p>
+                </div>
+                <div>
+                    <div class="section-label" style="margin-bottom:8px;">Navigate</div>
+                    <div class="blue-line" style="margin-bottom:20px;"></div>
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        <a href="index.html" class="nav-link">Home</a>
+                        <span class="nav-link">Live Map</span>
+                        <a href="report.html" class="nav-link">Report</a>
+                        <a href="news.html" class="nav-link">News</a>
+                        <a href="about.html" class="nav-link">About</a>
+                    </div>
+                </div>
+                <div>
+                    <div class="section-label" style="margin-bottom:8px;">Contact</div>
+                    <div class="blue-line" style="margin-bottom:20px;"></div>
+                    <div style="display:flex; flex-direction:column; gap:16px;">
+                        <div class="contact-item"><i data-lucide="phone" style="width:14px; height:14px; color:var(--blue);"></i> (555) 100-BEAT</div>
+                        <div class="contact-item"><i data-lucide="mail" style="width:14px; height:14px; color:var(--blue);"></i> hello@beatwatch.org</div>
+                        <div class="contact-item"><i data-lucide="map-pin" style="width:14px; height:14px; color:var(--blue);"></i> Pasig City, PH</div>
+                    </div>
+                </div>
+            </div>
+            <div style="border-top:1px solid rgba(26,86,219,0.1); padding-top:24px; text-align:center;">
+                <p id="footer-copy" style="color:rgba(136,153,187,0.4); font-size:0.8rem;">© 2026 BEAT — Block Enforcement & Alert Team. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="success-modal" class="modal-overlay">
+        <div class="modal-content widget-card">
+            <div style="background: rgba(34,197,94,0.1); width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
+                <i data-lucide="check-circle-2" style="width: 36px; height: 36px; color: #22c55e;"></i>
+            </div>
+            <h3 style="font-family: 'Bebas Neue'; font-size: 2.2rem; color: white; margin-bottom: 8px; letter-spacing: 0.05em;">CONCERN REPORTED</h3>
+            <p style="color: var(--gray); font-size: 0.95rem; margin-bottom: 32px; line-height: 1.5;">Thank you for your vigilance. Your incident report has been securely logged with the Pasig Administration.</p>
+            <button type="button" class="btn-primary" style="background: #22c55e; color: #050a14; padding-left: 40px; padding-right: 40px;" onclick="closeModal()">ACKNOWLEDGE</button>
+        </div>
+    </div>
+
+    <script>if (window.lucide) lucide.createIcons();</script>
+    <script src="initial.js"></script>
+</body>
+</html>

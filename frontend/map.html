@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BEAT | Live Community Map</title>
+    
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="initial.css">
+
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
+
+    <style>
+        .map-container {
+            height: calc(100vh - 64px); 
+            position: relative;
+            background: #070d19;
+            overflow: hidden;
+            display: flex;
+            width: 100%;
+        }
+        
+        #map { 
+            position: absolute; 
+            top: 0; 
+            bottom: 0; 
+            width: 100%; 
+            z-index: 1; 
+        }
+
+        /* --- DESKTOP STYLES --- */
+        .map-overlay-panel {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            z-index: 10; 
+            width: 360px;
+            background: rgba(10, 22, 40, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(26, 86, 219, 0.4);
+            border-radius: 12px;
+            padding: 32px;
+            max-height: calc(100% - 60px);
+            overflow-y: auto;
+        }
+        
+        .map-legend {
+            position: absolute;
+            bottom: 40px;
+            right: 30px;
+            z-index: 10; 
+            background: rgba(10, 22, 40, 0.95);
+            border: 1px solid rgba(26, 86, 219, 0.4);
+            border-radius: 8px;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 24px;
+        }
+        
+        .legend-header {
+            grid-column: span 2;
+            margin-bottom: 10px;
+        }
+        
+        .barangay-select {
+            width: 100%;
+            background: rgba(5, 10, 20, 0.8);
+            border: 1px solid var(--blue);
+            color: white;
+            padding: 14px;
+            font-size: 1rem;
+            border-radius: 6px;
+            font-family: 'Barlow Condensed';
+            text-transform: uppercase;
+            outline: none;
+            margin-top: 10px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.85rem;
+            color: var(--white);
+            font-family: 'Barlow Condensed';
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .dot { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 10px currentColor; flex-shrink: 0; }
+        
+        .mapboxgl-popup-content {
+            padding: 10px 14px;
+            border-radius: 6px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        /* --- UPDATED: MOBILE RESPONSIVE STYLES (LIGHTER & SMALLER) --- */
+        @media (max-width: 768px) {
+            .map-overlay-panel {
+                top: 10px;
+                left: 10px;
+                width: 280px; /* Much smaller width */
+                padding: 16px; /* Reduced padding */
+                
+                /* Frosted glass effect: lighter opacity + blur */
+                background: rgba(10, 22, 40, 0.7); 
+                backdrop-filter: blur(8px); 
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+                border: 1px solid rgba(96, 165, 250, 0.2);
+            }
+            
+            .map-overlay-panel .section-title {
+                font-size: 1.4rem !important; /* Smaller title */
+                margin-bottom: 10px !important;
+            }
+
+            .map-overlay-panel .section-label {
+                font-size: 0.65rem !important;
+            }
+
+            .barangay-select {
+                padding: 10px; /* Smaller dropdown box */
+                font-size: 0.85rem;
+            }
+
+            .map-legend {
+                bottom: 15px;
+                left: 10px;
+                right: 10px;
+                width: calc(100% - 20px);
+                padding: 12px 16px;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+                
+                /* Frosted glass effect */
+                background: rgba(10, 22, 40, 0.7); 
+                backdrop-filter: blur(8px);
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+                border: 1px solid rgba(96, 165, 250, 0.2);
+            }
+
+            .legend-header {
+                grid-column: span 3;
+                margin-bottom: 2px;
+            }
+
+            .legend-item {
+                font-size: 0.65rem; /* Smaller text */
+                gap: 6px; /* Tighter spacing */
+            }
+
+            .dot {
+                width: 8px; /* Micro dots */
+                height: 8px;
+            }
+
+            .mobile-hide {
+                display: none !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .map-legend {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .legend-header {
+                grid-column: span 2;
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col h-full overflow-hidden">
+    
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-text" style="cursor:pointer;" onclick="window.location.href='index.html'">
+                B<span class="logo-dot">E</span>AT
+            </div>
+            <nav style="display:flex; gap:28px; align-items:center;" class="hidden md:flex">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="map.html" class="nav-link active">Map</a>
+                <a href="report.html" class="nav-link">Report</a>
+                <a href="news.html" class="nav-link">News</a>
+                <a href="about.html" class="nav-link">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="map-container">
+        
+        <div id="map"></div>
+
+        <div class="grid-overlay" style="z-index: 2; pointer-events: none;"></div>
+
+        <div class="map-overlay-panel">
+            <div class="section-label" style="margin-bottom: 12px; letter-spacing: 0.2em;">GEOSPATIAL NAVIGATOR</div>
+            <h2 class="section-title" style="font-size: 2.2rem; margin-bottom: 24px;">JUMP TO DISTRICT</h2>
+            
+            <label class="report-field-label" style="font-size: 0.75rem;">SELECT PASIG BARANGAY</label>
+            <select class="barangay-select" onchange="zoomToBarangay(this.value)">
+                <option value="">-- ALL DISTRICTS --</option>
+                <option value="bagong-ilog">Bagong Ilog</option>
+                <option value="kapasigan">Kapasigan</option>
+                <option value="kapitolyo">Kapitolyo</option>
+                <option value="manggahan">Manggahan</option>
+                <option value="pinagbuhatan">Pinagbuhatan</option>
+                <option value="rosario">Rosario</option>
+                <option value="san-joaquin">San Joaquin</option>
+                <option value="ugong">Ugong</option>
+                <option value="pineda">Pineda</option>
+                <option value="santa-lucia">Santa Lucia</option>
+                <option value="caniogan">Caniogan</option>
+            </select>
+
+            <div class="mobile-hide" style="margin-top: 40px; border-top: 1px solid rgba(26, 86, 219, 0.2); padding-top: 1.5rem;">
+                <div class="section-label" style="font-size: 0.65rem; margin: 20px 0 15px;">LIVE SYSTEM STATS</div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                    <span style="color: var(--gray); font-size: 0.9rem; font-family: 'Barlow Condensed';">ACTIVE PATROLS</span>
+                    <span id="active-patrols-count" style="color: var(--blue); font-weight: 700; font-family: 'Bebas Neue'; font-size: 1.2rem;">08</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--gray); font-size: 0.9rem; font-family: 'Barlow Condensed';">SECURE ZONES</span>
+                    <span id="secure-zones-count" style="color: #22c55e; font-weight: 700; font-family: 'Bebas Neue'; font-size: 1.2rem;">24</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="map-legend">
+            <div class="legend-header">
+                <div class="section-label" style="font-size: 0.7rem; letter-spacing: 0.15em;">MAP LEGEND</div>
+            </div>
+            
+            <div class="legend-item"><span class="dot" style="color: #4ade80; background: #4ade80;"></span> SMOOTH FLOW</div>
+            <div class="legend-item"><span class="dot" style="color: #facc15; background: #facc15;"></span> MODERATE</div>
+            <div class="legend-item"><span class="dot" style="color: #f87171; background: #f87171;"></span> HEAVY/STALL</div>
+            <div class="legend-item"><span class="dot" style="color: #334155; background: #334155;"></span> CLOSED</div>
+
+            <div class="legend-item"><span class="dot" style="color: #3b82f6; background: #3b82f6;"></span> FLOOD</div>
+            <div class="legend-item"><span class="dot" style="color: #94a3b8; background: #94a3b8;"></span> POTHOLE</div>
+            <div class="legend-item"><span class="dot" style="color: #f97316; background: #f97316;"></span> FIRE</div>
+        </div>
+    </main>
+
+    <script>
+        if (window.lucide) lucide.createIcons();
+
+        mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag';
+        
+        const map = new mapboxgl.Map({
+            container: 'map', 
+            style: 'mapbox://styles/mapbox/dark-v11', 
+            center: [121.0825, 14.5764], 
+            zoom: 12.5,
+            pitch: 45
+        });
+
+        map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+        map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
+
+        map.on('load', () => {
+            
+            // 1. Load Pasig GeoJSON
+            map.addSource('pasig-barangays', {
+                type: 'geojson',
+                data: './pasig_boundaries.geojson' 
+            });
+
+            // 2. Load Live Traffic API Vector Tiles
+            map.addSource('live-traffic', {
+                type: 'vector',
+                url: 'mapbox://mapbox.mapbox-traffic-v1'
+            });
+
+            // 3. Highlight Layer (Hidden initially)
+            map.addLayer({
+                'id': 'barangay-highlight',
+                'type': 'fill',
+                'source': 'pasig-barangays',
+                'paint': {
+                    'fill-color': '#d946ef', 
+                    'fill-opacity': 0.45 
+                },
+                'filter': ['==', 'name', ''] 
+            });
+
+            // 4. Draw Live Traffic Lines
+            map.addLayer({
+                'id': 'traffic-lines',
+                'type': 'line',
+                'source': 'live-traffic',
+                'source-layer': 'traffic',
+                'paint': {
+                    'line-width': 3,
+                    'line-color': [
+                        'match',
+                        ['get', 'congestion'],
+                        'low', '#4ade80',      // Smooth Flow
+                        'moderate', '#facc15', // Moderate
+                        'heavy', '#f87171',    // Heavy
+                        'severe', '#334155',   // Closed/Severe
+                        'transparent'          // Fallback for empty roads
+                    ]
+                }
+            });
+
+            // 5. Draw Barangay Borders
+            map.addLayer({
+                'id': 'barangay-borders',
+                'type': 'line',
+                'source': 'pasig-barangays',
+                'paint': {
+                    'line-color': '#06b6d4', 
+                    'line-width': 4,
+                    'line-opacity': 0.9 
+                }
+            });
+
+            // 6. Draw 3D Buildings
+            map.addLayer({
+                'id': '3d-buildings',
+                'source': 'composite',
+                'source-layer': 'building',
+                'filter': ['==', 'extrude', 'true'],
+                'type': 'fill-extrusion',
+                'minzoom': 14, 
+                'paint': {
+                    'fill-extrusion-color': '#1e293b', 
+                    'fill-extrusion-height': ['get', 'height'],
+                    'fill-extrusion-base': ['get', 'min_height'],
+                    'fill-extrusion-opacity': 0.8
+                }
+            });
+        });
+
+        // Hover Tooltips
+        const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false });
+
+        map.on('mouseenter', 'barangay-borders', () => {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        map.on('mouseleave', 'barangay-borders', () => {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+        });
+
+        map.on('mousemove', 'barangay-borders', (e) => {
+            const coordinates = e.lngLat;
+            popup.setLngLat(coordinates)
+                 .setHTML(`<div style="color: black; font-family: 'Barlow Condensed'; font-weight: bold; font-size: 14px;">PASIG GRID: ${coordinates.lng.toFixed(4)}, ${coordinates.lat.toFixed(4)}</div>`)
+                 .addTo(map);
+        });
+
+        // Dropdown Data Dictionary
+        const barangayData = {
+            'bagong-ilog': { name: 'Bagong Ilog', center: [121.0689, 14.5652], zoom: 14.5 },
+            'kapasigan': { name: 'Kapasigan', center: [121.0741, 14.5644], zoom: 15 },
+            'kapitolyo': { name: 'Kapitolyo', center: [121.0592, 14.5712], zoom: 14.5 },
+            'manggahan': { name: 'Manggahan', center: [121.0992, 14.6038], zoom: 14 },
+            'pinagbuhatan': { name: 'Pinagbuhatan', center: [121.0909, 14.5572], zoom: 13.5 },
+            'rosario': { name: 'Rosario', center: [121.0882, 14.5904], zoom: 14 },
+            'san-joaquin': { name: 'San Joaquin', center: [121.0757, 14.5522], zoom: 15 },
+            'ugong': { name: 'Ugong', center: [121.0732, 14.5841], zoom: 14 },
+            'pineda': { name: 'Pineda', center: [121.0595, 14.5665], zoom: 15 },
+            'santa-lucia': { name: 'Santa Lucia', center: [121.1013, 14.5842], zoom: 14.5 },
+            'caniogan': { name: 'Caniogan', center: [121.0805, 14.5719], zoom: 14.5 }
+        };
+
+        function zoomToBarangay(val) {
+            const statusText = document.querySelector('p[style*="Bebas Neue"]');
+            
+            if (!val) {
+                map.setFilter('barangay-highlight', ['==', 'name', '']);
+                map.flyTo({ center: [121.0825, 14.5764], zoom: 12.5, pitch: 45, essential: true });
+                if(statusText) {
+                    statusText.innerText = "MONITORING ALL DISTRICTS";
+                    statusText.style.color = "var(--white)";
+                }
+                return;
+            }
+
+            const selectedData = barangayData[val];
+            map.setFilter('barangay-highlight', ['==', 'name', selectedData.name]);
+
+            map.flyTo({
+                center: selectedData.center,
+                zoom: selectedData.zoom,
+                pitch: 60, 
+                speed: 1.2,
+                curve: 1.5,
+                essential: true
+            });
+
+            if(statusText) {
+                statusText.innerText = "LOCATING " + selectedData.name.toUpperCase() + "...";
+                statusText.style.color = "#3b7de8"; 
+            }
+        }
+        
+        // Polling script for Live System Stats
+        async function updateSystemStats() {
+            try {
+                const response = await fetch('get_stats.php');
+                const data = await response.json();
+                const formatNum = (num) => num.toString().padStart(2, '0');
+
+                document.getElementById('active-patrols-count').innerText = formatNum(data.active_patrols);
+                document.getElementById('secure-zones-count').innerText = formatNum(data.secure_zones);
+            } catch (error) {
+                // Fails silently if get_stats.php is not setup yet
+            }
+        }
+        
+        updateSystemStats();
+        setInterval(updateSystemStats, 5000);
+    </script>
+</body>
+</html>
