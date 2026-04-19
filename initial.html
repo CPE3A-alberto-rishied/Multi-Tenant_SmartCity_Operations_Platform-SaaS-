@@ -182,27 +182,31 @@
                         <div class="section-label" style="margin-bottom:8px;">Today's Real-time Metrics</div>
                         <h2 class="section-title" style="font-size:2rem; margin-bottom:32px;">CITY LIVE STATUS</h2>
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                            
                             <div class="stat-box enlarged-card">
-                                <i data-lucide="thermometer" class="stat-icon-large" style="color:#facc15;"></i>
+                                <i id="current-weather-icon" data-lucide="thermometer" class="stat-icon-large" style="color:#facc15;"></i>
                                 <div class="stat-content-wrap">
-                                    <div class="stat-num-large">29°C</div>
+                                    <div id="current-temp" class="stat-num-large">--°C</div>
                                     <div class="stat-lbl-large">Temperature</div>
                                 </div>
                             </div>
+                            
                             <div class="stat-box enlarged-card">
                                 <i data-lucide="car" class="stat-icon-large" style="color:#facc15;"></i>
                                 <div class="stat-content-wrap">
-                                    <div class="stat-num-large">MODERATE</div>
+                                    <div class="stat-num-large" style="font-size: 1.5rem;">MODERATE</div>
                                     <div class="stat-lbl-large">Traffic</div>
                                 </div>
                             </div>
+                            
                             <div class="stat-box enlarged-card">
-                                <i data-lucide="sun" class="stat-icon-large" style="color:#fbbf24;"></i>
+                                <i id="current-condition-icon" data-lucide="sun" class="stat-icon-large" style="color:#fbbf24;"></i>
                                 <div class="stat-content-wrap">
-                                    <div class="stat-num-large">SUNNY</div>
+                                    <div id="current-desc" class="stat-num-large" style="font-size: 1.5rem;">LOADING</div>
                                     <div class="stat-lbl-large">Forecast</div>
                                 </div>
                             </div>
+                            
                             <div class="stat-box enlarged-card">
                                 <i data-lucide="shield-alert" class="stat-icon-large" style="color:#facc15;"></i>
                                 <div class="stat-content-wrap">
@@ -221,50 +225,8 @@
                     <h2 class="section-title" style="font-size:2.5rem; margin-bottom:12px; text-align:center;">WEEKLY WEATHER FORECAST</h2>
                     <div class="blue-line" style="margin:0 auto 40px;"></div>
                     
-                    <div style="display:grid; grid-template-columns: repeat(7, 1fr); gap:12px;">
-                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #fbbf24;">
-                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">MON</div>
-                            <i data-lucide="sun" style="width: 24px; height: 24px; color: #fbbf24; margin: 0 auto 10px;"></i>
-                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">31°C</div>
-                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">SUNNY</div>
+                    <div id="forecast-container" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:12px;">
                         </div>
-                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #fbbf24;">
-                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">TUE</div>
-                            <i data-lucide="sun" style="width: 24px; height: 24px; color: #fbbf24; margin: 0 auto 10px;"></i>
-                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">32°C</div>
-                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">CLEAR</div>
-                        </div>
-                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #8899bb;">
-                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">WED</div>
-                            <i data-lucide="cloud" style="width: 24px; height: 24px; color: #8899bb; margin: 0 auto 10px;"></i>
-                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">29°C</div>
-                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">CLOUDY</div>
-                        </div>
-                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #3b7de8;">
-                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">THU</div>
-                            <i data-lucide="cloud-rain" style="width: 24px; height: 24px; color: #3b7de8; margin: 0 auto 10px;"></i>
-                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">27°C</div>
-                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">SHOWERS</div>
-                        </div>
-                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #3b7de8;">
-                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">FRI</div>
-                            <i data-lucide="cloud-lightning" style="width: 24px; height: 24px; color: #3b7de8; margin: 0 auto 10px;"></i>
-                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">26°C</div>
-                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">STORM</div>
-                        </div>
-                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #8899bb;">
-                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">SAT</div>
-                            <i data-lucide="cloud-sun" style="width: 24px; height: 24px; color: #fbbf24; margin: 0 auto 10px;"></i>
-                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">28°C</div>
-                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">PARTLY</div>
-                        </div>
-                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #fbbf24;">
-                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">SUN</div>
-                            <i data-lucide="sun" style="width: 24px; height: 24px; color: #fbbf24; margin: 0 auto 10px;"></i>
-                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">30°C</div>
-                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">SUNNY</div>
-                        </div>
-                    </div>
                 </div>
             </section>
 
@@ -431,6 +393,85 @@
     </footer>
 
     <script src="initial.js"></script>
-    <script>if (window.lucide) lucide.createIcons();</script>
+    <script>
+        if (window.lucide) lucide.createIcons();
+
+        // 1. Helper function to translate API Weather Codes to Lucide Icons and Text
+        function getWeatherStyle(wmoCode) {
+            if (wmoCode === 0) return { text: 'CLEAR', icon: 'sun', color: '#fbbf24' };
+            if (wmoCode >= 1 && wmoCode <= 3) return { text: 'CLOUDY', icon: 'cloud-sun', color: '#fbbf24' };
+            if (wmoCode >= 45 && wmoCode <= 55) return { text: 'RAIN', icon: 'cloud-rain', color: '#3b7de8' };
+            if (wmoCode >= 61 && wmoCode <= 67) return { text: 'SHOWERS', icon: 'cloud-rain', color: '#3b7de8' };
+            if (wmoCode >= 80 && wmoCode <= 82) return { text: 'STORM', icon: 'cloud-lightning', color: '#ef4444' };
+            if (wmoCode >= 95 && wmoCode <= 99) return { text: 'THUNDER', icon: 'cloud-lightning', color: '#ef4444' };
+            return { text: 'CLOUDY', icon: 'cloud', color: '#8899bb' };
+        }
+
+        // 2. Fetch data from Open-Meteo for Pasig City
+        async function fetchLiveWeather() {
+            try {
+                // Fetch current + 7-day daily max temp and weather codes for Pasig
+                const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=14.5764&longitude=121.0825&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max&timezone=Asia%2FManila');
+                const data = await response.json();
+
+                // --- UPDATE CURRENT WEATHER ---
+                const currentTemp = Math.round(data.current.temperature_2m);
+                const currentStyle = getWeatherStyle(data.current.weather_code);
+
+                document.getElementById('current-temp').innerText = `${currentTemp}°C`;
+                document.getElementById('current-desc').innerText = currentStyle.text;
+                
+                // Update icons (we set the data-lucide attribute, then re-render)
+                const weatherIcon = document.getElementById('current-weather-icon');
+                const conditionIcon = document.getElementById('current-condition-icon');
+                
+                if (weatherIcon && conditionIcon) {
+                    weatherIcon.setAttribute('data-lucide', currentStyle.icon);
+                    weatherIcon.style.color = currentStyle.color;
+                    conditionIcon.setAttribute('data-lucide', currentStyle.icon);
+                    conditionIcon.style.color = currentStyle.color;
+                }
+
+                // --- UPDATE 7-DAY FORECAST ---
+                const forecastContainer = document.getElementById('forecast-container');
+                if (forecastContainer) {
+                    forecastContainer.innerHTML = ''; // Clear any existing items
+                    
+                    const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+                    for (let i = 0; i < 7; i++) {
+                        // Get the day of the week for this specific forecast day
+                        const dateObj = new Date(data.daily.time[i]);
+                        const dayName = daysOfWeek[dateObj.getDay()];
+                        
+                        const temp = Math.round(data.daily.temperature_2m_max[i]);
+                        const style = getWeatherStyle(data.daily.weather_code[i]);
+
+                        // Create the HTML card
+                        const cardHtml = `
+                            <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid ${style.color};">
+                                <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">${dayName}</div>
+                                <i data-lucide="${style.icon}" style="width: 24px; height: 24px; color: ${style.color}; margin: 0 auto 10px;"></i>
+                                <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">${temp}°C</div>
+                                <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">${style.text}</div>
+                            </div>
+                        `;
+                        forecastContainer.innerHTML += cardHtml;
+                    }
+                }
+
+                // Tell Lucide to draw the new icons we just injected
+                if (window.lucide) lucide.createIcons();
+
+            } catch (error) {
+                console.error("Failed to load weather data:", error);
+                const descElement = document.getElementById('current-desc');
+                if (descElement) descElement.innerText = "ERROR";
+            }
+        }
+
+        // Run the function when the page loads
+        fetchLiveWeather();
+    </script>
 </body>
 </html>
