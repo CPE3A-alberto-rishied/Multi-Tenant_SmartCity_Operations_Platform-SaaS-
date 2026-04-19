@@ -68,7 +68,6 @@ function prevMonth() { curDate.setMonth(curDate.getMonth() - 1); renderCal(); }
 function nextMonth() { curDate.setMonth(curDate.getMonth() + 1); renderCal(); }
 renderCal();
 
-// Updated async function to bridge front-end to back-end
 async function submitReport(e) {
     e.preventDefault();
     const form = e.target;
@@ -78,30 +77,30 @@ async function submitReport(e) {
         return; 
     }
     
-    // Create FormData object to send to PHP
-    const formData = new FormData(form);
-    
+    const data = {
+        name: form.querySelector('input[placeholder="Full name"]').value,
+        email: form.querySelector('input[type="email"]').value,
+        subject: form.querySelector('input[placeholder*="Broken street light"]').value,
+        contact: form.querySelector('input[type="tel"]').value,
+        address: form.querySelector('input[placeholder="Street address or landmark"]').value,
+        description: form.querySelector('textarea').value
+    };
+
     try {
-        const response = await fetch('process_report.php', {
+        const response = await fetch('http://localhost:3000/api/report', {
             method: 'POST',
-            body: formData
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
         });
-        
+
         const result = await response.json();
-        
-        if (result.status === 'success') {
-            const modal = document.getElementById('success-modal');
-            if (modal) {
-                modal.classList.add('active');
-            }
-            form.classList.remove('was-validated');
+        if (result.success) {
+            document.getElementById('success-modal').classList.add('active'); //
             form.reset();
-        } else {
-            alert("System Error: " + result.message);
+            form.classList.remove('was-validated');
         }
-    } catch (error) {
-        console.error("Submission failed:", error);
-        alert("Network error: Could not reach the Command Center.");
+    } catch (err) {
+        console.error("Connection failed:", err);
     }
 }
 
