@@ -32,6 +32,7 @@
             z-index: 1; 
         }
 
+        /* --- DESKTOP STYLES --- */
         .map-overlay-panel {
             position: absolute;
             top: 30px;
@@ -43,6 +44,8 @@
             border: 1px solid rgba(26, 86, 219, 0.4);
             border-radius: 12px;
             padding: 32px;
+            max-height: calc(100% - 60px);
+            overflow-y: auto;
         }
         
         .map-legend {
@@ -89,12 +92,86 @@
             text-transform: uppercase;
         }
         
-        .dot { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 10px currentColor; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 10px currentColor; flex-shrink: 0; }
         
         .mapboxgl-popup-content {
             padding: 10px 14px;
             border-radius: 6px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        /* --- UPDATED: MOBILE RESPONSIVE STYLES (LIGHTER & SMALLER) --- */
+        @media (max-width: 768px) {
+            .map-overlay-panel {
+                top: 10px;
+                left: 10px;
+                width: 280px; /* Much smaller width */
+                padding: 16px; /* Reduced padding */
+                
+                /* Frosted glass effect: lighter opacity + blur */
+                background: rgba(10, 22, 40, 0.7); 
+                backdrop-filter: blur(8px); 
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+                border: 1px solid rgba(96, 165, 250, 0.2);
+            }
+            
+            .map-overlay-panel .section-title {
+                font-size: 1.4rem !important; /* Smaller title */
+                margin-bottom: 10px !important;
+            }
+
+            .map-overlay-panel .section-label {
+                font-size: 0.65rem !important;
+            }
+
+            .barangay-select {
+                padding: 10px; /* Smaller dropdown box */
+                font-size: 0.85rem;
+            }
+
+            .map-legend {
+                bottom: 15px;
+                left: 10px;
+                right: 10px;
+                width: calc(100% - 20px);
+                padding: 12px 16px;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+                
+                /* Frosted glass effect */
+                background: rgba(10, 22, 40, 0.7); 
+                backdrop-filter: blur(8px);
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+                border: 1px solid rgba(96, 165, 250, 0.2);
+            }
+
+            .legend-header {
+                grid-column: span 3;
+                margin-bottom: 2px;
+            }
+
+            .legend-item {
+                font-size: 0.65rem; /* Smaller text */
+                gap: 6px; /* Tighter spacing */
+            }
+
+            .dot {
+                width: 8px; /* Micro dots */
+                height: 8px;
+            }
+
+            .mobile-hide {
+                display: none !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .map-legend {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .legend-header {
+                grid-column: span 2;
+            }
         }
     </style>
 </head>
@@ -141,15 +218,15 @@
                 <option value="caniogan">Caniogan</option>
             </select>
 
-            <div style="margin-top: 40px; border-top: 1px solid rgba(26, 86, 219, 0.2); padding-top: 1.5rem;">
+            <div class="mobile-hide" style="margin-top: 40px; border-top: 1px solid rgba(26, 86, 219, 0.2); padding-top: 1.5rem;">
                 <div class="section-label" style="font-size: 0.65rem; margin: 20px 0 15px;">LIVE SYSTEM STATS</div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
                     <span style="color: var(--gray); font-size: 0.9rem; font-family: 'Barlow Condensed';">ACTIVE PATROLS</span>
-                    <span style="color: var(--blue); font-weight: 700; font-family: 'Bebas Neue'; font-size: 1.2rem;">08</span>
+                    <span id="active-patrols-count" style="color: var(--blue); font-weight: 700; font-family: 'Bebas Neue'; font-size: 1.2rem;">08</span>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
                     <span style="color: var(--gray); font-size: 0.9rem; font-family: 'Barlow Condensed';">SECURE ZONES</span>
-                    <span style="color: #22c55e; font-weight: 700; font-family: 'Bebas Neue'; font-size: 1.2rem;">24</span>
+                    <span id="secure-zones-count" style="color: #22c55e; font-weight: 700; font-family: 'Bebas Neue'; font-size: 1.2rem;">24</span>
                 </div>
             </div>
         </div>
@@ -206,8 +283,8 @@
                 'type': 'fill',
                 'source': 'pasig-barangays',
                 'paint': {
-                    'fill-color': '#3b82f6', 
-                    'fill-opacity': 0.35 
+                    'fill-color': '#d946ef', 
+                    'fill-opacity': 0.45 
                 },
                 'filter': ['==', 'name', ''] 
             });
@@ -238,13 +315,8 @@
                 'type': 'line',
                 'source': 'pasig-barangays',
                 'paint': {
-                    // Changed from neon green to a distinct Neon Cyan
-                    'line-color': '#d946ef', 
-                    
-                    // Increased thickness from 2 to 4
+                    'line-color': '#06b6d4', 
                     'line-width': 4,
-                    
-                    // Optional: Adds a slight blur/glow effect to the edges
                     'line-opacity': 0.9 
                 }
             });
@@ -330,6 +402,23 @@
                 statusText.style.color = "#3b7de8"; 
             }
         }
+        
+        // Polling script for Live System Stats
+        async function updateSystemStats() {
+            try {
+                const response = await fetch('get_stats.php');
+                const data = await response.json();
+                const formatNum = (num) => num.toString().padStart(2, '0');
+
+                document.getElementById('active-patrols-count').innerText = formatNum(data.active_patrols);
+                document.getElementById('secure-zones-count').innerText = formatNum(data.secure_zones);
+            } catch (error) {
+                // Fails silently if get_stats.php is not setup yet
+            }
+        }
+        
+        updateSystemStats();
+        setInterval(updateSystemStats, 5000);
     </script>
 </body>
 </html>
