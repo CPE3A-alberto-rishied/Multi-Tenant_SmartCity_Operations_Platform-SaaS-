@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BEAT - Admin Control Center</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/styles2.css">
+ </head>
+ <body class="h-full">
+  
+  <div id="app" class="flex h-full" style="display:none">
+   <aside id="sidebar" class="sidebar">
+    <div class="p-5 border-b" style="border-color:var(--border)">
+     <div class="flex items-center gap-3">
+      <div style="background:var(--accent);width:36px;height:36px;border-radius:10px" class="flex items-center justify-center font-mono font-bold text-white text-sm">B</div>
+      <div>
+       <div class="font-mono font-bold text-lg tracking-wider" id="app-title-display">BEAT</div>
+       <div style="color:var(--text-dim);font-size:11px">Admin Control Center</div>
+      </div>
+     </div>
+    </div>
+    <nav class="flex-1 py-3 overflow-y-auto" id="nav-list"></nav>
+    <div class="p-4 border-t" style="border-color:var(--border)">
+     <div class="flex items-center gap-3 mb-3">
+      <div style="background:var(--accent);width:32px;height:32px;border-radius:50%" class="flex items-center justify-center text-white text-xs font-bold">MA</div>
+      <div>
+       <div class="text-sm font-semibold">Main Admin</div>
+       <div style="color:var(--text-dim);font-size:11px">System Administrator</div>
+      </div>
+     </div>
+     <button class="btn btn-ghost w-full justify-center" onclick="doLogout()"><i data-lucide="log-out" style="width:14px;height:14px"></i> Logout</button>
+    </div>
+   </aside>
+   
+   <main class="flex-1 overflow-y-auto h-full">
+    <header class="flex items-center justify-between px-6 py-4 border-b" style="border-color:var(--border);background:var(--surface)">
+     <div class="flex items-center gap-3">
+      <button class="btn-ghost btn btn-sm lg:hidden" onclick="toggleSidebar()"><i data-lucide="menu" style="width:18px;height:18px"></i></button>
+      <h1 id="page-title" class="font-semibold text-lg"></h1>
+     </div>
+    </header>
+    
+    <div id="page-content" class="p-6"></div>
+   </main>
+  </div>
+
+  <div id="login-screen" class="h-full flex flex-col items-center justify-center" style="background:linear-gradient(135deg,#0a0e1a 0%,#1a1f3a 25%,#0f1428 50%,#1a254a 75%,#0a0e1a 100%);position:relative;overflow:hidden">
+   <svg style="position:absolute;width:100%;height:100%;top:0;left:0;pointer-events:none;opacity:0.4" preserveaspectratio="xMidYMid slice" viewbox="0 0 1200 800">
+    <defs>
+     <pattern id="grid" width="40" height="40" patternunits="userspaceonuse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="#2563eb" stroke-width="0.5" opacity="0.3" /></pattern>
+     <lineargradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#2563eb;stop-opacity:0.2" /><stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.2" /></lineargradient>
+     <lineargradient id="grad2" x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#1d4ed8;stop-opacity:0.15" /><stop offset="100%" style="stop-color:#5b21b6;stop-opacity:0.15" /></lineargradient>
+     <filter id="blur1"><fegaussianblur in="SourceGraphic" stddeviation="3" /></filter>
+     <filter id="blur2"><fegaussianblur in="SourceGraphic" stddeviation="2" /></filter>
+    </defs>
+    <rect width="1200" height="800" fill="url(#grid)" /> 
+    <circle cx="150" cy="150" r="120" fill="url(#grad1)" filter="url(#blur1)" style="animation:float1 15s ease-in-out infinite" /> 
+    <circle cx="1050" cy="650" r="140" fill="url(#grad2)" filter="url(#blur1)" style="animation:float2 18s ease-in-out infinite" /> 
+    <circle cx="600" cy="400" r="80" fill="url(#grad1)" filter="url(#blur2)" style="animation:float3 20s ease-in-out infinite;opacity:0.6" />
+   </svg>
+
+   <div style="position:relative;z-index:10;text-align:center;margin-bottom:40px">
+    <div style="background:var(--accent);width:56px;height:56px;border-radius:14px;margin:0 auto 8px" class="flex items-center justify-center font-mono font-bold text-white text-xl">B</div>
+    <h1 class="font-mono font-bold tracking-widest" style="font-size:36px;margin:0 0 2px 0">BEAT</h1>
+    <p style="color:var(--text-dim);font-size:14px;margin:0">Administrative Control System</p>
+   </div>
+
+   <div class="card glow" style="width:400px;max-width:90%;position:relative;z-index:10">
+    <form id="login-form" onsubmit="handleLogin(event)">
+     <div class="mb-5">
+      <label class="block text-sm font-semibold mb-2" style="color:var(--text-dim)">ID NUMBER</label>
+      <div style="position:relative;display:flex;flex-direction:column">
+       <i data-lucide="hash" style="position:absolute;left:14px;top:12px;width:18px;height:18px;color:var(--text-dim);pointer-events:none"></i>
+       <input id="login-user" type="text" placeholder="Enter your ID number" style="padding:12px 14px 12px 42px;font-size:15px" required>
+      </div>
+     </div>
+     <div class="mb-5">
+      <label class="block text-sm font-semibold mb-2" style="color:var(--text-dim)">DEPARTMENT</label>
+      <select id="login-dept" style="padding:12px 14px;font-size:15px">
+       <option value="main">Main Admin</option>
+       <option value="traffic">Traffic Department</option>
+      </select>
+     </div>
+     <div class="mb-6">
+      <label class="block text-sm font-semibold mb-2" style="color:var(--text-dim)">PASSWORD</label>
+      <div style="position:relative;display:flex;flex-direction:column">
+       <i data-lucide="lock" style="position:absolute;left:14px;top:12px;width:18px;height:18px;color:var(--text-dim);pointer-events:none"></i>
+       <input id="login-pass" type="password" placeholder="Enter password" style="padding:12px 42px 12px 42px;font-size:15px" required>
+      </div>
+     </div>
+     <button type="submit" class="btn btn-primary w-full justify-center py-3" style="font-size:15px">Sign In</button>
+    </form>
+   </div>
+  </div>
+  
+  <div id="toast" class="toast" style="display:none"></div>
+
+  <script src="js/app.js"></script>
+ </body>
+</html>

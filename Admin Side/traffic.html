@@ -1,0 +1,35 @@
+<div class="animate-in">
+  <div class="card">
+    <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+      <h3 class="font-semibold flex items-center gap-2">
+        <i data-lucide="traffic-cone" style="width:16px;height:16px;color:var(--warn)"></i> Master Road List
+      </h3>
+      <button class="btn btn-ghost btn-sm" onclick="resetAllRoads()">
+        <i data-lucide="refresh-cw" style="width:14px;height:14px"></i> Reset to Auto
+      </button>
+    </div>
+    
+    <div class="mb-3 flex gap-3 flex-wrap" style="font-size:11px;color:var(--text-dim)">
+      <span>🟢 Open</span>
+      <span>🟡 Slow</span>
+      <span>🔴 Heavy</span>
+      <span>🔵 Event</span>
+      <span>⚫ Closed</span>
+    </div>
+    
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Road Name</th>
+            <th>Segment</th>
+            <th>Status</th>
+            <th>Control</th>
+          </tr>
+        </thead>
+        <tbody id="roads-table">
+           </tbody>
+      </table>
+    </div>
+  </div>
+</div>

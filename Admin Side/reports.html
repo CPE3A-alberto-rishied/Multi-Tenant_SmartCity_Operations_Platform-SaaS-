@@ -1,0 +1,16 @@
+<div class="animate-in">
+  <div class="mb-6 flex items-center justify-between flex-wrap gap-3">
+    <div class="flex gap-2 flex-wrap">
+      <input type="date" id="date-filter" onchange="changeSortByDate(this.value)" style="width:auto;padding:8px 12px;font-size:13px">
+      <select onchange="changeSortByStatus(this.value)" style="width:auto;padding:8px 12px;font-size:13px">
+        <option value="all">All Status</option>
+        <option value="New">New</option>
+        <option value="Forwarded">Forwarded</option>
+        <option value="Resolved">Resolved</option>
+      </select>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="navigateTo('reports-manual')"><i data-lucide="plus" style="width:14px;height:14px"></i> New Report</button>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    </div>
+</div>
