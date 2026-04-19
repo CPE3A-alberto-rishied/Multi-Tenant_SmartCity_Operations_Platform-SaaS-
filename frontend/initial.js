@@ -72,29 +72,28 @@ async function submitReport(event) {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
-    
-    // Convert FormData to JSON
     const data = Object.fromEntries(formData.entries());
 
+    // REPLACE THIS URL with your actual Render URL (e.g., https://beat-pasig-api.onrender.com)
+    const API_URL = 'https://beat-pasig-api.onrender.com/api/report';
+
     try {
-        const response = await fetch('http://localhost:3000/api/report', {
+        const response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
 
         const result = await response.json();
-        
         if (result.success) {
-            // Trigger your Success Modal defined in report.html
-            document.getElementById('success-modal').classList.add('active');
+            document.getElementById('success-modal').style.display = 'flex'; // Shows your Green Modal
             form.reset();
         } else {
-            alert('Something went wrong. Please try again.');
+            alert("Error submitting report.");
         }
     } catch (error) {
-        console.error('Error:', error);
-        alert('Could not connect to the server.');
+        console.error("Connection Error:", error);
+        alert("Could not reach the BEAT server. Check your connection.");
     }
 }
 
