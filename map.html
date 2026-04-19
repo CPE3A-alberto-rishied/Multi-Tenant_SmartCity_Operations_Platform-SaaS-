@@ -16,7 +16,7 @@
 
     <style>
         .map-container {
-            height: calc(100vh - 64px); /* Full height minus the header only */
+            height: calc(100vh - 64px); 
             position: relative;
             background: #070d19;
             overflow: hidden;
@@ -24,20 +24,19 @@
             width: 100%;
         }
         
-        /* 1. Added Mapbox Container Style */
         #map { 
             position: absolute; 
             top: 0; 
             bottom: 0; 
             width: 100%; 
-            z-index: 1; /* Places the map behind the UI */
+            z-index: 1; 
         }
 
         .map-overlay-panel {
             position: absolute;
             top: 30px;
             left: 30px;
-            z-index: 10; /* Ensures UI stays on top of the map */
+            z-index: 10; 
             width: 360px;
             background: rgba(10, 22, 40, 0.95);
             backdrop-filter: blur(12px);
@@ -50,7 +49,7 @@
             position: absolute;
             bottom: 40px;
             right: 30px;
-            z-index: 10; /* Ensures UI stays on top of the map */
+            z-index: 10; 
             background: rgba(10, 22, 40, 0.95);
             border: 1px solid rgba(26, 86, 219, 0.4);
             border-radius: 8px;
@@ -91,6 +90,12 @@
         }
         
         .dot { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 10px currentColor; }
+        
+        .mapboxgl-popup-content {
+            padding: 10px 14px;
+            border-radius: 6px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body class="flex flex-col h-full overflow-hidden">
@@ -166,42 +171,164 @@
     </main>
 
     <script>
-        // Initialize Icons
         if (window.lucide) lucide.createIcons();
 
-        // 5. Initialize the Mapbox Map
         mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag';
         
         const map = new mapboxgl.Map({
-            container: 'map', // Points to the id="map" div
+            container: 'map', 
             style: 'mapbox://styles/mapbox/dark-v11', 
             center: [121.0825, 14.5764], 
-            zoom: 12.5 
+            zoom: 12.5,
+            pitch: 45
         });
 
-        // 6. Draw GeoJSON Borders on Load
+        map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+        map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
+
         map.on('load', () => {
+            
+            // 1. Load Pasig GeoJSON
             map.addSource('pasig-barangays', {
                 type: 'geojson',
                 data: './pasig_boundaries.geojson' 
             });
 
+            // 2. Load Live Traffic API Vector Tiles
+            map.addSource('live-traffic', {
+                type: 'vector',
+                url: 'mapbox://mapbox.mapbox-traffic-v1'
+            });
+
+            // 3. Highlight Layer (Hidden initially)
+            map.addLayer({
+                'id': 'barangay-highlight',
+                'type': 'fill',
+                'source': 'pasig-barangays',
+                'paint': {
+                    'fill-color': '#3b82f6', 
+                    'fill-opacity': 0.35 
+                },
+                'filter': ['==', 'name', ''] 
+            });
+
+            // 4. Draw Live Traffic Lines
+            map.addLayer({
+                'id': 'traffic-lines',
+                'type': 'line',
+                'source': 'live-traffic',
+                'source-layer': 'traffic',
+                'paint': {
+                    'line-width': 3,
+                    'line-color': [
+                        'match',
+                        ['get', 'congestion'],
+                        'low', '#4ade80',      // Smooth Flow
+                        'moderate', '#facc15', // Moderate
+                        'heavy', '#f87171',    // Heavy
+                        'severe', '#334155',   // Closed/Severe
+                        'transparent'          // Fallback for empty roads
+                    ]
+                }
+            });
+
+            // 5. Draw Barangay Borders
             map.addLayer({
                 'id': 'barangay-borders',
                 'type': 'line',
                 'source': 'pasig-barangays',
                 'paint': {
-                    'line-color': '#00ff00', 
-                    'line-width': 2
+                    // Changed from neon green to a distinct Neon Cyan
+                    'line-color': '#3b82f6', 
+                    
+                    // Increased thickness from 2 to 4
+                    'line-width': 4,
+                    
+                    // Optional: Adds a slight blur/glow effect to the edges
+                    'line-opacity': 0.9 
+                }
+            });
+
+            // 6. Draw 3D Buildings
+            map.addLayer({
+                'id': '3d-buildings',
+                'source': 'composite',
+                'source-layer': 'building',
+                'filter': ['==', 'extrude', 'true'],
+                'type': 'fill-extrusion',
+                'minzoom': 14, 
+                'paint': {
+                    'fill-extrusion-color': '#1e293b', 
+                    'fill-extrusion-height': ['get', 'height'],
+                    'fill-extrusion-base': ['get', 'min_height'],
+                    'fill-extrusion-opacity': 0.8
                 }
             });
         });
 
-        // 7. Temporary function for the dropdown menu
+        // Hover Tooltips
+        const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false });
+
+        map.on('mouseenter', 'barangay-borders', () => {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        map.on('mouseleave', 'barangay-borders', () => {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
+        });
+
+        map.on('mousemove', 'barangay-borders', (e) => {
+            const coordinates = e.lngLat;
+            popup.setLngLat(coordinates)
+                 .setHTML(`<div style="color: black; font-family: 'Barlow Condensed'; font-weight: bold; font-size: 14px;">PASIG GRID: ${coordinates.lng.toFixed(4)}, ${coordinates.lat.toFixed(4)}</div>`)
+                 .addTo(map);
+        });
+
+        // Dropdown Data Dictionary
+        const barangayData = {
+            'bagong-ilog': { name: 'Bagong Ilog', center: [121.0689, 14.5652], zoom: 14.5 },
+            'kapasigan': { name: 'Kapasigan', center: [121.0741, 14.5644], zoom: 15 },
+            'kapitolyo': { name: 'Kapitolyo', center: [121.0592, 14.5712], zoom: 14.5 },
+            'manggahan': { name: 'Manggahan', center: [121.0992, 14.6038], zoom: 14 },
+            'pinagbuhatan': { name: 'Pinagbuhatan', center: [121.0909, 14.5572], zoom: 13.5 },
+            'rosario': { name: 'Rosario', center: [121.0882, 14.5904], zoom: 14 },
+            'san-joaquin': { name: 'San Joaquin', center: [121.0757, 14.5522], zoom: 15 },
+            'ugong': { name: 'Ugong', center: [121.0732, 14.5841], zoom: 14 },
+            'pineda': { name: 'Pineda', center: [121.0595, 14.5665], zoom: 15 },
+            'santa-lucia': { name: 'Santa Lucia', center: [121.1013, 14.5842], zoom: 14.5 },
+            'caniogan': { name: 'Caniogan', center: [121.0805, 14.5719], zoom: 14.5 }
+        };
+
         function zoomToBarangay(val) {
-            if (!val) return;
-            console.log("Feature pending: Fly to " + val);
-            // Once you get the coordinates for each barangay, you can use:
+            const statusText = document.querySelector('p[style*="Bebas Neue"]');
+            
+            if (!val) {
+                map.setFilter('barangay-highlight', ['==', 'name', '']);
+                map.flyTo({ center: [121.0825, 14.5764], zoom: 12.5, pitch: 45, essential: true });
+                if(statusText) {
+                    statusText.innerText = "MONITORING ALL DISTRICTS";
+                    statusText.style.color = "var(--white)";
+                }
+                return;
+            }
+
+            const selectedData = barangayData[val];
+            map.setFilter('barangay-highlight', ['==', 'name', selectedData.name]);
+
+            map.flyTo({
+                center: selectedData.center,
+                zoom: selectedData.zoom,
+                pitch: 60, 
+                speed: 1.2,
+                curve: 1.5,
+                essential: true
+            });
+
+            if(statusText) {
+                statusText.innerText = "LOCATING " + selectedData.name.toUpperCase() + "...";
+                statusText.style.color = "#3b7de8"; 
+            }
         }
     </script>
 </body>
