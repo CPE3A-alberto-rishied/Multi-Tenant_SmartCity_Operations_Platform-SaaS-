@@ -76,15 +76,22 @@ renderCal();
 
 // Function to handle form submission
 // Function to handle the incident report submission
+// Keep your clock and calendar functions at the top as they are
+
 async function submitReport(event) {
-    event.preventDefault(); 
-    
+    event.preventDefault();
     const form = event.target;
+
+    // 1. Validate all 'required' and 'pattern' attributes
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
     try {
-        // Points to your Render backend
         const response = await fetch('https://beat-pasig-api.onrender.com/api/report', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -94,28 +101,23 @@ async function submitReport(event) {
         const result = await response.json();
 
         if (result.success) {
-            // ✅ 1. SHOW THE SUCCESS MODAL
+            // 2. Force the Success Modal to appear
             const modal = document.getElementById('success-modal');
             if (modal) {
-                modal.style.display = 'flex';
+                modal.style.setProperty('display', 'flex', 'important');
+                modal.style.zIndex = "9999";
             }
-            
-            // ✅ 2. RESET THE FORM
             form.reset();
-            form.classList.remove('was-validated'); 
         } else {
-            alert("Submission failed: " + result.error);
+            alert("Error: " + result.error);
         }
     } catch (error) {
-        console.error("Connection Error:", error);
-        alert("Failed to connect to the BEAT server. Please check your internet.");
+        console.error("Fetch error:", error);
+        alert("Failed to reach server. Check your connection.");
     }
 }
 
-// Function to manually close the success modal
 function closeModal() {
     const modal = document.getElementById('success-modal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
+    if (modal) modal.style.display = 'none';
 }
