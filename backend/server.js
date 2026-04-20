@@ -84,6 +84,16 @@ app.post('/api/report', async (req, res) => {
         if (!res.headersSent) res.status(500).json({ success: false, error: error.message });
     }
 });
+
+// GET Route for Admin Reports
+app.get('/api/reports/all', async (req, res) => {
+    try {
+        const reports = await Report.find().sort({ createdAt: -1 }); // Newest first
+        res.status(200).json({ success: true, data: reports });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
 // 1. ADMIN SCHEMA
 // 1. Add OTP fields to the Schema
 const adminSchema = new mongoose.Schema({
