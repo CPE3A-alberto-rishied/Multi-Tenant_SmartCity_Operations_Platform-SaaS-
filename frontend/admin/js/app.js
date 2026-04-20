@@ -429,65 +429,69 @@ function cancelStatusChange() {
 // REPORTS PAGE SPECIFIC LOGIC
 // ==========================================
 
-function openReportDetails(card) {
-    if(!card) return;
-    
-    const title = card.querySelector('h3').innerText;
-    const badge = card.querySelector('.badge-status');
-    const dateText = card.querySelector('.report-date').innerText;
-    const timeText = card.querySelector('.report-date').nextElementSibling.innerText;
-    const pTags = card.querySelectorAll('.space-y-1 p');
-    let name = "Unknown", loc = "Unknown";
-    if(pTags.length >= 2) {
-        name = pTags[0].querySelector('span:nth-child(2)').innerText;
-        loc = pTags[1].querySelector('span:nth-child(2)').innerText;
+// REPLACE your existing openReportDetails(card) with this
+async function openReportDetails(reportId) {
+    try {
+        // Fetch the specific report details from your Render API
+        const response = await fetch(`https://beat-pasig-api.onrender.com/api/reports/${reportId}`);
+        const result = await response.json();
+
+        if (result.success) {
+            const report = result.data;
+            const dateObj = new Date(report.createdAt);
+            
+            // Populate the modal fields using ID
+            document.getElementById('modal-detail-title').innerText = report.report_subject;
+            document.getElementById('modal-detail-name').innerText = report.reporter_name;
+            document.getElementById('modal-detail-email').innerText = report.reporter_email;
+            document.getElementById('modal-detail-contact').innerText = report.contact_number;
+            document.getElementById('modal-detail-location').innerText = report.report_location;
+            document.getElementById('modal-detail-desc').innerText = report.report_description;
+            document.getElementById('modal-detail-forwarded').innerText = report.forwarded_to || "No assigned department";
+
+            // Handle the Status Badge
+            const modalBadge = document.getElementById('modal-detail-status');
+            modalBadge.innerText = report.status || 'NEW';
+            
+            // Handle Return Reason
+            const modalReturnBox = document.getElementById('modal-detail-return-box');
+            if (report.status === 'Returned' && report.return_reason) {
+                document.getElementById('modal-detail-return-reason').innerText = report.return_reason;
+                modalReturnBox.classList.remove('hidden');
+            } else {
+                modalReturnBox.classList.add('hidden');
+            }
+
+            openModal('view-report-modal');
+        }
+    } catch (error) {
+        console.error("Error fetching report details:", error);
     }
+}
 
-    let desc = "No description provided.";
-    const descLabel = Array.from(card.querySelectorAll('p')).find(p => p.innerText.includes('Description:'));
-    if (descLabel && descLabel.nextElementSibling) {
-        desc = descLabel.nextElementSibling.innerText;
+// ADD this function to fetch the list of reports
+async function fetchAdminReports() {
+    const grid = document.getElementById('reports-grid');
+    if (!grid) return;
+
+    try {
+        const response = await fetch('https://beat-pasig-api.onrender.com/api/reports/all');
+        const result = await response.json();
+
+        if (result.success) {
+            grid.innerHTML = ''; 
+
+            result.data.forEach(report => {
+                const cardHTML = `
+                <div class="report-card border rounded-xl p-6 ..." 
+                     onclick="openReportDetails('${report._id}')"> </div>`;
+                grid.insertAdjacentHTML('beforeend', cardHTML);
+            });
+            if (window.lucide) lucide.createIcons();
+        }
+    } catch (error) {
+        console.error("Failed to load reports:", error);
     }
-
-    const email = card.getAttribute('data-email') || "Not provided";
-    const contact = card.getAttribute('data-contact') || "Not provided";
-
-    const select = card.querySelector('select');
-    let forwarded = "No assigned department";
-    if (select && select.value && !select.value.includes('Select') && select.value !== "") {
-        forwarded = select.options[select.selectedIndex].text;
-    }
-
-    document.getElementById('modal-detail-title').innerText = title;
-    const modalBadge = document.getElementById('modal-detail-status');
-    if(modalBadge && badge) {
-        modalBadge.className = badge.className;
-        modalBadge.innerText = badge.innerText;
-    }
-
-    const datetimeBox = document.getElementById('modal-detail-datetime');
-    if(datetimeBox) {
-        datetimeBox.innerHTML = `${dateText} <span class="mx-1">at</span> ${timeText}`;
-    }
-
-    document.getElementById('modal-detail-name').innerText = name;
-    document.getElementById('modal-detail-email').innerText = email;
-    document.getElementById('modal-detail-contact').innerText = contact;
-    document.getElementById('modal-detail-location').innerText = loc;
-    document.getElementById('modal-detail-forwarded').innerText = forwarded;
-    document.getElementById('modal-detail-desc').innerText = desc;
-
-    const returnBox = card.querySelector('.border-red-500');
-    const modalReturnBox = document.getElementById('modal-detail-return-box');
-    if (returnBox && modalReturnBox) {
-        const reasonText = returnBox.querySelector('p:nth-child(2)').innerText.replace(' See More', '');
-        document.getElementById('modal-detail-return-reason').innerText = reasonText;
-        modalReturnBox.classList.remove('hidden');
-    } else if (modalReturnBox) {
-        modalReturnBox.classList.add('hidden');
-    }
-
-    openModal('view-report-modal');
 }
 
 function validateNewReport(e) {
@@ -517,6 +521,10 @@ function executeSubmitReport() {
     closeModal('confirm-report-modal');
     openModal('success-report-modal');
     
+    // Hide the empty state placeholder if it exists
+    const emptyState = document.getElementById('no-reports-empty');
+    if (emptyState) emptyState.classList.add('hidden');
+    
     const name = document.getElementById('report-name').value;
     const email = document.getElementById('report-email').value;
     const contact = document.getElementById('report-contact').value;
@@ -528,13 +536,17 @@ function executeSubmitReport() {
     const dateStr = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
     let hours = now.getHours();
     const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12; 
+    hours = hours % 12 || 12; 
     const minStr = now.getMinutes().toString().padStart(2, '0');
     const timeStr = `${hours}:${minStr} ${ampm}`;
 
+    // TEMPLATE FOR INCOMING REPORTS (No Return Reason)
     const newCardHTML = `
-        <div class="report-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors" style="background:var(--surface); border-color:var(--border)" onclick="openReportDetails(this)" data-email="${email}" data-contact="${contact}">
+        <div class="report-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors animate-in" 
+             style="background:var(--surface); border-color:var(--border)" 
+             onclick="openReportDetails(this)" 
+             data-email="${escapeHTML(email)}" 
+             data-contact="${escapeHTML(contact)}">
           <div class="flex justify-between items-start mb-4">
             <div>
               <p class="text-xs font-bold text-white report-date">${dateStr}</p>
@@ -575,7 +587,6 @@ function executeSubmitReport() {
 
     clearAndCloseReport();
     if(window.lucide) lucide.createIcons();
-    filterReports();
 }
 
 function clearAndCloseReport() {
@@ -1448,13 +1459,18 @@ function executeAnnFormSubmit() {
 document.addEventListener('DOMContentLoaded', () => { 
     if(window.lucide) lucide.createIcons(); 
     
-    // Load Manage Admins Logic
+    // 1. ADD THIS: Triggers the MongoDB fetch for Public Reports
+    if(document.getElementById('reports-grid')) {
+        fetchAdminReports();
+    }
+    
+    // 2. Existing: Load Manage Admins Logic
     if(document.getElementById('dept-filter') && typeof updateDepartmentDropdowns === 'function') {
         updateDepartmentDropdowns(); 
         populateAdmins(); 
     }
     
-    // Load Announcements Logic
+    // 3. Existing: Load Announcements Logic
     if(document.getElementById('filter-calendar') && typeof renderCategoryDropdowns === 'function') {
         renderCategoryDropdowns();
         filterAnnouncements(); 
