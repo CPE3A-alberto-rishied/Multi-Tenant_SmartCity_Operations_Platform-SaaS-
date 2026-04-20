@@ -11,9 +11,8 @@
   <style>
     body { font-family: 'DM Sans', sans-serif !important; }
     
-    /* SIDEBAR & LAYOUT */
+    /* SIDEBAR */
     .sidebar { width: 260px !important; flex-shrink: 0 !important; }
-    .sidebar-border-b { border-color: var(--border) !important; }
     
     .sidebar-item { 
       display: flex !important; align-items: center !important; gap: 12px !important;
@@ -25,22 +24,14 @@
     .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
     .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
     
-    /* BRANDING */
-    .logo-box { background: var(--accent); width: 36px; height: 36px; border-radius: 10px; }
-    .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
-    .text-dim-xs { color: var(--text-dim); font-size: 11px; }
-
     /* USER FOOTER */
     .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
-    .avatar-circle { background: #2563eb; width: 42px; height: 42px; border-radius: 50%; background-size: cover; }
-    .user-name { font-size: 14px; font-weight: 700; color: white; }
-    .user-role { color: #94a3b8; font-size: 11px; }
+    .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
+    .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
     .settings-link { color: #94a3b8; transition: color 0.2s; display: flex; align-items: center; }
     .settings-link:hover { color: #3b82f6; }
-    
-    /* UI ELEMENTS */
-    .icon-sm { width: 18px; height: 18px; }
-    .icon-xs { width: 16px; height: 16px; }
+
+    .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
     
     /* INPUT STYLING */
     .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 10px 14px; transition: all 0.2s; }
@@ -65,16 +56,6 @@
     .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; }
     .hidden { display: none !important; }
     .modal-card { background: #151b2d; border: 1px solid #2d3748; border-radius: 1.25rem; }
-
-    /* Tables & Toggles */
-    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #374151; transition: .4s; border-radius: 24px; }
-    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-    input:checked + .slider { background-color: #22c55e; }
-    input:checked + .slider:before { transform: translateX(20px); }
-    
-    .header-main { border-color: var(--border); background: var(--surface); }
 
     /* CUSTOM DROPDOWN SCROLLBAR */
     .cat-dropdown-menu::-webkit-scrollbar { width: 6px; }
@@ -154,16 +135,16 @@
     <div class="user-footer">
       <div class="flex items-center justify-between mb-5">
         <div class="flex items-center gap-3">
-          <div id="nav-avatar" class="avatar-circle flex items-center justify-center text-white font-bold text-sm shadow-lg">MA</div>
+          <div id="nav-avatar" style="background:#2563eb; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">MA</div>
           <div>
-            <div class="user-name">Main Admin</div>
-            <div class="user-role">System Administrator</div>
+            <div class="user-footer-name">Main Admin</div>
+            <div class="user-footer-sub">System Administrator</div>
           </div>
         </div>
-        <a href="profile.html" class="settings-link"><i data-lucide="settings" class="icon-sm"></i></a>
+        <a href="profile.html" class="settings-link"><i data-lucide="settings" style="width:18px; height:18px"></i></a>
       </div>
       <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
-        <i data-lucide="log-out" class="icon-xs"></i> Logout
+        <i data-lucide="log-out" style="width:16px; height:16px"></i> Logout
       </button>
     </div>
   </aside>
