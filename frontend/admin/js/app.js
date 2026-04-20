@@ -39,74 +39,52 @@ document.addEventListener('click', (e) => {
 // ==========================================
 // AUTHENTICATION LOGIC (admin.html)
 // ==========================================
-function handleLogin(e) {
+async function handleLogin(e) {
     e.preventDefault(); 
     
     const userEl = document.getElementById('login-user');
     const passEl = document.getElementById('login-pass');
+    const deptEl = document.getElementById('login-dept');
     
     const userErr = document.getElementById('user-error');
     const passErr = document.getElementById('pass-error');
 
-    let valid = true;
-
-    // 1. Check for empty fields
-    if (!userEl.value.trim()) {
-        userEl.classList.add('input-error');
-        userErr.innerText = "This field is required";
-        userErr.classList.remove('hidden');
-        valid = false;
-    }
-    if (!passEl.value.trim()) {
-        passEl.classList.add('input-error');
-        passErr.innerText = "This field is required";
-        passErr.classList.remove('hidden');
-        valid = false;
-    }
-
-    if (!valid) return;
-
-    const inputId = userEl.value.trim();
-    const inputPass = passEl.value;
-
-    // 2. Hardcoded Master Admin fallback
-    const isMasterAdmin = (inputId === '2023104513' && inputPass === 'admin123');
-
-    // 3. Retrieve created accounts from Memory
-    let savedAdmins = JSON.parse(localStorage.getItem('beat_admins')) || [];
-    const foundAdmin = savedAdmins.find(a => a.id === inputId);
-
-    // 4. Validate Account Existence
-    if (!isMasterAdmin && !foundAdmin) {
-        userEl.classList.add('input-error');
-        userErr.innerText = "No account made for that ID.";
-        userErr.classList.remove('hidden');
+    // Basic local validation
+    if (!userEl.value.trim() || !passEl.value.trim()) {
+        if (!userEl.value.trim()) userEl.classList.add('input-error'), userErr.classList.remove('hidden');
+        if (!passEl.value.trim()) passEl.classList.add('input-error'), passErr.classList.remove('hidden');
         return;
     }
 
-    // 5. Validate Password
-    if (!isMasterAdmin && foundAdmin && foundAdmin.password !== inputPass) {
-        passEl.classList.add('input-error');
-        passErr.innerText = "Wrong credentials input.";
-        passErr.classList.remove('hidden');
-        return;
-    }
+    try {
+        // Fetch from Render MongoDB
+        const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: userEl.value.trim(),
+                password: passEl.value,
+                dept: deptEl.options[deptEl.selectedIndex].text.replace(" Department", "") // Match DB format
+            })
+        });
 
-    // 6. Validate Account Status
-    if (!isMasterAdmin && foundAdmin && foundAdmin.status === "Disabled") {
-        userEl.classList.add('input-error');
-        userErr.innerText = "This account is disabled.";
-        userErr.classList.remove('hidden');
-        return;
-    }
-    
-    // 7. Login Successful! Store Active Department for Routing
-    let activeDept = isMasterAdmin ? "Main Admin" : foundAdmin.dept;
-    localStorage.setItem('activeDepartment', activeDept);
+        const result = await response.json();
 
-    // Proceed to Verify Screen
-    document.getElementById('login-card').classList.add('hidden');
-    document.getElementById('verify-card').classList.remove('hidden');
+        if (result.success) {
+            // Success! Store Dept for Routing
+            localStorage.setItem('activeDepartment', result.admin.dept);
+            document.getElementById('login-card').classList.add('hidden');
+            document.getElementById('verify-card').classList.remove('hidden');
+        } else {
+            // Show server error on the UI
+            userEl.classList.add('input-error');
+            userErr.innerText = result.error;
+            userErr.classList.remove('hidden');
+        }
+    } catch (error) {
+        console.error("Login failed:", error);
+        alert("Cannot connect to BEAT Security Server.");
+    }
 }
 
 function handleVerify(e) {
