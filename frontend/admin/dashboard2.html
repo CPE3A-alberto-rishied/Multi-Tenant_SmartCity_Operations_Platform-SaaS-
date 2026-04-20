@@ -3,55 +3,201 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BEAT – Dept Dashboard</title>
+  <title>BEAT – Dashboard Overview</title>
+
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-  <link rel="stylesheet" href="css/styles2.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* --- INLINED CSS --- */
+    html, body { height: 100%; margin: 0; overflow: hidden; }
+    * { box-sizing: border-box; }
+
+    :root { 
+        --bg: #0a0e1a; 
+        --surface: #111827; 
+        --surface2: #1f2937; 
+        --border: #374151; 
+        --accent: #2563eb; 
+        --accent-light: #3b82f6; 
+        --text: #e2e8f0; 
+        --text-dim: #9ca3af; 
+        --danger: #ef4444; 
+        --success: #22c55e; 
+        --warn: #f59e0b; 
+        --purple: #8b5cf6; 
+    }
+
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+    .font-mono { font-family: 'Space Mono', monospace; }
+
+    /* Layout & Sidebar */
+    .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; height: 100%; transition: transform 0.3s; }
+    .sidebar-item { padding: 10px 18px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 14px; border-left: 3px solid transparent; transition: all 0.15s; color: var(--text-dim); }
+    .sidebar-item:hover { background: var(--surface2); color: var(--text); }
+    .sidebar-item.active { background: var(--surface2); color: var(--accent-light); border-left-color: var(--accent); }
+    .sidebar-sub { padding-left: 44px; font-size: 13px; }
+    .sidebar-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 24px;
+        color: #94a3b8;
+        font-size: 15px;
+        font-weight: 500;
+        transition: all 0.2s;
+        text-decoration: none;
+        border-left: 3px solid transparent;
+    }
+
+    .sidebar-item:hover {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Active Page State - matches the blue text and border in screenshot */
+    .sidebar-item.active {
+        color: #2563eb !important;
+        background: rgba(37, 99, 235, 0.1);
+        border-left: 3px solid #2563eb;
+    }
+
+    .sidebar-item i {
+        flex-shrink: 0;
+    }
+    /* Cards & UI Elements */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .card-sm { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+    .glow { box-shadow: 0 0 30px rgba(37,99,235,0.15); }
+
+    /* Buttons */
+    .btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-primary { background: var(--accent); color: #fff; } .btn-primary:hover { background: var(--accent-light); }
+    .btn-danger { background: var(--danger); color: #fff; } .btn-danger:hover { opacity: 0.85; }
+    .btn-success { background: var(--success); color: #fff; } .btn-success:hover { opacity: 0.85; }
+    .btn-warn { background: var(--warn); color: #000; } .btn-warn:hover { opacity: 0.85; }
+    .btn-ghost { background: transparent; color: var(--text-dim); border: 1px solid var(--border); } .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+    .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+
+    /* Inputs */
+    input, select, textarea { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 9px 12px; border-radius: 8px; font-size: 13px; font-family: inherit; width: 100%; }
+    input::placeholder, select::placeholder, textarea::placeholder { color: var(--text-dim); opacity: 0.25; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+
+    /* Tables & Badges */
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 10px 12px; color: var(--text-dim); font-weight: 600; border-bottom: 1px solid var(--border); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .badge-red { background: #dc262620; color: #f87171; }
+    .badge-green { background: #22c55e20; color: #4ade80; }
+    .badge-yellow { background: #f59e0b20; color: #fbbf24; }
+    .badge-blue { background: #2563eb20; color: #60a5fa; }
+    .badge-purple { background: #8b5cf620; color: #a78bfa; }
+
+    /* Overlays & Animations */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px); }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; max-width: 480px; width: 90%; }
+    .road-btn { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; transition: all 0.15s; }
+    .road-btn:hover { transform: scale(1.15); }
+    .road-btn.selected { border-color: #fff; box-shadow: 0 0 12px rgba(255,255,255,0.3); }
+    .toast { position: fixed; top: 20px; right: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; z-index: 200; animation: slideIn 0.3s; display: flex; align-items: center; gap: 10px; font-size: 13px; }
+    .chart-bar { border-radius: 4px 4px 0 0; transition: height 0.5s ease; min-width: 24px; }
+    .toggle-switch { position: relative; display: inline-block; width: 48px; height: 26px; }
+    .toggle-switch input { display: none; }
+    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: 0.3s; border-radius: 26px; }
+    .toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: 0.3s; border-radius: 50%; }
+    input:checked + .toggle-slider { background-color: var(--success); }
+    input:checked + .toggle-slider:before { transform: translateX(22px); }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-in { animation: fadeIn 0.3s ease; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    @keyframes float1 { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(30px,-20px); } }
+    @keyframes float2 { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(-40px,30px); } }
+    @keyframes float3 { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(20px,40px); } }
+
+    /* --- SPECIFIC PAGE STYLES --- */
+    body { font-family: 'DM Sans', sans-serif !important; }
+    
+    /* SIDEBAR CSS */
+    .sidebar { width: 260px !important; flex-shrink: 0 !important; }
+    
+    .sidebar-item { 
+      display: flex !important; align-items: center !important; gap: 12px !important;
+      padding: 12px 18px !important; font-size: 14.5px !important; 
+      font-weight: 500 !important; color: #94a3b8 !important;
+      text-decoration: none !important; border-left: 3px solid transparent !important;
+    }
+    .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
+    
+    /* Hover & Active States matched exactly to manage_admin.html */
+    .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
+    .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
+    
+    /* USER FOOTER FIXED */
+    .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
+    .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
+    .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
+    .settings-link { color: #94a3b8; transition: color 0.2s; display: flex; align-items: center; }
+    .settings-link:hover { color: #3b82f6; }
+
+    .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
+  </style>
 </head>
 
 <body class="h-full flex bg-[#0a0e1a]">
 
-  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface">
-    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
+  <aside id="sidebar" class="sidebar flex flex-col h-full">
+    <div class="h-[76px] px-5 flex items-center border-b shrink-0" style="border-color:var(--border)">
       <div class="flex items-center gap-3">
-        <div class="logo-box">B</div>
+        <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
         <div class="flex flex-col justify-center">
-          <div class="logo-text font-bold text-lg text-white leading-none mb-1">BEAT</div>
-          <div class="text-[11px] text-[#94a3b8] leading-none">Department Portal</div>
+          <div class="logo-text font-bold text-lg text-white tracking-widest leading-none mb-1">BEAT</div>
+          <div style="color:var(--text-dim); font-size:11px" class="leading-none">Admin Control Center</div>
         </div>
       </div>
     </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
-      <a href="dashboard2.html" class="sidebar-item active"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
-      <a href="reports2.html" class="sidebar-item"><i data-lucide="alert-triangle"></i><span>Public Reports</span></a>
-      <a href="announcements2.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
-      <a href="traffic2.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
-      <a href="analytics2.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
+      <a href="dashboard.html" class="sidebar-item active"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+      <a href="reports.html" class="sidebar-item"><i data-lucide="alert-triangle"></i><span>Public Reports</span></a>
+      <a href="announcements.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+      <a href="traffic.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
+      <a href="analytics.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
     </nav>
 
     <div class="user-footer">
       <div class="flex items-center justify-between mb-5">
         <div class="flex items-center gap-3">
-          <div id="nav-avatar" class="nav-avatar"></div>
+          <div style="background:#2563eb; width:42px; height:42px; border-radius:50%;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">MA</div>
           <div>
-            <div class="user-footer-name">Loading...</div>
-            <div class="user-footer-sub">Loading...</div>
+            <div class="user-footer-name">Main Admin</div>
+            <div class="user-footer-sub">System Administrator</div>
           </div>
         </div>
-        <a href="profile2.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
+        <a href="profile.html" class="settings-link"><i data-lucide="settings" style="width:18px; height:18px"></i></a>
       </div>
-      <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border theme-border hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
-        <i data-lucide="log-out" class="icon-sm"></i> Logout
+      <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
+        <i data-lucide="log-out" style="width:16px; height:16px"></i> Logout
       </button>
     </div>
   </aside>
 
   <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a]">
-    <header class="h-[76px] px-8 flex items-center justify-between shrink-0 theme-surface theme-border-b">
+    
+    <header class="h-[76px] px-8 flex items-center justify-between border-b shrink-0" style="border-color:var(--border); background:var(--surface)">
       <h1 class="text-xl font-semibold text-white">Dashboard Overview</h1>
+      
       <div class="flex items-center gap-4">
-        <div class="px-3 py-1.5 rounded-lg flex items-center gap-2.5 shadow-sm border theme-surface-2">
+        <div class="px-3 py-1.5 rounded-lg flex items-center gap-2.5 shadow-sm border" style="background:var(--surface2); border-color:var(--border)">
           <i data-lucide="sun" class="w-3.5 h-3.5 text-yellow-500"></i>
           <span class="text-xs font-semibold text-white">28°C</span>
           <div class="w-px h-3 bg-gray-700"></div>
@@ -64,60 +210,128 @@
       <div class="max-w-[1400px] mx-auto space-y-6">
         
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div class="border theme-border rounded-xl p-5 shadow-sm theme-surface">
+          <div class="border rounded-xl p-5 shadow-sm" style="background:var(--surface); border-color:var(--border)">
             <p class="text-[10px] font-bold uppercase tracking-wider text-[#94a3b8] mb-3">Active Incidents</p>
-            <h2 class="text-3xl font-bold text-rose-500">0</h2>
+            <h2 class="text-3xl font-bold text-rose-500">4</h2>
             <p class="text-xs text-[#94a3b8] mt-2">Live count</p>
           </div>
-          <div class="border theme-border rounded-xl p-5 shadow-sm theme-surface">
+          
+          <div class="border rounded-xl p-5 shadow-sm" style="background:var(--surface); border-color:var(--border)">
             <p class="text-[10px] font-bold uppercase tracking-wider text-[#94a3b8] mb-3">Pending Approvals</p>
-            <h2 class="text-3xl font-bold text-white">0</h2>
+            <div class="flex items-center gap-3">
+              <h2 class="text-3xl font-bold text-orange-400">1</h2>
+              <span class="bg-orange-500/10 text-orange-400 text-[9px] px-2 py-0.5 rounded border border-orange-500/20 font-bold uppercase tracking-wider">Needs Review</span>
+            </div>
             <p class="text-xs text-[#94a3b8] mt-2">Staff announcements</p>
           </div>
-          <div class="border theme-border rounded-xl p-5 shadow-sm theme-surface">
+          
+          <div class="border rounded-xl p-5 shadow-sm" style="background:var(--surface); border-color:var(--border)">
             <p class="text-[10px] font-bold uppercase tracking-wider text-[#94a3b8] mb-3">Total Reports (30D)</p>
-            <h2 class="text-3xl font-bold text-white">0</h2>
+            <h2 class="text-3xl font-bold text-white">184</h2>
             <p class="text-xs text-[#94a3b8] mt-2">Across all barangays</p>
           </div>
-          <div class="border theme-border rounded-xl p-5 shadow-sm theme-surface">
+          
+          <div class="border rounded-xl p-5 shadow-sm" style="background:var(--surface); border-color:var(--border)">
             <p class="text-[10px] font-bold uppercase tracking-wider text-[#94a3b8] mb-3">Active Staff</p>
-            <h2 class="text-3xl font-bold text-emerald-500">1</h2>
+            <h2 class="text-3xl font-bold text-emerald-500">3</h2>
             <p class="text-xs text-[#94a3b8] mt-2">Online now</p>
           </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="border theme-border rounded-xl p-6 shadow-sm theme-surface">
+          <div class="border rounded-xl p-6 shadow-sm" style="background:var(--surface); border-color:var(--border)">
             <div class="flex items-center gap-2 mb-6">
               <i data-lucide="bar-chart-horizontal" class="w-4 h-4 text-blue-500"></i>
               <h3 class="text-xs font-bold uppercase tracking-wider text-[#94a3b8]">Congestion Index</h3>
             </div>
-            <p class="text-sm text-[#94a3b8] italic">No active data to display.</p>
+            <div class="space-y-5">
+              <div class="space-y-2">
+                <div class="flex justify-between text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">
+                  <span>C5 North</span><span class="text-white">82%</span>
+                </div>
+                <div class="h-1.5 w-full rounded-full overflow-hidden" style="background:var(--surface2)">
+                  <div class="h-full bg-rose-500 rounded-full" style="width: 82%"></div>
+                </div>
+              </div>
+              <div class="space-y-2">
+                <div class="flex justify-between text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">
+                  <span>EDSA South</span><span class="text-white">95%</span>
+                </div>
+                <div class="h-1.5 w-full rounded-full overflow-hidden" style="background:var(--surface2)">
+                  <div class="h-full bg-rose-500 rounded-full" style="width: 95%"></div>
+                </div>
+              </div>
+              <div class="space-y-2">
+                <div class="flex justify-between text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">
+                  <span>Ortigas Ave</span><span class="text-white">45%</span>
+                </div>
+                <div class="h-1.5 w-full rounded-full overflow-hidden" style="background:var(--surface2)">
+                  <div class="h-full bg-blue-500 rounded-full" style="width: 45%"></div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="border theme-border rounded-xl p-6 shadow-sm theme-surface">
+          <div class="border rounded-xl p-6 shadow-sm" style="background:var(--surface); border-color:var(--border)">
             <div class="flex items-center gap-2 mb-6">
               <i data-lucide="radio" class="w-4 h-4 text-emerald-500"></i>
               <h3 class="text-xs font-bold uppercase tracking-wider text-[#94a3b8]">Unit Dispatch Status</h3>
             </div>
-            <p class="text-sm text-[#94a3b8] italic">No active dispatches.</p>
+            <div class="space-y-3">
+              <div class="p-3 border rounded-lg flex items-center justify-between" style="background:var(--surface2); border-color:var(--border)">
+                <div>
+                  <p class="text-sm font-semibold text-white">Unit-Alpha (Rico)</p>
+                  <p class="text-[10px] text-[#94a3b8] mt-1 uppercase tracking-wider">Incident #882 / C5 North</p>
+                </div>
+                <span class="text-[9px] font-bold text-blue-400 bg-blue-400/10 px-2 py-1 rounded border border-blue-400/20 uppercase tracking-wider">En Route</span>
+              </div>
+              <div class="p-3 border rounded-lg flex items-center justify-between" style="background:var(--surface2); border-color:var(--border)">
+                <div>
+                  <p class="text-sm font-semibold text-white">Unit-Bravo (Santi)</p>
+                  <p class="text-[10px] text-[#94a3b8] mt-1 uppercase tracking-wider">Incident #880 / Ortigas</p>
+                </div>
+                <span class="text-[9px] font-bold text-rose-400 bg-rose-400/10 px-2 py-1 rounded border border-rose-400/20 uppercase tracking-wider">On Scene</span>
+              </div>
+            </div>
           </div>
 
-          <div class="border theme-border rounded-xl p-6 shadow-sm theme-surface">
+          <div class="border rounded-xl p-6 shadow-sm" style="background:var(--surface); border-color:var(--border)">
             <div class="flex items-center justify-between mb-6">
               <div class="flex items-center gap-2">
                 <i data-lucide="bell" class="w-4 h-4 text-purple-500"></i>
                 <h3 class="text-xs font-bold uppercase tracking-wider text-[#94a3b8]">Live Reports Feed</h3>
               </div>
+              <a href="reports.html" class="text-[10px] font-bold text-blue-400 uppercase tracking-wider hover:text-blue-300 transition-colors">View All</a>
             </div>
-            <p class="text-sm text-[#94a3b8] italic">No live reports to display.</p>
+            
+            <div class="relative space-y-5 before:absolute before:left-[3px] before:top-2 before:bottom-2 before:w-px before:bg-gray-800">
+              <div class="relative pl-5">
+                <div class="absolute left-0 top-1.5 w-1.5 h-1.5 rounded-full bg-rose-500 ring-4 ring-rose-500/10"></div>
+                <div class="flex justify-between items-start">
+                  <p class="text-sm font-semibold text-white leading-tight">Vehicular Accident</p>
+                  <span class="text-[10px] font-mono text-[#94a3b8] uppercase">2m ago</span>
+                </div>
+                <p class="text-[10px] text-[#94a3b8] mt-1 uppercase tracking-wider">Brgy. San Antonio, C5 North</p>
+              </div>
+              <div class="relative pl-5">
+                <div class="absolute left-0 top-1.5 w-1.5 h-1.5 rounded-full bg-slate-500"></div>
+                <div class="flex justify-between items-start">
+                  <p class="text-sm font-semibold text-white leading-tight">Illegal Parking</p>
+                  <span class="text-[10px] font-mono text-[#94a3b8] uppercase">15m ago</span>
+                </div>
+                <p class="text-[10px] text-[#94a3b8] mt-1 uppercase tracking-wider">Emerald Ave, Ortigas</p>
+              </div>
+            </div>
           </div>
-        </div>
 
+        </div>
       </div>
     </div>
   </main>
 
-<script src="js/app2.js"></script>
+<script>
+  lucide.createIcons();
+  function doLogout() { window.location.href = 'admin.html'; }
+</script>
 </body>
 </html>
