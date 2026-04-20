@@ -74,13 +74,9 @@
 </head>
 <body class="h-full flex bg-[#0a0e1a]">
 
-<<<<<<< Updated upstream
-  <aside id="sidebar" class="sidebar flex flex-col h-full" style="background:var(--surface); border-right: 1px solid var(--border)">
-=======
   <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
 
   <aside id="sidebar" class="sidebar flex flex-col h-full absolute lg:relative z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300" style="background:var(--surface); border-right: 1px solid var(--border)">
->>>>>>> Stashed changes
     <div class="h-[76px] px-5 flex items-center border-b shrink-0" style="border-color:var(--border)">
       <div class="flex items-center gap-3">
         <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
@@ -120,12 +116,6 @@
     </div>
   </aside>
 
-<<<<<<< Updated upstream
-  <main class="flex-1 overflow-y-auto flex flex-col">
-    <header class="px-8 h-[76px] flex items-center border-b shrink-0" style="border-color:var(--border); background:var(--surface)">
-      <h1 class="text-xl font-semibold text-white flex items-center gap-2">
-        <i data-lucide="file-text" class="w-6 h-6"></i> Public Reports
-=======
   <main class="flex-1 overflow-y-auto flex flex-col min-w-0">
     <header class="px-4 sm:px-8 h-[76px] flex items-center border-b shrink-0" style="border-color:var(--border); background:var(--surface)">
       <button class="lg:hidden text-gray-400 hover:text-white mr-4" onclick="toggleSidebar()">
@@ -133,21 +123,11 @@
       </button>
       <h1 class="text-xl font-semibold text-white flex items-center gap-2">
         <i data-lucide="file-text" class="w-6 h-6 hidden sm:block"></i> Public Reports
->>>>>>> Stashed changes
       </h1>
     </header>
 
     <div class="p-4 sm:p-8 space-y-6 sm:space-y-8 animate-in max-w-[1600px] mx-auto w-full flex-1">
       
-<<<<<<< Updated upstream
-      <div class="flex flex-wrap gap-4 items-center justify-between mb-8">
-        <div class="flex flex-wrap gap-3 items-center">
-          <div class="relative flex items-center">
-            <input type="date" id="filter-date" onchange="filterReports()" class="h-10 bg-[#1e2536] text-white border border-gray-700 rounded-lg px-3 text-sm outline-none focus:border-blue-500 cursor-pointer min-w-[160px]">
-          </div>
-          <div class="relative flex items-center">
-            <select id="filter-status" onchange="filterReports()" class="appearance-none h-10 bg-[#1e2536] text-white border border-gray-700 rounded-lg pl-4 pr-10 text-sm outline-none focus:border-blue-500 cursor-pointer min-w-[140px]">
-=======
       <div class="flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between mb-4">
         <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full xl:w-auto">
           
@@ -157,7 +137,6 @@
           
           <div class="relative flex items-center w-full sm:w-auto">
             <select id="filter-status" onchange="filterReports()" class="modal-input !mt-0 h-10 pl-4 pr-10 min-w-[140px] w-full sm:w-auto cursor-pointer">
->>>>>>> Stashed changes
               <option>All Status</option>
               <option>New</option>
               <option>Returned</option>
@@ -165,14 +144,9 @@
               <option>Resolved</option>
             </select>
           </div>
-<<<<<<< Updated upstream
-          <div class="relative flex items-center">
-            <select id="filter-dept" onchange="filterReports()" class="appearance-none h-10 bg-[#1e2536] text-white border border-gray-700 rounded-lg pl-4 pr-10 text-sm outline-none focus:border-blue-500 cursor-pointer min-w-[160px]">
-=======
           
           <div class="relative flex items-center w-full sm:w-auto">
             <select id="filter-dept" onchange="filterReports()" class="modal-input !mt-0 h-10 pl-4 pr-10 min-w-[160px] w-full sm:w-auto cursor-pointer">
->>>>>>> Stashed changes
               <option>All Departments</option>
               <option>DRRMO</option>
               <option>Engineering</option>
@@ -181,24 +155,14 @@
           </div>
         </div>
         
-<<<<<<< Updated upstream
-        <button onclick="openModal('new-report-modal')" class="h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg text-sm font-bold flex items-center gap-2 shadow-lg transition-all">
-=======
         <button onclick="openModal('new-report-modal')" class="w-full xl:w-auto h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg text-sm font-bold flex items-center justify-center gap-2 shadow-lg transition-all">
->>>>>>> Stashed changes
           <i data-lucide="plus" class="w-4 h-4"></i> New Report
         </button>
       </div>
 
-<<<<<<< Updated upstream
-      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch" id="reports-grid">
-        
-        <div class="report-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors" style="background:var(--surface); border-color:var(--border)" onclick="openReportDetails(this)" data-email="staff.dept@example.com" data-contact="+63 917 123 4567">
-=======
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 items-stretch" id="reports-grid">
         
         <div class="report-card border rounded-xl p-5 sm:p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors" style="background:var(--surface); border-color:var(--border)" onclick="openReportDetails(this)" data-email="staff.dept@example.com" data-contact="+63 917 123 4567">
->>>>>>> Stashed changes
           <div class="flex justify-between items-start mb-4">
             <div>
               <p class="text-xs font-bold text-white report-date">4/19/2026</p>
@@ -249,11 +213,7 @@
   </main>
 
   <div id="new-report-modal" class="modal-overlay hidden">
-<<<<<<< Updated upstream
-    <div class="border w-[550px] max-w-[90%] rounded-2xl p-8 max-h-[90vh] overflow-y-auto shadow-2xl" style="background:var(--surface); border-color:var(--border)">
-=======
     <div class="border w-full sm:max-w-[550px] rounded-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl" style="background:var(--surface); border-color:var(--border)">
->>>>>>> Stashed changes
       <h2 class="text-white font-bold text-xl mb-6 flex items-center gap-2 justify-center">
         <i data-lucide="file-plus" class="text-blue-500"></i> Submit a Report
       </h2>
@@ -283,37 +243,23 @@
         <textarea id="report-desc" rows="4" placeholder="Provide detailed description of the issue..." class="modal-input text-sm resize-none" oninput="clearError('report-desc', 'report-desc-error')"></textarea>
         <p id="report-desc-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p></div>
         
-<<<<<<< Updated upstream
-        <div class="flex justify-end gap-3 mt-8 pt-4">
-          <button type="button" onclick="clearAndCloseReport()" class="px-6 bg-[#1e2536] border border-[#374151] text-white font-bold py-2.5 rounded-xl text-sm hover:bg-gray-800 transition-colors">Cancel</button>
-          <button type="submit" class="px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg">Submit Report</button>
-=======
         <div class="flex flex-col sm:flex-row justify-end gap-3 mt-8 pt-4">
           <button type="button" onclick="clearAndCloseReport()" class="px-6 bg-[#1e2536] border border-[#374151] text-white font-bold py-2.5 rounded-xl text-sm hover:bg-gray-800 transition-colors w-full sm:w-auto">Cancel</button>
           <button type="submit" class="px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg w-full sm:w-auto">Submit Report</button>
->>>>>>> Stashed changes
         </div>
       </form>
     </div>
   </div>
 
   <div id="confirm-report-modal" class="modal-overlay hidden">
-<<<<<<< Updated upstream
-    <div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
-=======
     <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
->>>>>>> Stashed changes
       <div style="background:#3b82f6; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
         <i data-lucide="send" class="w-6 h-6"></i>
       </div>
       <h2 class="text-white font-bold text-xl mb-3">Submit Report?</h2>
       <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to submit this public report to the system?</p>
       
-<<<<<<< Updated upstream
-      <div class="flex gap-3">
-=======
       <div class="flex flex-col sm:flex-row gap-3">
->>>>>>> Stashed changes
         <button onclick="closeModal('confirm-report-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
         <button onclick="executeSubmitReport()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Confirm</button>
       </div>
@@ -321,11 +267,7 @@
   </div>
 
   <div id="success-report-modal" class="modal-overlay hidden">
-<<<<<<< Updated upstream
-    <div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
-=======
     <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
->>>>>>> Stashed changes
       <div style="background:#22c55e; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-green-500/20">
         <i data-lucide="check-circle" class="w-6 h-6"></i>
       </div>
@@ -337,22 +279,14 @@
   </div>
 
   <div id="confirm-forward-modal" class="modal-overlay hidden">
-<<<<<<< Updated upstream
-    <div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
-=======
     <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
->>>>>>> Stashed changes
       <div style="background:#3b82f6; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
         <i data-lucide="share" class="w-6 h-6"></i>
       </div>
       <h2 class="text-white font-bold text-xl mb-3">Forward Report?</h2>
       <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to assign this report to a new department?</p>
       
-<<<<<<< Updated upstream
-      <div class="flex gap-3">
-=======
       <div class="flex flex-col sm:flex-row gap-3">
->>>>>>> Stashed changes
         <button onclick="cancelForward()" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
         <button onclick="confirmForward()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Confirm</button>
       </div>
@@ -360,15 +294,9 @@
   </div>
 
   <div id="view-report-modal" class="modal-overlay hidden" onclick="closeModal('view-report-modal')">
-<<<<<<< Updated upstream
-    <div class="border w-[450px] max-w-[90%] rounded-2xl p-8 shadow-2xl text-left max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)" onclick="event.stopPropagation()">
-      <div class="flex justify-between items-start mb-6">
-        <h2 id="modal-detail-title" class="text-white font-bold text-2xl">Title</h2>
-=======
     <div class="border w-full sm:max-w-[450px] rounded-2xl p-6 sm:p-8 shadow-2xl text-left max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)" onclick="event.stopPropagation()">
       <div class="flex justify-between items-start mb-6">
         <h2 id="modal-detail-title" class="text-white font-bold text-xl sm:text-2xl">Title</h2>
->>>>>>> Stashed changes
         <span id="modal-detail-status" class="bg-gray-500/10 text-gray-500 border border-gray-500/20 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase">Status</span>
       </div>
       
@@ -381,11 +309,7 @@
         <p id="modal-detail-name" class="text-white font-semibold">Name</p></div>
         
         <div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Email</p>
-<<<<<<< Updated upstream
-        <p id="modal-detail-email" class="text-white">Email</p></div>
-=======
         <p id="modal-detail-email" class="text-white break-all">Email</p></div>
->>>>>>> Stashed changes
         
         <div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Contact</p>
         <p id="modal-detail-contact" class="text-white">Contact</p></div>
@@ -404,11 +328,7 @@
         </div>
 
         <div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Full Description</p>
-<<<<<<< Updated upstream
-        <p id="modal-detail-desc" class="text-slate-300 leading-relaxed">Description</p></div>
-=======
         <p id="modal-detail-desc" class="text-slate-300 leading-relaxed whitespace-pre-wrap">Description</p></div>
->>>>>>> Stashed changes
       </div>
 
       <button onclick="closeModal('view-report-modal')" class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg text-sm">Close</button>
@@ -416,51 +336,31 @@
   </div>
 
   <div id="resolve-modal" class="modal-overlay hidden">
-<<<<<<< Updated upstream
-    <div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
-=======
     <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
->>>>>>> Stashed changes
       <div style="background:#22c55e; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-green-500/20">
         <i data-lucide="check-circle" class="w-6 h-6"></i>
       </div>
       <h2 class="text-white font-bold text-xl mb-3">Mark as Resolved?</h2>
       <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Please ensure you have communicated with the assigned department and verified that this incident has been adequately addressed before confirming resolution.</p>
       
-<<<<<<< Updated upstream
-      <div class="flex gap-3">
-        <button onclick="cancelReportToggle('resolve-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
-        <button onclick="confirmResolution()" class="flex-1 bg-[#22c55e] hover:bg-green-600 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Confirm Resolution</button>
-=======
       <div class="flex flex-col sm:flex-row gap-3">
         <button onclick="cancelReportToggle('resolve-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
         <button onclick="confirmResolution()" class="flex-1 bg-[#22c55e] hover:bg-green-600 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg border-transparent">Confirm Resolution</button>
->>>>>>> Stashed changes
       </div>
     </div>
   </div>
 
   <div id="cancel-resolve-modal" class="modal-overlay hidden">
-<<<<<<< Updated upstream
-    <div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
-=======
     <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
->>>>>>> Stashed changes
       <div style="background:#ef4444; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-red-500/20">
         <i data-lucide="x-circle" class="w-6 h-6"></i>
       </div>
       <h2 class="text-white font-bold text-xl mb-3">Reopen Incident?</h2>
       <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to reopen this incident? This will change its status from Resolved back to Pending.</p>
       
-<<<<<<< Updated upstream
-      <div class="flex gap-3">
-        <button onclick="cancelReportToggle('cancel-resolve-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
-        <button onclick="confirmCancelResolution()" class="flex-1 bg-[#ef4444] hover:bg-red-600 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Confirm</button>
-=======
       <div class="flex flex-col sm:flex-row gap-3">
         <button onclick="cancelReportToggle('cancel-resolve-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
         <button onclick="confirmCancelResolution()" class="flex-1 bg-[#ef4444] hover:bg-red-600 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg border-transparent">Confirm</button>
->>>>>>> Stashed changes
       </div>
     </div>
   </div>
@@ -468,8 +368,6 @@
 <script src="js/app.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => { if(window.lucide) lucide.createIcons(); });
-<<<<<<< Updated upstream
-=======
 
   // Handle Mobile Sidebar Toggle securely without touching app.js
   function toggleSidebar() {
@@ -484,7 +382,6 @@
           overlay.classList.add('hidden');
       }
   }
->>>>>>> Stashed changes
 </script>
 </body>
 </html>
