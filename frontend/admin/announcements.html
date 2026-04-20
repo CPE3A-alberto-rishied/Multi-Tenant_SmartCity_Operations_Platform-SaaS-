@@ -11,8 +11,9 @@
   <style>
     body { font-family: 'DM Sans', sans-serif !important; }
     
-    /* SIDEBAR */
+    /* SIDEBAR & LAYOUT */
     .sidebar { width: 260px !important; flex-shrink: 0 !important; }
+    .sidebar-border-b { border-color: var(--border) !important; }
     
     .sidebar-item { 
       display: flex !important; align-items: center !important; gap: 12px !important;
@@ -24,6 +25,24 @@
     .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
     .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
     
+    /* BRANDING */
+    .logo-box { background: var(--accent); width: 36px; height: 36px; border-radius: 10px; }
+    .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
+    .text-dim-xs { color: var(--text-dim); font-size: 11px; }
+
+    /* USER FOOTER */
+    .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
+    .avatar-circle { background: #2563eb; width: 42px; height: 42px; border-radius: 50%; background-size: cover; }
+    .user-name { font-size: 14px; font-weight: 700; color: white; }
+    .user-role { color: #94a3b8; font-size: 11px; }
+    
+    /* UI ELEMENTS */
+    .icon-sm { width: 18px; height: 18px; }
+    .icon-xs { width: 16px; height: 16px; }
+    
+    .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; }
+    .hidden { display: none !important; }
+    .modal-card { background: #151b2d; border: 1px solid #2d3748; border-radius: 1.25rem; }
     /* USER FOOTER */
     .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
     .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
@@ -56,6 +75,25 @@
     .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; }
     .hidden { display: none !important; }
 
+    /* Tables & Toggles */
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #374151; transition: .4s; border-radius: 24px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: #22c55e; }
+    input:checked + .slider:before { transform: translateX(20px); }
+    
+    .header-main { border-color: var(--border); background: var(--surface); }
+  </style>
+</head>
+<body class="h-full flex bg-[#0a0e1a]">
+  <aside id="sidebar" class="sidebar flex flex-col h-full">
+    <div class="p-5 border-b sidebar-border-b">
+      <div class="flex items-center gap-3">
+        <div class="logo-box flex items-center justify-center font-bold text-white text-sm">B</div>
+        <div>
+          <div class="font-bold text-lg tracking-widest text-white logo-text">BEAT</div>
+          <div class="text-dim-xs">Admin Control Center</div>
     /* CUSTOM DROPDOWN SCROLLBAR */
     .cat-dropdown-menu::-webkit-scrollbar { width: 6px; }
     .cat-dropdown-menu::-webkit-scrollbar-thumb { background-color: #374151; border-radius: 10px; }
@@ -86,6 +124,18 @@
     <div class="user-footer">
       <div class="flex items-center justify-between mb-5">
         <div class="flex items-center gap-3">
+          <div id="nav-avatar" class="avatar-circle flex items-center justify-center text-white font-bold text-sm">MA</div>
+          <div>
+            <div class="user-name">Main Admin</div>
+            <div class="user-role">System Administrator</div>
+          </div>
+        </div>
+        <a href="profile.html" class="text-[#94a3b8] hover:text-blue-500 transition-colors">
+          <i data-lucide="settings" class="icon-sm"></i>
+        </a>
+      </div>
+      <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
+        <i data-lucide="log-out" class="icon-xs"></i> Logout
           <div id="nav-avatar" style="background:#2563eb; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">MA</div>
           <div>
             <div class="user-footer-name">Main Admin</div>
@@ -100,6 +150,17 @@
     </div>
   </aside>
 
+  <main class="flex-1 overflow-y-auto">
+    <header class="px-8 py-5 border-b header-main">
+      <h1 class="text-xl font-semibold text-white">Announcement Manager</h1>
+    </header>
+    <div class="p-8 animate-in">
+      <button class="btn btn-primary">Create Article</button>
+    </div>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script>lucide.createIcons();</script>
   <main class="flex-1 overflow-y-auto flex flex-col relative">
     <header class="px-8 h-[76px] flex items-center border-b shrink-0" style="border-color:var(--border); background:var(--surface)">
       <h1 class="text-xl font-semibold text-white flex items-center gap-2">

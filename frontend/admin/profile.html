@@ -7,25 +7,41 @@
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles2.css">
+  
   <style>
-    body { font-family: 'DM Sans', sans-serif !important; }
+    /* CSS VARIABLES - The core of styles2.css */
+    :root { 
+        --bg: #0a0e1a; 
+        --surface: #111827; 
+        --surface2: #1f2937; 
+        --border: #374151; 
+        --accent: #2563eb; 
+        --accent-light: #3b82f6; 
+        --text: #e2e8f0; 
+        --text-dim: #9ca3af; 
+        --danger: #ef4444; 
+        --success: #22c55e; 
+        --warn: #f59e0b; 
+        --purple: #8b5cf6; 
+    }
+
+    /* GLOBAL STYLES */
+    body { font-family: 'DM Sans', sans-serif !important; background: var(--bg); color: var(--text); }
     
     /* SIDEBAR */
-    .sidebar { width: 260px !important; flex-shrink: 0 !important; }
-    
-    /* PERFECT SIZING: 14.5px text, 20px icons, clean padding */
+    .sidebar { width: 260px !important; flex-shrink: 0 !important; background: var(--surface); }
     .sidebar-item { 
       display: flex !important; align-items: center !important; gap: 12px !important;
       padding: 12px 18px !important; font-size: 14.5px !important; 
       font-weight: 500 !important; color: #94a3b8 !important;
       text-decoration: none !important; border-left: 3px solid transparent !important;
+      transition: all 0.2s;
     }
     .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
     .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
     .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
     
-    /* USER FOOTER FIXED */
+    /* USER FOOTER */
     .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
     .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
     .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
@@ -33,16 +49,19 @@
     .settings-link:hover { color: #3b82f6; }
 
     .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
+
+    /* MODALS & CARDS */
     .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; }
     .hidden { display: none !important; }
+    .card { background: var(--surface); border: 1px solid var(--border); }
     .modal-card { background: #151b2d; border: 1px solid #2d3748; border-radius: 1.25rem; }
     
-    /* Input Styling */
+    /* INPUT STYLING */
     .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 8px 12px; transition: all 0.2s; }
     .modal-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
     .input-error { border-color: #ef4444 !important; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important; }
     
-    /* Profile Specific */
+    /* PROFILE SPECIFIC */
     .profile-card { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(16px); border: 1px solid var(--border); }
     .otp-input { width: 42px; height: 50px; background: #1e2536; color: white; text-align: center; font-size: 1.25rem; font-weight: bold; border-radius: 8px; border: 1.5px solid #374151; outline: none; transition: all 0.2s; }
     .otp-input:focus { border-color: #2563eb; box-shadow: 0 0 10px rgba(37, 99, 235, 0.2); }
@@ -50,20 +69,28 @@
     input:read-only { color: #64748b; cursor: not-allowed; background: rgba(30, 37, 54, 0.5); }
     .badge-stack { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 16px; }
 
-    /* ULTIMATE AUTOFILL FIX */
+    /* AUTOFILL FIX */
     input:-webkit-autofill,
     input:-webkit-autofill:hover, 
     input:-webkit-autofill:focus, 
-    input:-webkit-autofill:active,
-    select:-webkit-autofill {
+    input:-webkit-autofill:active {
         -webkit-box-shadow: 0 0 0px 1000px #1e2536 inset !important;
         -webkit-text-fill-color: #ffffff !important;
         caret-color: white !important;
         transition: background-color 5000s ease-in-out 0s;
     }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ANIMATIONS */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-in { animation: fadeIn 0.4s ease-out; }
   </style>
 </head>
-<body class="h-full flex bg-[#0a0e1a]">
+<body class="h-full flex">
   
   <div id="confirm-modal" class="modal-overlay hidden">
     <div class="card" style="width:400px; text-align:center; padding:2rem; border-radius:1rem;">
@@ -105,7 +132,7 @@
     </div>
   </div>
 
-  <aside id="sidebar" class="sidebar flex flex-col h-full" style="background:var(--surface); border-right: 1px solid var(--border)">
+  <aside id="sidebar" class="sidebar flex flex-col h-full" style="border-right: 1px solid var(--border)">
     <div class="h-[76px] px-5 flex items-center border-b shrink-0" style="border-color:var(--border)">
       <div class="flex items-center gap-3">
         <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>

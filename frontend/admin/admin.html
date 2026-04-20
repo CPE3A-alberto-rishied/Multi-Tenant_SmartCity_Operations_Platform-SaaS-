@@ -9,12 +9,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles2.css">
     <style>
+        /* Base Errors & Animations */
         .input-error { 
             border: 1.5px solid #ef4444 !important; 
             box-shadow: 0 0 12px rgba(239, 68, 68, 0.35) !important; 
             animation: shake 0.2s ease-in-out 0s 2;
         }
         .error-text { color: #ef4444; font-size: 11px; margin-top: 5px; font-weight: 500; }
+        
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-4px); }
@@ -22,57 +24,135 @@
         }
 
         .card-glow { box-shadow: 0 0 40px rgba(37, 99, 235, 0.2); }
-        
         .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999; }
         .hidden { display: none !important; }
         
+        /* OTP & Select Inputs */
         .otp-input { width: 48px; height: 56px; background: #1e2536; color: white; text-align: center; font-size: 1.25rem; font-weight: bold; border-radius: 8px; border: 1.5px solid #374151; outline: none; transition: all 0.2s; }
         .otp-input:focus { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2); }
         select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
         
         button, a { cursor: pointer !important; }
+
+        /* =========================================
+           EXTRACTED INLINE STYLES 
+           ========================================= */
+        
+        /* Backgrounds & Containers */
+        .auth-bg {
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f3a 25%, #0f1428 50%, #1a254a 75%, #0a0e1a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Cards */
+        .popup-panel {
+            width: 420px;
+            background: rgba(20, 26, 45, 0.95);
+            padding: 2.5rem;
+            border-radius: 1rem;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .auth-panel {
+            width: 420px;
+            background: rgba(15, 20, 35, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 2.5rem;
+            border-radius: 1rem;
+        }
+
+        /* Typography */
+        .text-dim-sm { color: #94a3b8; font-size: 14px; }
+        .line-height-relaxed { line-height: 1.6; }
+
+        /* UI Elements & Icons */
+        .logo-box {
+            background: var(--accent);
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            margin: 0 auto 12px;
+        }
+        .icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+        }
+        .bg-blue-accent { background: #2563eb; }
+        .bg-green-accent { background: #22c55e; }
+        
+        .input-icon-left {
+            position: absolute; left: 14px; top: 13px; width: 18px; height: 18px; color: #94a3b8;
+        }
+        .input-icon-right {
+            position: absolute; right: 14px; top: 13px; width: 18px; height: 18px; color: #94a3b8; cursor: pointer;
+        }
+
+        /* Form Inputs */
+        .auth-input-field {
+            padding: 12px 14px 12px 42px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .auth-input-pass {
+            padding: 12px 45px 12px 42px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .auth-select-field {
+            padding: 12px 14px;
+            border-radius: 8px;
+        }
+        .auth-email-field {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
     </style>
 </head>
 <body class="h-full">
-    <div id="auth-screen" class="h-full flex flex-col items-center justify-center" style="background:linear-gradient(135deg,#0a0e1a 0%,#1a1f3a 25%,#0f1428 50%,#1a254a 75%,#0a0e1a 100%); position:relative; overflow:hidden">
+    <div id="auth-screen" class="h-full flex flex-col items-center justify-center auth-bg">
         
         <div id="success-popup" class="modal-overlay hidden">
-            <div class="card card-glow" style="width:420px; background:rgba(20, 26, 45, 0.95); padding:2.5rem; border-radius:1rem; text-align:center; border:1px solid rgba(255,255,255,0.1);">
-                <div style="background:#2563eb; width:48px; height:48px; border-radius:50%; margin:0 auto 20px" class="flex items-center justify-center text-white"><i data-lucide="mail-check"></i></div>
+            <div class="card card-glow popup-panel">
+                <div class="icon-circle bg-blue-accent flex items-center justify-center text-white"><i data-lucide="mail-check"></i></div>
                 <h2 class="text-white font-bold text-xl mb-4">Reset Link Sent</h2>
-                <p style="color:#94a3b8; font-size:14px; line-height:1.6; margin-bottom:32px">Check your email for password reset instructions.</p>
+                <p class="text-dim-sm line-height-relaxed mb-8">Check your email for password reset instructions.</p>
                 <button onclick="closePopup()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-[10px]">Back to Login</button>
             </div>
         </div>
 
         <div id="resent-popup" class="modal-overlay hidden">
-            <div class="card card-glow" style="width:420px; background:rgba(20, 26, 45, 0.95); border:1px solid rgba(255,255,255,0.1); padding:2.5rem; border-radius:1rem; text-align:center;">
-                <div style="background:#22c55e; width:48px; height:48px; border-radius:50%; margin:0 auto 20px" class="flex items-center justify-center text-white"><i data-lucide="mail"></i></div>
+            <div class="card card-glow popup-panel">
+                <div class="icon-circle bg-green-accent flex items-center justify-center text-white"><i data-lucide="mail"></i></div>
                 <h2 class="text-white font-bold text-xl mb-4">Code Resent</h2>
-                <p style="color:#94a3b8; font-size:14px; margin-bottom:32px">A new verification code has been sent to your email.</p>
+                <p class="text-dim-sm mb-8">A new verification code has been sent to your email.</p>
                 <button onclick="closeResentPopup()" class="w-32 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 mx-auto rounded-[10px]">Got it</button>
             </div>
         </div>
 
-        <div id="auth-logo" style="text-align:center; margin-bottom:40px">
-            <div style="background:var(--accent); width:56px; height:56px; border-radius:14px; margin:0 auto 12px" class="flex items-center justify-center font-mono font-bold text-white text-xl shadow-lg">B</div>
-            <h1 class="font-mono font-bold tracking-widest text-white" style="font-size:36px; margin:0">BEAT</h1>
-            <p style="color:#94a3b8; font-size:14px;">Administrative Control System</p>
+        <div id="auth-logo" class="text-center mb-10">
+            <div class="logo-box flex items-center justify-center font-mono font-bold text-white text-xl shadow-lg">B</div>
+            <h1 class="font-mono font-bold tracking-widest text-white text-4xl m-0">BEAT</h1>
+            <p class="text-dim-sm mt-1">Administrative Control System</p>
         </div>
 
-        <div id="login-card" class="card card-glow" style="width:420px; background:rgba(15, 20, 35, 0.85); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.05); padding:2.5rem; border-radius:1rem;">
+        <div id="login-card" class="card card-glow auth-panel">
             <form onsubmit="handleLogin(event)" novalidate>
                 <div class="mb-5">
                     <label class="block text-[11px] font-bold mb-2 text-[#94a3b8] tracking-wider uppercase">ID Number</label>
                     <div class="relative flex flex-col">
-                        <i data-lucide="hash" style="position:absolute; left:14px; top:13px; width:18px; height:18px; color:#94a3b8"></i>
-                        <input id="login-user" type="text" placeholder="Enter ID number" class="w-full bg-[#1e2536] text-white" style="padding:12px 14px 12px 42px; border-radius:8px; border:1px solid var(--border);" oninput="clearError('login-user', 'user-error')">
+                        <i data-lucide="hash" class="input-icon-left"></i>
+                        <input id="login-user" type="text" placeholder="Enter ID number" class="w-full bg-[#1e2536] text-white auth-input-field" oninput="clearError('login-user', 'user-error')">
                         <p id="user-error" class="error-text hidden">This field is required</p>
                     </div>
                 </div>
                 <div class="mb-5">
                     <label class="block text-[11px] font-bold mb-2 text-[#94a3b8] tracking-wider uppercase">Department</label>
-                    <select id="login-dept" class="w-full bg-[#1e2536] text-white border border-gray-700" style="padding:12px 14px; border-radius:8px;">
+                    <select id="login-dept" class="w-full bg-[#1e2536] text-white border border-gray-700 auth-select-field">
                         <option value="main">Main Admin</option>
                         <option value="traffic">Traffic Department</option>
                     </select>
@@ -80,9 +160,9 @@
                 <div class="mb-2">
                     <label class="block text-[11px] font-bold mb-2 text-[#94a3b8] tracking-wider uppercase">Password</label>
                     <div class="relative flex flex-col">
-                        <i data-lucide="lock" style="position:absolute; left:14px; top:13px; width:18px; height:18px; color:#94a3b8"></i>
-                        <input id="login-pass" type="password" placeholder="Enter password" class="w-full bg-[#1e2536] text-white" style="padding:12px 45px 12px 42px; border-radius:8px; border:1px solid var(--border);" oninput="clearError('login-pass', 'pass-error')">
-                        <i data-lucide="eye" style="position:absolute; right:14px; top:13px; width:18px; height:18px; color:#94a3b8; cursor:pointer"></i>
+                        <i data-lucide="lock" class="input-icon-left"></i>
+                        <input id="login-pass" type="password" placeholder="Enter password" class="w-full bg-[#1e2536] text-white auth-input-pass" oninput="clearError('login-pass', 'pass-error')">
+                        <i data-lucide="eye" class="input-icon-right"></i>
                         <p id="pass-error" class="error-text hidden">This field is required</p>
                     </div>
                 </div>
@@ -93,10 +173,10 @@
             </form>
         </div>
 
-        <div id="verify-card" class="card card-glow hidden" style="width:420px; background:rgba(15, 20, 35, 0.85); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.05); padding:2.5rem; border-radius:1rem; text-align:center;">
-            <div style="background:#2563eb; width:48px; height:48px; border-radius:50%; margin:0 auto 20px" class="flex items-center justify-center text-white"><i data-lucide="shield-check"></i></div>
+        <div id="verify-card" class="card card-glow auth-panel hidden text-center">
+            <div class="icon-circle bg-blue-accent flex items-center justify-center text-white"><i data-lucide="shield-check"></i></div>
             <h2 class="text-white font-bold text-xl mb-2">Verify Your Identity</h2>
-            <p style="color:#94a3b8; font-size:14px; margin-bottom:24px">Enter the 6-digit code sent to your email</p>
+            <p class="text-dim-sm mb-6">Enter the 6-digit code sent to your email</p>
             <form onsubmit="handleVerify(event)" novalidate>
                 <div class="flex justify-between gap-2 mb-4">
                     <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 0)" onkeydown="handleOtpBack(event, 0)">
@@ -115,13 +195,13 @@
             </form>
         </div>
 
-        <div id="reset-card" class="card card-glow hidden" style="width:420px; background:rgba(15, 20, 35, 0.85); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.05); padding:2.5rem; border-radius:1rem; text-align:center;">
-            <div style="background:#2563eb; width:48px; height:48px; border-radius:50%; margin:0 auto 20px" class="flex items-center justify-center text-white"><i data-lucide="key"></i></div>
+        <div id="reset-card" class="card card-glow auth-panel hidden text-center">
+            <div class="icon-circle bg-blue-accent flex items-center justify-center text-white"><i data-lucide="key"></i></div>
             <h2 class="text-white font-bold text-xl mb-2">Reset Password</h2>
             <form onsubmit="handleReset(event)" novalidate>
                 <div class="mb-6 text-left">
                     <label class="block text-[11px] font-bold mb-2 text-[#94a3b8] tracking-wider uppercase">Email Address</label>
-                    <input id="reset-email" type="email" placeholder="admin@beat.gov.ph" class="w-full bg-[#1e2536] text-white" style="padding:12px 16px; border-radius:8px; border:1px solid var(--border);" oninput="clearError('reset-email', 'reset-error')">
+                    <input id="reset-email" type="email" placeholder="admin@beat.gov.ph" class="w-full bg-[#1e2536] text-white auth-email-field" oninput="clearError('reset-email', 'reset-error')">
                     <p id="reset-error" class="error-text hidden">Enter a valid email address</p>
                 </div>
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-[10px] mb-6">Send Reset Link</button>
