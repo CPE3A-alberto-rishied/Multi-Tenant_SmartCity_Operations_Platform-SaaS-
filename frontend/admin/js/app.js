@@ -19,6 +19,18 @@ function clearReqError(el) {
         }
     }
 }
+// ADD THIS TO THE TOP OF app.js
+function clearError(inputId, errorId) {
+    const input = document.getElementById(inputId);
+    const error = document.getElementById(errorId);
+    
+    if (input) {
+        input.classList.remove('input-error');
+    }
+    if (error) {
+        error.classList.add('hidden');
+    }
+}
 
 function escapeHTML(str) {
     if (!str) return '';
@@ -39,6 +51,7 @@ document.addEventListener('click', (e) => {
 // ==========================================
 // AUTHENTICATION LOGIC (admin.html)
 // ==========================================
+let currentLoggingInId = "";
 async function handleLogin(e) {
     e.preventDefault(); 
     
@@ -57,61 +70,51 @@ async function handleLogin(e) {
     }
 
     try {
-        // Fetch from Render MongoDB
         const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 id: userEl.value.trim(),
                 password: passEl.value,
-                dept: deptEl.options[deptEl.selectedIndex].text.replace(" Department", "") // Match DB format
+                dept: deptEl.options[deptEl.selectedIndex].text.replace(" Department", "")
             })
         });
 
         const result = await response.json();
-
         if (result.success) {
-            // Success! Store Dept for Routing
-            localStorage.setItem('activeDepartment', result.admin.dept);
+            currentLoggingInId = result.adminId; // Store for verification
             document.getElementById('login-card').classList.add('hidden');
             document.getElementById('verify-card').classList.remove('hidden');
         } else {
-            // Show server error on the UI
-            userEl.classList.add('input-error');
-            userErr.innerText = result.error;
-            userErr.classList.remove('hidden');
+            alert(result.error);
         }
-    } catch (error) {
-        console.error("Login failed:", error);
-        alert("Cannot connect to BEAT Security Server.");
-    }
+    } catch (error) { console.error(error); }
 }
 
-function handleVerify(e) {
+async function handleVerify(e) {
     e.preventDefault();
     const inputs = document.querySelectorAll('.otp-input');
-    let valid = true;
-    
-    inputs.forEach(input => {
-        if (!input.value.trim()) {
-            input.classList.add('input-error');
-            valid = false;
-        }
-    });
+    const otpCode = Array.from(inputs).map(i => i.value).join('');
 
-    if (!valid) {
-        const err = document.getElementById('verify-error');
-        if(err) err.classList.remove('hidden');
-    } else {
-        // SMART ROUTING BASED ON ACCOUNT
-        const activeDept = localStorage.getItem('activeDepartment');
-        
-        if (activeDept === 'Main Admin') {
-            window.location.href = "dashboard.html"; 
+    if (otpCode.length < 6) return;
+
+    try {
+        const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adminId: currentLoggingInId, otpCode })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            localStorage.setItem('activeDepartment', result.dept);
+            window.location.href = result.dept === 'Main Admin' ? "dashboard.html" : "dashboard2.html";
         } else {
-            window.location.href = "dashboard2.html"; 
+            alert("Incorrect code. Please try again.");
+            inputs.forEach(i => i.value = ''); // Clear inputs
+            inputs[0].focus();
         }
-    }
+    } catch (error) { alert("Connection lost."); }
 }
 
 function handleReset(e) {

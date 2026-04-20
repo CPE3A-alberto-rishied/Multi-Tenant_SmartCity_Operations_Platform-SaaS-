@@ -85,43 +85,65 @@ app.post('/api/report', async (req, res) => {
     }
 });
 // 1. ADMIN SCHEMA
+// 1. Add OTP fields to the Schema
 const adminSchema = new mongoose.Schema({
     id: { type: String, required: true, unique: true },
-    username: String,
-    email: String,
     password: { type: String, required: true },
+    email: String,
     dept: String,
-    status: { type: String, default: 'Active' }
+    otp: String,          // Temporary verification code
+    otpExpires: Date      // Code expiration time
 });
 const Admin = mongoose.model('Admin', adminSchema);
 
-// 2. LOGIN ROUTE
+// 2. Modified Login Route (Sends Email)
 app.post('/api/admin/login', async (req, res) => {
     try {
         const { id, password, dept } = req.body;
-
-        // Find admin by ID and Department
         const foundAdmin = await Admin.findOne({ id, dept });
 
-        if (!foundAdmin) {
-            return res.status(404).json({ success: false, error: "No account found for that ID/Department." });
+        if (!foundAdmin || foundAdmin.password !== password) {
+            return res.status(401).json({ success: false, error: "Invalid credentials." });
         }
 
-        if (foundAdmin.password !== password) {
-            return res.status(401).json({ success: false, error: "Wrong credentials input." });
-        }
+        // GENERATE 6-DIGIT CODE
+        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+        foundAdmin.otp = otpCode;
+        foundAdmin.otpExpires = Date.now() + 600000; // Valid for 10 minutes
+        await foundAdmin.save();
 
-        if (foundAdmin.status === "Disabled") {
-            return res.status(403).json({ success: false, error: "This account is disabled." });
-        }
-
-        // Return admin data for frontend routing
-        res.status(200).json({ 
-            success: true, 
-            admin: { username: foundAdmin.username, dept: foundAdmin.dept } 
+        // SEND EMAIL VIA GMAIL
+        await transporter.sendMail({
+            from: `"BEAT Security" <${process.env.EMAIL_USER}>`,
+            to: foundAdmin.email,
+            subject: "B.E.A.T. Admin Verification Code",
+            html: `<h3>Verification Code: <b>${otpCode}</b></h3><p>This code expires in 10 minutes.</p>`
         });
+
+        res.status(200).json({ success: true, adminId: foundAdmin.id });
     } catch (error) {
-        res.status(500).json({ success: false, error: "Server Error" });
+        res.status(500).json({ success: false, error: "Server Error during 2FA." });
+    }
+});
+
+// 3. NEW: Verification Route
+app.post('/api/admin/verify', async (req, res) => {
+    try {
+        const { adminId, otpCode } = req.body;
+        const admin = await Admin.findOne({ id: adminId });
+
+        if (!admin || admin.otp !== otpCode || Date.now() > admin.otpExpires) {
+            return res.status(400).json({ success: false, error: "Invalid or expired code." });
+        }
+
+        // Clear OTP after success
+        admin.otp = undefined;
+        admin.otpExpires = undefined;
+        await admin.save();
+
+        res.status(200).json({ success: true, dept: admin.dept });
+    } catch (error) {
+        res.status(500).json({ success: false, error: "Verification failed." });
     }
 });
 const PORT = process.env.PORT || 3000;
