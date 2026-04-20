@@ -1368,7 +1368,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCategoryDropdowns();
         filterAnnouncements(); 
     }
-});});
+});
 
 // ==========================================
 // AUTHENTICATION & POPUP UI LOGIC
