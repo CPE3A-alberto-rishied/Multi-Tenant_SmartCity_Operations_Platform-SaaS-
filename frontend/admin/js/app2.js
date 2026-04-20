@@ -20,13 +20,6 @@ function clearReqError(el) {
     }
 }
 
-function clearError(inputId, errorId) {
-    const input = document.getElementById(inputId);
-    const error = document.getElementById(errorId);
-    if (input) input.classList.remove('input-error');
-    if (error) error.classList.add('hidden');
-}
-
 function escapeHTML(str) {
     if (!str) return '';
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
@@ -36,421 +29,11 @@ function doLogout() {
     window.location.href = 'admin.html'; 
 }
 
-// Close custom dropdowns when clicking outside
 document.addEventListener('click', (e) => {
     if (!e.target.closest('.custom-dropdown-container')) {
         document.querySelectorAll('.cat-dropdown-menu').forEach(el => el.classList.add('hidden'));
     }
 });
-
-
-// ==========================================
-// AUTHENTICATION LOGIC (admin.html)
-// ==========================================
-function handleLogin(e) {
-    e.preventDefault(); 
-    
-    const userEl = document.getElementById('login-user');
-    const passEl = document.getElementById('login-pass');
-    
-    const userErr = document.getElementById('user-error');
-    const passErr = document.getElementById('pass-error');
-
-    let valid = true;
-
-    // 1. Check for empty fields
-    if (!userEl.value.trim()) {
-        userEl.classList.add('input-error');
-        userErr.innerText = "This field is required";
-        userErr.classList.remove('hidden');
-        valid = false;
-    }
-    if (!passEl.value.trim()) {
-        passEl.classList.add('input-error');
-        passErr.innerText = "This field is required";
-        passErr.classList.remove('hidden');
-        valid = false;
-    }
-
-    if (!valid) return;
-
-    const inputId = userEl.value.trim();
-    const inputPass = passEl.value;
-
-    // 2. Hardcoded Master Admin fallback
-    const isMasterAdmin = (inputId === '2023104513' && inputPass === 'admin123');
-
-    // 3. Retrieve created accounts from Memory
-    let savedAdmins = JSON.parse(localStorage.getItem('beat_admins')) || [];
-    const foundAdmin = savedAdmins.find(a => a.id === inputId);
-
-    // 4. Validate Account Existence
-    if (!isMasterAdmin && !foundAdmin) {
-        userEl.classList.add('input-error');
-        userErr.innerText = "No account made for that ID.";
-        userErr.classList.remove('hidden');
-        return;
-    }
-
-    // 5. Validate Password
-    if (!isMasterAdmin && foundAdmin && foundAdmin.password !== inputPass) {
-        passEl.classList.add('input-error');
-        passErr.innerText = "Wrong credentials input.";
-        passErr.classList.remove('hidden');
-        return;
-    }
-
-    // 6. Validate Account Status
-    if (!isMasterAdmin && foundAdmin && foundAdmin.status === "Disabled") {
-        userEl.classList.add('input-error');
-        userErr.innerText = "This account is disabled.";
-        userErr.classList.remove('hidden');
-        return;
-    }
-    
-    // 7. Login Successful! Store Active Department for Routing
-    let activeDept = isMasterAdmin ? "Main Admin" : foundAdmin.dept;
-    localStorage.setItem('activeDepartment', activeDept);
-
-    // Proceed to Verify Screen
-    document.getElementById('login-card').classList.add('hidden');
-    document.getElementById('verify-card').classList.remove('hidden');
-}
-
-function handleVerify(e) {
-    e.preventDefault();
-    const inputs = document.querySelectorAll('.otp-input');
-    let valid = true;
-    
-    inputs.forEach(input => {
-        if (!input.value.trim()) {
-            input.classList.add('input-error');
-            valid = false;
-        }
-    });
-
-    if (!valid) {
-        const err = document.getElementById('verify-error');
-        if(err) err.classList.remove('hidden');
-    } else {
-        // SMART ROUTING BASED ON ACCOUNT
-        const activeDept = localStorage.getItem('activeDepartment');
-        
-        if (activeDept === 'Main Admin') {
-            window.location.href = "dashboard.html"; 
-        } else {
-            window.location.href = "dashboard2.html"; 
-        }
-    }
-}
-
-function handleReset(e) {
-    e.preventDefault(); 
-    const email = document.getElementById('reset-email');
-    let valid = true;
-
-    if (email && (!email.value.trim() || !email.value.includes('@'))) {
-        email.classList.add('input-error');
-        const err = document.getElementById('reset-error');
-        if(err) err.classList.remove('hidden');
-        valid = false;
-    }
-
-    if (valid && email) {
-        const popup = document.getElementById('success-popup');
-        if(popup) popup.classList.remove('hidden');
-    }
-}
-
-function handleOtp(input, index) {
-    const inputs = document.querySelectorAll('.otp-input');
-    input.classList.remove('input-error');
-    const err = document.getElementById('verify-error');
-    if(err) err.classList.add('hidden');
-    
-    if (input.value.length === 1 && index < inputs.length - 1) {
-        inputs[index + 1].focus();
-    }
-}
-
-function handleOtpBack(e, index) {
-    const inputs = document.querySelectorAll('.otp-input');
-    if (e.key === 'Backspace' && index > 0 && !inputs[index].value) {
-        inputs[index - 1].focus();
-    }
-}
-
-function showResetScreen() {
-    document.getElementById('login-card').classList.add('hidden');
-    document.getElementById('reset-card').classList.remove('hidden');
-}
-
-function showLoginScreen() {
-    const resetCard = document.getElementById('reset-card');
-    const verifyCard = document.getElementById('verify-card');
-    const loginCard = document.getElementById('login-card');
-    
-    if(resetCard) resetCard.classList.add('hidden');
-    if(verifyCard) verifyCard.classList.add('hidden');
-    if(loginCard) loginCard.classList.remove('hidden');
-}
-
-function showResentPopup(e) {
-    if(e) e.preventDefault(); 
-    const popup = document.getElementById('resent-popup');
-    if(popup) popup.classList.remove('hidden');
-}
-
-function closePopup(popupId) { 
-    const popup = document.getElementById(popupId);
-    if(popup) popup.classList.add('hidden'); 
-}
-
-
-// ==========================================
-// MANAGE ADMINS LOGIC (With Memory Sync)
-// ==========================================
-
-// Pulls data from memory so it persists across reloads!
-let departments = JSON.parse(localStorage.getItem('beat_departments')) || []; 
-let mockData = { 
-    admins: JSON.parse(localStorage.getItem('beat_admins')) || [] 
-}; 
-
-let currentFilter = "All Departments";
-let currentSearchQuery = "";
-let userToDelete = null;
-
-function checkDeptBeforeStaff() {
-    if (departments.length === 0) { openModal('no-dept-modal'); } 
-    else { openModal('add-staff-modal'); }
-}
-
-function handleSort(val) {
-    currentFilter = val;
-    const deleteBtn = document.getElementById('delete-dept-btn');
-    if (val !== "All Departments") {
-        deleteBtn.classList.remove('hidden');
-        document.getElementById('delete-dept-title').innerText = `Delete ${val}?`;
-        const count = mockData.admins.filter(a => a.dept === val).length;
-        document.getElementById('delete-dept-desc').innerText = `This will remove the department AND delete all ${count} associated staff member(s).`;
-    } else { 
-        deleteBtn.classList.add('hidden'); 
-    }
-    populateAdmins();
-}
-
-function handleSearch(val) {
-    currentSearchQuery = val.toLowerCase();
-    populateAdmins();
-}
-
-function updateDepartmentDropdowns() {
-    const filterSelect = document.getElementById('dept-filter');
-    const modalSelect = document.getElementById('staff-dept');
-    if (filterSelect) filterSelect.innerHTML = `<option>All Departments</option>` + departments.map(d => `<option value="${d}">${d}</option>`).join('');
-    if (modalSelect) modalSelect.innerHTML = `<option value="" disabled selected>Select Department</option>` + departments.map(d => `<option value="${d}">${d}</option>`).join('');
-}
-
-function populateAdmins() {
-    const activeTbody = document.getElementById('active-admin-table-body');
-    const disabledTbody = document.getElementById('disabled-admin-table-body');
-    if(!activeTbody || !disabledTbody) return;
-
-    let adminsToDisplay = mockData.admins;
-    
-    // Apply Department Filter
-    if (currentFilter !== "All Departments") {
-        adminsToDisplay = adminsToDisplay.filter(a => a.dept === currentFilter);
-    }
-
-    // Apply Search Filter (Name or ID)
-    if (currentSearchQuery) {
-        adminsToDisplay = adminsToDisplay.filter(a => 
-            a.username.toLowerCase().includes(currentSearchQuery) || 
-            a.id.toLowerCase().includes(currentSearchQuery)
-        );
-    }
-
-    const activeAdmins = adminsToDisplay.filter(a => a.status === "Active");
-    const disabledAdmins = adminsToDisplay.filter(a => a.status !== "Active");
-
-    activeTbody.innerHTML = activeAdmins.map(a => `
-        <tr class="border-b border-[#1e293b] hover:bg-white/5 transition-colors">
-            <td class="px-5 py-4 w-10"></td> 
-            <td class="font-bold py-4 px-5 text-white">${escapeHTML(a.username)}</td>
-            <td class="text-[#94a3b8]">${escapeHTML(a.id)}</td>
-            <td class="text-[#94a3b8]">${escapeHTML(a.email)}</td>
-            <td class="text-[#94a3b8]">${escapeHTML(a.dept)}</td>
-            <td><span class="bg-green-500/20 text-green-500 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">Active</span></td>
-            <td><label class="switch"><input type="checkbox" checked onchange="handleStatusToggle(this, '${escapeHTML(a.username)}')"><span class="slider"></span></label></td>
-        </tr>`).join('');
-        
-    disabledTbody.innerHTML = disabledAdmins.map(a => `
-        <tr class="hover:bg-white/5 opacity-60">
-            <td class="px-5 py-4 w-10"><i data-lucide="trash-2" class="w-4 h-4 text-red-500/60 hover:text-red-500 cursor-pointer transition-colors" onclick="promptDeleteUser('${escapeHTML(a.username)}')"></i></td>
-            <td class="font-bold py-4 px-5 text-white">${escapeHTML(a.username)}</td>
-            <td class="text-[#94a3b8]">${escapeHTML(a.id)}</td>
-            <td class="text-[#94a3b8]">${escapeHTML(a.email)}</td>
-            <td class="text-[#94a3b8]">${escapeHTML(a.dept)}</td>
-            <td><span class="bg-yellow-500/10 text-yellow-500/70 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">Disabled</span></td>
-            <td><label class="switch"><input type="checkbox" onchange="handleStatusToggle(this, '${escapeHTML(a.username)}')"><span class="slider"></span></label></td>
-        </tr>`).join('');
-    
-    if (window.lucide) lucide.createIcons(); 
-}
-
-function promptDeleteUser(username) {
-    userToDelete = username;
-    const nameSpan = document.getElementById('delete-user-name');
-    if(nameSpan) nameSpan.innerText = username;
-    openModal('confirm-delete-user-modal');
-}
-
-function executeDeleteUser() {
-    if(userToDelete) {
-        mockData.admins = mockData.admins.filter(a => a.username !== userToDelete);
-        
-        // SAVE USERS TO MEMORY
-        localStorage.setItem('beat_admins', JSON.stringify(mockData.admins));
-
-        userToDelete = null;
-        populateAdmins();
-    }
-    closeModal('confirm-delete-user-modal');
-}
-
-function executeDeleteDept() {
-    mockData.admins = mockData.admins.filter(a => a.dept !== currentFilter);
-    departments = departments.filter(d => d !== currentFilter);
-    
-    // SAVE BOTH DEPARTMENTS AND USERS TO MEMORY
-    localStorage.setItem('beat_departments', JSON.stringify(departments));
-    localStorage.setItem('beat_admins', JSON.stringify(mockData.admins));
-
-    currentFilter = "All Departments";
-    const filterEl = document.getElementById('dept-filter');
-    if (filterEl) filterEl.value = "All Departments";
-    document.getElementById('delete-dept-btn').classList.add('hidden');
-    updateDepartmentDropdowns();
-    populateAdmins();
-    closeModal('delete-dept-modal');
-}
-
-function validateAddStaff() {
-    const name = document.getElementById('staff-name'), 
-          id = document.getElementById('staff-id'), 
-          email = document.getElementById('staff-email'), 
-          pass = document.getElementById('staff-pass'),
-          dept = document.getElementById('staff-dept'); 
-          
-    let isValid = true;
-    if (!name.value.trim()) { name.classList.add('input-error'); document.getElementById('name-error').classList.remove('hidden'); isValid = false; }
-    if (!id.value.trim()) { id.classList.add('input-error'); document.getElementById('id-error').classList.remove('hidden'); isValid = false; }
-    if (!email.value.trim()) { email.classList.add('input-error'); document.getElementById('email-error').classList.remove('hidden'); isValid = false; }
-    if (pass.value.length < 8) { pass.classList.add('input-error'); document.getElementById('pass-error').classList.remove('hidden'); isValid = false; }
-    if (!dept.value) { dept.classList.add('input-error'); document.getElementById('dept-select-error').classList.remove('hidden'); isValid = false; }
-    
-    if (isValid) openModal('confirm-staff-modal');
-}
-
-function executeAddStaff() {
-    const newUser = {
-        username: document.getElementById('staff-name').value,
-        id: document.getElementById('staff-id').value,
-        email: document.getElementById('staff-email').value,
-        password: document.getElementById('staff-pass').value, // Saved for Login Validation
-        dept: document.getElementById('staff-dept').value,
-        status: "Active"
-    };
-    mockData.admins.push(newUser);
-    
-    // SAVE USERS TO MEMORY
-    localStorage.setItem('beat_admins', JSON.stringify(mockData.admins));
-
-    clearAndCloseStaff(); 
-    closeModal('confirm-staff-modal'); 
-    populateAdmins();
-}
-
-function validateCreateDept() {
-    const input = document.getElementById('new-dept-name');
-    if (!input.value.trim()) { input.classList.add('input-error'); document.getElementById('dept-error').classList.remove('hidden'); return; }
-    openModal('confirm-dept-modal');
-}
-
-function executeCreateDept() {
-    const name = document.getElementById('new-dept-name').value.trim();
-    if (name && !departments.includes(name)) { 
-        departments.push(name); 
-        
-        // SAVE DEPARTMENTS TO MEMORY
-        localStorage.setItem('beat_departments', JSON.stringify(departments));
-
-        updateDepartmentDropdowns(); 
-    }
-    clearAndCloseDept(); 
-    closeModal('confirm-dept-modal');
-}
-
-function clearAndCloseStaff() {
-    ['staff-name', 'staff-id', 'staff-email', 'staff-pass', 'staff-dept'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            if (el.tagName === 'SELECT') el.value = "";
-            else el.value = "";
-        }
-        let errId = id === 'staff-pass' ? 'pass-error' : id === 'staff-dept' ? 'dept-select-error' : id.split('-')[1] + '-error';
-        clearError(id, errId);
-    });
-    closeModal('add-staff-modal');
-}
-
-function clearAndCloseDept() {
-    const input = document.getElementById('new-dept-name');
-    if (input) input.value = "";
-    clearError('new-dept-name', 'dept-error');
-    closeModal('new-dept-modal');
-}
-
-let pendingToggle = null;
-let currentTargetUser = "";
-
-function handleStatusToggle(checkbox, userName) {
-    pendingToggle = checkbox;
-    currentTargetUser = userName;
-    if (!checkbox.checked) {
-        document.getElementById('disable-title').innerText = `Disable ${userName}?`;
-        openModal('disable-modal');
-        checkbox.checked = true;
-    } else {
-        document.getElementById('enable-title').innerText = `Enable ${userName}?`;
-        openModal('enable-modal');
-        checkbox.checked = false;
-    }
-}
-
-function confirmStatusChange(isEnabling) {
-    if (pendingToggle) {
-        const user = mockData.admins.find(u => u.username === currentTargetUser);
-        if (user) {
-            user.status = isEnabling ? "Active" : "Disabled";
-            
-            // SAVE STATUS CHANGE TO MEMORY
-            localStorage.setItem('beat_admins', JSON.stringify(mockData.admins));
-            
-            populateAdmins(); 
-        }
-        closeModal(isEnabling ? 'enable-modal' : 'disable-modal');
-    }
-}
-
-function cancelStatusChange() { 
-    closeModal('enable-modal'); 
-    closeModal('disable-modal'); 
-    pendingToggle = null; 
-}
-
 
 // ==========================================
 // REPORTS PAGE SPECIFIC LOGIC
@@ -504,16 +87,6 @@ function openReportDetails(card) {
     document.getElementById('modal-detail-forwarded').innerText = forwarded;
     document.getElementById('modal-detail-desc').innerText = desc;
 
-    const returnBox = card.querySelector('.border-red-500');
-    const modalReturnBox = document.getElementById('modal-detail-return-box');
-    if (returnBox && modalReturnBox) {
-        const reasonText = returnBox.querySelector('p:nth-child(2)').innerText.replace(' See More', '');
-        document.getElementById('modal-detail-return-reason').innerText = reasonText;
-        modalReturnBox.classList.remove('hidden');
-    } else if (modalReturnBox) {
-        modalReturnBox.classList.add('hidden');
-    }
-
     openModal('view-report-modal');
 }
 
@@ -560,8 +133,10 @@ function executeSubmitReport() {
     const minStr = now.getMinutes().toString().padStart(2, '0');
     const timeStr = `${hours}:${minStr} ${ampm}`;
 
+    let departments = JSON.parse(localStorage.getItem('beat_departments')) || []; 
+
     const newCardHTML = `
-        <div class="report-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors" style="background:var(--surface); border-color:var(--border)" onclick="openReportDetails(this)" data-email="${email}" data-contact="${contact}">
+        <div class="report-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors theme-surface" onclick="openReportDetails(this)" data-email="${email}" data-contact="${contact}">
           <div class="flex justify-between items-start mb-4">
             <div>
               <p class="text-xs font-bold text-white report-date">${dateStr}</p>
@@ -578,7 +153,7 @@ function executeSubmitReport() {
             <p class="text-[#94a3b8] mb-1">Description:</p>
             <p class="text-slate-300 leading-relaxed line-clamp-3">${escapeHTML(desc)}</p>
           </div>
-          <div class="mt-auto pt-4 border-t space-y-4 text-sm" style="border-color:var(--border)" onclick="event.stopPropagation()">
+          <div class="mt-auto pt-4 border-t theme-border space-y-4 text-sm" onclick="event.stopPropagation()">
             <div>
               <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2">FORWARD TO</p>
               <select class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500 cursor-pointer transition-all" onfocus="storePrevValue(this)" onchange="handleForward(this)">
@@ -602,14 +177,14 @@ function executeSubmitReport() {
 
     clearAndCloseReport();
     if(window.lucide) lucide.createIcons();
-    filterReports();
+    if(typeof filterReports === 'function') filterReports();
 }
 
 function clearAndCloseReport() {
     ['report-name', 'report-email', 'report-contact', 'report-location', 'report-subject', 'report-desc'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
-        clearError(id, id + '-error');
+        clearReqError(el);
     });
     closeModal('new-report-modal');
 }
@@ -655,11 +230,7 @@ function filterReports() {
             if (cardDate !== formattedFilterDate) show = false;
         }
         
-        if (show) {
-            card.style.display = 'flex'; 
-        } else {
-            card.style.display = 'none';
-        }
+        card.style.display = show ? 'flex' : 'none'; 
     });
 }
 
@@ -694,7 +265,7 @@ function confirmForward() {
             badge.setAttribute('data-orig-text', badge.innerText);
         }
         pendingForwardSelect.setAttribute('data-prev', pendingForwardSelect.value);
-        filterReports();
+        if(typeof filterReports === 'function') filterReports();
         pendingForwardSelect = null;
     }
     closeModal('confirm-forward-modal');
@@ -740,7 +311,7 @@ function confirmResolution() {
             }
 
             card.classList.add('opacity-70');
-            filterReports();
+            if(typeof filterReports === 'function') filterReports();
         }
         pendingReportToggle = null; 
     }
@@ -768,7 +339,7 @@ function confirmCancelResolution() {
                 badge.className = 'badge-status bg-orange-500/10 text-orange-400 border border-orange-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all';
                 badge.innerText = 'Pending';
             }
-            filterReports();
+            if(typeof filterReports === 'function') filterReports();
         }
         pendingReportToggle = null;
     }
@@ -783,10 +354,10 @@ function cancelReportToggle(modalId) {
     closeModal(modalId);
 }
 
-
 // ==========================================
 // ANNOUNCEMENTS PAGE SPECIFIC LOGIC
 // ==========================================
+
 let currentAnnMode = 'create';
 let annBlockCount = 1;
 let currentEditingCard = null;
@@ -808,7 +379,7 @@ function renderCategoryDropdowns() {
             html += `
             <div class="p-2 text-sm text-white hover:bg-gray-700 cursor-pointer flex justify-between items-center group transition-colors" onclick="selectCategory('filter', '${escapeHTML(cat)}', '${escapeHTML(cat)}')">
                 <span class="truncate pr-2">${escapeHTML(cat)}</span>
-                <button onclick="promptDeleteCategory(event, '${escapeHTML(cat)}')" class="text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" title="Delete Category"><i data-lucide="minus-circle" class="w-4 h-4"></i></button>
+                <button onclick="promptDeleteCategory(event, '${escapeHTML(cat)}')" class="text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" title="Delete Category"><i data-lucide="minus-circle" class="icon-sm"></i></button>
             </div>`;
         });
         filterMenu.innerHTML = html;
@@ -821,7 +392,7 @@ function renderCategoryDropdowns() {
             html += `
             <div class="p-2 text-sm text-white hover:bg-gray-700 cursor-pointer flex justify-between items-center group transition-colors" onclick="selectCategory('form', '${escapeHTML(cat)}', '${escapeHTML(cat)}')">
                 <span class="truncate pr-2">${escapeHTML(cat)}</span>
-                <button onclick="promptDeleteCategory(event, '${escapeHTML(cat)}')" class="text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" title="Delete Category"><i data-lucide="minus-circle" class="w-4 h-4"></i></button>
+                <button onclick="promptDeleteCategory(event, '${escapeHTML(cat)}')" class="text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" title="Delete Category"><i data-lucide="minus-circle" class="icon-sm"></i></button>
             </div>`;
         });
         formMenu.innerHTML = html;
@@ -847,7 +418,7 @@ function selectCategory(type, val, text) {
         if(val === 'all') document.getElementById('filter-category-text').classList.add('text-[#94a3b8]');
         document.getElementById('filter-category-menu').classList.add('hidden');
         checkCategoryRemovable('filter');
-        filterAnnouncements();
+        if(typeof filterAnnouncements === 'function') filterAnnouncements();
     } else {
         selectedFormCategory = val;
         document.getElementById('ann-category-text').innerText = text;
@@ -916,7 +487,7 @@ function executeDeleteCategory() {
     
     renderCategoryDropdowns();
     closeModal('confirm-delete-cat-modal');
-    filterAnnouncements();
+    if(typeof filterAnnouncements === 'function') filterAnnouncements();
 }
 
 function saveCategory() {
@@ -1002,12 +573,11 @@ function filterAnnouncements() {
     });
 }
 
-function setupActionModal(icon, bg, shadow, title, desc, btnText, btnClass) {
+function setupActionModal(icon, bgClass, title, desc, btnText, btnClass) {
     const bgEl = document.getElementById('action-icon-bg');
     const iconEl = document.getElementById('action-icon');
     
-    bgEl.style.background = bg;
-    bgEl.className = `flex items-center justify-center text-white shadow-lg ${shadow}`;
+    bgEl.className = `modal-icon-circle ${bgClass}`;
     iconEl.setAttribute('data-lucide', icon);
     
     document.getElementById('action-title').innerText = title;
@@ -1015,7 +585,7 @@ function setupActionModal(icon, bg, shadow, title, desc, btnText, btnClass) {
     
     const btn = document.getElementById('btn-action-confirm');
     btn.innerText = btnText;
-    btn.className = `flex-1 font-bold py-3 rounded-xl text-sm transition-all shadow-sm ${btnClass}`;
+    btn.className = `flex-1 btn-action ${btnClass}`;
     
     if(window.lucide) lucide.createIcons();
     openModal('confirm-action-modal');
@@ -1024,31 +594,31 @@ function setupActionModal(icon, bg, shadow, title, desc, btnText, btnClass) {
 function triggerApprove(btn) {
     currentActionCard = btn.closest('.ann-card');
     currentActionType = 'approve';
-    setupActionModal('check', '#22c55e', 'shadow-green-500/20', 'Approve Announcement?', 'This will move the announcement to the Live tab.', 'Approve', 'bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10');
+    setupActionModal('check', 'modal-icon-bg-green', 'Approve Announcement?', 'This will move the announcement to the Live tab.', 'Approve', 'border-green-500 text-green-500 hover:bg-green-500/10');
 }
 
 function triggerReject(btn) {
     currentActionCard = btn.closest('.ann-card');
     currentActionType = 'reject';
-    setupActionModal('x', '#ef4444', 'shadow-red-500/20', 'Reject Announcement?', 'This will move the announcement to the Denied/Taken Down tab.', 'Reject', 'bg-transparent border border-red-500 text-red-500 hover:bg-red-500/10');
+    setupActionModal('x', 'modal-icon-bg-red', 'Reject Announcement?', 'This will move the announcement to the Denied/Taken Down tab.', 'Reject', 'border-red-500 text-red-500 hover:bg-red-500/10');
 }
 
 function triggerTakeDown(btn) {
     currentActionCard = btn.closest('.ann-card');
     currentActionType = 'takedown';
-    setupActionModal('trash-2', '#ef4444', 'shadow-red-500/20', 'Take Down Announcement?', 'This will remove it from live view and move it to the Denied tab.', 'Take Down', 'bg-transparent border border-red-500 text-red-500 hover:bg-red-500/10');
+    setupActionModal('trash-2', 'modal-icon-bg-red', 'Take Down Announcement?', 'This will remove it from live view and move it to the Denied tab.', 'Take Down', 'border-red-500 text-red-500 hover:bg-red-500/10');
 }
 
 function triggerTakeBack(btn) {
     currentActionCard = btn.closest('.ann-card');
     currentActionType = 'takeback';
-    setupActionModal('refresh-cw', '#3b82f6', 'shadow-blue-500/20', 'Take Back Announcement?', 'This will restore the announcement to the Approval Queue for review.', 'Restore', 'bg-transparent border border-blue-500 text-blue-500 hover:bg-blue-500/10');
+    setupActionModal('refresh-cw', 'modal-icon-bg-blue', 'Take Back Announcement?', 'This will restore the announcement to the Approval Queue for review.', 'Restore', 'bg-blue-600 hover:bg-blue-700 text-white border-transparent');
 }
 
 function triggerDelete(btn) {
     currentActionCard = btn.closest('.ann-card');
     currentActionType = 'delete';
-    setupActionModal('alert-triangle', '#ef4444', 'shadow-red-500/20', 'Delete Permanently?', 'This action cannot be undone. The announcement will be completely erased.', 'Delete', 'bg-transparent border border-red-500 text-red-500 hover:bg-red-500/10');
+    setupActionModal('alert-triangle', 'modal-icon-bg-red', 'Delete Permanently?', 'This action cannot be undone. The announcement will be completely erased.', 'Delete', 'bg-red-500 hover:bg-red-600 text-white border-transparent');
 }
 
 function executeCardAction() {
@@ -1062,7 +632,7 @@ function executeCardAction() {
         container.innerHTML = `
             <button onclick="openAnnForm('edit', this.closest('.ann-card'))" class="bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2 px-8 rounded-lg text-sm transition-colors">Edit</button>
             <button onclick="triggerTakeDown(this)" class="bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center gap-2 ml-auto">
-              <i data-lucide="trash-2" class="w-4 h-4"></i> Take Down
+              <i data-lucide="trash-2" class="icon-sm"></i> Take Down
             </button>
         `;
         document.getElementById('grid-live').appendChild(currentActionCard);
@@ -1071,11 +641,11 @@ function executeCardAction() {
     } else if (currentActionType === 'reject' || currentActionType === 'takedown') {
         currentActionCard.classList.add('opacity-60');
         container.innerHTML = `
-            <button onclick="triggerTakeBack(this)" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm">
-              <i data-lucide="refresh-cw" class="w-4 h-4"></i> Take Back
+            <button onclick="triggerTakeBack(this)" class="flex-1 btn-primary font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm">
+              <i data-lucide="refresh-cw" class="icon-sm"></i> Take Back
             </button>
-            <button onclick="triggerDelete(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm">
-              <i data-lucide="trash-2" class="w-4 h-4"></i> Delete Permanently
+            <button onclick="triggerDelete(this)" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm border-transparent">
+              <i data-lucide="trash-2" class="icon-sm"></i> Delete Permanently
             </button>
         `;
         document.getElementById('grid-denied').appendChild(currentActionCard);
@@ -1085,13 +655,13 @@ function executeCardAction() {
         currentActionCard.classList.remove('opacity-60');
         container.innerHTML = `
             <button onclick="triggerApprove(this)" class="flex-1 bg-transparent border border-green-500 hover:bg-green-500/10 text-green-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
-              <i data-lucide="check" class="w-4 h-4"></i> Approve
+              <i data-lucide="check" class="icon-sm"></i> Approve
             </button>
             <button onclick="openAnnForm('edit', this.closest('.ann-card'))" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
               Edit
             </button>
             <button onclick="triggerReject(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
-              <i data-lucide="x" class="w-4 h-4"></i> Reject
+              <i data-lucide="x" class="icon-sm"></i> Reject
             </button>
         `;
         document.getElementById('grid-queue').appendChild(currentActionCard);
@@ -1102,7 +672,7 @@ function executeCardAction() {
     }
 
     if(window.lucide) lucide.createIcons();
-    filterAnnouncements();
+    if(typeof filterAnnouncements === 'function') filterAnnouncements();
 }
 
 function openAnnDetails(card) {
@@ -1128,7 +698,7 @@ function openAnnDetails(card) {
     
     const coverContainer = document.getElementById('detail-cover-container');
     if (coverImgSrc && coverImgSrc.trim() !== '') {
-        coverContainer.innerHTML = `<img src="${coverImgSrc}" class="w-full aspect-video max-h-[500px] object-cover object-center rounded-xl border border-gray-700 shadow-md">`;
+        coverContainer.innerHTML = `<img src="${coverImgSrc}" class="w-full aspect-video max-h-[500px] object-cover object-center rounded-xl border theme-border shadow-md">`;
         coverContainer.classList.remove('hidden');
     } else {
         coverContainer.innerHTML = '';
@@ -1151,7 +721,7 @@ function openAnnDetails(card) {
             
             if (blk.image) {
                 blkHTML += `<div class="w-full md:w-1/3 flex-shrink-0">
-                              <img src="${blk.image}" class="w-full aspect-video object-cover object-center rounded-lg border border-gray-700 shadow-sm">
+                              <img src="${blk.image}" class="w-full aspect-video object-cover object-center rounded-lg border theme-border shadow-sm">
                             </div>`;
             }
             
@@ -1207,36 +777,36 @@ function removeImage(previewId) {
 }
 
 function getBlockHTML(id, subtitle = '', content = '', imageSrc = '') {
-    const imgClass = imageSrc ? "w-full aspect-video max-h-[250px] object-cover object-center mt-3 rounded-lg border border-gray-700 shadow-sm" : "hidden w-full aspect-video max-h-[250px] object-cover object-center mt-3 rounded-lg border border-gray-700 shadow-sm";
+    const imgClass = imageSrc ? "w-full aspect-video max-h-[250px] object-cover object-center mt-3 rounded-lg border theme-border shadow-sm" : "hidden w-full aspect-video max-h-[250px] object-cover object-center mt-3 rounded-lg border theme-border shadow-sm";
     const removeClass = imageSrc ? "ml-4 text-red-400 hover:text-red-500 text-xs font-bold transition-colors" : "hidden ml-4 text-red-400 hover:text-red-500 text-xs font-bold transition-colors";
     
     return `
-      <div class="ann-block border border-gray-700 bg-[#1e2536] rounded-lg p-5 mt-4" id="ann-block-${id}">
+      <div class="ann-block border theme-border theme-surface-2 rounded-lg p-5 mt-4" id="ann-block-${id}">
         <div class="flex justify-between items-center mb-4">
           <h4 class="text-[10px] font-bold text-blue-400 uppercase tracking-widest">BLOCK ${id}</h4>
-          <button type="button" onclick="document.getElementById('ann-block-${id}').remove()" class="text-red-400 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+          <button type="button" onclick="document.getElementById('ann-block-${id}').remove()" class="text-red-400 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="icon-sm"></i></button>
         </div>
         <div class="space-y-4">
            <div>
              <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">MEDIA ATTACHMENT</label>
-             <div class="modal-input flex flex-col p-3" style="background:var(--surface); border-color:var(--border)">
+             <div class="modal-input flex flex-col p-3 theme-surface">
                <div class="flex items-center">
                    <label class="bg-white text-black font-bold text-xs py-1.5 px-3 rounded cursor-pointer hover:bg-gray-200 transition-colors">
                       Choose File
                       <input type="file" class="hidden" accept="image/*" onchange="handleImageUpload(this, 'block-img-preview-${id}')">
                    </label>
-                   <button type="button" class="${removeClass}" id="block-img-remove-${id}" onclick="removeImage('block-img-preview-${id}')"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                   <button type="button" class="${removeClass}" id="block-img-remove-${id}" onclick="removeImage('block-img-preview-${id}')"><i data-lucide="trash-2" class="icon-sm"></i></button>
                </div>
                <img id="block-img-preview-${id}" src="${imageSrc}" class="${imgClass}">
              </div>
            </div>
            <div>
              <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">SUBTITLE (OPTIONAL)</label>
-             <input type="text" placeholder="Enter section subtitle" class="block-subtitle modal-input text-sm" value="${escapeHTML(subtitle)}" style="background:var(--surface); border-color:var(--border)">
+             <input type="text" placeholder="Enter section subtitle" class="block-subtitle modal-input text-sm theme-surface" value="${escapeHTML(subtitle)}">
            </div>
            <div>
              <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">TEXT CONTENT <span class="text-red-500">*</span></label>
-             <textarea rows="4" placeholder="Enter section content..." class="block-content modal-input text-sm resize-none req-content" style="background:var(--surface); border-color:var(--border)" oninput="clearReqError(this)">${escapeHTML(content)}</textarea>
+             <textarea rows="4" placeholder="Enter section content..." class="block-content modal-input text-sm resize-none req-content theme-surface" oninput="clearReqError(this)">${escapeHTML(content)}</textarea>
              <p class="text-[10px] text-red-500 hidden mt-1">Required field</p>
            </div>
         </div>
@@ -1263,6 +833,9 @@ function openAnnForm(mode, card = null) {
     inputTitle.value = '';
     selectCategory('form', '', 'Select a category...');
     removeImage('ann-cover-preview');
+
+    const btnFormRemove = document.getElementById('btn-remove-form-cat');
+    if (btnFormRemove) btnFormRemove.classList.add('hidden');
 
     const container = document.getElementById('content-blocks-container');
     container.innerHTML = '';
@@ -1433,7 +1006,7 @@ function executeAnnFormSubmit() {
 
     if (currentAnnMode === 'create') {
         const cardHTML = `
-        <div class="ann-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors" style="background:var(--surface); border-color:var(--border)" onclick="openAnnDetails(this)" data-date="${isoDate}" data-raw-date="${rawDateStr}" data-cover-image="${coverImage}" data-blocks="${blocksJSON}">
+        <div class="ann-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors theme-surface" onclick="openAnnDetails(this)" data-date="${isoDate}" data-raw-date="${rawDateStr}" data-cover-image="${coverImage}" data-blocks="${blocksJSON}">
             <div class="flex justify-between items-start mb-2">
               <h3 class="ann-title text-lg font-bold text-white">${escapeHTML(title)}</h3>
               <span class="ann-badge ${badgeClass} px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase">${escapeHTML(category)}</span>
@@ -1443,13 +1016,13 @@ function executeAnnFormSubmit() {
             <p class="ann-desc text-sm text-slate-300 leading-relaxed mb-6 line-clamp-2">${escapeHTML(firstContent)}</p>
             <div class="mt-auto pt-4 flex gap-3 action-container" onclick="event.stopPropagation()">
               <button onclick="triggerApprove(this)" class="flex-1 bg-transparent border border-green-500 hover:bg-green-500/10 text-green-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
-                <i data-lucide="check" class="w-4 h-4"></i> Approve
+                <i data-lucide="check" class="icon-sm"></i> Approve
               </button>
               <button onclick="openAnnForm('edit', this.closest('.ann-card'))" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
                 Edit
               </button>
               <button onclick="triggerReject(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
-                <i data-lucide="x" class="w-4 h-4"></i> Reject
+                <i data-lucide="x" class="icon-sm"></i> Reject
               </button>
             </div>
         </div>
@@ -1459,7 +1032,7 @@ function executeAnnFormSubmit() {
         
         if(window.lucide) lucide.createIcons();
         switchAnnTab('queue');
-        filterAnnouncements();
+        if(typeof filterAnnouncements === 'function') filterAnnouncements();
     } else if (currentAnnMode === 'edit' && currentEditingCard) {
         currentEditingCard.querySelector('.ann-title').innerText = title;
         currentEditingCard.querySelector('.ann-badge').className = `ann-badge ${badgeClass} px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase`;
@@ -1471,19 +1044,49 @@ function executeAnnFormSubmit() {
     }
 }
 
-// ====== PAGE LOAD INITIALIZER ======
+// ====== DYNAMIC INITIALIZER (Sidebar globally synced) ======
 document.addEventListener('DOMContentLoaded', () => { 
     if(window.lucide) lucide.createIcons(); 
-    
-    // Load Manage Admins Logic
-    if(document.getElementById('dept-filter') && typeof updateDepartmentDropdowns === 'function') {
-        updateDepartmentDropdowns(); 
-        populateAdmins(); 
+
+    // 1. Pull current user data from memory
+    const activeDept = localStorage.getItem('activeDepartment') || 'Traffic Department';
+    const activeName = localStorage.getItem('activeUserName') || 'Dept Admin';
+
+    // 2. Update Sidebar text globally across all *2.html pages
+    const subTitles = document.querySelectorAll('.user-footer-sub');
+    subTitles.forEach(el => el.innerText = activeDept);
+
+    const nameTitles = document.querySelectorAll('.user-footer-name');
+    nameTitles.forEach(el => el.innerText = activeName);
+
+    const initBadge = document.querySelectorAll('#nav-avatar');
+    initBadge.forEach(el => {
+        if(activeName) el.innerText = activeName.charAt(0).toUpperCase(); 
+    });
+
+    // 3. Lock the Reports Data to ONLY show this department
+    const deptFilter = document.getElementById('filter-dept');
+    if (deptFilter) {
+        const shortDeptName = activeDept.replace(' Department', '').trim();
+        
+        let optionExists = Array.from(deptFilter.options).some(opt => opt.value === shortDeptName);
+        if (!optionExists) {
+            const newOpt = document.createElement('option');
+            newOpt.value = shortDeptName;
+            newOpt.text = shortDeptName;
+            deptFilter.appendChild(newOpt);
+        }
+
+        deptFilter.value = shortDeptName;
+        deptFilter.disabled = true; 
+        deptFilter.classList.add('opacity-50', 'cursor-not-allowed');
+
+        if(typeof filterReports === 'function') filterReports(); 
     }
     
-    // Load Announcements Logic
+    // 4. Initialize existing Announcements logic
     if(document.getElementById('filter-calendar') && typeof renderCategoryDropdowns === 'function') {
         renderCategoryDropdowns();
-        filterAnnouncements(); 
+        if(typeof filterAnnouncements === 'function') filterAnnouncements(); 
     }
 });

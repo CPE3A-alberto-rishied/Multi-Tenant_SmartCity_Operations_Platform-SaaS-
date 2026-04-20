@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BEAT - Public Reports</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="css/styles2.css">
+</head>
+<body class="h-full flex bg-[#0a0e1a]">
+
+  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface">
+    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
+      <div class="flex items-center gap-3">
+        <div class="logo-box">B</div>
+        <div class="flex flex-col justify-center">
+          <div class="logo-text font-bold text-lg text-white leading-none mb-1">BEAT</div>
+          <div class="text-[11px] text-[#94a3b8] leading-none">Department Portal</div>
+        </div>
+      </div>
+    </div>
+    
+    <nav class="flex-1 py-4 overflow-y-auto">
+      <a href="dashboard2.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+      <a href="reports2.html" class="sidebar-item active"><i data-lucide="file-text"></i><span>Public Reports</span></a>
+      <a href="announcements2.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+      <a href="traffic2.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
+      <a href="analytics2.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
+    </nav>
+    
+    <div class="user-footer">
+      <div class="flex items-center justify-between mb-5">
+        <div class="flex items-center gap-3">
+          <div id="nav-avatar" class="nav-avatar"></div>
+          <div>
+            <div class="user-footer-name">Loading...</div>
+            <div class="user-footer-sub">Loading...</div>
+          </div>
+        </div>
+        <a href="profile2.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
+      </div>
+      <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border theme-border hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
+        <i data-lucide="log-out" class="icon-sm"></i> Logout
+      </button>
+    </div>
+  </aside>
+
+  <main class="flex-1 overflow-y-auto flex flex-col">
+    <header class="px-8 h-[76px] flex items-center justify-between shrink-0 theme-surface theme-border-b">
+      <h1 class="text-xl font-semibold text-white flex items-center gap-2">
+        <i data-lucide="file-text" class="icon-lg"></i> Public Reports
+      </h1>
+      <button onclick="openModal('new-report-modal')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center gap-2 shadow-lg"><i data-lucide="plus" class="icon-sm"></i> Log New Report</button>
+    </header>
+
+    <div class="p-8 flex-1 animate-in">
+      <div class="flex flex-wrap gap-4 items-center justify-between mb-8">
+        <div class="flex flex-wrap gap-3 items-center">
+          <div class="relative flex items-center">
+            <input type="date" id="filter-date" onchange="filterReports()" class="modal-input !mt-0 min-w-[160px] cursor-pointer">
+          </div>
+          <div class="relative flex items-center">
+            <select id="filter-status" onchange="filterReports()" class="modal-input !mt-0 min-w-[140px] cursor-pointer">
+              <option>All Status</option>
+              <option>New</option>
+              <option>Returned</option>
+              <option>Forwarded</option>
+              <option>Resolved</option>
+            </select>
+          </div>
+          <div class="relative flex items-center">
+            <select id="filter-dept" onchange="filterReports()" class="modal-input !mt-0 min-w-[160px] cursor-pointer">
+              <option>All Departments</option>
+              <option>DRRMO</option>
+              <option>Engineering</option>
+              <option>Traffic</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 items-stretch" id="reports-grid"></div>
+    </div>
+  </main>
+
+  <div id="view-report-modal" class="modal-overlay hidden"><div class="border theme-border w-[450px] max-w-[90%] rounded-2xl p-8 shadow-2xl text-left max-h-[90vh] overflow-y-auto theme-surface" onclick="event.stopPropagation()"><div class="flex justify-between items-start mb-6"><h2 id="modal-detail-title" class="text-white font-bold text-2xl">Title</h2><span id="modal-detail-status" class="bg-gray-500/10 text-gray-500 border border-gray-500/20 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase">Status</span></div><div id="modal-detail-datetime" class="bg-[#1e2536] p-3 rounded-lg text-sm text-[#94a3b8] mb-6 border theme-border">Date <span class="mx-1">at</span> Time</div><div class="space-y-5 text-sm"><div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Name of Reportee:</p><p id="modal-detail-name" class="text-white font-semibold">Name</p></div><div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Email</p><p id="modal-detail-email" class="text-white">Email</p></div><div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Contact</p><p id="modal-detail-contact" class="text-white">Contact</p></div><div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Location</p><p id="modal-detail-location" class="text-white">Location</p></div><div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Department Forwarded To</p><p id="modal-detail-forwarded" class="text-white">Dept</p></div><hr class="theme-border border-t"><div id="modal-detail-return-box" class="hidden border-l-2 border-red-500 bg-[#1e2536] p-3 rounded-r-lg text-sm mb-5"><p class="text-[#94a3b8] mb-1 font-bold text-[10px] uppercase tracking-wider">Return Reason:</p><p id="modal-detail-return-reason" class="text-slate-300 leading-relaxed"></p></div><div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Full Description</p><p id="modal-detail-desc" class="text-slate-300 leading-relaxed">Description</p></div></div><button onclick="closeModal('view-report-modal')" class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg text-sm">Close</button></div></div>
+  <div id="new-report-modal" class="modal-overlay hidden"><div class="border theme-border w-[550px] max-w-[90%] rounded-2xl p-8 max-h-[90vh] overflow-y-auto shadow-2xl theme-surface"><h2 class="text-white font-bold text-xl mb-6 flex items-center gap-2 justify-center"><i data-lucide="file-plus" class="text-blue-500"></i> Submit a Report</h2><form id="new-report-form" class="space-y-4 text-left" onsubmit="validateNewReport(event)"><div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Name</label><input type="text" id="report-name" placeholder="Your full name" class="modal-input text-sm" oninput="clearReqError(this)"><p id="report-name-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p></div><div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Email Address</label><input type="email" id="report-email" placeholder="your@email.com" class="modal-input text-sm" oninput="clearReqError(this)"><p id="report-email-error" class="text-[10px] text-red-500 hidden mt-1">Valid email required</p></div><div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Contact Number</label><input type="text" id="report-contact" placeholder="+63 9XX XXX XXXX" class="modal-input text-sm" oninput="clearReqError(this)"><p id="report-contact-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p></div><div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Location / Address of the Issue</label><input type="text" id="report-location" placeholder="e.g. Brgy. Rosario, C5 Southbound" class="modal-input text-sm" oninput="clearReqError(this)"><p id="report-location-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p></div><div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Subject of the Report</label><input type="text" id="report-subject" placeholder="Brief title of your report" class="modal-input text-sm" oninput="clearReqError(this)"><p id="report-subject-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p></div><div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Description</label><textarea id="report-desc" rows="4" placeholder="Provide detailed description of the issue..." class="modal-input text-sm resize-none" oninput="clearReqError(this)"></textarea><p id="report-desc-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p></div><div class="flex justify-end gap-3 mt-8 pt-4"><button type="button" onclick="clearAndCloseReport()" class="px-6 bg-[#1e2536] border theme-border text-white font-bold py-2.5 rounded-xl text-sm hover:bg-gray-800 transition-colors">Cancel</button><button type="submit" class="px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg">Submit Report</button></div></form></div></div>
+  <div id="confirm-report-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-blue"><i data-lucide="send"></i></div><h2 class="text-white font-bold text-xl mb-3">Submit Report?</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to submit this public report to the system?</p><div class="flex gap-3"><button onclick="closeModal('confirm-report-modal')" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="executeSubmitReport()" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Confirm</button></div></div></div>
+  <div id="success-report-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-green"><i data-lucide="check-circle"></i></div><h2 class="text-white font-bold text-xl mb-3">Report Submitted</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">The public report has been successfully added to the system and is awaiting review.</p><button onclick="closeModal('success-report-modal')" class="w-full bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Done</button></div></div>
+  <div id="confirm-forward-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-blue"><i data-lucide="share"></i></div><h2 class="text-white font-bold text-xl mb-3">Forward Report?</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to assign this report to a new department?</p><div class="flex gap-3"><button onclick="cancelForward()" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="confirmForward()" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Confirm</button></div></div></div>
+  <div id="resolve-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-green"><i data-lucide="check-circle"></i></div><h2 class="text-white font-bold text-xl mb-3">Mark as Resolved?</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Please ensure you have communicated with the assigned department and verified that this incident has been adequately addressed before confirming resolution.</p><div class="flex gap-3"><button onclick="cancelReportToggle('resolve-modal')" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="confirmResolution()" class="flex-1 bg-transparent border border-green-500 hover:bg-green-500/10 text-green-500 font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Confirm Resolution</button></div></div></div>
+  <div id="cancel-resolve-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-red"><i data-lucide="x-circle"></i></div><h2 class="text-white font-bold text-xl mb-3">Reopen Incident?</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to reopen this incident? This will change its status from Resolved back to Pending.</p><div class="flex gap-3"><button onclick="cancelReportToggle('cancel-resolve-modal')" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="confirmCancelResolution()" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Reopen</button></div></div></div>
+
+<script src="js/app2.js"></script>
+</body>
+</html>

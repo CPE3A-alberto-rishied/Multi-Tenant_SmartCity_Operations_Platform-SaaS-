@@ -3,136 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BEAT - Admin Profile</title>
+  <title>BEAT - Main Admin Profile</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
+  <link rel="stylesheet" href="css/styles2.css">
   <style>
-    /* CSS VARIABLES - The core of styles2.css */
-    :root { 
-        --bg: #0a0e1a; 
-        --surface: #111827; 
-        --surface2: #1f2937; 
-        --border: #374151; 
-        --accent: #2563eb; 
-        --accent-light: #3b82f6; 
-        --text: #e2e8f0; 
-        --text-dim: #9ca3af; 
-        --danger: #ef4444; 
-        --success: #22c55e; 
-        --warn: #f59e0b; 
-        --purple: #8b5cf6; 
-    }
-
-    /* GLOBAL STYLES */
-    body { font-family: 'DM Sans', sans-serif !important; background: var(--bg); color: var(--text); }
+    body { font-family: 'DM Sans', sans-serif !important; }
     
-    /* SIDEBAR */
-    .sidebar { width: 260px !important; flex-shrink: 0 !important; background: var(--surface); }
-    .sidebar-item { 
-      display: flex !important; align-items: center !important; gap: 12px !important;
-      padding: 12px 18px !important; font-size: 14.5px !important; 
-      font-weight: 500 !important; color: #94a3b8 !important;
-      text-decoration: none !important; border-left: 3px solid transparent !important;
-      transition: all 0.2s;
-    }
+    .sidebar { width: 260px !important; flex-shrink: 0 !important; }
+    .sidebar-item { display: flex !important; align-items: center !important; gap: 12px !important; padding: 12px 18px !important; font-size: 14.5px !important; font-weight: 500 !important; color: #94a3b8 !important; text-decoration: none !important; border-left: 3px solid transparent !important; }
     .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
     .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
     .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
     
-    /* USER FOOTER */
     .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
     .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
     .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
-    .settings-link { color: #94a3b8; transition: color 0.2s; display: flex; align-items: center; }
-    .settings-link:hover { color: #3b82f6; }
-
+    .settings-link { color: #3b82f6; transition: color 0.2s; display: flex; align-items: center; } 
+    
     .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
-
-    /* MODALS & CARDS */
+    
     .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; }
     .hidden { display: none !important; }
-    .card { background: var(--surface); border: 1px solid var(--border); }
-    .modal-card { background: #151b2d; border: 1px solid #2d3748; border-radius: 1.25rem; }
-    
-    /* INPUT STYLING */
-    .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 8px 12px; transition: all 0.2s; }
+    .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 10px 14px; transition: all 0.2s; }
     .modal-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
     .input-error { border-color: #ef4444 !important; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important; }
     
-    /* PROFILE SPECIFIC */
     .profile-card { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(16px); border: 1px solid var(--border); }
     .otp-input { width: 42px; height: 50px; background: #1e2536; color: white; text-align: center; font-size: 1.25rem; font-weight: bold; border-radius: 8px; border: 1.5px solid #374151; outline: none; transition: all 0.2s; }
     .otp-input:focus { border-color: #2563eb; box-shadow: 0 0 10px rgba(37, 99, 235, 0.2); }
     .otp-input.input-error { border-color: #ef4444 !important; box-shadow: 0 0 12px rgba(239, 68, 68, 0.35) !important; }
-    input:read-only { color: #64748b; cursor: not-allowed; background: rgba(30, 37, 54, 0.5); }
-    .badge-stack { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 16px; }
+    input:read-only { color: #64748b; cursor: not-allowed; background: rgba(30, 37, 54, 0.5) !important; }
+    .badge-stack { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 16px; }
 
-    /* AUTOFILL FIX */
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover, 
-    input:-webkit-autofill:focus, 
-    input:-webkit-autofill:active {
+    input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active {
         -webkit-box-shadow: 0 0 0px 1000px #1e2536 inset !important;
         -webkit-text-fill-color: #ffffff !important;
-        caret-color: white !important;
         transition: background-color 5000s ease-in-out 0s;
     }
-
-    /* SCROLLBAR */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-    /* ANIMATIONS */
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    .animate-in { animation: fadeIn 0.4s ease-out; }
   </style>
 </head>
-<body class="h-full flex">
+<body class="h-full flex bg-[#0a0e1a]">
   
-  <div id="confirm-modal" class="modal-overlay hidden">
-    <div class="card" style="width:400px; text-align:center; padding:2rem; border-radius:1rem;">
-      <div style="background:var(--warn); width:48px; height:48px; border-radius:50%; margin:0 auto 20px" class="flex items-center justify-center text-black"><i data-lucide="alert-circle"></i></div>
-      <h2 class="text-white font-bold text-xl mb-2">Update Account?</h2>
-      <p style="color:#94a3b8; font-size:14px; margin-bottom:24px">Confirm changes to username or password? Verification is required.</p>
-      <div class="flex gap-3">
-        <button onclick="closeModal('confirm-modal')" class="flex-1 bg-gray-700 text-white font-bold py-2.5 rounded-lg">Cancel</button>
-        <button onclick="proceedToVerify()" class="flex-1 bg-blue-600 text-white font-bold py-2.5 rounded-lg">Proceed</button>
-      </div>
-    </div>
-  </div>
+  <div id="confirm-modal" class="modal-overlay hidden"><div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)"><div style="background:#f59e0b; width:48px; height:48px; border-radius:50%; margin:0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-yellow-500/20"><i data-lucide="alert-circle"></i></div><h2 class="text-white font-bold text-xl mb-2">Update Account?</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Confirm changes to your profile or password? Verification is required.</p><div class="flex gap-3"><button onclick="closeModal('confirm-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="proceedToVerify()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Proceed</button></div></div></div>
+  <div id="verify-modal" class="modal-overlay hidden"><div class="border w-[420px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)"><div style="background:#2563eb; width:48px; height:48px; border-radius:50%; margin:0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-blue-500/20"><i data-lucide="shield-check"></i></div><h2 class="text-white font-bold text-xl mb-2">Security Verification</h2><p class="text-[#94a3b8] text-xs mb-6">Enter the 6-digit code sent to your email</p><div class="flex justify-between gap-2 mb-2"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 0)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 1)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 2)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 3)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 4)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 5)"></div><p id="otp-error" class="text-red-500 text-xs hidden mb-6">Enter all 6 digits</p><button onclick="confirmChanges()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Confirm Updates</button></div></div>
+  <div id="success-modal" class="modal-overlay hidden"><div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)"><div style="background:#22c55e; width:48px; height:48px; border-radius:50%; margin:0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-green-500/20"><i data-lucide="check-circle"></i></div><h2 class="text-white font-bold text-xl mb-4">Changes Successful</h2><button onclick="closeModal('success-modal')" class="w-full bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Got it</button></div></div>
+  <div id="no-changes-modal" class="modal-overlay hidden"><div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)"><div style="background:#f59e0b; width:48px; height:48px; border-radius:50%; margin:0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-yellow-500/20"><i data-lucide="info"></i></div><h2 class="text-white font-bold text-xl mb-4">No Changes Detected</h2><button onclick="closeModal('no-changes-modal')" class="w-full bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Dismiss</button></div></div>
 
-  <div id="verify-modal" class="modal-overlay hidden">
-    <div class="card" style="width:420px; text-align:center; padding:2.5rem; border-radius:1rem;">
-      <div style="background:#2563eb; width:48px; height:48px; border-radius:50%; margin:0 auto 20px" class="flex items-center justify-center text-white"><i data-lucide="shield-check"></i></div>
-      <h2 class="text-white font-bold text-xl mb-2">Security Verification</h2>
-      <div class="flex justify-between gap-2 mb-2">
-        <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 0)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 1)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 2)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 3)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 4)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 5)">
-      </div>
-      <p id="otp-error" class="text-red-500 text-xs hidden mb-6">Enter all 6 digits</p>
-      <button onclick="confirmChanges()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl">Confirm Updates</button>
-    </div>
-  </div>
-
-  <div id="success-modal" class="modal-overlay hidden">
-    <div class="card" style="width:400px; text-align:center; padding:2rem; border-radius:1rem;">
-      <div style="background:var(--success); width:48px; height:48px; border-radius:50%; margin:0 auto 20px" class="flex items-center justify-center text-white"><i data-lucide="check-circle"></i></div>
-      <h2 class="text-white font-bold text-xl mb-2">Changes Successful</h2>
-      <button onclick="closeModal('success-modal')" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-lg">Got it</button>
-    </div>
-  </div>
-
-  <div id="no-changes-modal" class="modal-overlay hidden">
-    <div class="card" style="width:400px; text-align:center; padding:2rem; border-radius:1rem;">
-      <div style="background:var(--warn); width:48px; height:48px; border-radius:50%; margin:0 auto 20px" class="flex items-center justify-center text-black"><i data-lucide="info"></i></div>
-      <h2 class="text-white font-bold text-xl mb-2">No Changes Detected</h2>
-      <button onclick="closeModal('no-changes-modal')" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-lg">Dismiss</button>
-    </div>
-  </div>
-
-  <aside id="sidebar" class="sidebar flex flex-col h-full" style="border-right: 1px solid var(--border)">
+  <aside id="sidebar" class="sidebar flex flex-col h-full" style="background:var(--surface); border-right: 1px solid var(--border)">
     <div class="h-[76px] px-5 flex items-center border-b shrink-0" style="border-color:var(--border)">
       <div class="flex items-center gap-3">
         <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
@@ -144,18 +63,18 @@
     </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
-        <a href="dashboard.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
-        <a href="manage_admin.html" class="sidebar-item"><i data-lucide="users"></i><span>Manage Admins</span></a>
-        <a href="reports.html" class="sidebar-item"><i data-lucide="alert-triangle"></i><span>Public Reports</span></a>
-        <a href="announcements.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
-        <a href="traffic.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
-        <a href="analytics.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
+      <a href="dashboard.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+      <a href="manage_admin.html" class="sidebar-item"><i data-lucide="users"></i><span>Manage Admins</span></a>
+      <a href="reports.html" class="sidebar-item"><i data-lucide="alert-triangle"></i><span>Public Reports</span></a>
+      <a href="announcements.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+      <a href="traffic.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
+      <a href="analytics.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
     </nav>
     
     <div class="user-footer">
         <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
-                <div id="nav-avatar" style="background:#2563eb; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">TR</div>
+                <div id="nav-avatar" style="background:#2563eb; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">M</div>
                 <div>
                   <div class="user-footer-name">Main Admin</div>
                   <div class="user-footer-sub">System Administrator</div>
@@ -169,65 +88,65 @@
     </div>
   </aside>
 
-  <main class="flex-1 overflow-y-auto flex flex-col items-center">
+  <main class="flex-1 overflow-y-auto flex flex-col items-center relative">
     <header class="w-full px-8 h-[76px] flex items-center border-b shrink-0" style="border-color:var(--border);background:var(--surface)">
       <h1 class="text-xl font-semibold text-white flex items-center gap-2"><i data-lucide="user"></i>Admin Profile</h1>
     </header>
 
     <div class="p-8 animate-in w-full max-w-2xl">
-      <div class="profile-card rounded-2xl p-10 flex flex-col items-center">
+      <div class="profile-card rounded-2xl p-10 flex flex-col items-center shadow-lg relative">
         
         <div class="relative group mb-6">
-          <div id="profile-display" style="background:#2563eb;width:140px;height:140px;border-radius:50%;background-size:cover;background-position:center;" class="flex items-center justify-center text-white text-5xl font-bold border-4 border-[#1e2536] shadow-2xl">TR</div>
-          <label for="avatar-input" class="absolute bottom-1 right-1 bg-blue-600 p-2.5 rounded-full cursor-pointer border-2 border-[#1e2536]">
+          <div id="profile-display" style="background:#2563eb;width:140px;height:140px;border-radius:50%;background-size:cover;background-position:center;" class="flex items-center justify-center text-white text-5xl font-bold border-4 border-[#1e2536] shadow-2xl">M</div>
+          <label for="avatar-input" class="absolute bottom-1 right-1 bg-blue-600 p-2.5 rounded-full cursor-pointer border-2 border-[#1e2536] hover:bg-blue-700 transition-colors">
             <i data-lucide="camera" class="text-white w-5 h-5"></i>
             <input type="file" id="avatar-input" class="hidden" accept="image/*" onchange="previewAvatar(this)">
           </label>
         </div>
 
         <div class="text-center mb-10">
-          <h2 class="text-white text-2xl font-bold">Thara D. Del Rosario</h2>
+          <h2 id="display-name" class="text-white text-2xl font-bold">Main Admin</h2>
           
           <div class="badge-stack">
-            <span class="text-[11px] font-bold tracking-widest bg-purple-600/20 text-purple-400 px-3 py-1.5 rounded-full uppercase w-max">Dept: College of Engineering</span>
-            <span class="text-[11px] font-bold tracking-widest bg-blue-600/20 text-blue-400 px-3 py-1.5 rounded-full uppercase w-max">ID: 2026-0001</span>
-            <span class="text-[11px] font-bold tracking-widest bg-gray-700 text-[#94a3b8] px-3 py-1.5 rounded-full lowercase w-max">thara@beat.gov.ph</span>
+            <span id="display-dept" class="text-[11px] font-bold tracking-widest bg-blue-600/20 text-blue-400 px-3 py-1.5 rounded-full uppercase w-max border border-blue-500/20">System Administrator</span>
+            <span id="display-id" class="text-[11px] font-bold tracking-widest bg-gray-700/50 text-[#94a3b8] px-3 py-1.5 rounded-full uppercase w-max border border-gray-600/50">ID: 2023104513</span>
+            <span id="display-email" class="text-[11px] font-bold tracking-widest bg-gray-800/30 text-[#94a3b8] px-3 py-1.5 rounded-full lowercase w-max">admin@beat.gov.ph</span>
           </div>
         </div>
 
         <form id="profile-form" onsubmit="handleInitialSave(event)" class="w-full space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label class="block text-[11px] font-bold mb-2 tracking-wider text-[#94a3b8]">USERNAME</label>
-              <input type="text" id="prof-username" value="Thara_DelRosario" data-original="Thara_DelRosario" class="w-full bg-[#1e2536] text-white p-3 rounded-lg border border-gray-700 outline-none focus:border-blue-500">
+              <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">Full Name / Username</label>
+              <input type="text" id="prof-username" class="modal-input text-sm">
             </div>
             <div>
-              <label class="block text-[11px] font-bold mb-2 tracking-wider text-[#94a3b8]">EMAIL ADDRESS (READ-ONLY)</label>
-              <input type="email" value="thara@beat.gov.ph" class="w-full bg-[#1e2536] text-white p-3 rounded-lg border border-gray-700 outline-none" readonly>
+              <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">Email Address (Read-Only)</label>
+              <input type="email" id="prof-email" class="modal-input text-sm" readonly>
             </div>
           </div>
 
-          <hr class="border-gray-800 my-4">
+          <hr class="border-gray-800 my-6">
 
           <div class="space-y-4">
             <h3 class="text-white font-bold text-sm flex items-center gap-2"><i data-lucide="lock" class="w-4 h-4 text-blue-500"></i> Password Updates</h3>
             <div>
-              <label class="block text-[11px] font-bold mb-2 tracking-wider text-[#94a3b8]">CURRENT PASSWORD</label>
-              <input type="password" id="curr-pass" placeholder="Verify with current password" class="w-full bg-[#1e2536] text-white p-3 rounded-lg border border-gray-700 outline-none focus:border-blue-500">
+              <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">Current Password</label>
+              <input type="password" id="curr-pass" placeholder="Verify with current password" class="modal-input text-sm">
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label class="block text-[11px] font-bold mb-2 tracking-wider text-[#94a3b8]">NEW PASSWORD</label>
-                <input type="password" id="new-pass" placeholder="New password" class="w-full bg-[#1e2536] text-white p-3 rounded-lg border border-gray-700 outline-none focus:border-blue-500">
+                <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">New Password</label>
+                <input type="password" id="new-pass" placeholder="New password" class="modal-input text-sm">
               </div>
               <div>
-                <label class="block text-[11px] font-bold mb-2 tracking-wider text-[#94a3b8]">CONFIRM PASSWORD</label>
-                <input type="password" id="conf-pass" placeholder="Confirm password" class="w-full bg-[#1e2536] text-white p-3 rounded-lg border border-gray-700 outline-none focus:border-blue-500">
+                <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">Confirm Password</label>
+                <input type="password" id="conf-pass" placeholder="Confirm password" class="modal-input text-sm">
               </div>
             </div>
           </div>
 
-          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all mt-4">
+          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all mt-4">
             Update Profile
           </button>
         </form>
@@ -237,8 +156,24 @@
 
   <script src="js/app.js"></script>
   <script>
-    lucide.createIcons();
-    
+    document.addEventListener('DOMContentLoaded', () => { 
+        if(window.lucide) lucide.createIcons(); 
+        
+        // Load stored user info
+        const activeName = localStorage.getItem('activeUserName') || 'Main Admin';
+        const activeId = localStorage.getItem('activeUserId') || '2023104513';
+        const activeEmail = localStorage.getItem('activeUserEmail') || 'admin@beat.gov.ph';
+        
+        // Update DOM
+        document.getElementById('display-name').innerText = activeName;
+        document.getElementById('display-id').innerText = `ID: ${activeId}`;
+        document.getElementById('display-email').innerText = activeEmail;
+        
+        document.getElementById('prof-username').value = activeName;
+        document.getElementById('prof-username').setAttribute('data-original', activeName);
+        document.getElementById('prof-email').value = activeEmail;
+    });
+
     function previewAvatar(input) {
       if (input.files && input.files[0]) {
         const reader = new FileReader();
@@ -281,6 +216,7 @@
       if (input.value.length === 1 && index < inputs.length - 1) inputs[index + 1].focus();
     }
 
+    // --- SAVE NEW USERNAME & PASSWORD TO MEMORY ---
     function confirmChanges() {
       const inputs = document.querySelectorAll('.otp-input');
       let code = "";
@@ -290,11 +226,35 @@
         inputs.forEach(i => i.classList.add('input-error'));
         document.getElementById('otp-error').classList.remove('hidden');
       } else {
+        const newName = document.getElementById('prof-username').value.trim();
+        const newPass = document.getElementById('new-pass').value;
+        
+        if (newName) {
+            // Save to memory globally!
+            localStorage.setItem('masterAdminName', newName);
+            localStorage.setItem('activeUserName', newName);
+
+            // Update Master Password if changed
+            if (newPass.length > 0) {
+                localStorage.setItem('masterAdminPass', newPass);
+            }
+
+            // Sync Sidebar
+            document.querySelectorAll('.user-footer-name').forEach(el => el.innerText = newName);
+            document.getElementById('display-name').innerText = newName;
+            
+            document.querySelectorAll('#nav-avatar, #profile-display').forEach(el => {
+                if(!el.style.backgroundImage || el.style.backgroundImage === 'none') {
+                    el.innerText = newName.charAt(0).toUpperCase();
+                }
+            });
+            document.getElementById('prof-username').setAttribute('data-original', newName);
+        }
+
         document.getElementById('verify-modal').classList.add('hidden');
         document.getElementById('success-modal').classList.remove('hidden');
         document.getElementById('profile-form').dataset.changed = 'false';
-        const username = document.getElementById('prof-username');
-        username.setAttribute('data-original', username.value);
+        
         document.getElementById('curr-pass').value = "";
         document.getElementById('new-pass').value = "";
         document.getElementById('conf-pass').value = "";
