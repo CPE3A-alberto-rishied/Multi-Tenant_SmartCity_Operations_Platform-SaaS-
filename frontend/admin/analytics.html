@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
  <style>
-    body { font-family: 'DM Sans', sans-serif !important; }
+    body { font-family: 'DM Sans', sans-serif !important; overflow: hidden; }
     
     /* SIDEBAR */
     .sidebar { width: 260px !important; flex-shrink: 0 !important; }
@@ -52,7 +52,7 @@
     }
 
     /* CUSTOM SCROLLBAR FOR AUDIT TABLE */
-    .audit-container::-webkit-scrollbar { width: 6px; }
+    .audit-container::-webkit-scrollbar { width: 6px; height: 6px; }
     .audit-container::-webkit-scrollbar-track { background: transparent; }
     .audit-container::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
     .audit-container::-webkit-scrollbar-thumb:hover { background: #4b5563; }
@@ -93,7 +93,7 @@
     /* PRINT SPECIFIC STYLING */
     @media print {
         .sidebar, header, .charts-container, .search-container { display: none !important; }
-        body, main { background: white !important; color: black !important; display: block !important; }
+        body, main { background: white !important; color: black !important; display: block !important; overflow: visible !important; }
         .audit-card { width: 100% !important; margin: 0 !important; padding: 0 !important; border: none !important; background: white !important; box-shadow: none !important; height: auto !important; }
         .audit-card h3 { color: black !important; margin-bottom: 20px !important; }
         .audit-card h3 svg, .audit-card h3 i { display: none !important; } 
@@ -115,15 +115,8 @@
     }
 
     @media (max-width: 768px) {
+        /* Fix Layout Stacking */
         body { flex-direction: column !important; }
-        
-        /* Convert Sidebar to Swipeable Top Navigation */
-        .sidebar { width: 100% !important; height: auto !important; border-right: none !important; border-bottom: 1px solid var(--border); z-index: 40; }
-        .sidebar nav { display: flex; flex-direction: row !important; overflow-x: auto; padding: 0 16px 16px 16px !important; gap: 8px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
-        .sidebar nav::-webkit-scrollbar { display: none; }
-        .sidebar-item { padding: 8px 16px !important; white-space: nowrap; border-left: none !important; border-bottom: 2px solid transparent !important; background: var(--surface2) !important; border-radius: 8px; flex-shrink: 0; }
-        .sidebar-item.active { border-bottom-color: #3b82f6 !important; }
-        .user-footer { display: none !important; }
         
         /* Adjust Header */
         header { height: auto !important; padding: 16px !important; flex-direction: column; align-items: flex-start !important; gap: 12px; }
@@ -146,7 +139,10 @@
   </style>
 </head>
 <body class="h-full flex bg-[#0a0e1a]">
-  <aside id="sidebar" class="sidebar flex flex-col h-full border-r border-gray-800/50 bg-surface">
+
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+  <aside id="sidebar" class="sidebar flex flex-col h-full absolute lg:relative z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 border-r border-gray-800/50 bg-surface">
     <div class="h-[76px] px-5 flex items-center border-b shrink-0 border-theme">
       <div class="flex items-center gap-3">
         <div class="logo-box-sm flex items-center justify-center font-bold text-white text-sm">B</div>
@@ -155,6 +151,9 @@
           <div class="text-dim-xs leading-none">Admin Control Center</div>
         </div>
       </div>
+      <button class="lg:hidden ml-auto text-gray-400 hover:text-white" onclick="toggleSidebar()">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
     </div>
     <nav class="flex-1 py-4 overflow-y-auto">
       <a href="dashboard.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
@@ -182,22 +181,27 @@
     </div>
   </aside>
 
-  <main class="flex-1 overflow-y-auto">
-    <header class="px-8 h-[76px] flex items-center justify-between border-b shrink-0 border-theme bg-surface">
-      <h1 class="text-xl font-semibold flex items-center gap-2 text-white">
-        <i data-lucide="bar-chart-3"></i>
-        Analytics & Audit
-      </h1>
+  <main class="flex-1 overflow-y-auto flex flex-col min-w-0 bg-[#0a0e1a]">
+    <header class="px-4 sm:px-8 h-[76px] flex items-center justify-between border-b shrink-0 border-theme bg-surface">
+      <div class="flex items-center gap-3">
+        <button class="lg:hidden text-gray-400 hover:text-white" onclick="toggleSidebar()">
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+        <h1 class="text-xl font-semibold flex items-center gap-2 text-white">
+          <i data-lucide="bar-chart-3" class="hidden sm:block"></i>
+          Analytics & Audit
+        </h1>
+      </div>
       <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 bg-[#1e2536] hover:bg-gray-800 text-white text-sm font-medium rounded-lg border border-gray-700 transition-colors">
-        <i data-lucide="printer" class="icon-xs"></i> Print / Export Logs
+        <i data-lucide="printer" class="icon-xs"></i> <span class="hidden sm:inline">Print / Export Logs</span>
       </button>
     </header>
 
-    <div class="p-8 animate-in">
+    <div class="p-4 sm:p-8 animate-in max-w-[1600px] mx-auto w-full">
       
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <div id="audit-section" class="audit-card lg:col-span-2 card border border-gray-800/50 rounded-xl p-6 shadow-sm flex flex-col h-[600px] bg-surface">
+        <div id="audit-section" class="audit-card lg:col-span-2 card border border-gray-800/50 rounded-xl p-4 sm:p-6 shadow-sm flex flex-col h-[600px] bg-surface">
           <div class="flex items-center justify-between mb-4">
             <h3 class="font-semibold flex items-center gap-2 text-white text-lg">
               <i data-lucide="scroll-text" class="text-accent"></i>
@@ -205,12 +209,12 @@
             </h3>
             <div class="search-container relative w-72">
               <i data-lucide="search" class="absolute left-3 top-2.5 text-gray-500 icon-xs"></i>
-              <input type="text" id="auditSearch" placeholder="Search logs by admin, action, IP..." class="modal-input !mt-0 !pl-9 text-sm search-input-py">
+              <input type="text" id="auditSearch" placeholder="Search logs by admin, action, IP..." class="modal-input !mt-0 !pl-9 text-sm search-input-py w-full">
             </div>
           </div>
           
-          <div class="audit-container overflow-y-auto flex-1 pr-2">
-            <table class="w-full text-left text-sm text-gray-400">
+          <div class="audit-container overflow-y-auto flex-1 pr-2 w-full">
+            <table class="w-full text-left text-sm text-gray-400 whitespace-nowrap sm:whitespace-normal">
               <thead class="text-xs uppercase bg-[#1e2536] text-gray-300 sticky top-0 z-10">
                 <tr>
                   <th class="px-4 py-3 rounded-l-lg">Date & Time</th>
@@ -285,9 +289,9 @@
           </div>
         </div>
 
-        <div class="charts-container flex flex-col gap-6 h-[600px]">
+        <div class="charts-container flex flex-col gap-6 h-auto lg:h-[600px]">
           
-          <div class="card border border-gray-800/50 rounded-xl p-5 shadow-sm flex flex-col shrink-0 h-[260px] bg-surface">
+          <div class="card border border-gray-800/50 rounded-xl p-5 shadow-sm flex flex-col shrink-0 h-[300px] lg:h-[260px] bg-surface">
             <div class="flex items-center justify-between mb-3 shrink-0">
               <h3 class="font-semibold flex items-center gap-2 text-white">
                 <i data-lucide="pie-chart" class="text-accent"></i>
@@ -299,8 +303,8 @@
             </div>
           </div>
 
-          <div class="card border border-gray-800/50 rounded-xl p-6 shadow-sm flex flex-col flex-1 bg-surface">
-            <div class="flex items-center justify-between mb-4">
+          <div class="card border border-gray-800/50 rounded-xl p-4 sm:p-6 shadow-sm flex flex-col flex-1 h-[300px] lg:h-auto bg-surface">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
               <h3 class="font-semibold flex items-center gap-2 text-white">
                 <i data-lucide="activity" class="text-accent"></i>
                 Report Frequency
@@ -324,9 +328,25 @@
 
 <script src="js/app.js"></script>
 <script>
-  lucide.createIcons();
+  document.addEventListener("DOMContentLoaded", function() {
+    if(window.lucide) lucide.createIcons();
+  });
   
   function doLogout() { window.location.href = 'admin.html'; }
+
+  // Handle Mobile Sidebar Toggle
+  function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      
+      if (sidebar.classList.contains('-translate-x-full')) {
+          sidebar.classList.remove('-translate-x-full');
+          if(overlay) overlay.classList.remove('hidden');
+      } else {
+          sidebar.classList.add('-translate-x-full');
+          if(overlay) overlay.classList.add('hidden');
+      }
+  }
 
   document.getElementById('auditSearch').addEventListener('keyup', function() {
     let filter = this.value.toLowerCase();

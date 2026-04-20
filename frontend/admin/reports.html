@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
   <style>
-    body { font-family: 'DM Sans', sans-serif !important; }
+    body { font-family: 'DM Sans', sans-serif !important; overflow: hidden; }
     
     /* SIDEBAR BASE */
     .sidebar { width: 260px !important; flex-shrink: 0 !important; }
@@ -27,7 +27,7 @@
     /* USER FOOTER */
     .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
     .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
-    .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; padding: 1rem; }
     .hidden { display: none !important; }
     
     /* Input Styling */
@@ -89,6 +89,9 @@
           <div class="text-[11px] text-[#94a3b8] leading-none">Admin Control Center</div>
         </div>
       </div>
+      <button class="lg:hidden ml-auto text-gray-400 hover:text-white" onclick="toggleSidebar()">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
     </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
@@ -124,7 +127,7 @@
       </h1>
     </header>
 
-    <div class="p-8 flex-1 animate-in">
+    <div class="p-4 sm:p-8 space-y-6 sm:space-y-8 animate-in max-w-[1600px] mx-auto w-full flex-1">
       
       <div class="flex flex-wrap gap-4 items-center justify-between mb-8">
         <div class="flex flex-wrap gap-3 items-center">
