@@ -92,43 +92,56 @@
 
     /* PRINT SPECIFIC STYLING */
     @media print {
-        /* Hide everything except the audit trail */
         .sidebar, header, .charts-container, .search-container { display: none !important; }
-        
-        /* Reset backgrounds and colors for standard printing */
         body, main { background: white !important; color: black !important; display: block !important; }
-        
-        .audit-card { 
-            width: 100% !important; 
-            margin: 0 !important; 
-            padding: 0 !important; 
-            border: none !important; 
-            background: white !important; 
-            box-shadow: none !important;
-            height: auto !important; /* Allow full height expansion */
-        }
-        
+        .audit-card { width: 100% !important; margin: 0 !important; padding: 0 !important; border: none !important; background: white !important; box-shadow: none !important; height: auto !important; }
         .audit-card h3 { color: black !important; margin-bottom: 20px !important; }
-        .audit-card h3 svg, .audit-card h3 i { display: none !important; } /* Hide icon on print */
-        
+        .audit-card h3 svg, .audit-card h3 i { display: none !important; } 
         .audit-container { overflow: visible !important; max-height: none !important; padding-right: 0 !important; }
-        
-        /* Table print formatting */
         table { width: 100% !important; border-collapse: collapse !important; }
-        thead { display: table-header-group !important; } /* Re-print headers on new pages */
+        thead { display: table-header-group !important; } 
         tr { page-break-inside: avoid !important; }
         th { background-color: #f3f4f6 !important; color: black !important; border-bottom: 2px solid #000 !important; padding: 12px !important; }
         td { border-bottom: 1px solid #ccc !important; color: black !important; padding: 12px !important; }
-        
-        /* Tags formatting for print */
-        span[class*="bg-"] { 
-            border: 1px solid #666 !important; 
-            background: transparent !important; 
-            color: black !important; 
-            padding: 2px 6px !important;
-        }
-        
+        span[class*="bg-"] { border: 1px solid #666 !important; background: transparent !important; color: black !important; padding: 2px 6px !important; }
         * { color: black !important; }
+    }
+
+    /* =========================================
+       MOBILE RESPONSIVE DASHBOARD FIXES 
+       ========================================= */
+    @media (max-width: 1024px) {
+        .audit-card, .charts-container { height: auto !important; min-height: 450px; }
+    }
+
+    @media (max-width: 768px) {
+        body { flex-direction: column !important; }
+        
+        /* Convert Sidebar to Swipeable Top Navigation */
+        .sidebar { width: 100% !important; height: auto !important; border-right: none !important; border-bottom: 1px solid var(--border); z-index: 40; }
+        .sidebar nav { display: flex; flex-direction: row !important; overflow-x: auto; padding: 0 16px 16px 16px !important; gap: 8px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        .sidebar nav::-webkit-scrollbar { display: none; }
+        .sidebar-item { padding: 8px 16px !important; white-space: nowrap; border-left: none !important; border-bottom: 2px solid transparent !important; background: var(--surface2) !important; border-radius: 8px; flex-shrink: 0; }
+        .sidebar-item.active { border-bottom-color: #3b82f6 !important; }
+        .user-footer { display: none !important; }
+        
+        /* Adjust Header */
+        header { height: auto !important; padding: 16px !important; flex-direction: column; align-items: flex-start !important; gap: 12px; }
+        .animate-in { padding: 16px !important; }
+        
+        /* Adjust Panels */
+        .audit-card { height: 500px !important; }
+        .charts-container { height: auto !important; gap: 16px !important; }
+        .charts-container > .card { height: 350px !important; }
+        
+        /* Audit Table Fixes (Prevents Squishing) */
+        .audit-container { overflow-x: auto !important; padding-right: 0 !important; }
+        table { min-width: 700px; }
+        
+        /* Wrap Titles and Search Bars */
+        #audit-section > div:first-child { flex-direction: column; align-items: flex-start !important; gap: 12px; }
+        .search-container { width: 100% !important; }
+        .charts-container .flex.items-center.justify-between { flex-wrap: wrap; gap: 8px; }
     }
   </style>
 </head>
@@ -311,13 +324,10 @@
 
 <script src="js/app.js"></script>
 <script>
-  // Initialize Icons
   lucide.createIcons();
   
-  // Logout Function
   function doLogout() { window.location.href = 'admin.html'; }
 
-  // Interactive Search for Audit Trail
   document.getElementById('auditSearch').addEventListener('keyup', function() {
     let filter = this.value.toLowerCase();
     let rows = document.querySelectorAll('#auditTableBody tr');
@@ -328,12 +338,10 @@
     });
   });
 
-  // Chart instances
   let freqChart;
 
   document.addEventListener("DOMContentLoaded", function() {
     
-    // 1. Report Categories (Doughnut Chart) - ADJUSTED CONFIGURATION
     const ctxCat = document.getElementById('categoriesChart').getContext('2d');
     new Chart(ctxCat, {
       type: 'doughnut',
@@ -342,10 +350,10 @@
         datasets: [{
           data: [151, 192, 85, 42],
           backgroundColor: [
-            '#ef4444', // Red
-            '#eab308', // Yellow
-            '#3b82f6', // Blue
-            '#10b981'  // Green
+            '#ef4444', 
+            '#eab308', 
+            '#3b82f6', 
+            '#10b981'  
           ],
           borderWidth: 0,
           hoverOffset: 4
@@ -354,7 +362,7 @@
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        cutout: '70%', // Adjusted for smaller height
+        cutout: '70%', 
         layout: {
           padding: { top: 0, bottom: 0 } 
         },
@@ -375,7 +383,6 @@
       }
     });
 
-    // 2. Report Frequency (Bar Chart)
     const ctxFreq = document.getElementById('frequencyChart').getContext('2d');
     freqChart = new Chart(ctxFreq, {
       type: 'bar',
@@ -400,7 +407,6 @@
     });
   });
 
-  // Dynamic Dropdown Interaction for Report Frequency Chart
   function updateFrequencyChart() {
     const selection = document.getElementById('freqDropdown').value;
     

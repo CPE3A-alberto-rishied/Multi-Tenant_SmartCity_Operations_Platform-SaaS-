@@ -55,10 +55,59 @@
     /* MODALS */
     .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; }
     .hidden { display: none !important; }
+    .modal-card { background: #151b2d; border: 1px solid #2d3748; border-radius: 1.25rem; }
 
     /* CUSTOM DROPDOWN SCROLLBAR */
     .cat-dropdown-menu::-webkit-scrollbar { width: 6px; }
     .cat-dropdown-menu::-webkit-scrollbar-thumb { background-color: #374151; border-radius: 10px; }
+
+    /* =========================================
+       MOBILE RESPONSIVE DASHBOARD FIXES 
+       ========================================= */
+    @media (max-width: 768px) {
+        body { flex-direction: column !important; }
+        
+        /* Convert Sidebar to Swipeable Top Navigation */
+        .sidebar { width: 100% !important; height: auto !important; border-right: none !important; border-bottom: 1px solid var(--border); z-index: 40; }
+        
+        /* FIX: Push the logo down so it doesn't get cut off at the top edge of mobile screens */
+        .sidebar > div:first-child { 
+            height: auto !important; 
+            padding-top: 24px !important; 
+            padding-bottom: 16px !important; 
+        }
+
+        .sidebar nav { display: flex; flex-direction: row !important; overflow-x: auto; padding: 0 16px 16px 16px !important; gap: 8px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        .sidebar nav::-webkit-scrollbar { display: none; }
+        .sidebar-item { padding: 8px 16px !important; white-space: nowrap; border-left: none !important; border-bottom: 2px solid transparent !important; background: var(--surface2) !important; border-radius: 8px; flex-shrink: 0; }
+        .sidebar-item.active { border-bottom-color: #3b82f6 !important; }
+        .user-footer { display: none !important; }
+        
+        /* Adjust Header */
+        header { height: auto !important; padding: 24px 16px 20px 16px !important; flex-direction: column; align-items: flex-start !important; gap: 12px; }
+        
+        /* Adjust Content Container Padding */
+        .p-8.flex-1 { padding: 20px 16px !important; }
+        
+        /* Tabs Horizontal Scroll */
+        .border-b.flex.gap-2.mb-6 { overflow-x: auto; white-space: nowrap; padding-bottom: 4px; margin-bottom: 24px !important; }
+        .border-b.flex.gap-2.mb-6::-webkit-scrollbar { display: none; }
+        
+        /* Filters and Action Buttons Stacking - Added gaps between inputs */
+        .flex.items-center.gap-3 { flex-direction: column; align-items: stretch !important; width: 100%; margin-bottom: 24px; gap: 12px !important; }
+        .flex.items-center.gap-3 span { display: none; } 
+        #filter-calendar, .custom-dropdown-container { width: 100% !important; }
+        
+        /* Buttons container - Added gap between buttons */
+        .flex.gap-3 { flex-direction: column; width: 100%; gap: 12px !important; }
+        .flex.gap-3 button { width: 100%; justify-content: center; }
+
+        /* Modals and Forms Scaling */
+        .modal-overlay { padding: 0 16px; }
+        .modal-overlay > div { width: 100% !important; max-width: 400px; }
+        .modal-overlay .flex.gap-3 { flex-direction: column; }
+        #view-form .border.rounded-2xl.p-8, #view-details .border.rounded-2xl.p-8 { padding: 16px !important; }
+    }
   </style>
 </head>
 <body class="h-full flex bg-[#0a0e1a]">
@@ -66,10 +115,10 @@
   <aside id="sidebar" class="sidebar flex flex-col h-full" style="background:var(--surface); border-right: 1px solid var(--border)">
     <div class="h-[76px] px-5 flex items-center border-b shrink-0" style="border-color:var(--border)">
       <div class="flex items-center gap-3">
-        <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
+        <div class="logo-box flex items-center justify-center font-bold text-white text-sm">B</div>
         <div class="flex flex-col justify-center">
           <div class="logo-text font-bold text-lg text-white tracking-widest leading-none mb-1">BEAT</div>
-          <div style="color:var(--text-dim); font-size:11px" class="leading-none">Admin Control Center</div>
+          <div class="text-dim-xs leading-none">Admin Control Center</div>
         </div>
       </div>
     </div>
@@ -103,7 +152,7 @@
   <main class="flex-1 overflow-y-auto flex flex-col relative">
     <header class="px-8 h-[76px] flex items-center border-b shrink-0" style="border-color:var(--border); background:var(--surface)">
       <h1 class="text-xl font-semibold text-white flex items-center gap-2">
-        Announcement Manager
+        <i data-lucide="megaphone" class="w-6 h-6 text-[#94a3b8]"></i> Announcement Manager
       </h1>
     </header>
 
@@ -367,6 +416,6 @@
   </div>
 
 <script src="js/app.js"></script>
-
+<script>lucide.createIcons();</script>
 </body>
 </html>
