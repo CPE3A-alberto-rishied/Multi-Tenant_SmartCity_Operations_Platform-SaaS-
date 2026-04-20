@@ -517,6 +517,10 @@ function executeSubmitReport() {
     closeModal('confirm-report-modal');
     openModal('success-report-modal');
     
+    // Hide the empty state placeholder if it exists
+    const emptyState = document.getElementById('no-reports-empty');
+    if (emptyState) emptyState.classList.add('hidden');
+    
     const name = document.getElementById('report-name').value;
     const email = document.getElementById('report-email').value;
     const contact = document.getElementById('report-contact').value;
@@ -528,13 +532,17 @@ function executeSubmitReport() {
     const dateStr = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
     let hours = now.getHours();
     const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12; 
+    hours = hours % 12 || 12; 
     const minStr = now.getMinutes().toString().padStart(2, '0');
     const timeStr = `${hours}:${minStr} ${ampm}`;
 
+    // TEMPLATE FOR INCOMING REPORTS (No Return Reason)
     const newCardHTML = `
-        <div class="report-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors" style="background:var(--surface); border-color:var(--border)" onclick="openReportDetails(this)" data-email="${email}" data-contact="${contact}">
+        <div class="report-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors animate-in" 
+             style="background:var(--surface); border-color:var(--border)" 
+             onclick="openReportDetails(this)" 
+             data-email="${escapeHTML(email)}" 
+             data-contact="${escapeHTML(contact)}">
           <div class="flex justify-between items-start mb-4">
             <div>
               <p class="text-xs font-bold text-white report-date">${dateStr}</p>
@@ -575,7 +583,6 @@ function executeSubmitReport() {
 
     clearAndCloseReport();
     if(window.lucide) lucide.createIcons();
-    filterReports();
 }
 
 function clearAndCloseReport() {
