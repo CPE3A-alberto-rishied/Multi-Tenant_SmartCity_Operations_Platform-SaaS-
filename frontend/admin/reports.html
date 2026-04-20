@@ -7,41 +7,24 @@
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
+  <link rel="stylesheet" href="css/styles2.css">
   <style>
-    /* CSS VARIABLES - The core of styles2.css */
-    :root { 
-        --bg: #0a0e1a; 
-        --surface: #111827; 
-        --surface2: #1f2937; 
-        --border: #374151; 
-        --accent: #2563eb; 
-        --accent-light: #3b82f6; 
-        --text: #e2e8f0; 
-        --text-dim: #9ca3af; 
-        --danger: #ef4444; 
-        --success: #22c55e; 
-        --warn: #f59e0b; 
-        --purple: #8b5cf6; 
-    }
-
-    /* GLOBAL STYLES */
-    body { font-family: 'DM Sans', sans-serif !important; background: var(--bg); color: var(--text); }
+    body { font-family: 'DM Sans', sans-serif !important; }
     
     /* SIDEBAR */
-    .sidebar { width: 260px !important; flex-shrink: 0 !important; background: var(--surface); }
+    .sidebar { width: 260px !important; flex-shrink: 0 !important; }
+    
     .sidebar-item { 
       display: flex !important; align-items: center !important; gap: 12px !important;
       padding: 12px 18px !important; font-size: 14.5px !important; 
       font-weight: 500 !important; color: #94a3b8 !important;
       text-decoration: none !important; border-left: 3px solid transparent !important;
-      transition: all 0.2s;
     }
     .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
     .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
     .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
     
-    /* USER FOOTER */
+    /* USER FOOTER FIXED */
     .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
     .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
     .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
@@ -49,12 +32,10 @@
     .settings-link:hover { color: #3b82f6; }
 
     .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
-
-    /* MODALS & OVERLAYS */
     .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; }
     .hidden { display: none !important; }
     
-    /* INPUT STYLING */
+    /* Input Styling */
     .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 8px 12px; transition: all 0.2s; }
     .modal-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
     .input-error { border-color: #ef4444 !important; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important; }
@@ -63,14 +44,15 @@
     input:-webkit-autofill,
     input:-webkit-autofill:hover, 
     input:-webkit-autofill:focus, 
-    input:-webkit-autofill:active {
+    input:-webkit-autofill:active,
+    select:-webkit-autofill {
         -webkit-box-shadow: 0 0 0px 1000px #1e2536 inset !important;
         -webkit-text-fill-color: #ffffff !important;
         caret-color: white !important;
         transition: background-color 5000s ease-in-out 0s;
     }
     
-    /* CUSTOM SELECT & DATE OVERRIDES */
+    /* Custom Select & Date Overrides */
     select { 
       appearance: none; 
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); 
@@ -81,27 +63,18 @@
     }
     input[type="date"] { color-scheme: dark; }
 
-    /* TABLES & TOGGLES */
+    /* Tables & Toggles */
     .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; inset: 0; background-color: #374151; transition: .4s; border-radius: 24px; }
     .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
     input:checked + .slider { background-color: #22c55e; }
     input:checked + .slider:before { transform: translateX(18px); }
-
-    /* SCROLLBAR */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-    /* ANIMATIONS */
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    .animate-in { animation: fadeIn 0.4s ease-out; }
   </style>
 </head>
 <body class="h-full flex bg-[#0a0e1a]">
 
-  <aside id="sidebar" class="sidebar flex flex-col h-full" style="border-right: 1px solid var(--border)">
+  <aside id="sidebar" class="sidebar flex flex-col h-full" style="background:var(--surface); border-right: 1px solid var(--border)">
     <div class="h-[76px] px-5 flex items-center border-b shrink-0" style="border-color:var(--border)">
       <div class="flex items-center gap-3">
         <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
@@ -146,6 +119,7 @@
     </header>
 
     <div class="p-8 flex-1 animate-in">
+      
       <div class="flex flex-wrap gap-4 items-center justify-between mb-8">
         <div class="flex flex-wrap gap-3 items-center">
           <div class="relative flex items-center">
@@ -176,6 +150,7 @@
       </div>
 
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch" id="reports-grid">
+        
         <div class="report-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors" style="background:var(--surface); border-color:var(--border)" onclick="openReportDetails(this)" data-email="staff.dept@example.com" data-contact="+63 917 123 4567">
           <div class="flex justify-between items-start mb-4">
             <div>
@@ -221,6 +196,7 @@
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </main>
@@ -231,18 +207,31 @@
         <i data-lucide="file-plus" class="text-blue-500"></i> Submit a Report
       </h2>
       <form id="new-report-form" class="space-y-4 text-left" onsubmit="validateNewReport(event)">
+        
         <div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Name</label>
-        <input type="text" id="report-name" placeholder="Your full name" class="modal-input text-sm"></div>
+        <input type="text" id="report-name" placeholder="Your full name" class="modal-input text-sm" oninput="clearError('report-name', 'report-name-error')">
+        <p id="report-name-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p></div>
+        
         <div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Email Address</label>
-        <input type="email" id="report-email" placeholder="your@email.com" class="modal-input text-sm"></div>
+        <input type="email" id="report-email" placeholder="your@email.com" class="modal-input text-sm" oninput="clearError('report-email', 'report-email-error')">
+        <p id="report-email-error" class="text-[10px] text-red-500 hidden mt-1">Valid email required</p></div>
+        
         <div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Contact Number</label>
-        <input type="text" id="report-contact" placeholder="+63 9XX XXX XXXX" class="modal-input text-sm"></div>
-        <div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Location</label>
-        <input type="text" id="report-location" placeholder="e.g. Brgy. Rosario" class="modal-input text-sm"></div>
-        <div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Subject</label>
-        <input type="text" id="report-subject" placeholder="Title of report" class="modal-input text-sm"></div>
+        <input type="text" id="report-contact" placeholder="+63 9XX XXX XXXX" class="modal-input text-sm" oninput="clearError('report-contact', 'report-contact-error')">
+        <p id="report-contact-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p></div>
+        
+        <div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Location / Address of the Issue</label>
+        <input type="text" id="report-location" placeholder="e.g. Brgy. Rosario, C5 Southbound" class="modal-input text-sm" oninput="clearError('report-location', 'report-location-error')">
+        <p id="report-location-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p></div>
+        
+        <div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Subject of the Report</label>
+        <input type="text" id="report-subject" placeholder="Brief title of your report" class="modal-input text-sm" oninput="clearError('report-subject', 'report-subject-error')">
+        <p id="report-subject-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p></div>
+        
         <div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Description</label>
-        <textarea id="report-desc" rows="4" placeholder="Details..." class="modal-input text-sm resize-none"></textarea></div>
+        <textarea id="report-desc" rows="4" placeholder="Provide detailed description of the issue..." class="modal-input text-sm resize-none" oninput="clearError('report-desc', 'report-desc-error')"></textarea>
+        <p id="report-desc-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p></div>
+        
         <div class="flex justify-end gap-3 mt-8 pt-4">
           <button type="button" onclick="clearAndCloseReport()" class="px-6 bg-[#1e2536] border border-[#374151] text-white font-bold py-2.5 rounded-xl text-sm hover:bg-gray-800 transition-colors">Cancel</button>
           <button type="submit" class="px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg">Submit Report</button>
@@ -251,7 +240,121 @@
     </div>
   </div>
 
-  <script src="js/app.js"></script>
+  <div id="confirm-report-modal" class="modal-overlay hidden">
+    <div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
+      <div style="background:#3b82f6; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+        <i data-lucide="send" class="w-6 h-6"></i>
+      </div>
+      <h2 class="text-white font-bold text-xl mb-3">Submit Report?</h2>
+      <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to submit this public report to the system?</p>
+      
+      <div class="flex gap-3">
+        <button onclick="closeModal('confirm-report-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
+        <button onclick="executeSubmitReport()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="success-report-modal" class="modal-overlay hidden">
+    <div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
+      <div style="background:#22c55e; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-green-500/20">
+        <i data-lucide="check-circle" class="w-6 h-6"></i>
+      </div>
+      <h2 class="text-white font-bold text-xl mb-3">Report Submitted</h2>
+      <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">The public report has been successfully added to the system and is awaiting review.</p>
+      
+      <button onclick="closeModal('success-report-modal')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Done</button>
+    </div>
+  </div>
+
+  <div id="confirm-forward-modal" class="modal-overlay hidden">
+    <div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
+      <div style="background:#3b82f6; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+        <i data-lucide="share" class="w-6 h-6"></i>
+      </div>
+      <h2 class="text-white font-bold text-xl mb-3">Forward Report?</h2>
+      <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to assign this report to a new department?</p>
+      
+      <div class="flex gap-3">
+        <button onclick="cancelForward()" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
+        <button onclick="confirmForward()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-report-modal" class="modal-overlay hidden" onclick="closeModal('view-report-modal')">
+    <div class="border w-[450px] max-w-[90%] rounded-2xl p-8 shadow-2xl text-left max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)" onclick="event.stopPropagation()">
+      <div class="flex justify-between items-start mb-6">
+        <h2 id="modal-detail-title" class="text-white font-bold text-2xl">Title</h2>
+        <span id="modal-detail-status" class="bg-gray-500/10 text-gray-500 border border-gray-500/20 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase">Status</span>
+      </div>
+      
+      <div id="modal-detail-datetime" class="bg-[#1e2536] p-3 rounded-lg text-sm text-[#94a3b8] mb-6 border" style="border-color:var(--border)">
+        Date <span class="mx-1">at</span> Time
+      </div>
+
+      <div class="space-y-5 text-sm">
+        <div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Name of Reportee:</p>
+        <p id="modal-detail-name" class="text-white font-semibold">Name</p></div>
+        
+        <div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Email</p>
+        <p id="modal-detail-email" class="text-white">Email</p></div>
+        
+        <div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Contact</p>
+        <p id="modal-detail-contact" class="text-white">Contact</p></div>
+        
+        <div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Location</p>
+        <p id="modal-detail-location" class="text-white">Location</p></div>
+        
+        <div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Department Forwarded To</p>
+        <p id="modal-detail-forwarded" class="text-white">Dept</p></div>
+        
+        <hr style="border-color:var(--border)">
+
+        <div id="modal-detail-return-box" class="hidden border-l-2 border-red-500 bg-[#1e2536] p-3 rounded-r-lg text-sm mb-5">
+            <p class="text-[#94a3b8] mb-1 font-bold text-[10px] uppercase tracking-wider">Return Reason:</p>
+            <p id="modal-detail-return-reason" class="text-slate-300 leading-relaxed"></p>
+        </div>
+
+        <div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Full Description</p>
+        <p id="modal-detail-desc" class="text-slate-300 leading-relaxed">Description</p></div>
+      </div>
+
+      <button onclick="closeModal('view-report-modal')" class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg text-sm">Close</button>
+    </div>
+  </div>
+
+  <div id="resolve-modal" class="modal-overlay hidden">
+    <div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
+      <div style="background:#22c55e; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-green-500/20">
+        <i data-lucide="check-circle" class="w-6 h-6"></i>
+      </div>
+      <h2 class="text-white font-bold text-xl mb-3">Mark as Resolved?</h2>
+      <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Please ensure you have communicated with the assigned department and verified that this incident has been adequately addressed before confirming resolution.</p>
+      
+      <div class="flex gap-3">
+        <button onclick="cancelReportToggle('resolve-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
+        <button onclick="confirmResolution()" class="flex-1 bg-[#22c55e] hover:bg-green-600 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Confirm Resolution</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="cancel-resolve-modal" class="modal-overlay hidden">
+    <div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
+      <div style="background:#ef4444; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-red-500/20">
+        <i data-lucide="x-circle" class="w-6 h-6"></i>
+      </div>
+      <h2 class="text-white font-bold text-xl mb-3">Reopen Incident?</h2>
+      <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to reopen this incident? This will change its status from Resolved back to Pending.</p>
+      
+      <div class="flex gap-3">
+        <button onclick="cancelReportToggle('cancel-resolve-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
+        <button onclick="confirmCancelResolution()" class="flex-1 bg-[#ef4444] hover:bg-red-600 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+<script src="js/app.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => { if(window.lucide) lucide.createIcons(); });
 </script>
