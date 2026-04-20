@@ -112,13 +112,13 @@
 </head>
 <body class="h-full flex bg-[#0a0e1a]">
 
-  <aside id="sidebar" class="sidebar flex flex-col h-full" style="background:var(--surface); border-right: 1px solid var(--border)">
-    <div class="h-[76px] px-5 flex items-center border-b shrink-0" style="border-color:var(--border)">
+  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface">
+    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
       <div class="flex items-center gap-3">
-        <div class="logo-box flex items-center justify-center font-bold text-white text-sm">B</div>
+        <div class="logo-box">B</div>
         <div class="flex flex-col justify-center">
-          <div class="logo-text font-bold text-lg text-white tracking-widest leading-none mb-1">BEAT</div>
-          <div class="text-dim-xs leading-none">Admin Control Center</div>
+          <div class="logo-text font-bold text-lg text-white leading-none mb-1">BEAT</div>
+          <div class="text-[11px] text-[#94a3b8] leading-none">Admin Control Center</div>
         </div>
       </div>
     </div>
@@ -133,19 +133,19 @@
     </nav>
     
     <div class="user-footer">
-      <div class="flex items-center justify-between mb-5">
-        <div class="flex items-center gap-3">
-          <div id="nav-avatar" style="background:#2563eb; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">MA</div>
-          <div>
-            <div class="user-footer-name">Main Admin</div>
-            <div class="user-footer-sub">System Administrator</div>
-          </div>
+        <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-3">
+                <div id="nav-avatar" style="background:#2563eb; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">M</div>
+                <div>
+                  <div class="user-footer-name">Main Admin</div>
+                  <div class="user-footer-sub">System Administrator</div>
+                </div>
+            </div>
+            <a href="profile.html" class="settings-link"><i data-lucide="settings" style="width:18px; height:18px"></i></a>
         </div>
-        <a href="profile.html" class="settings-link"><i data-lucide="settings" style="width:18px; height:18px"></i></a>
-      </div>
-      <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
-        <i data-lucide="log-out" style="width:16px; height:16px"></i> Logout
-      </button>
+        <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
+            <i data-lucide="log-out" style="width:16px; height:16px"></i> Logout
+        </button>
     </div>
   </aside>
 
