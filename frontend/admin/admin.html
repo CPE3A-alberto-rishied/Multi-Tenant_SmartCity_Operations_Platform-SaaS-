@@ -32,108 +32,27 @@
         .otp-input:focus { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2); }
         select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
         
-        button, a { cursor: pointer !important; }
-
-        /* =========================================
-           EXTRACTED INLINE STYLES (MOBILE RESPONSIVE)
-           ========================================= */
-        
-        /* Backgrounds & Containers */
+        /* Layout Fixes */
         .auth-bg {
             background: linear-gradient(135deg, #0a0e1a 0%, #1a1f3a 25%, #0f1428 50%, #1a254a 75%, #0a0e1a 100%);
-            position: relative;
-            overflow: hidden;
+            min-height: 100vh;
         }
-        
-        /* Cards: Changed from fixed width to max-width for mobile support */
-        .popup-panel {
-            width: 100%;
-            max-width: 420px;
-            background: rgba(20, 26, 45, 0.95);
-            padding: 2.5rem;
-            border-radius: 1rem;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .auth-panel {
+
+        .auth-panel, .popup-panel {
             width: 100%;
             max-width: 420px;
             background: rgba(15, 20, 35, 0.85);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255,255,255,0.05);
-            padding: 2.5rem;
+            padding: 2rem;
             border-radius: 1rem;
         }
 
-        /* Typography */
-        .text-dim-sm { color: #94a3b8; font-size: 14px; }
-        .line-height-relaxed { line-height: 1.6; }
-
-        /* UI Elements & Icons */
-        .logo-box {
-            background: var(--accent);
-            width: 56px;
-            height: 56px;
-            border-radius: 14px;
-            margin: 0 auto 12px;
-        }
-        .icon-circle {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            margin: 0 auto 20px;
-        }
-        .bg-blue-accent { background: #2563eb; }
-        .bg-green-accent { background: #22c55e; }
-        
-        .input-icon-left {
-            position: absolute; left: 14px; top: 13px; width: 18px; height: 18px; color: #94a3b8;
-        }
-        .input-icon-right {
-            position: absolute; right: 14px; top: 13px; width: 18px; height: 18px; color: #94a3b8; cursor: pointer; transition: color 0.2s;
-        }
-        .input-icon-right:hover { color: #ffffff; }
-
-        /* Form Inputs */
-        .auth-input-field {
-            padding: 12px 14px 12px 42px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-        .auth-input-pass {
-            padding: 12px 45px 12px 42px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-        .auth-select-field {
-            padding: 12px 14px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            cursor: pointer;
-        }
-        .auth-email-field {
-            padding: 12px 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-
-        /* MOBILE RESPONSIVE MEDIA QUERY */
+        /* Responsive Mobile Tweak */
         @media (max-width: 480px) {
-            .auth-panel, .popup-panel {
-                padding: 1.5rem; /* Less padding on small screens to save space */
-            }
-            .otp-input {
-                width: 40px; /* Slightly narrower OTP boxes so they don't overflow */
-                height: 48px;
-                font-size: 1.1rem;
-            }
-            .logo-box {
-                width: 48px;
-                height: 48px;
-            }
-            #auth-logo h1 {
-                font-size: 32px;
-            }
+            .auth-panel, .popup-panel { padding: 1.5rem; }
+            .otp-input { width: 40px; height: 48px; font-size: 1.1rem; }
+            .flex-otp { gap: 0.25rem; }
         }
     </style>
 </head>
@@ -141,27 +60,27 @@
     <div id="auth-screen" class="h-full w-full flex flex-col items-center justify-center auth-bg px-4">
         
         <div id="success-popup" class="modal-overlay hidden px-4">
-            <div class="card card-glow popup-panel">
-                <div class="icon-circle bg-blue-accent flex items-center justify-center text-white"><i data-lucide="mail-check"></i></div>
+            <div class="card card-glow popup-panel text-center">
+                <div class="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white mx-auto mb-4"><i data-lucide="mail-check"></i></div>
                 <h2 class="text-white font-bold text-xl mb-4">Reset Link Sent</h2>
-                <p class="text-dim-sm line-height-relaxed mb-8">Check your email for password reset instructions.</p>
+                <p class="text-[#94a3b8] text-sm mb-8">Check your email for password reset instructions.</p>
                 <button onclick="closePopup('success-popup')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-[10px]">Back to Login</button>
             </div>
         </div>
 
         <div id="resent-popup" class="modal-overlay hidden px-4">
-            <div class="card card-glow popup-panel">
-                <div class="icon-circle bg-green-accent flex items-center justify-center text-white"><i data-lucide="mail"></i></div>
+            <div class="card card-glow popup-panel text-center">
+                <div class="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center text-white mx-auto mb-4"><i data-lucide="mail"></i></div>
                 <h2 class="text-white font-bold text-xl mb-4">Code Resent</h2>
-                <p class="text-dim-sm mb-8">A new verification code has been sent to your email.</p>
+                <p class="text-[#94a3b8] text-sm mb-8">A new verification code has been sent to your email.</p>
                 <button onclick="closePopup('resent-popup')" class="w-32 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 mx-auto rounded-[10px]">Got it</button>
             </div>
         </div>
 
-        <div id="auth-logo" class="text-center mb-10">
-            <div class="logo-box flex items-center justify-center font-mono font-bold text-white text-xl shadow-lg">B</div>
-            <h1 class="font-mono font-bold tracking-widest text-white text-4xl m-0">BEAT</h1>
-            <p class="text-dim-sm mt-1">Administrative Control System</p>
+        <div id="auth-logo" class="text-center mb-8">
+            <div class="w-14 h-14 bg-blue-600 flex items-center justify-center font-mono font-bold text-white text-xl rounded-xl shadow-lg mx-auto mb-3">B</div>
+            <h1 class="font-mono font-bold tracking-widest text-white text-3xl m-0">BEAT</h1>
+            <p class="text-[#94a3b8] text-xs mt-1 uppercase tracking-widest">Admin Control System</p>
         </div>
 
         <div id="login-card" class="card card-glow auth-panel">
@@ -169,39 +88,39 @@
                 <div class="mb-5">
                     <label class="block text-[11px] font-bold mb-2 text-[#94a3b8] tracking-wider uppercase">ID Number</label>
                     <div class="relative flex flex-col">
-                        <i data-lucide="hash" class="input-icon-left"></i>
-                        <input id="login-user" type="text" placeholder="Enter ID number" class="w-full bg-[#1e2536] text-white auth-input-field" oninput="clearError('login-user', 'user-error')">
+                        <i data-lucide="hash" class="absolute left-3.5 top-3 w-4.5 h-4.5 text-[#94a3b8]"></i>
+                        <input id="login-user" type="text" placeholder="Enter ID number" class="w-full bg-[#1e2536] text-white pl-11 pr-4 py-3 rounded-lg border border-gray-700 outline-none focus:border-blue-500 transition-all" oninput="clearError('login-user', 'user-error')">
                         <p id="user-error" class="error-text hidden">This field is required</p>
                     </div>
                 </div>
                 <div class="mb-5">
                     <label class="block text-[11px] font-bold mb-2 text-[#94a3b8] tracking-wider uppercase">Department</label>
-                    <select id="login-dept" class="w-full bg-[#1e2536] text-white border border-gray-700 auth-select-field">
-                        <option value="main">Main Admin</option>
+                    <select id="login-dept" class="w-full bg-[#1e2536] text-white border border-gray-700 px-4 py-3 rounded-lg outline-none cursor-pointer focus:border-blue-500 transition-all">
+                        <option value="Main Admin">Main Admin</option>
                         </select>
                 </div>
                 <div class="mb-2">
                     <label class="block text-[11px] font-bold mb-2 text-[#94a3b8] tracking-wider uppercase">Password</label>
                     <div class="relative flex flex-col">
-                        <i data-lucide="lock" class="input-icon-left"></i>
-                        <input id="login-pass" type="password" placeholder="Enter password" class="w-full bg-[#1e2536] text-white auth-input-pass" oninput="clearError('login-pass', 'pass-error')">
-                        <i data-lucide="eye" class="input-icon-right" onclick="const p=document.getElementById('login-pass'); p.type=p.type==='password'?'text':'password';"></i>
+                        <i data-lucide="lock" class="absolute left-3.5 top-3 w-4.5 h-4.5 text-[#94a3b8]"></i>
+                        <input id="login-pass" type="password" placeholder="Enter password" class="w-full bg-[#1e2536] text-white pl-11 pr-12 py-3 rounded-lg border border-gray-700 outline-none focus:border-blue-500 transition-all" oninput="clearError('login-pass', 'pass-error')">
+                        <i data-lucide="eye" class="absolute right-4 top-3.5 w-4.5 h-4.5 text-[#94a3b8] cursor-pointer hover:text-white transition-colors" onclick="const p=document.getElementById('login-pass'); p.type=p.type==='password'?'text':'password';"></i>
                         <p id="pass-error" class="error-text hidden">This field is required</p>
                     </div>
                 </div>
-                <div class="flex justify-end mb-8">
+                <div class="flex justify-end mb-6">
                     <button type="button" onclick="showResetScreen()" class="text-xs font-semibold text-blue-500 hover:text-blue-400">Forgot password?</button>
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-[10px] shadow-lg transition-colors mb-2">Sign In</button>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg transition-colors">Sign In</button>
             </form>
         </div>
 
         <div id="verify-card" class="card card-glow auth-panel hidden text-center">
-            <div class="icon-circle bg-blue-accent flex items-center justify-center text-white"><i data-lucide="shield-check"></i></div>
-            <h2 class="text-white font-bold text-xl mb-2">Verify Your Identity</h2>
-            <p class="text-dim-sm mb-6">Enter the 6-digit code sent to your email</p>
+            <div class="w-12 h-12 bg-blue-600 flex items-center justify-center text-white rounded-full mx-auto mb-4"><i data-lucide="shield-check"></i></div>
+            <h2 class="text-white font-bold text-xl mb-2">Verify Identity</h2>
+            <p class="text-[#94a3b8] text-sm mb-6">Enter the 6-digit code sent to your email</p>
             <form onsubmit="handleVerify(event)" novalidate>
-                <div class="flex justify-between gap-1 sm:gap-2 mb-4">
+                <div class="flex justify-between flex-otp gap-1 mb-6">
                     <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 0)" onkeydown="handleOtpBack(event, 0)">
                     <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 1)" onkeydown="handleOtpBack(event, 1)">
                     <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 2)" onkeydown="handleOtpBack(event, 2)">
@@ -210,25 +129,23 @@
                     <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 5)" onkeydown="handleOtpBack(event, 5)">
                 </div>
                 <p id="verify-error" class="error-text hidden mb-4">Please enter all 6 digits</p>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-[10px] mb-6 transition-colors">Verify Code</button>
-                
-                <p class="text-[12px] mb-8 text-[#94a3b8]">Didn't receive it? <button type="button" onclick="showResentPopup(event)" class="text-blue-500 font-semibold hover:text-blue-400">Resend</button></p>
-                
-                <button type="button" onclick="showLoginScreen()" class="flex items-center justify-center gap-2 text-blue-500 text-[13px] font-semibold mx-auto hover:text-blue-400"><i data-lucide="arrow-left" style="width:14px"></i> Back</button>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg mb-6 transition-colors">Verify Code</button>
+                <p class="text-xs text-[#94a3b8]">Didn't receive it? <button type="button" onclick="showResentPopup(event)" class="text-blue-500 font-semibold hover:text-blue-400">Resend</button></p>
+                <button type="button" onclick="showLoginScreen()" class="mt-8 flex items-center justify-center gap-2 text-blue-500 text-sm font-semibold mx-auto hover:text-blue-400"><i data-lucide="arrow-left" class="w-4 h-4"></i> Back</button>
             </form>
         </div>
 
         <div id="reset-card" class="card card-glow auth-panel hidden text-center">
-            <div class="icon-circle bg-blue-accent flex items-center justify-center text-white"><i data-lucide="key"></i></div>
-            <h2 class="text-white font-bold text-xl mb-2">Reset Password</h2>
+            <div class="w-12 h-12 bg-blue-600 flex items-center justify-center text-white rounded-full mx-auto mb-4"><i data-lucide="key"></i></div>
+            <h2 class="text-white font-bold text-xl mb-4">Reset Password</h2>
             <form onsubmit="handleReset(event)" novalidate>
                 <div class="mb-6 text-left">
                     <label class="block text-[11px] font-bold mb-2 text-[#94a3b8] tracking-wider uppercase">Email Address</label>
-                    <input id="reset-email" type="email" placeholder="admin@beat.gov.ph" class="w-full bg-[#1e2536] text-white auth-email-field" oninput="clearError('reset-email', 'reset-error')">
+                    <input id="reset-email" type="email" placeholder="admin@beat.gov.ph" class="w-full bg-[#1e2536] text-white px-4 py-3 rounded-lg border border-gray-700 outline-none focus:border-blue-500 transition-all" oninput="clearError('reset-email', 'reset-error')">
                     <p id="reset-error" class="error-text hidden">Enter a valid email address</p>
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-[10px] mb-6 transition-colors">Send Reset Link</button>
-                <button type="button" onclick="showLoginScreen()" class="flex items-center justify-center gap-2 text-blue-500 text-[13px] font-semibold mx-auto hover:text-blue-400"><i data-lucide="arrow-left" style="width:14px"></i> Back</button>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg mb-6">Send Reset Link</button>
+                <button type="button" onclick="showLoginScreen()" class="flex items-center justify-center gap-2 text-blue-500 text-sm font-semibold mx-auto hover:text-blue-400"><i data-lucide="arrow-left" class="w-4 h-4"></i> Back</button>
             </form>
         </div>
     </div>
@@ -238,14 +155,14 @@
         document.addEventListener('DOMContentLoaded', () => { 
             if(window.lucide) lucide.createIcons(); 
             
-            // DYNAMIC LOGIN DROPDOWN: Loads created Departments from memory!
+            // DYNAMIC DEPARTMENTS: Matches the format sent to the backend
             const loginDept = document.getElementById('login-dept');
             if (loginDept) {
                 const savedDepts = JSON.parse(localStorage.getItem('beat_departments')) || [];
                 savedDepts.forEach(dept => {
                     const opt = document.createElement('option');
-                    opt.value = dept.toLowerCase();
-                    opt.text = dept + " Department";
+                    opt.value = dept; // e.g., "Traffic"
+                    opt.text = dept;
                     loginDept.appendChild(opt);
                 });
             }
