@@ -74,39 +74,44 @@ function prevMonth() { curDate.setMonth(curDate.getMonth() - 1); renderCal(); }
 function nextMonth() { curDate.setMonth(curDate.getMonth() + 1); renderCal(); }
 renderCal();
 
+// Function to handle form submission
 async function submitReport(event) {
-    event.preventDefault();
+    event.preventDefault(); 
+    
     const form = event.target;
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
-    const API_URL = 'https://beat-pasig-api.onrender.com';
-
     try {
-        const response = await fetch(API_URL, {
+        // Must point to the specific /api/report endpoint
+        const response = await fetch('https://beat-pasig-api.onrender.com/api/report', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
 
         const result = await response.json();
+
         if (result.success) {
-            document.getElementById('success-modal').style.display = 'flex'; // Shows your Green Modal
-            form.reset();
+            // Trigger the modal built in report.html
+            const modal = document.getElementById('success-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+            form.reset(); // Clear form after success
         } else {
-            alert("Error submitting report.");
+            alert("Submission failed. Error: " + result.error);
         }
     } catch (error) {
         console.error("Connection Error:", error);
-        alert("Could not reach the BEAT server. Check your connection.");
+        alert("Server is currently unreachable. Please check your internet.");
     }
 }
 
+// Function to close the modal
 function closeModal() {
     const modal = document.getElementById('success-modal');
     if (modal) {
-        modal.classList.remove('active');
+        modal.style.display = 'none';
     }
 }
-
-if (window.lucide) lucide.createIcons();
