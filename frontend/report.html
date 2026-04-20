@@ -13,7 +13,11 @@
     
     <header style="background: rgba(5,10,20,0.97); border-bottom: 1px solid rgba(26,86,219,0.25); position:sticky; top:0; z-index:100; backdrop-filter:blur(12px);">
         <div style="max-width:1200px; margin:0 auto; padding: 0 24px; display:flex; align-items:center; justify-content:space-between; height:64px;">
-            <div class="logo-text" style="cursor:pointer;" onclick="window.location.href='index.html'">B<span class="logo-dot">E</span>AT</div>
+            <div style="cursor:pointer; display:flex; align-items:center; gap:10px;" onclick="window.location.href='index.html'">
+                <img src="assets/beat_logo.png" alt="BEAT Logo" style="height: 40px; width: auto; object-fit: contain;">
+
+                <img src="assets/beat_text.png" alt="BEAT Text" style="height: 50px; width: auto; object-fit: contain; opacity: 0.9;">
+            </div>
             <nav style="display:flex; gap:28px; align-items:center;" class="hidden md:flex">
                 <a href="index.html" class="nav-link">Home</a>
                 <a href="map.html" class="nav-link">Map</a>
