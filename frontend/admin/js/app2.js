@@ -500,19 +500,32 @@ function promptActionConfirm(type, btn) {
     if (window.event) window.event.stopPropagation();
     const card = btn.closest('.report-card');
     const textarea = card.querySelector('#action-description');
+    const errorMsg = card.querySelector('#action-error');
 
-    // Action input field validation
+    // RED GLOW VALIDATION
     if (!textarea.value.trim()) {
-        textarea.classList.add('input-error');
-        card.querySelector('#action-error').classList.remove('hidden');
+        textarea.classList.add('input-error'); // Triggers red border glow
+        if(errorMsg) errorMsg.classList.remove('hidden');
         return;
     }
 
-    document.getElementById('confirm-title').innerText = type === 'return' ? "Confirm Return?" : "Confirm Resolution?";
-    document.getElementById('confirm-body').innerText = type === 'return' ? "Do you confirm to return this report to Admin?" : "Do you confirm to submit this resolution?";
+    const title = type === 'return' ? "Confirm Return?" : "Confirm Resolution?";
+    const body = type === 'return' ? "Do you confirm to return this report to Admin?" : "Do you confirm to submit this resolution?";
     
-    // Set the specific action for the confirm button inside the modal
-    document.getElementById('btn-final-confirm').onclick = () => executeFinalAction(type, card);
+    document.getElementById('confirm-title').innerText = title;
+    document.getElementById('confirm-body').innerText = body;
+    
+    document.getElementById('btn-final-confirm').onclick = () => {
+        closeModal('modal-confirm-action');
+        card.querySelector('#dynamic-action-field').classList.add('hidden');
+        
+        document.getElementById('success-title').innerText = "Action Successful";
+        document.getElementById('success-body').innerText = type === 'return' ? "Your report is returned." : "Your resolution is submitted.";
+        
+        textarea.value = ""; // Clear on success
+        openModal('action-success-modal');
+    };
+    
     openModal('modal-confirm-action');
 }
 
@@ -713,7 +726,7 @@ function saveCategory() {
     const error = document.getElementById('new-category-error');
     
     if (!input || !input.value.trim()) {
-        if (input) input.classList.add('input-error');
+        if (input) input.classList.add('input-error'); // Red Glow
         if (error) error.classList.remove('hidden');
         return;
     }
@@ -726,8 +739,10 @@ function saveCategory() {
     renderCategoryDropdowns();
     selectCategory('form', newCat, newCat);
     
+    // Clear and Close
     input.value = '';
-    clearReqError(input);
+    input.classList.remove('input-error');
+    if (error) error.classList.add('hidden');
     closeModal('create-category-modal');
 }
 
@@ -848,11 +863,9 @@ function executeCardAction() {
 
     if (currentActionType === 'approve') {
         currentActionCard.classList.remove('opacity-60');
+        // Approved state: Only show Edit button
         container.innerHTML = `
             <button onclick="openAnnForm('edit', this.closest('.ann-card'))" class="bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2 px-8 rounded-lg text-sm transition-colors">Edit</button>
-            <button onclick="triggerTakeDown(this)" class="bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center gap-2 ml-auto">
-              <i data-lucide="trash-2" class="w-4 h-4"></i> Take Down
-            </button>
         `;
         document.getElementById('grid-live').appendChild(currentActionCard);
         switchAnnTab('live');
@@ -872,17 +885,8 @@ function executeCardAction() {
 
     } else if (currentActionType === 'takeback') {
         currentActionCard.classList.remove('opacity-60');
-        container.innerHTML = `
-            <button onclick="triggerApprove(this)" class="flex-1 bg-transparent border border-green-500 hover:bg-green-500/10 text-green-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
-              <i data-lucide="check" class="w-4 h-4"></i> Approve
-            </button>
-            <button onclick="openAnnForm('edit', this.closest('.ann-card'))" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
-              Edit
-            </button>
-            <button onclick="triggerReject(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
-              <i data-lucide="x" class="w-4 h-4"></i> Reject
-            </button>
-        `;
+        // Clear buttons when returning to "Waiting for Approval"
+        container.innerHTML = ``; 
         document.getElementById('grid-queue').appendChild(currentActionCard);
         switchAnnTab('queue');
 
@@ -1182,12 +1186,10 @@ function handleAnnFormSubmit() {
 
 function executeAnnFormSubmit() {
     closeModal('confirm-submit-modal');
-    closeAnnForm(); 
-    openModal('success-submit-modal');
-
-    const title = document.getElementById('ann-title').value;
-    const category = selectedFormCategory;
     
+    const titleInput = document.getElementById('ann-title');
+    const title = titleInput.value;
+    const category = selectedFormCategory;
     const coverPreview = document.getElementById('ann-cover-preview');
     const coverImage = (coverPreview && !coverPreview.classList.contains('hidden')) ? coverPreview.src : '';
 
@@ -1200,64 +1202,54 @@ function executeAnnFormSubmit() {
         const txt = blk.querySelector('.block-content').value;
         const imgEl = blk.querySelector('img[id^="block-img-preview-"]');
         const img = (imgEl && !imgEl.classList.contains('hidden')) ? imgEl.src : '';
-        
         blocksData.push({ subtitle: sub, content: txt, image: img });
         if (idx === 0) firstContent = txt; 
     });
 
     const blocksJSON = escapeHTML(JSON.stringify(blocksData));
-    
     const now = new Date();
-    let hours = now.getHours();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12; 
-    const minStr = now.getMinutes().toString().padStart(2, '0');
-    const timeStr = `${hours}:${minStr}${ampm}`;
+    const timeStr = `${now.getHours() % 12 || 12}:${now.getMinutes().toString().padStart(2, '0')}${now.getHours() >= 12 ? 'PM' : 'AM'}`;
     const dateStr = `Today ${timeStr}`;
     const isoDate = now.toISOString();
     const rawDateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
 
-    const badgeClass = "bg-green-500/10 text-green-400 border border-green-500/20";
-
     if (currentAnnMode === 'create') {
         const cardHTML = `
-        <div class="ann-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors" style="background:var(--surface); border-color:var(--border)" onclick="openAnnDetails(this)" data-date="${isoDate}" data-raw-date="${rawDateStr}" data-cover-image="${coverImage}" data-blocks="${blocksJSON}">
+        <div class="ann-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors theme-surface" onclick="openAnnDetails(this)" data-date="${isoDate}" data-raw-date="${rawDateStr}" data-cover-image="${coverImage}" data-blocks="${blocksJSON}">
             <div class="flex justify-between items-start mb-2">
               <h3 class="ann-title text-lg font-bold text-white">${escapeHTML(title)}</h3>
-              <span class="ann-badge ${badgeClass} px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase">${escapeHTML(category)}</span>
+              <span class="ann-badge bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase">${escapeHTML(category)}</span>
             </div>
             <p class="text-xs text-[#94a3b8] mb-4">Published <span class="ann-date">${dateStr}</span></p>
             <div class="ann-content-hidden hidden">${escapeHTML(firstContent)}</div>
             <p class="ann-desc text-sm text-slate-300 leading-relaxed mb-6 line-clamp-2">${escapeHTML(firstContent)}</p>
             <div class="mt-auto pt-4 flex gap-3 action-container" onclick="event.stopPropagation()">
-              <button onclick="triggerApprove(this)" class="flex-1 bg-transparent border border-green-500 hover:bg-green-500/10 text-green-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
-                <i data-lucide="check" class="w-4 h-4"></i> Approve
-              </button>
-              <button onclick="openAnnForm('edit', this.closest('.ann-card'))" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
-                Edit
-              </button>
-              <button onclick="triggerReject(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
-                <i data-lucide="x" class="w-4 h-4"></i> Reject
-              </button>
-            </div>
-        </div>
-        `;
-        const gridQueue = document.getElementById('grid-queue');
-        if(gridQueue) gridQueue.insertAdjacentHTML('afterbegin', cardHTML);
-        
-        if(window.lucide) lucide.createIcons();
-        switchAnnTab('queue');
-        filterAnnouncements();
+              </div>
+        </div>`;
+        document.getElementById('grid-queue').insertAdjacentHTML('afterbegin', cardHTML);
     } else if (currentAnnMode === 'edit' && currentEditingCard) {
         currentEditingCard.querySelector('.ann-title').innerText = title;
-        currentEditingCard.querySelector('.ann-badge').className = `ann-badge ${badgeClass} px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase`;
         currentEditingCard.querySelector('.ann-badge').innerText = category;
         currentEditingCard.querySelector('.ann-desc').innerText = firstContent;
-        
         currentEditingCard.setAttribute('data-cover-image', coverImage);
         currentEditingCard.setAttribute('data-blocks', blocksJSON);
     }
+
+    // RESET FORM: Clear title, images, and category selection
+    titleInput.value = '';
+    removeImage('ann-cover-preview');
+    document.getElementById('content-blocks-container').innerHTML = '';
+    selectedFormCategory = '';
+    const catText = document.getElementById('ann-category-text');
+    if (catText) {
+        catText.innerText = 'Select a category...';
+        catText.classList.add('text-[#94a3b8]');
+    }
+    
+    closeAnnForm(); 
+    openModal('success-submit-modal');
+    switchAnnTab('queue'); // Move user to "Waiting for Approval" tab
+    filterAnnouncements();
 }
 
 // ====== PAGE LOAD INITIALIZER ======
