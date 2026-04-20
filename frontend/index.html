@@ -62,6 +62,34 @@
             transform: translateY(-2px);
             color: var(--white) !important;
         }
+
+        /* --- MOBILE RESPONSIVE FIXES --- */
+        .clock-display {
+            font-size: clamp(3rem, 12vw, 4.5rem) !important; 
+        }
+
+        @media (max-width: 640px) {
+            .feed-item-box {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 8px !important;
+                padding: 16px !important;
+            }
+            .feed-sep { display: none; }
+            .feed-item-box > div {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 4px;
+                width: 100%;
+            }
+            .feed-item-box > div > span:last-child {
+                margin-left: 0 !important; 
+            }
+            section {
+                padding-left: 16px !important;
+                padding-right: 16px !important;
+            }
+        }
     </style>
 </head>
 <body class="flex flex-col h-full overflow-auto">
@@ -97,7 +125,7 @@
             
             <section style="padding: 60px 24px 80px 24px; position:relative; z-index:1;">
                 <div style="max-width:1200px; margin:0 auto;">
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:flex-start;" class="hero-grid">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
                         <div>
                             <div class="section-label" style="margin-bottom:12px;">Broadcast of Events, Alerts, & Traffic</div>
                             <h1 class="section-title" style="font-size:clamp(3rem,6vw,5.5rem); line-height:0.95; margin:0 0 20px;">
@@ -148,7 +176,7 @@
             </section>
 
             <section class="py-16" style="padding-left: 24px; padding-right: 24px; position:relative; z-index:1;">
-                <div style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns: 1.2fr 1fr; gap:60px;" class="hero-grid">
+                <div class="max-width-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-12 lg:gap-[60px]">
                     <div>
                         <div class="section-label" style="margin-bottom:8px;">Operational Framework</div>
                         <h2 class="section-title" style="font-size:2.5rem; margin-bottom:12px;">URBAN VIGILANCE & RESPONSE</h2>
@@ -181,25 +209,26 @@
                     <div>
                         <div class="section-label" style="margin-bottom:8px;">Today's Real-time Metrics</div>
                         <h2 class="section-title" style="font-size:2rem; margin-bottom:32px;">CITY LIVE STATUS</h2>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="stat-box enlarged-card">
-                                <i data-lucide="thermometer" class="stat-icon-large" style="color:#facc15;"></i>
+                                <i id="current-weather-icon" data-lucide="thermometer" class="stat-icon-large" style="color:#facc15;"></i>
                                 <div class="stat-content-wrap">
-                                    <div class="stat-num-large">29°C</div>
+                                    <div id="current-temp" class="stat-num-large">--°C</div>
                                     <div class="stat-lbl-large">Temperature</div>
                                 </div>
                             </div>
                             <div class="stat-box enlarged-card">
                                 <i data-lucide="car" class="stat-icon-large" style="color:#facc15;"></i>
                                 <div class="stat-content-wrap">
-                                    <div class="stat-num-large">MODERATE</div>
+                                    <div id="current-traffic" class="stat-num-large">LOADING</div>
                                     <div class="stat-lbl-large">Traffic</div>
                                 </div>
                             </div>
                             <div class="stat-box enlarged-card">
-                                <i data-lucide="sun" class="stat-icon-large" style="color:#fbbf24;"></i>
+                                <i id="current-condition-icon" data-lucide="sun" class="stat-icon-large" style="color:#fbbf24;"></i>
                                 <div class="stat-content-wrap">
-                                    <div class="stat-num-large">SUNNY</div>
+                                    <div id="current-desc" class="stat-num-large">LOADING</div>
                                     <div class="stat-lbl-large">Forecast</div>
                                 </div>
                             </div>
@@ -221,49 +250,7 @@
                     <h2 class="section-title" style="font-size:2.5rem; margin-bottom:12px; text-align:center;">WEEKLY WEATHER FORECAST</h2>
                     <div class="blue-line" style="margin:0 auto 40px;"></div>
                     
-                    <div style="display:grid; grid-template-columns: repeat(7, 1fr); gap:12px;">
-                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #fbbf24;">
-                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">MON</div>
-                            <i data-lucide="sun" style="width: 24px; height: 24px; color: #fbbf24; margin: 0 auto 10px;"></i>
-                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">31°C</div>
-                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">SUNNY</div>
-                        </div>
-                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #fbbf24;">
-                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">TUE</div>
-                            <i data-lucide="sun" style="width: 24px; height: 24px; color: #fbbf24; margin: 0 auto 10px;"></i>
-                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">32°C</div>
-                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">CLEAR</div>
-                        </div>
-                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #8899bb;">
-                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">WED</div>
-                            <i data-lucide="cloud" style="width: 24px; height: 24px; color: #8899bb; margin: 0 auto 10px;"></i>
-                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">29°C</div>
-                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">CLOUDY</div>
-                        </div>
-                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #3b7de8;">
-                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">THU</div>
-                            <i data-lucide="cloud-rain" style="width: 24px; height: 24px; color: #3b7de8; margin: 0 auto 10px;"></i>
-                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">27°C</div>
-                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">SHOWERS</div>
-                        </div>
-                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #3b7de8;">
-                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">FRI</div>
-                            <i data-lucide="cloud-lightning" style="width: 24px; height: 24px; color: #3b7de8; margin: 0 auto 10px;"></i>
-                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">26°C</div>
-                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">STORM</div>
-                        </div>
-                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #8899bb;">
-                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">SAT</div>
-                            <i data-lucide="cloud-sun" style="width: 24px; height: 24px; color: #fbbf24; margin: 0 auto 10px;"></i>
-                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">28°C</div>
-                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">PARTLY</div>
-                        </div>
-                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #fbbf24;">
-                            <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">SUN</div>
-                            <i data-lucide="sun" style="width: 24px; height: 24px; color: #fbbf24; margin: 0 auto 10px;"></i>
-                            <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">30°C</div>
-                            <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">SUNNY</div>
-                        </div>
+                    <div id="forecast-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
                     </div>
                 </div>
             </section>
@@ -285,7 +272,7 @@
                             <span style="color:var(--gray); font-size:0.75rem; font-weight: 600;">OPERATIONAL: 24/7 ONLINE</span>
                         </div>
 
-                        <div style="display:flex; flex-direction:column; gap:12px;">
+                        <div id="news-flash-feed" style="display:flex; flex-direction:column; gap:12px;">
                             <div class="widget-card feed-item-box">
                                 <span class="feed-category" style="color: #fb923c;">ROAD WORK</span>
                                 <span class="feed-sep">|</span>
@@ -396,9 +383,9 @@
         </div>
     </main>
 
-    <footer class="footer-bg" style="padding: 60px 24px 20px;">
-        <div style="max-width:1200px; margin:0 auto;">
-            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:48px; margin-bottom:48px;" class="footer-grid">
+    <footer class="footer-bg px-6 py-12 md:py-16">
+        <div class="max-w-[1200px] mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] gap-10 md:gap-12 mb-12">
                 <div>
                     <div class="logo-text" style="font-size:1.8rem; margin-bottom:16px;">B<span class="logo-dot">E</span>AT</div>
                     <p style="color:var(--gray); font-size:0.95rem; line-height:1.7; max-width:320px;">Your trusted neighborhood watch platform. Keeping communities safe through real-time updates.</p>
@@ -425,12 +412,178 @@
                 </div>
             </div>
             <div style="border-top:1px solid rgba(26,86,219,0.1); padding-top:24px; text-align:center;">
-                <p id="footer-copy" style="color:rgba(136,153,187,0.4); font-size:0.8rem;">© 2026 BEAT — Broadcast of Events, Alerts, and Traffic. All rights reserved.</p>
+                <p id="footer-copy" style="color:rgba(136,153,187,0.4); font-size:0.8rem;">© 2026 BEAT — Block Enforcement & Alert Team. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <script src="initial.js"></script>
-    <script>if (window.lucide) lucide.createIcons();</script>
+    <script>
+        if (window.lucide) lucide.createIcons();
+
+        // 1. Weather Logic Helper
+        function getWeatherStyle(wmoCode) {
+            if (wmoCode === 0) return { text: 'CLEAR', icon: 'sun', color: '#fbbf24' };
+            if (wmoCode >= 1 && wmoCode <= 3) return { text: 'CLOUDY', icon: 'cloud-sun', color: '#fbbf24' };
+            if (wmoCode >= 45 && wmoCode <= 55) return { text: 'RAIN', icon: 'cloud-rain', color: '#3b7de8' };
+            if (wmoCode >= 61 && wmoCode <= 67) return { text: 'SHOWERS', icon: 'cloud-rain', color: '#3b7de8' };
+            if (wmoCode >= 80 && wmoCode <= 82) return { text: 'STORM', icon: 'cloud-lightning', color: '#ef4444' };
+            if (wmoCode >= 95 && wmoCode <= 99) return { text: 'THUNDER', icon: 'cloud-lightning', color: '#ef4444' };
+            return { text: 'CLOUDY', icon: 'cloud', color: '#8899bb' };
+        }
+
+        // 2. Fetch Live Weather, Forecast & Real Mapbox Traffic
+        async function fetchLiveMetrics() {
+            try {
+                // --- A. OPEN-METEO WEATHER FETCH ---
+                const weatherRes = await fetch('https://api.open-meteo.com/v1/forecast?latitude=14.5764&longitude=121.0825&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max&timezone=Asia%2FManila');
+                const weatherData = await weatherRes.json();
+
+                const currentTemp = Math.round(weatherData.current.temperature_2m);
+                const currentStyle = getWeatherStyle(weatherData.current.weather_code);
+
+                document.getElementById('current-temp').innerText = `${currentTemp}°C`;
+                document.getElementById('current-desc').innerText = currentStyle.text;
+                
+                const weatherIcon = document.getElementById('current-weather-icon');
+                const conditionIcon = document.getElementById('current-condition-icon');
+                if (weatherIcon) {
+                    weatherIcon.setAttribute('data-lucide', currentStyle.icon);
+                    weatherIcon.style.color = currentStyle.color;
+                }
+                if (conditionIcon) {
+                    conditionIcon.setAttribute('data-lucide', currentStyle.icon);
+                    conditionIcon.style.color = currentStyle.color;
+                }
+
+                // Update 7-Day Forecast Grid
+                const forecastContainer = document.getElementById('forecast-container');
+                if (forecastContainer) {
+                    forecastContainer.innerHTML = ''; 
+                    const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+                    for (let i = 0; i < 7; i++) {
+                        const dateObj = new Date(weatherData.daily.time[i]);
+                        const dayName = daysOfWeek[dateObj.getDay()];
+                        const temp = Math.round(weatherData.daily.temperature_2m_max[i]);
+                        const style = getWeatherStyle(weatherData.daily.weather_code[i]);
+                        
+                        const extraClasses = i === 6 ? "lg:col-span-1 sm:col-span-3 col-span-2" : "";
+
+                        forecastContainer.innerHTML += `
+                            <div class="widget-card ${extraClasses}" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid ${style.color};">
+                                <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">${dayName}</div>
+                                <i data-lucide="${style.icon}" style="width: 24px; height: 24px; color: ${style.color}; margin: 0 auto 10px;"></i>
+                                <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">${temp}°C</div>
+                                <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">${style.text}</div>
+                            </div>
+                        `;
+                    }
+                }
+
+                // --- B. MAPBOX REAL-TIME TRAFFIC FETCH ---
+                // IMPORTANT: Replace this with your actual Mapbox token
+                const MAPBOX_TOKEN = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag'; 
+                
+                // Coordinates for a major route (e.g., C5 Pasig)
+                const startCoords = '121.0664,14.5630'; 
+                const endCoords = '121.0770,14.5890';
+
+                const baseRes = await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${startCoords};${endCoords}?access_token=${MAPBOX_TOKEN}`);
+                const baseData = await baseRes.json();
+                
+                const liveRes = await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${startCoords};${endCoords}?depart_at=now&access_token=${MAPBOX_TOKEN}`);
+                const liveData = await liveRes.json();
+
+                if (baseData.routes && liveData.routes) {
+                    const baseTime = baseData.routes[0].duration; 
+                    const liveTime = liveData.routes[0].duration; 
+
+                    // Calculate the delay ratio
+                    const trafficRatio = liveTime / baseTime;
+                    
+                    let trafficStatus = "LIGHT";
+                    let trafficColor = "#22c55e"; // Green
+
+                    if (trafficRatio > 1.3) {
+                        trafficStatus = "HEAVY";
+                        trafficColor = "#ef4444"; // Red
+                    } else if (trafficRatio > 1.1) {
+                        trafficStatus = "MODERATE";
+                        trafficColor = "#facc15"; // Yellow
+                    }
+
+                    const trafficElement = document.getElementById('current-traffic');
+                    if (trafficElement) {
+                        trafficElement.innerText = trafficStatus;
+                        trafficElement.style.color = trafficColor;
+                    }
+                }
+
+                if (window.lucide) lucide.createIcons();
+
+            } catch (error) {
+                console.error("Failed to load live data:", error);
+                document.getElementById('current-desc').innerText = "ERROR";
+                document.getElementById('current-traffic').innerText = "ERROR";
+            }
+        }
+
+        // 3. Fetch Latest News Flash from Database (via Arvin's API)
+        async function fetchLatestNewsFlash() {
+            const feedContainer = document.getElementById('news-flash-feed');
+            if (!feedContainer) return;
+
+            try {
+                // Ensure this points to the correct API url your team is using!
+                const response = await fetch('https://beat-pasig-api.onrender.com/api/latest-news');
+                const result = await response.json();
+
+                if (result.success && result.data && result.data.length > 0) {
+                    // Clear the hardcoded placeholder cards
+                    feedContainer.innerHTML = '';
+
+                    const getCategoryStyle = (category) => {
+                        const styles = {
+                            'Road Work': '#fb923c', // Orange
+                            'Security': '#22c55e',  // Green
+                            'Traffic': '#3b82f6',   // Blue
+                            'Health': '#a855f7',    // Purple
+                            'Urgent Alert': '#ef4444' // Red
+                        };
+                        return styles[category] || '#94a3b8'; // Gray default
+                    };
+
+                    result.data.forEach(article => {
+                        const catColor = getCategoryStyle(article.category);
+                        
+                        const dateObj = new Date(article.created_at);
+                        const timeString = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+                        const feedHTML = `
+                            <div class="widget-card feed-item-box">
+                                <span class="feed-category" style="color: ${catColor};">${article.category}</span>
+                                <span class="feed-sep">|</span>
+                                <div style="flex-grow: 1; display: flex; align-items: center; justify-content: space-between;">
+                                    <span style="color:var(--white); font-size:1rem;">${article.title}</span>
+                                    <span style="font-family:'Barlow Condensed'; font-weight: 700; color:var(--gray); font-size: 0.85rem; margin-left: 20px;">${timeString}</span>
+                                </div>
+                            </div>
+                        `;
+                        
+                        feedContainer.innerHTML += feedHTML;
+                    });
+                }
+            } catch (error) {
+                console.error("Could not fetch live news flash. Displaying fallbacks.", error);
+            }
+        }
+
+        // Initialize everything when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchLiveMetrics();
+            fetchLatestNewsFlash();
+        });
+    </script>
 </body>
 </html>

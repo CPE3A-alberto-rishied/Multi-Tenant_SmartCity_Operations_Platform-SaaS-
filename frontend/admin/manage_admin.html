@@ -7,42 +7,88 @@
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles2.css">
+  
   <style>
-    body { font-family: 'DM Sans', sans-serif !important; }
-    
+    /* CSS VARIABLES */
+    :root { 
+        --bg: #0a0e1a; 
+        --surface: #111827; 
+        --surface2: #1f2937; 
+        --border: #374151; 
+        --accent: #2563eb; 
+        --accent-light: #3b82f6; 
+        --text: #e2e8f0; 
+        --text-dim: #9ca3af; 
+        --danger: #ef4444; 
+        --success: #22c55e; 
+        --warn: #f59e0b; 
+        --purple: #8b5cf6; 
+    }
+
+    /* GLOBAL STYLES */
+    * { box-sizing: border-box; }
+    body { 
+        font-family: 'DM Sans', sans-serif !important; 
+        background: var(--bg); 
+        color: var(--text); 
+        height: 100%; 
+        margin: 0; 
+        overflow: hidden; 
+    }
+    .font-mono { font-family: 'Space Mono', monospace; }
+    .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
+
     /* SIDEBAR */
-    .sidebar { width: 260px !important; flex-shrink: 0 !important; }
+    .sidebar { 
+        width: 260px !important; 
+        background: var(--surface); 
+        border-right: 1px solid var(--border); 
+        display: flex; 
+        flex-direction: column; 
+        height: 100%; 
+        flex-shrink: 0 !important; 
+    }
     
-    /* PERFECT SIZING */
     .sidebar-item { 
-      display: flex !important; align-items: center !important; gap: 12px !important;
-      padding: 12px 18px !important; font-size: 14.5px !important; 
-      font-weight: 500 !important; color: #94a3b8 !important;
-      text-decoration: none !important; border-left: 3px solid transparent !important;
+        display: flex !important; 
+        align-items: center !important; 
+        gap: 12px !important;
+        padding: 12px 18px !important; 
+        font-size: 14.5px !important; 
+        font-weight: 500 !important; 
+        color: #94a3b8 !important;
+        text-decoration: none !important; 
+        border-left: 3px solid transparent !important;
+        transition: all 0.2s;
     }
     .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
     .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
     .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
     
-    /* USER FOOTER FIXED */
+    /* USER FOOTER */
     .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
     .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
     .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
     .settings-link { color: #94a3b8; transition: color 0.2s; display: flex; align-items: center; }
     .settings-link:hover { color: #3b82f6; }
 
-    .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
+    /* CARDS & TABLES */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 12px; color: var(--text-dim); font-weight: 600; border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { padding: 12px; border-bottom: 1px solid var(--border); color: var(--text); }
+
+    /* MODALS */
     .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; }
     .hidden { display: none !important; }
     .modal-card { background: #151b2d; border: 1px solid #2d3748; border-radius: 1.25rem; }
     
-    /* Input Styling */
+    /* INPUT STYLING */
     .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 8px 12px; transition: all 0.2s; }
     .modal-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
     .input-error { border-color: #ef4444 !important; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important; }
     
-    /* ULTIMATE AUTOFILL FIX */
+    /* AUTOFILL FIX */
     input:-webkit-autofill,
     input:-webkit-autofill:hover, 
     input:-webkit-autofill:focus, 
@@ -64,18 +110,27 @@
       padding-right: 2.5rem !important;
     }
 
-    /* Tables & Toggles */
+    /* TOGGLE SWITCHES */
     .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; inset: 0; background-color: #374151; transition: .4s; border-radius: 24px; }
     .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
     input:checked + .slider { background-color: #22c55e; }
     input:checked + .slider:before { transform: translateX(20px); }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ANIMATIONS */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-in { animation: fadeIn 0.3s ease; }
   </style>
 </head>
-<body class="h-full flex bg-[#0a0e1a]">
+<body class="h-full flex">
 
-  <aside id="sidebar" class="sidebar flex flex-col h-full" style="background:var(--surface); border-right: 1px solid var(--border)">
+  <aside id="sidebar" class="sidebar flex flex-col h-full">
     <div class="h-[76px] px-5 flex items-center border-b shrink-0" style="border-color:var(--border)">
       <div class="flex items-center gap-3">
         <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
@@ -112,19 +167,25 @@
     </div>
   </aside>
 
-  <main class="flex-1 overflow-y-auto">
+  <main class="flex-1 overflow-y-auto bg-[#0a0e1a]">
     <header class="h-[76px] px-8 flex items-center border-b shrink-0" style="border-color:var(--border); background:var(--surface)">
       <h1 class="text-xl font-semibold text-white">Manage Admins</h1>
     </header>
 
     <div class="p-8 space-y-8 animate-in">
       
-      <div class="flex justify-between items-center">
+      <div class="flex justify-between items-center flex-wrap gap-4">
         <div class="flex items-center gap-3">
+          
+          <div class="relative">
+            <i data-lucide="search" class="w-4 h-4 text-[#94a3b8] absolute left-3 top-3"></i>
+            <input type="text" id="admin-search" oninput="handleSearch(this.value)" placeholder="Search Name or ID..." class="appearance-none h-10 bg-[#1e2536] text-white border border-gray-700 rounded-lg pl-9 pr-4 text-sm outline-none focus:border-blue-500 transition-colors w-[220px] shadow-sm">
+          </div>
+
           <div class="relative flex items-center">
-            <select id="dept-filter" onchange="handleSort(this.value)" class="appearance-none h-10 bg-[#1e2536] text-white border border-gray-700 rounded-lg pl-4 pr-10 text-sm outline-none focus:border-blue-500 cursor-pointer min-w-[140px]">
+            <select id="dept-filter" onchange="handleSort(this.value)" class="h-10 bg-[#1e2536] text-white border border-gray-700 rounded-lg pl-4 pr-10 text-sm outline-none focus:border-blue-500 cursor-pointer min-w-[140px]">
+            <select id="dept-filter" onchange="handleSort(this.value)" class="appearance-none h-10 bg-[#1e2536] text-white border border-gray-700 rounded-lg pl-4 pr-10 text-sm outline-none focus:border-blue-500 cursor-pointer min-w-[140px] shadow-sm">
             </select>
-            <i data-lucide="chevron-down" class="w-4 h-4 text-[#94a3b8] absolute right-3 pointer-events-none"></i>
           </div>
           
           <button id="delete-dept-btn" onclick="openModal('delete-dept-modal')" class="hidden h-10 bg-[#ef4444] text-white px-4 rounded-lg text-sm font-bold shadow-lg hover:bg-red-600 transition-all whitespace-nowrap leading-tight">
@@ -137,18 +198,18 @@
         </div>
       </div>
 
-      <div class="card border border-gray-800/50" style="background:var(--surface)">
+      <div class="card border border-gray-800/50">
         <h3 class="px-4 py-3 text-[#94a3b8] font-bold text-[10px] uppercase flex items-center gap-2 border-b border-gray-800/50"><i data-lucide="check-circle" class="w-3 h-3 text-green-500"></i> Active Accounts</h3>
         <table class="w-full text-left">
-          <thead><tr class="border-b border-gray-800"><th class="py-4 px-4 w-10"></th><th class="py-4 px-4 text-[11px] text-[#94a3b8] uppercase tracking-wider">Full Name</th><th class="py-4 px-4 text-[11px] text-[#94a3b8] uppercase tracking-wider">ID Number</th><th class="py-4 px-4 text-[11px] text-[#94a3b8] uppercase tracking-wider">Email</th><th class="py-4 px-4 text-[11px] text-[#94a3b8] uppercase tracking-wider">Department</th><th class="py-4 px-4 text-[11px] text-[#94a3b8] uppercase tracking-wider">Status</th><th class="py-4 px-4 text-[11px] text-[#94a3b8] uppercase tracking-wider">Action</th></tr></thead>
+          <thead><tr class="border-b border-gray-800"><th class="py-4 px-4 w-10"></th><th class="py-4 px-4">Full Name</th><th class="py-4 px-4">ID Number</th><th class="py-4 px-4">Email</th><th class="py-4 px-4">Department</th><th class="py-4 px-4">Status</th><th class="py-4 px-4">Action</th></tr></thead>
           <tbody id="active-admin-table-body"></tbody>
         </table>
       </div>
 
-      <div class="card border border-gray-800/50" style="background:var(--surface)">
+      <div class="card border border-gray-800/50">
         <h3 class="px-4 py-3 text-[#94a3b8] font-bold text-[10px] uppercase flex items-center gap-2 border-b border-gray-800/50"><i data-lucide="lock" class="w-3 h-3 text-red-500"></i> Disabled Accounts</h3>
         <table class="w-full text-left">
-          <thead><tr class="border-b border-gray-800"><th class="py-4 px-4 w-10"></th><th class="py-4 px-4 text-[11px] text-[#94a3b8] uppercase tracking-wider">Full Name</th><th class="py-4 px-4 text-[11px] text-[#94a3b8] uppercase tracking-wider">ID Number</th><th class="py-4 px-4 text-[11px] text-[#94a3b8] uppercase tracking-wider">Email</th><th class="py-4 px-4 text-[11px] text-[#94a3b8] uppercase tracking-wider">Department</th><th class="py-4 px-4 text-[11px] text-[#94a3b8] uppercase tracking-wider">Status</th><th class="py-4 px-4 text-[11px] text-[#94a3b8] uppercase tracking-wider">Action</th></tr></thead>
+          <thead><tr class="border-b border-gray-800"><th class="py-4 px-4 w-10"></th><th class="py-4 px-4">Full Name</th><th class="py-4 px-4">ID Number</th><th class="py-4 px-4">Email</th><th class="py-4 px-4">Department</th><th class="py-4 px-4">Status</th><th class="py-4 px-4">Action</th></tr></thead>
           <tbody id="disabled-admin-table-body"></tbody>
         </table>
       </div>
@@ -157,25 +218,43 @@
 
   <div id="no-dept-modal" class="modal-overlay hidden"><div class="modal-card" style="width: 380px; text-align: center; padding: 2rem;"><div style="background:#3b82f6; width:48px; height:48px; border-radius:50%; margin: 0 auto 15px" class="flex items-center justify-center text-white"><i data-lucide="info"></i></div><h2 class="text-white font-bold text-xl mb-2">No Department Found</h2><p class="text-[#94a3b8] text-xs mb-8">Please create a department first before adding staff members.</p><div class="flex gap-2"><button onclick="closeModal('no-dept-modal'); openModal('new-dept-modal')" class="flex-1 bg-blue-600 text-white font-bold py-2 rounded-lg text-xs">Create Now</button><button onclick="closeModal('no-dept-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] text-white font-bold py-2 rounded-lg text-xs">Close</button></div></div></div>
   <div id="delete-dept-modal" class="modal-overlay hidden"><div class="modal-card" style="width: 380px; text-align: center; padding: 2rem;"><div style="background:#ef4444; width:48px; height:48px; border-radius:50%; margin: 0 auto 15px" class="flex items-center justify-center text-white"><i data-lucide="alert-circle"></i></div><h2 id="delete-dept-title" class="text-white font-bold text-xl mb-2">Delete Dept?</h2><p id="delete-dept-desc" class="text-[#94a3b8] text-xs mb-6 leading-relaxed"></p><div class="flex gap-2 px-4"><button onclick="executeDeleteDept()" class="flex-1 bg-[#ef4444] text-white font-bold py-2 rounded-lg text-xs hover:bg-red-600">Delete Everything</button><button onclick="closeModal('delete-dept-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] text-white font-bold py-2 rounded-lg text-xs">Cancel</button></div></div></div>
-
   <div id="new-dept-modal" class="modal-overlay hidden"><div class="modal-card" style="width: 380px; padding: 2rem;"><h2 class="text-white font-bold text-xl mb-6 text-center">Create New Department</h2><div class="space-y-4"><div><label class="text-[10px] font-bold text-[#94a3b8] uppercase">Department Name</label><input type="text" id="new-dept-name" placeholder="e.g. Water Management" class="modal-input px-3 py-2 text-sm" oninput="clearError('new-dept-name', 'dept-error')"><p id="dept-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p></div></div><div class="flex gap-2 mt-8"><button onclick="validateCreateDept()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs">Create Department</button><button onclick="clearAndCloseDept()" class="flex-1 bg-[#1e2536] text-white font-bold py-2 rounded-lg text-xs border border-[#374151]">Cancel</button></div></div></div>
+  <div id="add-staff-modal" class="modal-overlay hidden"><div class="modal-card" style="width: 400px; padding: 1.5rem;"><h2 class="text-white font-bold text-lg mb-4">Add New Staff</h2><div class="space-y-3"><div><label class="text-[10px] font-bold text-[#94a3b8] uppercase">Full Name</label><input type="text" id="staff-name" placeholder="e.g. John Doe" class="modal-input px-3 py-2 text-sm" oninput="clearError('staff-name', 'name-error')"><p id="name-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p></div><div class="grid grid-cols-2 gap-3"><div><label class="text-[10px] font-bold text-[#94a3b8] uppercase">ID Number</label><input type="text" id="staff-id" placeholder="EMP-12345" class="modal-input px-3 py-2 text-sm" oninput="clearError('staff-id', 'id-error')"><p id="id-error" class="text-[10px] text-red-500 hidden mt-1">Required</p></div><div><label class="text-[10px] font-bold text-[#94a3b8] uppercase">Department</label><div class="relative flex items-center"><select id="staff-dept" class="modal-input px-3 py-2 text-sm" onchange="clearError('staff-dept', 'dept-select-error')"></select><i data-lucide="chevron-down" class="w-4 h-4 text-[#94a3b8] absolute right-2 top-3 pointer-events-none"></i></div><p id="dept-select-error" class="text-[10px] text-red-500 hidden mt-1">Required</p></div></div><div><label class="text-[10px] font-bold text-[#94a3b8] uppercase">Email</label><input type="email" id="staff-email" placeholder="staff@beat.gov.ph" class="modal-input px-3 py-2 text-sm" oninput="clearError('staff-email', 'email-error')"><p id="email-error" class="text-[10px] text-red-500 hidden mt-1">Valid email required</p></div><div><label class="text-[10px] font-bold text-[#94a3b8] uppercase">Password</label><input type="password" id="staff-pass" placeholder="Min. 8 characters" class="modal-input px-3 py-2 text-sm" oninput="clearError('staff-pass', 'pass-error')"><p id="pass-error" class="text-[10px] text-red-500 hidden mt-1">At least 8 characters required</p></div></div><div class="flex gap-2 mt-6"><button onclick="validateAddStaff()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs">Create Account</button><button onclick="clearAndCloseStaff()" class="flex-1 bg-[#1e2536] text-white font-bold py-2 rounded-lg text-xs border border-[#374151]">Cancel</button></div></div></div>
+  <div id="no-dept-modal" class="modal-overlay hidden z-[100]"><div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border);"><div style="background:#f59e0b; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-yellow-500/20"><i data-lucide="alert-circle" class="w-6 h-6"></i></div><h2 class="text-white font-bold text-xl mb-3">No Department Found</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Please create a department first before adding staff members.</p><div class="flex gap-3"><button onclick="closeModal('no-dept-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="closeModal('no-dept-modal'); openModal('new-dept-modal')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Create Now</button></div></div></div>
+  <div id="delete-dept-modal" class="modal-overlay hidden z-[100]"><div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border);"><div style="background:#ef4444; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-red-500/20"><i data-lucide="alert-circle" class="w-6 h-6"></i></div><h2 id="delete-dept-title" class="text-white font-bold text-xl mb-3">Delete Dept?</h2><p id="delete-dept-desc" class="text-[#94a3b8] text-sm mb-8 leading-relaxed"></p><div class="flex gap-3"><button onclick="closeModal('delete-dept-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="executeDeleteDept()" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Delete Everything</button></div></div></div>
+
+  <div id="new-dept-modal" class="modal-overlay hidden z-[100]"><div class="border rounded-2xl p-8 w-[400px] shadow-2xl text-left" style="background:var(--surface); border-color:var(--border)"><h2 class="text-white font-bold text-xl mb-6 flex items-center gap-2"><i data-lucide="folder-plus" class="text-blue-500 w-6 h-6"></i> Create New Department</h2><div class="space-y-4"><div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Department Name <span class="text-red-500">*</span></label><input type="text" id="new-dept-name" placeholder="e.g. Water Management" class="modal-input text-sm" oninput="clearError('new-dept-name', 'dept-error')"><p id="dept-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p></div></div><div class="flex justify-end gap-3 mt-8"><button onclick="clearAndCloseDept()" class="px-5 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">Cancel</button><button onclick="validateCreateDept()" class="px-5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg">Create Department</button></div></div></div>
   
-  <div id="add-staff-modal" class="modal-overlay hidden"><div class="modal-card" style="width: 400px; padding: 1.5rem;"><h2 class="text-white font-bold text-lg mb-4">Add New Staff</h2><div class="space-y-3"><div><label class="text-[10px] font-bold text-[#94a3b8] uppercase">Full Name</label><input type="text" id="staff-name" placeholder="e.g. John Doe" class="modal-input px-3 py-2 text-sm" oninput="clearError('staff-name', 'name-error')"><p id="name-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p></div><div class="grid grid-cols-2 gap-3"><div><label class="text-[10px] font-bold text-[#94a3b8] uppercase">ID Number</label><input type="text" id="staff-id" placeholder="EMP-12345" class="modal-input px-3 py-2 text-sm" oninput="clearError('staff-id', 'id-error')"><p id="id-error" class="text-[10px] text-red-500 hidden mt-1">Required</p></div>
-  <div><label class="text-[10px] font-bold text-[#94a3b8] uppercase">Department</label>
+  <div id="add-staff-modal" class="modal-overlay hidden z-[100]"><div class="border rounded-2xl p-8 w-[450px] shadow-2xl text-left" style="background:var(--surface); border-color:var(--border)"><h2 class="text-white font-bold text-xl mb-6 flex items-center gap-2"><i data-lucide="user-plus" class="text-blue-500 w-6 h-6"></i> Add New Staff</h2><div class="space-y-5"><div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Full Name <span class="text-red-500">*</span></label><input type="text" id="staff-name" placeholder="e.g. John Doe" class="modal-input text-sm" oninput="clearError('staff-name', 'name-error')"><p id="name-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p></div><div class="grid grid-cols-2 gap-4"><div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">ID Number <span class="text-red-500">*</span></label><input type="text" id="staff-id" placeholder="EMP-12345" class="modal-input text-sm" oninput="clearError('staff-id', 'id-error')"><p id="id-error" class="text-[10px] text-red-500 hidden mt-1">Required</p></div>
+  <div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Department <span class="text-red-500">*</span></label>
   <div class="relative flex items-center">
-    <select id="staff-dept" class="modal-input appearance-none px-3 py-2 pr-8 text-sm" onchange="clearError('staff-dept', 'dept-select-error')"></select>
-    <i data-lucide="chevron-down" class="w-4 h-4 text-[#94a3b8] absolute right-2 top-3 pointer-events-none"></i>
+    <select id="staff-dept" class="modal-input appearance-none text-sm" onchange="clearError('staff-dept', 'dept-select-error')"></select>
+    <i data-lucide="chevron-down" class="w-4 h-4 text-[#94a3b8] absolute right-3 pointer-events-none mt-1"></i>
   </div>
   <p id="dept-select-error" class="text-[10px] text-red-500 hidden mt-1">Required</p></div></div>
-  <div><label class="text-[10px] font-bold text-[#94a3b8] uppercase">Email</label><input type="email" id="staff-email" placeholder="staff@beat.gov.ph" class="modal-input px-3 py-2 text-sm" oninput="clearError('staff-email', 'email-error')"><p id="email-error" class="text-[10px] text-red-500 hidden mt-1">Valid email required</p></div><div><label class="text-[10px] font-bold text-[#94a3b8] uppercase">Password</label><input type="password" id="staff-pass" placeholder="Min. 8 characters" class="modal-input px-3 py-2 text-sm" oninput="clearError('staff-pass', 'pass-error')"><p id="pass-error" class="text-[10px] text-red-500 hidden mt-1">At least 8 characters required</p></div></div><div class="flex gap-2 mt-6"><button onclick="validateAddStaff()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs">Create Account</button><button onclick="clearAndCloseStaff()" class="flex-1 bg-[#1e2536] text-white font-bold py-2 rounded-lg text-xs border border-[#374151]">Cancel</button></div></div></div>
+  <div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Email <span class="text-red-500">*</span></label><input type="email" id="staff-email" placeholder="staff@beat.gov.ph" class="modal-input text-sm" oninput="clearError('staff-email', 'email-error')"><p id="email-error" class="text-[10px] text-red-500 hidden mt-1">Valid email required</p></div><div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Password <span class="text-red-500">*</span></label><input type="password" id="staff-pass" placeholder="Min. 8 characters" class="modal-input text-sm" oninput="clearError('staff-pass', 'pass-error')"><p id="pass-error" class="text-[10px] text-red-500 hidden mt-1">At least 8 characters required</p></div></div><div class="flex justify-end gap-3 mt-8"><button onclick="clearAndCloseStaff()" class="px-5 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">Cancel</button><button onclick="validateAddStaff()" class="px-5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg">Create Account</button></div></div></div>
 
-  <div id="confirm-staff-modal" class="modal-overlay hidden"><div class="modal-card" style="width: 350px; text-align: center; padding: 2rem;"><div style="background:#2563eb; width:48px; height:48px; border-radius:50%; margin: 0 auto 15px" class="flex items-center justify-center text-white"><i data-lucide="user-plus" class="w-5 h-5"></i></div><h2 class="text-white font-bold text-xl mb-2">Confirm Staff?</h2><p class="text-[#94a3b8] text-xs mb-6">Add this account to the system?</p><div class="flex gap-2 px-4"><button onclick="executeAddStaff()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs">Confirm</button><button onclick="closeModal('confirm-staff-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] text-white font-bold py-2 rounded-lg text-xs">Cancel</button></div></div></div>
-  <div id="confirm-dept-modal" class="modal-overlay hidden"><div class="modal-card" style="width: 350px; text-align: center; padding: 2rem;"><div style="background:#2563eb; width:48px; height:48px; border-radius:50%; margin: 0 auto 15px" class="flex items-center justify-center text-white"><i data-lucide="folder-plus" class="w-5 h-5"></i></div><h2 class="text-white font-bold text-xl mb-2">Create Dept?</h2><p class="text-[#94a3b8] text-xs mb-6">Confirm adding this department?</p><div class="flex gap-2 px-4"><button onclick="executeCreateDept()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs">Confirm</button><button onclick="closeModal('confirm-dept-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] text-white font-bold py-2 rounded-lg text-xs">Cancel</button></div></div></div>
+  <div id="confirm-staff-modal" class="modal-overlay hidden z-[100]"><div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border);"><div style="background:#2563eb; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-blue-500/20"><i data-lucide="user-plus" class="w-6 h-6"></i></div><h2 class="text-white font-bold text-xl mb-3">Confirm Staff?</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Add this account to the system?</p><div class="flex gap-3"><button onclick="closeModal('confirm-staff-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="executeAddStaff()" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Confirm</button></div></div></div>
+  <div id="confirm-dept-modal" class="modal-overlay hidden z-[100]"><div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border);"><div style="background:#2563eb; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-blue-500/20"><i data-lucide="folder-plus" class="w-6 h-6"></i></div><h2 class="text-white font-bold text-xl mb-3">Create Dept?</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Confirm adding this department?</p><div class="flex gap-3"><button onclick="closeModal('confirm-dept-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="executeCreateDept()" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Confirm</button></div></div></div>
   
-  <div id="disable-modal" class="modal-overlay hidden"><div class="modal-card" style="width: 380px; text-align: center; padding: 2rem;"><div style="background:#ef4444; width:48px; height:48px; border-radius:50%; margin: 0 auto 15px" class="flex items-center justify-center text-white"><i data-lucide="shield-off" class="w-5 h-5"></i></div><h2 id="disable-title" class="text-white font-bold text-xl mb-2">Disable user?</h2><p class="text-[#94a3b8] text-xs mb-6">Revoke system access?</p><div class="flex gap-2 px-4"><button onclick="confirmStatusChange(false)" class="flex-1 bg-[#ef4444] text-white font-bold py-2 rounded-lg text-xs hover:bg-red-600">Disable Access</button><button onclick="cancelStatusChange()" class="flex-1 bg-[#1e2536] border border-[#374151] text-white font-bold py-2 rounded-lg text-xs">Cancel</button></div></div></div>
-  <div id="enable-modal" class="modal-overlay hidden"><div class="modal-card" style="width: 380px; text-align: center; padding: 2rem;"><div style="background:#22c55e; width:48px; height:48px; border-radius:50%; margin: 0 auto 15px" class="flex items-center justify-center text-white"><i data-lucide="shield-check" class="w-5 h-5"></i></div><h2 id="enable-title" class="text-white font-bold text-xl mb-2">Enable user?</h2><p class="text-[#94a3b8] text-xs mb-6">Restore system access?</p><div class="flex gap-2 px-4"><button onclick="confirmStatusChange(true)" class="flex-1 bg-[#22c55e] hover:bg-green-600 text-white font-bold py-2 rounded-lg text-xs transition-all">Enable Access</button><button onclick="cancelStatusChange()" class="flex-1 bg-[#1e2536] border border-[#374151] text-white font-bold py-2 rounded-lg text-xs">Cancel</button></div></div></div>
+  <div id="disable-modal" class="modal-overlay hidden z-[100]"><div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border);"><div style="background:#ef4444; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-red-500/20"><i data-lucide="shield-off" class="w-6 h-6"></i></div><h2 id="disable-title" class="text-white font-bold text-xl mb-3">Disable user?</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Revoke system access?</p><div class="flex gap-3"><button onclick="cancelStatusChange()" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="confirmStatusChange(false)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Disable Access</button></div></div></div>
+  <div id="enable-modal" class="modal-overlay hidden z-[100]"><div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border);"><div style="background:#22c55e; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-green-500/20"><i data-lucide="shield-check" class="w-6 h-6"></i></div><h2 id="enable-title" class="text-white font-bold text-xl mb-3">Enable user?</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Restore system access?</p><div class="flex gap-3"><button onclick="cancelStatusChange()" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="confirmStatusChange(true)" class="flex-1 bg-transparent border border-green-500 hover:bg-green-500/10 text-green-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Enable Access</button></div></div></div>
+
+  <div id="confirm-delete-user-modal" class="modal-overlay hidden z-[100]">
+    <div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
+      <div style="background:#ef4444; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-red-500/20">
+        <i data-lucide="trash-2" class="w-6 h-6"></i>
+      </div>
+      <h2 class="text-white font-bold text-xl mb-3">Delete Account Permanently?</h2>
+      <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to delete <span id="delete-user-name" class="font-bold text-white"></span>? This action cannot be undone.</p>
+      
+      <div class="flex gap-3">
+        <button onclick="closeModal('confirm-delete-user-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
+        <button onclick="executeDeleteUser()" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Delete</button>
+      </div>
+    </div>
+  </div>
 
   <script src="js/app.js"></script>
-  <script>document.addEventListener('DOMContentLoaded', () => { lucide.createIcons(); });</script>
 </body>
 </html>

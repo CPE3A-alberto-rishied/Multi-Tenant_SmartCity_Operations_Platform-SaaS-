@@ -15,11 +15,11 @@
         <div style="max-width:1200px; margin:0 auto; padding: 0 24px; display:flex; align-items:center; justify-content:space-between; height:64px;">
             <div class="logo-text" style="cursor:pointer;" onclick="window.location.href='index.html'">B<span class="logo-dot">E</span>AT</div>
             <nav style="display:flex; gap:28px; align-items:center;" class="hidden md:flex">
-                <a href="index.html" class="nav-link">HOME</a>
+                <a href="index.html" class="nav-link">Home</a>
                 <a href="map.html" class="nav-link">Map</a>
-                <a href="report.html" class="nav-link active">REPORT</a>
-                <a href="news.html" class="nav-link">NEWS</a>
-                <a href="about.html" class="nav-link">ABOUT</a>
+                <a href="report.html" class="nav-link active">Report</a>
+                <a href="news.html" class="nav-link">News</a>
+                <a href="about.html" class="nav-link">About</a>
             </nav>
         </div>
     </header>
@@ -35,57 +35,56 @@
         </div>
     </div>
 
-    <main style="flex:1; display:flex; flex-direction:column;">
-        <div class="internal-page-bg" style="flex:1;">
+    <main class="flex-1 flex flex-col">
+        <div class="internal-page-bg flex-1 relative">
             <div class="grid-overlay"></div>
             
-            <div style="position:relative; z-index:1; padding: 60px 24px;">
-                <div style="max-width:850px; margin:0 auto;">
+            <div class="relative z-10 w-full px-6 py-10 md:py-16 mx-auto">
+                <div class="max-w-[850px] mx-auto w-full">
                     <div class="section-label">WE HEAR YOU</div>
-                    <h1 class="section-title" style="font-size:3.5rem; margin-bottom:4px; text-transform: uppercase;">REPORT YOUR CONCERN</h1>
+                    <h1 class="section-title" style="font-size:clamp(2.5rem, 8vw, 3.5rem); margin-bottom:4px; text-transform: uppercase;">REPORT YOUR CONCERN</h1>
                     <div class="blue-line" style="margin-bottom:20px;"></div>
                     <p style="color:var(--gray); font-size:0.95rem; margin-bottom:40px; opacity: 0.8;">Your report helps keep the community safe. All submissions are reviewed within 24 hours.</p>
 
-                    <form id="report-form" onsubmit="submitReport(event)" novalidate class="space-y-6">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-            <label class="block text-xs font-bold text-blue-500 uppercase mb-2">Your Full Name</label>
-            <input name="reporter_name" type="text" 
-                   pattern="[A-Za-z\s]+" 
-                   title="Please use letters and spaces only"
-                   class="report-field-input" required>
-        </div>
-        <div>
-            <label class="block text-xs font-bold text-blue-500 uppercase mb-2">Email Address</label>
-            <input name="reporter_email" type="email" class="report-field-input" required>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-            <label class="block text-xs font-bold text-blue-500 uppercase mb-2">Subject of the Report</label>
-            <input name="report_subject" type="text" class="report-field-input" required>
-        </div>
-        <div>
-            <label class="block text-xs font-bold text-blue-500 uppercase mb-2">Contact Number (11 Digits)</label>
-            <input name="contact_number" type="text" 
-                   pattern="[0-9]{11}" maxlength="11" minlength="11" 
-                   title="Enter your 11-digit number (e.g. 09123456789)"
-                   class="report-field-input" required>
-        </div>
-    </div>
-
-    <div>
-        <label class="block text-xs font-bold text-blue-500 uppercase mb-2">Location / Address</label>
-        <input name="report_location" type="text" class="report-field-input" required>
-    </div>
-
-    <div>
-        <label class="block text-xs font-bold text-blue-500 uppercase mb-2">Description</label>
-        <textarea name="report_description" rows="5" class="report-field-input" required></textarea>
-    </div>
-                            <button type="submit" class="btn-primary">SUBMIT REPORT</button>
-                            <button type="button" class="btn-outline" onclick="document.getElementById('report-form').classList.remove('was-validated'); document.getElementById('report-form').reset();">CLEAR FORM</button>
+                    <form id="report-form" class="flex flex-col gap-6 md:gap-8" novalidate onsubmit="submitReport(event)">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="report-field-label">YOUR NAME</label>
+                                <input name="reporter_name" class="report-field-input" type="text" placeholder="Full name" required>
+                            </div>
+                            <div>
+                                <label class="report-field-label">EMAIL ADDRESS</label>
+                                <input name="reporter_email" class="report-field-input" type="email" placeholder="email@example.com" required>
+                                <div class="invalid-feedback">Enter a valid email</div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="report-field-label">SUBJECT OF THE REPORT</label>
+                                <input name="report_subject" class="report-field-input" type="text" placeholder="e.g. Broken street light, Traffic obstruction" required>
+                            </div>
+                            <div>
+                                <label class="report-field-label">CONTACT NUMBER</label>
+                                <input name="contact_number" class="report-field-input" type="tel" pattern="[0-9]+" placeholder="e.g. 09123456789" required>
+                                <div class="invalid-feedback">Input numbers only</div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="report-field-label">LOCATION / ADDRESS OF THE ISSUE</label>
+                            <input name="report_location" class="report-field-input" type="text" placeholder="Street address or landmark" required>
+                        </div>
+                        
+                        <div>
+                            <label class="report-field-label">DESCRIPTION</label>
+                            <textarea name="report_description" class="report-field-input" rows="6" placeholder="Describe the incident in detail..." required></textarea>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row gap-4 mt-2">
+                            <button type="submit" class="btn-primary w-full sm:w-auto">SUBMIT REPORT</button>
+                            <button type="button" class="btn-outline w-full sm:w-auto text-center" onclick="document.getElementById('report-form').reset();">CLEAR FORM</button>
                         </div>
                     </form>
                 </div>
@@ -93,9 +92,9 @@
         </div>
     </main>
 
-    <footer class="footer-bg" style="padding: 60px 24px 20px;">
-        <div style="max-width:1200px; margin:0 auto;">
-            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:48px; margin-bottom:48px;" class="footer-grid">
+    <footer class="footer-bg px-6 py-12 md:py-16">
+        <div class="max-w-[1200px] mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] gap-10 md:gap-12 mb-12">
                 <div>
                     <div class="logo-text" style="font-size:1.8rem; margin-bottom:16px;">B<span class="logo-dot">E</span>AT</div>
                     <p id="footer-tagline" style="color:var(--gray); font-size:0.95rem; line-height:1.7; max-width:320px;">Your trusted neighborhood watch platform. Keeping communities safe through real-time updates.</p>
@@ -105,7 +104,7 @@
                     <div class="blue-line" style="margin-bottom:20px;"></div>
                     <div style="display:flex; flex-direction:column; gap:12px;">
                         <a href="index.html" class="nav-link">Home</a>
-                        <span class="nav-link">Live Map</span>
+                        <a href="map.html" class="nav-link">Live Map</a>
                         <a href="report.html" class="nav-link">Report</a>
                         <a href="news.html" class="nav-link">News</a>
                         <a href="about.html" class="nav-link">About</a>
@@ -134,7 +133,7 @@
             </div>
             <h3 style="font-family: 'Bebas Neue'; font-size: 2.2rem; color: white; margin-bottom: 8px; letter-spacing: 0.05em;">CONCERN REPORTED</h3>
             <p style="color: var(--gray); font-size: 0.95rem; margin-bottom: 32px; line-height: 1.5;">Thank you for your vigilance. Your incident report has been securely logged with the Pasig Administration.</p>
-            <button type="button" class="btn-primary" style="background: #22c55e; color: #050a14; padding-left: 40px; padding-right: 40px;" onclick="closeModal()">ACKNOWLEDGE</button>
+            <button type="button" class="btn-primary w-full sm:w-auto" style="background: #22c55e; color: #050a14; padding-left: 40px; padding-right: 40px;" onclick="closeModal()">ACKNOWLEDGE</button>
         </div>
     </div>
 

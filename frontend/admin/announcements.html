@@ -6,15 +6,14 @@
   <title>BEAT - Announcement Manager</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
- <style>
+  <style>
     body { font-family: 'DM Sans', sans-serif !important; }
     
     /* SIDEBAR */
     .sidebar { width: 260px !important; flex-shrink: 0 !important; }
     
-    /* ✅ PERFECT SIZING: 14.5px text, 20px icons, clean padding */
     .sidebar-item { 
       display: flex !important; align-items: center !important; gap: 12px !important;
       padding: 12px 18px !important; font-size: 14.5px !important; 
@@ -25,7 +24,7 @@
     .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
     .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
     
-    /* USER FOOTER FIXED */
+    /* USER FOOTER */
     .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
     .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
     .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
@@ -33,16 +32,13 @@
     .settings-link:hover { color: #3b82f6; }
 
     .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
-    .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; }
-    .hidden { display: none !important; }
-    .modal-card { background: #151b2d; border: 1px solid #2d3748; border-radius: 1.25rem; }
     
-    /* Input Styling */
-    .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 8px 12px; transition: all 0.2s; }
+    /* INPUT STYLING */
+    .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 10px 14px; transition: all 0.2s; }
     .modal-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
     .input-error { border-color: #ef4444 !important; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important; }
     
-    /* ✅ ULTIMATE AUTOFILL FIX: Prevents browser from turning inputs black/transparent */
+    /* AUTOFILL FIX */
     input:-webkit-autofill,
     input:-webkit-autofill:hover, 
     input:-webkit-autofill:focus, 
@@ -54,33 +50,79 @@
         transition: background-color 5000s ease-in-out 0s;
     }
     
-    /* CUSTOM SELECT ARROW */
-    select { 
-      appearance: none; 
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); 
-      background-repeat: no-repeat; 
-      background-position: right 0.75rem center; 
-      background-size: 1em; 
-      padding-right: 2.5rem !important;
-    }
+    input[type="date"] { color-scheme: dark; }
 
-    /* Tables & Toggles */
-    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #374151; transition: .4s; border-radius: 24px; }
-    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-    input:checked + .slider { background-color: #22c55e; }
-    input:checked + .slider:before { transform: translateX(20px); }
+    /* MODALS */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; }
+    .hidden { display: none !important; }
+    .modal-card { background: #151b2d; border: 1px solid #2d3748; border-radius: 1.25rem; }
+
+    /* CUSTOM DROPDOWN SCROLLBAR */
+    .cat-dropdown-menu::-webkit-scrollbar { width: 6px; }
+    .cat-dropdown-menu::-webkit-scrollbar-thumb { background-color: #374151; border-radius: 10px; }
+
+    /* =========================================
+       MOBILE RESPONSIVE DASHBOARD FIXES 
+       ========================================= */
+    @media (max-width: 768px) {
+        body { flex-direction: column !important; }
+        
+        /* Convert Sidebar to Swipeable Top Navigation */
+        .sidebar { width: 100% !important; height: auto !important; border-right: none !important; border-bottom: 1px solid var(--border); z-index: 40; }
+        
+        /* FIX: Push the logo down so it doesn't get cut off at the top edge of mobile screens */
+        .sidebar > div:first-child { 
+            height: auto !important; 
+            padding-top: 24px !important; 
+            padding-bottom: 16px !important; 
+        }
+
+        .sidebar nav { display: flex; flex-direction: row !important; overflow-x: auto; padding: 0 16px 16px 16px !important; gap: 8px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        .sidebar nav::-webkit-scrollbar { display: none; }
+        .sidebar-item { padding: 8px 16px !important; white-space: nowrap; border-left: none !important; border-bottom: 2px solid transparent !important; background: var(--surface2) !important; border-radius: 8px; flex-shrink: 0; }
+        .sidebar-item.active { border-bottom-color: #3b82f6 !important; }
+        .user-footer { display: none !important; }
+        
+        /* Adjust Header */
+        header { height: auto !important; padding: 24px 16px 20px 16px !important; flex-direction: column; align-items: flex-start !important; gap: 12px; }
+        
+        /* Adjust Content Container Padding */
+        .p-8.flex-1 { padding: 20px 16px !important; }
+        
+        /* Tabs Horizontal Scroll */
+        .border-b.flex.gap-2.mb-6 { overflow-x: auto; white-space: nowrap; padding-bottom: 4px; margin-bottom: 24px !important; }
+        .border-b.flex.gap-2.mb-6::-webkit-scrollbar { display: none; }
+        
+        /* Filters and Action Buttons Stacking - Added gaps between inputs */
+        .flex.items-center.gap-3 { flex-direction: column; align-items: stretch !important; width: 100%; margin-bottom: 24px; gap: 12px !important; }
+        .flex.items-center.gap-3 span { display: none; } 
+        #filter-calendar, .custom-dropdown-container { width: 100% !important; }
+        
+        /* Buttons container - Added gap between buttons */
+        .flex.gap-3 { flex-direction: column; width: 100%; gap: 12px !important; }
+        .flex.gap-3 button { width: 100%; justify-content: center; }
+
+        /* Modals and Forms Scaling */
+        .modal-overlay { padding: 0 16px; }
+        .modal-overlay > div { width: 100% !important; max-width: 400px; }
+        .modal-overlay .flex.gap-3 { flex-direction: column; }
+        #view-form .border.rounded-2xl.p-8, #view-details .border.rounded-2xl.p-8 { padding: 16px !important; }
+    }
   </style>
 </head>
 <body class="h-full flex bg-[#0a0e1a]">
-  <aside id="sidebar" class="sidebar flex flex-col h-full">
-    <div class="p-5 border-b" style="border-color:var(--border)">
+
+  <aside id="sidebar" class="sidebar flex flex-col h-full" style="background:var(--surface); border-right: 1px solid var(--border)">
+    <div class="h-[76px] px-5 flex items-center border-b shrink-0" style="border-color:var(--border)">
       <div class="flex items-center gap-3">
-        <div style="background:var(--accent);width:36px;height:36px;border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
-        <div><div class="font-bold text-lg tracking-widest text-white">BEAT</div><div style="color:var(--text-dim);font-size:11px">Admin Control Center</div></div>
+        <div class="logo-box flex items-center justify-center font-bold text-white text-sm">B</div>
+        <div class="flex flex-col justify-center">
+          <div class="logo-text font-bold text-lg text-white tracking-widest leading-none mb-1">BEAT</div>
+          <div class="text-dim-xs leading-none">Admin Control Center</div>
+        </div>
       </div>
     </div>
+    
     <nav class="flex-1 py-4 overflow-y-auto">
       <a href="dashboard.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
       <a href="manage_admin.html" class="sidebar-item"><i data-lucide="users"></i><span>Manage Admins</span></a>
@@ -89,18 +131,291 @@
       <a href="traffic.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
       <a href="analytics.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
     </nav>
-    <div class="p-5 border-t mt-auto" style="border-color:var(--border)">
+    
+    <div class="user-footer">
       <div class="flex items-center justify-between mb-5">
         <div class="flex items-center gap-3">
-          <div id="nav-avatar" style="background:#2563eb;width:42px;height:42px;border-radius:50%;background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm">MA</div>
-          <div><div class="text-sm font-bold text-white">Main Admin</div><div style="color:#94a3b8;font-size:11px">System Administrator</div></div>
+          <div id="nav-avatar" style="background:#2563eb; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">MA</div>
+          <div>
+            <div class="user-footer-name">Main Admin</div>
+            <div class="user-footer-sub">System Administrator</div>
+          </div>
         </div>
-        <a href="profile.html" class="text-[#94a3b8] hover:text-blue-500 transition-colors"><i data-lucide="settings" style="width:18px;height:18px"></i></a>
+        <a href="profile.html" class="settings-link"><i data-lucide="settings" style="width:18px; height:18px"></i></a>
       </div>
-      <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white"><i data-lucide="log-out" style="width:16px;height:16px"></i> Logout</button>
+      <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
+        <i data-lucide="log-out" style="width:16px; height:16px"></i> Logout
+      </button>
     </div>
   </aside>
-  <main class="flex-1 overflow-y-auto"><header class="px-8 py-5 border-b" style="border-color:var(--border);background:var(--surface)"><h1 class="text-xl font-semibold text-white">Announcement Manager</h1></header><div class="p-8 animate-in"><button class="btn btn-primary">Create Article</button></div></main>
-  <script src="js/app.js"></script><script>lucide.createIcons();</script>
+
+  <main class="flex-1 overflow-y-auto flex flex-col relative">
+    <header class="px-8 h-[76px] flex items-center border-b shrink-0" style="border-color:var(--border); background:var(--surface)">
+      <h1 class="text-xl font-semibold text-white flex items-center gap-2">
+        <i data-lucide="megaphone" class="w-6 h-6 text-[#94a3b8]"></i> Announcement Manager
+      </h1>
+    </header>
+
+    <div class="p-8 flex-1 relative flex flex-col">
+      
+      <div id="view-list" class="animate-in block w-full">
+        
+        <div class="border-b border-gray-800 flex gap-2 mb-6">
+            <button id="tab-btn-live" onclick="switchAnnTab('live')" class="px-4 py-3 text-sm font-semibold text-blue-500 border-b-2 border-blue-500 -mb-[1px] flex items-center gap-2 transition-colors">
+                <i data-lucide="radio" class="w-4 h-4"></i> Live Announcements
+            </button>
+            <button id="tab-btn-queue" onclick="switchAnnTab('queue')" class="px-4 py-3 text-sm font-semibold text-[#94a3b8] hover:text-white border-b-2 border-transparent -mb-[1px] flex items-center gap-2 transition-colors">
+                <i data-lucide="clock" class="w-4 h-4"></i> Approval Queue
+            </button>
+            <button id="tab-btn-denied" onclick="switchAnnTab('denied')" class="px-4 py-3 text-sm font-semibold text-[#94a3b8] hover:text-white border-b-2 border-transparent -mb-[1px] flex items-center gap-2 transition-colors">
+                <i data-lucide="trash-2" class="w-4 h-4"></i> Denied/Taken Down
+            </button>
+        </div>
+
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <div class="flex items-center gap-3">
+              <span class="text-sm font-semibold text-[#94a3b8]">Filter:</span>
+              <input type="date" id="filter-calendar" onchange="filterAnnouncements()" class="modal-input !mt-0 h-10 py-0 px-3 text-sm w-40 shadow-sm" title="Filter by Date">
+              
+              <div class="custom-dropdown-container relative w-48 text-sm shadow-sm z-30">
+                  <div id="filter-category-btn" onclick="toggleDropdown('filter-category-menu')" class="modal-input !mt-0 h-10 py-0 pl-3 pr-3 flex justify-between items-center cursor-pointer text-white">
+                      <span id="filter-category-text" class="truncate text-[#94a3b8]">All Categories</span>
+                      <i data-lucide="chevron-down" class="w-4 h-4 text-[#94a3b8] flex-shrink-0 ml-2"></i>
+                  </div>
+                  <div id="filter-category-menu" class="cat-dropdown-menu absolute left-0 top-full mt-1 w-full bg-[#1e2536] border border-gray-700 rounded-lg shadow-xl hidden max-h-48 overflow-y-auto">
+                      </div>
+              </div>
+              <button id="btn-remove-filter-cat" onclick="removeCategory('filter')" class="hidden p-2.5 rounded-lg border border-gray-700 bg-[#1e2536] text-red-400 hover:text-red-500 hover:border-red-500/50 transition-all shadow-sm" title="Delete Selected Category">
+                  <i data-lucide="minus" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="openModal('create-category-modal')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-lg text-sm flex items-center gap-2 shadow-lg transition-colors whitespace-nowrap">
+                    <i data-lucide="folder-plus" class="w-4 h-4"></i> Create Category
+                </button>
+                <button onclick="checkCategoryBeforeAnn()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-lg text-sm flex items-center gap-2 shadow-lg transition-colors whitespace-nowrap">
+                    <i data-lucide="file-plus" class="w-4 h-4"></i> Create Announcement
+                </button>
+            </div>
+        </div>
+        
+        <div id="grid-live" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+          </div>
+
+        <div id="grid-queue" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch hidden">
+          </div>
+
+        <div id="grid-denied" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch hidden">
+          </div>
+
+      </div>
+
+      <div id="view-form" class="hidden animate-in pb-10 w-full max-w-[800px] mx-auto mt-4">
+        
+        <button onclick="handleAnnBackClick()" id="btn-back-trigger" class="border border-[#374151] bg-transparent hover:bg-[#1e2536] text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center gap-2 mb-6 transition-colors">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> <span id="btn-back-text">Back to Announcements</span>
+        </button>
+        
+        <div class="border rounded-2xl p-8 shadow-lg" style="background:var(--surface); border-color:var(--border)">
+          
+          <h2 class="text-2xl font-bold text-white flex items-center gap-3 mb-8">
+            <i id="form-icon" data-lucide="file-plus" class="text-blue-500 w-6 h-6"></i> 
+            <span id="form-title">Create Announcement</span>
+          </h2>
+          
+          <form onsubmit="event.preventDefault(); handleAnnFormSubmit();">
+             
+             <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-4 border-b border-gray-800 pb-2">Global Details</p>
+             
+             <div class="space-y-5 mb-12">
+               <div>
+                 <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">TITLE <span class="text-red-500">*</span></label>
+                 <input type="text" id="ann-title" placeholder="Enter announcement title" class="modal-input text-sm" oninput="clearReqError(this)">
+                 <p class="text-[10px] text-red-500 hidden mt-1">Required field</p>
+               </div>
+               <div>
+                 <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">CATEGORY <span class="text-red-500">*</span></label>
+                 <div class="flex items-center gap-2">
+                     <div class="custom-dropdown-container relative flex-1 z-20">
+                         <div id="ann-category-container" onclick="toggleDropdown('ann-category-menu')" class="modal-input text-sm flex justify-between items-center cursor-pointer bg-[#1e2536] text-white">
+                             <span id="ann-category-text" class="truncate text-[#94a3b8]">Select a category...</span>
+                             <i data-lucide="chevron-down" class="w-4 h-4 text-[#94a3b8] flex-shrink-0 ml-2"></i>
+                         </div>
+                         <div id="ann-category-menu" class="cat-dropdown-menu absolute left-0 top-full mt-1 w-full bg-[#1e2536] border border-gray-700 rounded-lg shadow-xl hidden max-h-48 overflow-y-auto">
+                             </div>
+                     </div>
+                     <button type="button" id="btn-remove-form-cat" onclick="removeCategory('form')" class="hidden p-2.5 mt-1.5 rounded-lg border border-gray-700 bg-[#1e2536] text-red-400 hover:text-red-500 hover:border-red-500/50 transition-all shadow-sm" title="Delete Selected Category">
+                         <i data-lucide="minus" class="w-4 h-4"></i>
+                     </button>
+                 </div>
+                 <p id="ann-category-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p>
+               </div>
+               <div>
+                 <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">COVER IMAGE (OPTIONAL)</label>
+                 <div class="modal-input flex flex-col p-3" style="background:var(--surface); border-color:var(--border)">
+                   <div class="flex items-center">
+                     <label class="bg-white text-black font-bold text-xs py-1.5 px-3 rounded cursor-pointer hover:bg-gray-200 transition-colors">
+                        Choose File
+                        <input type="file" class="hidden" accept="image/*" onchange="handleImageUpload(this, 'ann-cover-preview')">
+                     </label>
+                     <button type="button" class="ml-4 text-red-400 hover:text-red-500 text-xs font-bold hidden transition-colors" id="ann-cover-remove" onclick="removeImage('ann-cover-preview')"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                   </div>
+                   <img id="ann-cover-preview" src="" class="hidden w-full aspect-video max-h-[300px] object-cover object-center mt-3 rounded-lg border border-gray-700 shadow-sm">
+                 </div>
+               </div>
+             </div>
+
+             <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-4 border-b border-gray-800 pb-2">Content Structure</p>
+             
+             <div id="content-blocks-container" class="space-y-4 mb-6">
+                </div>
+
+             <button type="button" onclick="addContentBlock()" class="w-full border border-[#374151] bg-transparent hover:bg-[#1e2536] text-[#94a3b8] hover:text-white font-bold py-3 rounded-lg text-sm transition-colors flex items-center justify-center gap-2 mb-8">
+               <i data-lucide="plus" class="w-4 h-4"></i> Add New Content Block
+             </button>
+
+             <div class="flex justify-center mt-4">
+               <button type="submit" id="btn-submit" class="px-8 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-lg text-sm transition-colors shadow-sm">Submit for Review</button>
+             </div>
+
+          </form>
+        </div>
+      </div>
+
+      <div id="view-details" class="hidden animate-in pb-10 w-full max-w-[800px] mx-auto mt-4">
+        
+        <button onclick="closeAnnDetails()" class="border border-[#374151] bg-transparent hover:bg-[#1e2536] text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center gap-2 mb-6 transition-colors">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Announcements
+        </button>
+        
+        <div class="border rounded-2xl p-8 shadow-lg relative" style="background:var(--surface); border-color:var(--border)">
+          
+          <span id="detail-badge" class="absolute top-8 right-8 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase"></span>
+          
+          <div class="text-center mb-8 mt-2 max-w-[80%] mx-auto flex flex-col items-center">
+              <h1 id="detail-title" class="text-3xl font-bold text-white mb-3 leading-tight"></h1>
+              <p class="text-sm text-[#94a3b8]">Published <span id="detail-date"></span></p>
+          </div>
+          
+          <div id="detail-cover-container" class="hidden mb-8 flex justify-center"></div>
+
+          <hr style="border-color:var(--border)" class="mb-8">
+          
+          <div id="detail-content" class="w-full"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="create-category-modal" class="modal-overlay hidden z-[100]">
+    <div class="border rounded-2xl p-8 w-[400px] shadow-2xl text-left" style="background:var(--surface); border-color:var(--border)">
+      <h2 class="text-white font-bold text-xl mb-6 flex items-center gap-2">
+        <i data-lucide="folder-plus" class="text-blue-500 w-6 h-6"></i> Create Category
+      </h2>
+      <div class="space-y-4">
+        <div>
+          <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Category Name <span class="text-red-500">*</span></label>
+          <input type="text" id="new-category-name" placeholder="e.g. Weather Alert" class="modal-input text-sm" oninput="clearReqError(this)">
+          <p class="text-[10px] text-red-500 hidden mt-1">Required field</p>
+        </div>
+      </div>
+      <div class="flex justify-end gap-3 mt-8">
+        <button onclick="closeModal('create-category-modal')" class="px-5 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">Cancel</button>
+        <button onclick="saveCategory()" class="px-5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg">Save Category</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="no-category-modal" class="modal-overlay hidden z-[100]">
+    <div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
+      <div style="background:#f59e0b; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-yellow-500/20">
+        <i data-lucide="alert-circle" class="w-6 h-6"></i>
+      </div>
+      <h2 class="text-white font-bold text-xl mb-3">No Categories Found</h2>
+      <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">You need to create at least one category before you can publish an announcement.</p>
+      
+      <div class="flex gap-3">
+        <button onclick="closeModal('no-category-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
+        <button onclick="closeModal('no-category-modal'); openModal('create-category-modal')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Create Category</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirm-delete-cat-modal" class="modal-overlay hidden z-[100]">
+    <div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
+      <div style="background:#ef4444; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-red-500/20">
+        <i data-lucide="trash-2" class="w-6 h-6"></i>
+      </div>
+      <h2 class="text-white font-bold text-xl mb-3">Delete Category?</h2>
+      <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to remove this category from the dropdown? Existing announcements will keep their category labels.</p>
+      
+      <div class="flex gap-3">
+        <button onclick="closeModal('confirm-delete-cat-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
+        <button onclick="executeDeleteCategory()" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirm-submit-modal" class="modal-overlay hidden z-[100]">
+    <div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
+      <div style="background:#3b82f6; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+        <i data-lucide="send" class="w-6 h-6"></i>
+      </div>
+      <h2 id="confirm-submit-title" class="text-white font-bold text-xl mb-3">Submit for Review?</h2>
+      <p id="confirm-submit-desc" class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to submit this announcement?</p>
+      
+      <div class="flex gap-3">
+        <button onclick="closeModal('confirm-submit-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
+        <button onclick="executeAnnFormSubmit()" id="btn-confirm-submit" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirm-back-modal" class="modal-overlay hidden z-[100]">
+    <div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
+      <div style="background:#ef4444; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-red-500/20">
+        <i data-lucide="alert-triangle" class="w-6 h-6 text-white"></i>
+      </div>
+      <h2 id="confirm-back-title" class="text-white font-bold text-xl mb-3">Discard Changes?</h2>
+      <p id="confirm-back-desc" class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to go back? Any unsaved changes will be lost.</p>
+      
+      <div class="flex gap-3">
+        <button onclick="closeModal('confirm-back-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Stay</button>
+        <button onclick="executeAnnBack()" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Discard</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirm-action-modal" class="modal-overlay hidden z-[100]">
+    <div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
+      <div id="action-icon-bg" style="background:#3b82f6; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+        <i id="action-icon" data-lucide="check" class="w-6 h-6"></i>
+      </div>
+      <h2 id="action-title" class="text-white font-bold text-xl mb-3">Confirm Action?</h2>
+      <p id="action-desc" class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure?</p>
+      
+      <div class="flex gap-3">
+        <button onclick="closeModal('confirm-action-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
+        <button onclick="executeCardAction()" id="btn-action-confirm" class="flex-1 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="success-submit-modal" class="modal-overlay hidden z-[100]">
+    <div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
+      <div style="background:#22c55e; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-green-500/20">
+        <i data-lucide="check-circle" class="w-6 h-6"></i>
+      </div>
+      <h2 class="text-white font-bold text-xl mb-3">Success</h2>
+      <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Your announcement action was completed successfully.</p>
+      
+      <button onclick="closeModal('success-submit-modal')" class="w-full bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Done</button>
+    </div>
+  </div>
+
+<script src="js/app.js"></script>
+<script>lucide.createIcons();</script>
 </body>
 </html>
