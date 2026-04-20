@@ -1370,11 +1370,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// ==========================================
-// AUTHENTICATION & POPUP UI LOGIC
-// ==========================================
-
-// Clears the red error rings when a user starts typing
 function clearError(inputId, errorId) {
     const input = document.getElementById(inputId);
     const error = document.getElementById(errorId);
@@ -1497,19 +1492,8 @@ function handleVerify(e) {
     const code = Array.from(inputs).map(i => i.value).join('');
 
     if (code.length === 6) {
-        // SUCCESS! Hide the whole Auth screen and show the Dashboard
-        document.getElementById('auth-screen').style.display = 'none';
-        
-        const appShell = document.getElementById('app');
-        if (appShell) {
-            appShell.style.display = 'flex';
-            appShell.classList.remove('hidden');
-        }
-        
-        // Trigger the SPA navigation functions (from your existing app.js)
-        if (typeof buildNav === 'function') buildNav();
-        if (typeof navigateTo === 'function') navigateTo('dashboard');
-        
+        // SUCCESS! Redirect directly to the separate dashboard.html file
+        window.location.href = 'dashboard.html';
     } else {
         // Show error if they didn't fill out all 6 boxes
         document.getElementById('verify-error').classList.remove('hidden');
