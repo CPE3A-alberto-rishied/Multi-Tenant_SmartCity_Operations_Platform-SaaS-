@@ -9,125 +9,12 @@
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
 
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles2.css">
   
   <style>
-    /* --- INLINED CSS --- */
-    html, body { height: 100%; margin: 0; overflow: hidden; }
-    * { box-sizing: border-box; }
-
-    :root { 
-        --bg: #0a0e1a; 
-        --surface: #111827; 
-        --surface2: #1f2937; 
-        --border: #374151; 
-        --accent: #2563eb; 
-        --accent-light: #3b82f6; 
-        --text: #e2e8f0; 
-        --text-dim: #9ca3af; 
-        --danger: #ef4444; 
-        --success: #22c55e; 
-        --warn: #f59e0b; 
-        --purple: #8b5cf6; 
-    }
-
-    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
-    .font-mono { font-family: 'Space Mono', monospace; }
-
-    /* Layout & Sidebar */
-    .sidebar { width: 260px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; height: 100%; transition: transform 0.3s; }
-    .sidebar-item { padding: 10px 18px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 14px; border-left: 3px solid transparent; transition: all 0.15s; color: var(--text-dim); }
-    .sidebar-item:hover { background: var(--surface2); color: var(--text); }
-    .sidebar-item.active { background: var(--surface2); color: var(--accent-light); border-left-color: var(--accent); }
-    .sidebar-sub { padding-left: 44px; font-size: 13px; }
-    .sidebar-item {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        padding: 12px 24px;
-        color: #94a3b8;
-        font-size: 15px;
-        font-weight: 500;
-        transition: all 0.2s;
-        text-decoration: none;
-        border-left: 3px solid transparent;
-    }
-
-    .sidebar-item:hover {
-        color: #ffffff;
-        background: rgba(255, 255, 255, 0.05);
-    }
-
-    /* Active Page State - matches the blue text and border in screenshot */
-    .sidebar-item.active {
-        color: #2563eb !important;
-        background: rgba(37, 99, 235, 0.1);
-        border-left: 3px solid #2563eb;
-    }
-
-    .sidebar-item i {
-        flex-shrink: 0;
-    }
-    /* Cards & UI Elements */
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
-    .card-sm { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
-    .glow { box-shadow: 0 0 30px rgba(37,99,235,0.15); }
-
-    /* Buttons */
-    .btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-    .btn-primary { background: var(--accent); color: #fff; } .btn-primary:hover { background: var(--accent-light); }
-    .btn-danger { background: var(--danger); color: #fff; } .btn-danger:hover { opacity: 0.85; }
-    .btn-success { background: var(--success); color: #fff; } .btn-success:hover { opacity: 0.85; }
-    .btn-warn { background: var(--warn); color: #000; } .btn-warn:hover { opacity: 0.85; }
-    .btn-ghost { background: transparent; color: var(--text-dim); border: 1px solid var(--border); } .btn-ghost:hover { background: var(--surface2); color: var(--text); }
-    .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
-
-    /* Inputs */
-    input, select, textarea { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 9px 12px; border-radius: 8px; font-size: 13px; font-family: inherit; width: 100%; }
-    input::placeholder, select::placeholder, textarea::placeholder { color: var(--text-dim); opacity: 0.25; }
-    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
-
-    /* Tables & Badges */
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th { text-align: left; padding: 10px 12px; color: var(--text-dim); font-weight: 600; border-bottom: 1px solid var(--border); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
-    td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
-    .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-    .badge-red { background: #dc262620; color: #f87171; }
-    .badge-green { background: #22c55e20; color: #4ade80; }
-    .badge-yellow { background: #f59e0b20; color: #fbbf24; }
-    .badge-blue { background: #2563eb20; color: #60a5fa; }
-    .badge-purple { background: #8b5cf620; color: #a78bfa; }
-
-    /* Overlays & Animations */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px); }
-    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; max-width: 480px; width: 90%; }
-    .road-btn { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; transition: all 0.15s; }
-    .road-btn:hover { transform: scale(1.15); }
-    .road-btn.selected { border-color: #fff; box-shadow: 0 0 12px rgba(255,255,255,0.3); }
-    .toast { position: fixed; top: 20px; right: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 20px; z-index: 200; animation: slideIn 0.3s; display: flex; align-items: center; gap: 10px; font-size: 13px; }
-    .chart-bar { border-radius: 4px 4px 0 0; transition: height 0.5s ease; min-width: 24px; }
-    .toggle-switch { position: relative; display: inline-block; width: 48px; height: 26px; }
-    .toggle-switch input { display: none; }
-    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: 0.3s; border-radius: 26px; }
-    .toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: 0.3s; border-radius: 50%; }
-    input:checked + .toggle-slider { background-color: var(--success); }
-    input:checked + .toggle-slider:before { transform: translateX(22px); }
-
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    .animate-in { animation: fadeIn 0.3s ease; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-    @keyframes float1 { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(30px,-20px); } }
-    @keyframes float2 { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(-40px,30px); } }
-    @keyframes float3 { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(20px,40px); } }
-
-    /* --- SPECIFIC PAGE STYLES --- */
     body { font-family: 'DM Sans', sans-serif !important; }
     
-    /* SIDEBAR CSS */
+    /* SIDEBAR */
     .sidebar { width: 260px !important; flex-shrink: 0 !important; }
     
     .sidebar-item { 
@@ -137,8 +24,6 @@
       text-decoration: none !important; border-left: 3px solid transparent !important;
     }
     .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
-    
-    /* Hover & Active States matched exactly to manage_admin.html */
     .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
     .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
     
@@ -150,12 +35,50 @@
     .settings-link:hover { color: #3b82f6; }
 
     .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; }
+    .hidden { display: none !important; }
+    
+    /* Input Styling */
+    .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 8px 12px; transition: all 0.2s; }
+    .modal-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
+    .input-error { border-color: #ef4444 !important; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important; }
+    
+    /* AUTOFILL FIX */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus, 
+    input:-webkit-autofill:active,
+    select:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0px 1000px #1e2536 inset !important;
+        -webkit-text-fill-color: #ffffff !important;
+        caret-color: white !important;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+    
+    /* Custom Select & Date Overrides */
+    select { 
+      appearance: none; 
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); 
+      background-repeat: no-repeat; 
+      background-position: right 0.75rem center; 
+      background-size: 1em; 
+      padding-right: 2.5rem !important;
+    }
+    input[type="date"] { color-scheme: dark; }
+
+    /* Tables & Toggles */
+    .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #374151; transition: .4s; border-radius: 24px; }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: #22c55e; }
+    input:checked + .slider:before { transform: translateX(18px); }
   </style>
 </head>
 
 <body class="h-full flex bg-[#0a0e1a]">
 
-  <aside id="sidebar" class="sidebar flex flex-col h-full">
+  <aside id="sidebar" class="sidebar flex flex-col h-full" style="background:var(--surface); border-right: 1px solid var(--border)">
     <div class="h-[76px] px-5 flex items-center border-b shrink-0" style="border-color:var(--border)">
       <div class="flex items-center gap-3">
         <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
@@ -174,28 +97,30 @@
       <a href="traffic.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
       <a href="analytics.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
     </nav>
-
+    
     <div class="user-footer">
-      <div class="flex items-center justify-between mb-5">
-        <div class="flex items-center gap-3">
-          <div style="background:#2563eb; width:42px; height:42px; border-radius:50%;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">MA</div>
-          <div>
-            <div class="user-footer-name">Main Admin</div>
-            <div class="user-footer-sub">System Administrator</div>
-          </div>
+        <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-3">
+                <div id="nav-avatar" style="background:#2563eb; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">M</div>
+                <div>
+                  <div class="user-footer-name">Main Admin</div>
+                  <div class="user-footer-sub">System Administrator</div>
+                </div>
+            </div>
+            <a href="profile.html" class="settings-link"><i data-lucide="settings" style="width:18px; height:18px"></i></a>
         </div>
-        <a href="profile.html" class="settings-link"><i data-lucide="settings" style="width:18px; height:18px"></i></a>
-      </div>
-      <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
-        <i data-lucide="log-out" style="width:16px; height:16px"></i> Logout
-      </button>
+        <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
+            <i data-lucide="log-out" style="width:16px; height:16px"></i> Logout
+        </button>
     </div>
   </aside>
 
-  <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a]">
+  <main class="flex-1 overflow-y-auto flex flex-col">
     
-    <header class="h-[76px] px-8 flex items-center justify-between border-b shrink-0" style="border-color:var(--border); background:var(--surface)">
-      <h1 class="text-xl font-semibold text-white">Dashboard Overview</h1>
+    <header class="px-8 h-[76px] flex items-center justify-between border-b shrink-0" style="border-color:var(--border); background:var(--surface)">
+      <h1 class="text-xl font-semibold text-white flex items-center gap-2">
+        <i data-lucide="layout-grid" class="w-6 h-6"></i> Dashboard Overview
+      </h1>
       
       <div class="flex items-center gap-4">
         <div class="px-3 py-1.5 rounded-lg flex items-center gap-2.5 shadow-sm border" style="background:var(--surface2); border-color:var(--border)">
@@ -330,9 +255,6 @@
     </div>
   </main>
 
-<script>
-  lucide.createIcons();
-  function doLogout() { window.location.href = 'admin.html'; }
-</script>
+  <script src="js/app.js"></script>
 </body>
 </html>

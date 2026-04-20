@@ -20,13 +20,6 @@ function clearReqError(el) {
     }
 }
 
-function clearError(inputId, errorId) {
-    const input = document.getElementById(inputId);
-    const error = document.getElementById(errorId);
-    if (input) input.classList.remove('input-error');
-    if (error) error.classList.add('hidden');
-}
-
 function escapeHTML(str) {
     if (!str) return '';
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
@@ -35,7 +28,6 @@ function escapeHTML(str) {
 function doLogout() { 
     window.location.href = 'admin.html'; 
 }
-
 // Close custom dropdowns when clicking outside
 document.addEventListener('click', (e) => {
     if (!e.target.closest('.custom-dropdown-container')) {

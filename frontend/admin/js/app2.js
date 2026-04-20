@@ -1090,3 +1090,35 @@ document.addEventListener('DOMContentLoaded', () => {
         if(typeof filterAnnouncements === 'function') filterAnnouncements(); 
     }
 });
+// Add/Replace this at the very bottom of your app2.js
+document.addEventListener('DOMContentLoaded', () => { 
+    if(window.lucide) lucide.createIcons(); 
+
+    // 1. SYNC SIDEBAR: Pull current user data from memory
+    const activeDept = localStorage.getItem('activeDepartment') || 'Traffic Department';
+    const activeName = localStorage.getItem('activeUserName') || 'Dept Admin';
+
+    // 2. Inject Names/Titles to remove placeholders
+    document.querySelectorAll('.user-footer-sub').forEach(el => el.innerText = activeDept);
+    document.querySelectorAll('.user-footer-name').forEach(el => el.innerText = activeName);
+
+    const initBadge = document.querySelectorAll('#nav-avatar');
+    initBadge.forEach(el => {
+        el.innerText = activeName.charAt(0).toUpperCase(); 
+    });
+
+    // 3. Page Specific Logic (Filters/Dropdowns)
+    const deptFilter = document.getElementById('filter-dept');
+    if (deptFilter) {
+        const shortDeptName = activeDept.replace(' Department', '').trim();
+        deptFilter.value = shortDeptName;
+        deptFilter.disabled = true; 
+        deptFilter.classList.add('opacity-50', 'cursor-not-allowed');
+        if(typeof filterReports === 'function') filterReports(); 
+    }
+    
+    if(document.getElementById('filter-calendar') && typeof renderCategoryDropdowns === 'function') {
+        renderCategoryDropdowns();
+        if(typeof filterAnnouncements === 'function') filterAnnouncements(); 
+    }
+});
