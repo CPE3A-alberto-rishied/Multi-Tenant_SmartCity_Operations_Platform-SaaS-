@@ -164,3 +164,53 @@ body {
 .internal-page-bg { position: relative; min-height: 100vh; display: flex; flex-direction: column; }
 
 @media(max-width:768px) { .hero-grid { grid-template-columns: 1fr !important; } .form-grid { grid-template-columns: 1fr; } }
+/* Submit Button Styling & Interaction */
+.btn-submit {
+    background-color: #2563eb;
+    color: white;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    width: 100%;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-submit:hover {
+    background-color: #1d4ed8;
+}
+
+/* Color change and shrink effect when pressed */
+.btn-submit:active {
+    background-color: #1e40af;
+    transform: scale(0.95);
+}
+
+/* Success Modal Overlay */
+#success-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none; /* Controlled by initial.js */
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+}
+
+/* Modal Content Box */
+.modal-content {
+    background-color: #121212;
+    border: 1px solid #1f2937;
+    padding: 2rem;
+    border-radius: 1rem;
+    text-align: center;
+    max-width: 24rem;
+    width: 90%;
+}
+
+.hidden {
+    display: none !important;
+}
