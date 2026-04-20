@@ -6,6 +6,7 @@
   <title>BEAT - Analytics & Audit</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
  <style>
@@ -49,6 +50,53 @@
         caret-color: white !important;
         transition: background-color 5000s ease-in-out 0s;
     }
+
+    /* CUSTOM SCROLLBAR FOR AUDIT TABLE */
+    .audit-container::-webkit-scrollbar { width: 6px; }
+    .audit-container::-webkit-scrollbar-track { background: transparent; }
+    .audit-container::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
+    .audit-container::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+
+    /* PRINT SPECIFIC STYLING */
+    @media print {
+        /* Hide everything except the audit trail */
+        .sidebar, header, .charts-container, .search-container { display: none !important; }
+        
+        /* Reset backgrounds and colors for standard printing */
+        body, main { background: white !important; color: black !important; display: block !important; }
+        
+        .audit-card { 
+            width: 100% !important; 
+            margin: 0 !important; 
+            padding: 0 !important; 
+            border: none !important; 
+            background: white !important; 
+            box-shadow: none !important;
+            height: auto !important; /* Allow full height expansion */
+        }
+        
+        .audit-card h3 { color: black !important; margin-bottom: 20px !important; }
+        .audit-card h3 svg, .audit-card h3 i { display: none !important; } /* Hide icon on print */
+        
+        .audit-container { overflow: visible !important; max-height: none !important; padding-right: 0 !important; }
+        
+        /* Table print formatting */
+        table { width: 100% !important; border-collapse: collapse !important; }
+        thead { display: table-header-group !important; } /* Re-print headers on new pages */
+        tr { page-break-inside: avoid !important; }
+        th { background-color: #f3f4f6 !important; color: black !important; border-bottom: 2px solid #000 !important; padding: 12px !important; }
+        td { border-bottom: 1px solid #ccc !important; color: black !important; padding: 12px !important; }
+        
+        /* Tags formatting for print */
+        span[class*="bg-"] { 
+            border: 1px solid #666 !important; 
+            background: transparent !important; 
+            color: black !important; 
+            padding: 2px 6px !important;
+        }
+        
+        * { color: black !important; }
+    }
   </style>
 </head>
 <body class="h-full flex bg-[#0a0e1a]">
@@ -89,47 +137,253 @@
   </aside>
 
   <main class="flex-1 overflow-y-auto">
-    <header class="px-8 h-[76px] flex items-center border-b shrink-0" style="border-color:var(--border);background:var(--surface)">
+    <header class="px-8 h-[76px] flex items-center justify-between border-b shrink-0" style="border-color:var(--border);background:var(--surface)">
       <h1 class="text-xl font-semibold flex items-center gap-2 text-white">
         <i data-lucide="bar-chart-3"></i>
         Analytics & Audit
       </h1>
+      <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 bg-[#1e2536] hover:bg-gray-800 text-white text-sm font-medium rounded-lg border border-gray-700 transition-colors">
+        <i data-lucide="printer" style="width:16px; height:16px"></i> Print / Export Logs
+      </button>
     </header>
 
-    <div class="p-8 grid grid-cols-1 lg:grid-cols-2 gap-6 animate-in">
-
-      <div class="card border border-gray-800/50 rounded-xl p-6 shadow-sm" style="background:var(--surface)">
-        <h3 class="font-semibold mb-4 flex items-center gap-2 text-white">
-          <i data-lucide="scroll-text" style="color:var(--accent)"></i>
-          Audit Trail
-        </h3>
-        <ul style="font-size:13px;color:var(--text-dim)" class="space-y-2">
-          <li>Admin approved report</li>
-          <li>Traffic status updated</li>
-          <li>Announcement published</li>
-        </ul>
-      </div>
-
-      <div class="card border border-gray-800/50 rounded-xl p-6 shadow-sm" style="background:var(--surface)">
-        <h3 class="font-semibold mb-4 flex items-center gap-2 text-white">
-          <i data-lucide="activity" style="color:var(--accent)"></i>
-          Reports Overview
-        </h3>
-
-        <div class="flex items-end gap-3 h-40">
-          <div class="chart-bar flex-1" style="height:40%; background:var(--accent); border-radius:4px"></div>
-          <div class="chart-bar flex-1" style="height:65%; background:var(--accent); border-radius:4px"></div>
-          <div class="chart-bar flex-1" style="height:50%; background:var(--accent); border-radius:4px"></div>
-          <div class="chart-bar flex-1" style="height:80%; background:var(--accent); border-radius:4px"></div>
+    <div class="p-8 animate-in">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div id="audit-section" class="audit-card lg:col-span-2 card border border-gray-800/50 rounded-xl p-6 shadow-sm flex flex-col h-[600px]" style="background:var(--surface);">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold flex items-center gap-2 text-white text-lg">
+              <i data-lucide="scroll-text" style="color:var(--accent)"></i>
+              System Audit Trail
+            </h3>
+            <div class="search-container relative w-72">
+              <i data-lucide="search" class="absolute left-3 top-2.5 text-gray-500" style="width:16px; height:16px"></i>
+              <input type="text" id="auditSearch" placeholder="Search logs by admin, action, IP..." class="modal-input !mt-0 !pl-9 text-sm" style="padding-top:8px; padding-bottom:8px;">
+            </div>
+          </div>
+          
+          <div class="audit-container overflow-y-auto flex-1 pr-2">
+            <table class="w-full text-left text-sm text-gray-400">
+              <thead class="text-xs uppercase bg-[#1e2536] text-gray-300 sticky top-0 z-10">
+                <tr>
+                  <th class="px-4 py-3 rounded-l-lg">Date & Time</th>
+                  <th class="px-4 py-3">Admin</th>
+                  <th class="px-4 py-3">Action Details</th>
+                  <th class="px-4 py-3 rounded-r-lg">IP Address</th>
+                </tr>
+              </thead>
+              <tbody id="auditTableBody">
+                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
+                  <td class="px-4 py-4 text-white">Today, 10:24 AM</td>
+                  <td class="px-4 py-4">Main Admin</td>
+                  <td class="px-4 py-4"><span class="bg-green-500/10 text-green-400 px-2 py-1 rounded text-xs mr-2">Status Update</span>Marked Report #402 as Resolved</td>
+                  <td class="px-4 py-4">192.168.1.10</td>
+                </tr>
+                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
+                  <td class="px-4 py-4 text-white">Today, 09:15 AM</td>
+                  <td class="px-4 py-4">Traffic Manager</td>
+                  <td class="px-4 py-4"><span class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded text-xs mr-2">Announcement</span>Published "EDSA Southbound Heavy Traffic"</td>
+                  <td class="px-4 py-4">192.168.1.44</td>
+                </tr>
+                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
+                  <td class="px-4 py-4 text-white">Yesterday, 16:40 PM</td>
+                  <td class="px-4 py-4">System Auto</td>
+                  <td class="px-4 py-4"><span class="bg-purple-500/10 text-purple-400 px-2 py-1 rounded text-xs mr-2">Backup</span>Automated database backup completed</td>
+                  <td class="px-4 py-4">Localhost</td>
+                </tr>
+                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
+                  <td class="px-4 py-4 text-white">Yesterday, 14:20 PM</td>
+                  <td class="px-4 py-4">Main Admin</td>
+                  <td class="px-4 py-4"><span class="bg-yellow-500/10 text-yellow-400 px-2 py-1 rounded text-xs mr-2">Login</span>Successful login to dashboard</td>
+                  <td class="px-4 py-4">192.168.1.10</td>
+                </tr>
+                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
+                  <td class="px-4 py-4 text-white">Apr 18, 11:10 AM</td>
+                  <td class="px-4 py-4">Support Agent</td>
+                  <td class="px-4 py-4"><span class="bg-red-500/10 text-red-400 px-2 py-1 rounded text-xs mr-2">Deleted</span>Removed spam report #399</td>
+                  <td class="px-4 py-4">192.168.1.22</td>
+                </tr>
+                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
+                  <td class="px-4 py-4 text-white">Apr 17, 08:00 AM</td>
+                  <td class="px-4 py-4">Traffic Manager</td>
+                  <td class="px-4 py-4"><span class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded text-xs mr-2">Announcement</span>Published "Morning Road Closures"</td>
+                  <td class="px-4 py-4">192.168.1.44</td>
+                </tr>
+                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
+                  <td class="px-4 py-4 text-white">Apr 16, 22:30 PM</td>
+                  <td class="px-4 py-4">Main Admin</td>
+                  <td class="px-4 py-4"><span class="bg-indigo-500/10 text-indigo-400 px-2 py-1 rounded text-xs mr-2">Settings</span>Updated system routing parameters</td>
+                  <td class="px-4 py-4">192.168.1.10</td>
+                </tr>
+                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
+                  <td class="px-4 py-4 text-white">Apr 15, 14:15 PM</td>
+                  <td class="px-4 py-4">Support Agent</td>
+                  <td class="px-4 py-4"><span class="bg-green-500/10 text-green-400 px-2 py-1 rounded text-xs mr-2">Status Update</span>Marked Report #395 as In Progress</td>
+                  <td class="px-4 py-4">192.168.1.22</td>
+                </tr>
+                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
+                  <td class="px-4 py-4 text-white">Apr 15, 09:00 AM</td>
+                  <td class="px-4 py-4">System Auto</td>
+                  <td class="px-4 py-4"><span class="bg-purple-500/10 text-purple-400 px-2 py-1 rounded text-xs mr-2">Backup</span>Automated database backup completed</td>
+                  <td class="px-4 py-4">Localhost</td>
+                </tr>
+                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
+                  <td class="px-4 py-4 text-white">Apr 14, 18:45 PM</td>
+                  <td class="px-4 py-4">Traffic Manager</td>
+                  <td class="px-4 py-4"><span class="bg-red-500/10 text-red-400 px-2 py-1 rounded text-xs mr-2">Alert</span>Triggered emergency signal on Route A</td>
+                  <td class="px-4 py-4">192.168.1.44</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
+
+        <div class="charts-container flex flex-col gap-6 h-[600px]">
+          
+          <div class="card border border-gray-800/50 rounded-xl p-5 shadow-sm flex flex-col shrink-0 h-[260px]" style="background:var(--surface)">
+            <div class="flex items-center justify-between mb-3 shrink-0">
+              <h3 class="font-semibold flex items-center gap-2 text-white">
+                <i data-lucide="pie-chart" style="color:var(--accent)"></i>
+                Report Categories
+              </h3>
+            </div>
+            <div class="flex-1 relative w-full min-h-0">
+              <canvas id="categoriesChart"></canvas>
+            </div>
+          </div>
+
+          <div class="card border border-gray-800/50 rounded-xl p-6 shadow-sm flex flex-col flex-1" style="background:var(--surface)">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-semibold flex items-center gap-2 text-white">
+                <i data-lucide="activity" style="color:var(--accent)"></i>
+                Report Frequency
+              </h3>
+              <select id="freqDropdown" onchange="updateFrequencyChart()" class="modal-input !mt-0 !w-auto text-xs cursor-pointer" style="padding:4px 8px;">
+                <option value="This Week">This Week</option>
+                <option value="This Month">This Month</option>
+                <option value="This Year">This Year</option>
+              </select>
+            </div>
+            <div class="flex-1 flex items-center justify-center relative w-full">
+              <canvas id="frequencyChart"></canvas>
+            </div>
+          </div>
+          
+        </div>
+        
       </div>
     </div>
   </main>
 
 <script src="js/app.js"></script>
 <script>
+  // Initialize Icons
   lucide.createIcons();
+  
+  // Logout Function
   function doLogout() { window.location.href = 'admin.html'; }
+
+  // Interactive Search for Audit Trail
+  document.getElementById('auditSearch').addEventListener('keyup', function() {
+    let filter = this.value.toLowerCase();
+    let rows = document.querySelectorAll('#auditTableBody tr');
+    
+    rows.forEach(row => {
+      let text = row.textContent.toLowerCase();
+      row.style.display = text.includes(filter) ? '' : 'none';
+    });
+  });
+
+  // Chart instances
+  let freqChart;
+
+  document.addEventListener("DOMContentLoaded", function() {
+    
+    // 1. Report Categories (Doughnut Chart) - ADJUSTED CONFIGURATION
+    const ctxCat = document.getElementById('categoriesChart').getContext('2d');
+    new Chart(ctxCat, {
+      type: 'doughnut',
+      data: {
+        labels: ['Accidents', 'Traffic Jams', 'Road Works', 'Hazards'],
+        datasets: [{
+          data: [151, 192, 85, 42],
+          backgroundColor: [
+            '#ef4444', // Red
+            '#eab308', // Yellow
+            '#3b82f6', // Blue
+            '#10b981'  // Green
+          ],
+          borderWidth: 0,
+          hoverOffset: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '70%', // Adjusted for smaller height
+        layout: {
+          padding: { top: 0, bottom: 0 } 
+        },
+        plugins: {
+          legend: {
+            position: 'right',
+            align: 'center',
+            labels: { 
+              color: '#94a3b8', 
+              boxWidth: 10,
+              font: { size: 11 },
+              padding: 12,
+              usePointStyle: true,
+              pointStyle: 'circle'
+            }
+          }
+        }
+      }
+    });
+
+    // 2. Report Frequency (Bar Chart)
+    const ctxFreq = document.getElementById('frequencyChart').getContext('2d');
+    freqChart = new Chart(ctxFreq, {
+      type: 'bar',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+          label: 'Reports Received',
+          data: [45, 59, 80, 81, 56, 55, 40],
+          backgroundColor: '#3b82f6',
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
+          x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+        }
+      }
+    });
+  });
+
+  // Dynamic Dropdown Interaction for Report Frequency Chart
+  function updateFrequencyChart() {
+    const selection = document.getElementById('freqDropdown').value;
+    
+    if (selection === 'This Week') {
+      freqChart.data.labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      freqChart.data.datasets[0].data = [45, 59, 80, 81, 56, 55, 40];
+    } else if (selection === 'This Month') {
+      freqChart.data.labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+      freqChart.data.datasets[0].data = [210, 350, 290, 420];
+    } else if (selection === 'This Year') {
+      freqChart.data.labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      freqChart.data.datasets[0].data = [1200, 1500, 1100, 1800, 2100, 2300, 2500, 2200, 1900, 1600, 1400, 1700];
+    }
+    
+    freqChart.update();
+  }
 </script>
 </body>
 </html>
