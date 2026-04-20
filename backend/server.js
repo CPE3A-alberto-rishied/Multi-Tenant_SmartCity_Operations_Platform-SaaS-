@@ -56,7 +56,7 @@ app.post('/api/report', async (req, res) => {
                     
                     <br><br>
                     <p style="font-style: italic; color: #888888; font-size: 0.9rem; border-top: 1px solid #333333; padding-top: 15px;">
-                        This is an automated receipt from the BEAT (Block Enforcement & Alert Team) System.
+                        This is an automated receipt from the BEAT (Broadcast of Events, Alerts, and Traffic) System.
                     </p>
                 </div>
             `
