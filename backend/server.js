@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 1. CLOUD DATABASE CONNECTION
+// 1. DATABASE CONNECTION
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('✅ BEAT Cloud Connected'))
     .catch(err => console.error('❌ MongoDB Error:', err));
@@ -26,7 +26,7 @@ const reportSchema = new mongoose.Schema({
 });
 const Report = mongoose.model('Report', reportSchema);
 
-// 3. EMAIL TRANSPORTER SETUP
+// 3. EMAIL SETUP
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -35,38 +35,53 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// 4. THE POST ROUTE
+// 4. POST ROUTE
 app.post('/api/report', async (req, res) => {
     try {
+        const { reporter_name, reporter_email, contact_number, report_subject, report_location, report_description } = req.body;
+
+        // A. Server-side Validation
+        if (!reporter_name || !reporter_email || !contact_number || !report_subject || !report_location || !report_description) {
+            return res.status(400).json({ success: false, error: "All fields are required." });
+        }
+        if (!/^[a-zA-Z\s]+$/.test(reporter_name)) {
+            return res.status(400).json({ success: false, error: "Name must be letters only." });
+        }
+        if (!/^\d{11}$/.test(contact_number)) {
+            return res.status(400).json({ success: false, error: "Contact must be exactly 11 digits." });
+        }
+
+        // B. Save to MongoDB
         const newReport = new Report(req.body);
         await newReport.save();
 
-        // 📧 UPDATED RECEIPT LOGIC (Matches Screenshot)
-        await transporter.sendMail({
-            from: `"BEAT Pasig Support" <${process.env.EMAIL_USER}>`,
-            to: req.body.reporter_email,
-            subject: `Confirmation: We received your report - ${req.body.report_subject}`,
-            html: `
-                <div style="font-family: sans-serif; background-color: #121212; color: #ffffff; padding: 30px; border-radius: 8px; max-width: 600px;">
-                    <h3 style="color: #ffffff; margin-bottom: 20px;">Hello ${req.body.reporter_name},</h3>
-                    
-                    <p style="line-height: 1.6;">Thank you for your vigilance. We have received your report regarding <b>${req.body.report_subject}</b>.</p>
-                    
-                    <p style="line-height: 1.6;">Our team is currently reviewing the details provided for <b>${req.body.report_location}</b>. You will be notified once action has been taken.</p>
-                    
-                    <br><br>
-                    <p style="font-style: italic; color: #888888; font-size: 0.9rem; border-top: 1px solid #333333; padding-top: 15px;">
-                        This is an automated receipt from the BEAT (Broadcast of Events, Alerts, and Traffic) System.
-                    </p>
-                </div>
-            `
-        });
-
-        // Response for Frontend
+        // ✅ C. Send Success Response IMMEDIATELY for the Modal
         res.status(200).json({ success: true });
+
+        // D. Background Emails
+        // User Email
+        transporter.sendMail({
+            from: `"BEAT Pasig Support" <${process.env.EMAIL_USER}>`,
+            to: reporter_email,
+            subject: `Confirmation: Report Received - ${report_subject}`,
+            html: `<p>Hi ${reporter_name}, your report has been successfully logged.</p>`
+        }).catch(e => console.error("User Mail Error:", e));
+
+        // Reverted Admin Alert format
+        transporter.sendMail({
+            from: `"BEAT SYSTEM" <${process.env.EMAIL_USER}>`,
+            to: process.env.ADMIN_EMAIL,
+            subject: `🚨 New BEAT Report: ${report_subject}`,
+            html: `
+                <p><b>New Incident Logged</b></p>
+                <p><b>From:</b> ${reporter_name}</p>
+                <p><b>Location:</b> ${report_location}</p>
+                <p><b>Details:</b> ${report_description}</p>`
+        }).catch(e => console.error("Admin Mail Error:", e));
+
     } catch (error) {
         console.error("Server Error:", error);
-        res.status(500).json({ success: false, error: error.message });
+        if (!res.headersSent) res.status(500).json({ success: false, error: error.message });
     }
 });
 
