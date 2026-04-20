@@ -479,14 +479,78 @@ async function fetchAdminReports() {
         const result = await response.json();
 
         if (result.success) {
-            grid.innerHTML = ''; 
+            grid.innerHTML = ''; // Clear the grid
 
             result.data.forEach(report => {
+                const dateObj = new Date(report.createdAt);
+                const dateStr = dateObj.toLocaleDateString();
+                const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                // Match status colors to your UI
+                const statusStyles = {
+                    'Pending': 'bg-orange-500/10 text-orange-400 border-orange-500/20',
+                    'Resolved': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+                    'Returned': 'bg-red-500/10 text-red-400 border-red-500/20'
+                };
+                const currentStyle = statusStyles[report.status] || 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+
+                // Construct the full HTML card
                 const cardHTML = `
-                <div class="report-card border rounded-xl p-6 ..." 
-                     onclick="openReportDetails('${report._id}')"> </div>`;
+                <div class="report-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors" 
+                     style="background:rgba(15, 23, 42, 0.5); border-color:rgba(51, 65, 85, 0.5)" 
+                     onclick="openReportDetails('${report._id}')">
+                    
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-xs font-bold text-white report-date">${dateStr}</p>
+                            <p class="text-[10px] text-[#94a3b8]">${timeStr}</p>
+                        </div>
+                        <span class="badge-status ${currentStyle} px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border">
+                            ${report.status || 'PENDING'}
+                        </span>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-white mb-4 uppercase tracking-tight">${escapeHTML(report.report_subject)}</h3>
+                    
+                    <div class="space-y-1 text-sm mb-4">
+                        <p><span class="text-[#94a3b8]">Name of reportee:</span> <span class="text-white font-semibold">${escapeHTML(report.reporter_name)}</span></p>
+                        <p><span class="text-[#94a3b8]">Location:</span> <span class="text-white font-semibold">${escapeHTML(report.report_location)}</span></p>
+                    </div>
+
+                    ${report.status === 'Returned' && report.return_reason ? `
+                        <div class="mb-4 p-4 bg-gray-900/50 border-l-4 border-red-500 rounded-r-lg">
+                            <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest mb-1">RETURN REASON:</p>
+                            <p class="text-xs text-[#94a3b8] italic">${escapeHTML(report.return_reason)}</p>
+                        </div>` : ''}
+
+                    <div class="text-sm mb-6">
+                        <p class="text-[#94a3b8] mb-1">Description:</p>
+                        <p class="text-slate-300 leading-relaxed line-clamp-3">${escapeHTML(report.report_description)}</p>
+                    </div>
+
+                    <div class="mt-auto pt-4 border-t space-y-4 text-sm" style="border-color:rgba(51, 65, 85, 0.5)" onclick="event.stopPropagation()">
+                        <div>
+                            <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2">FORWARD TO</p>
+                            <select class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500 cursor-pointer" 
+                                    onchange="handleForward(this, '${report._id}')">
+                                <option value="" disabled selected>${report.forwarded_to || 'Select department...'}</option>
+                                <option value="Traffic">Traffic</option>
+                                <option value="DRRMO">DRRMO</option>
+                                <option value="Engineering">Engineering</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center justify-between mt-4">
+                            <p class="text-[11px] font-bold text-white uppercase tracking-wider">Mark as Resolved</p>
+                            <label class="switch">
+                                <input type="checkbox" ${report.status === 'Resolved' ? 'checked' : ''} onchange="handleReportToggle(event, this)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>`;
                 grid.insertAdjacentHTML('beforeend', cardHTML);
             });
+
             if (window.lucide) lucide.createIcons();
         }
     } catch (error) {
