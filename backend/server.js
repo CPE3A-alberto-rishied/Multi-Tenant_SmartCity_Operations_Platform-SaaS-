@@ -158,3 +158,18 @@ app.post('/api/admin/verify', async (req, res) => {
 });
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+// UPDATE REPORT STATUS ROUTE
+app.put('/api/report/:id', async (req, res) => {
+    try {
+        const { status } = req.body;
+        const updatedReport = await Report.findByIdAndUpdate(
+            req.params.id, 
+            { status: status }, 
+            { new: true }
+        );
+        res.status(200).json({ success: true, data: updatedReport });
+    } catch (error) {
+        res.status(500).json({ success: false, error: "Failed to update status" });
+    }
+});
