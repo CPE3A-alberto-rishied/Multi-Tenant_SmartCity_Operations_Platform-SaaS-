@@ -35,7 +35,7 @@
         button, a { cursor: pointer !important; }
 
         /* =========================================
-           EXTRACTED INLINE STYLES 
+           EXTRACTED INLINE STYLES (MOBILE RESPONSIVE)
            ========================================= */
         
         /* Backgrounds & Containers */
@@ -45,9 +45,10 @@
             overflow: hidden;
         }
         
-        /* Cards */
+        /* Cards: Changed from fixed width to max-width for mobile support */
         .popup-panel {
-            width: 420px;
+            width: 100%;
+            max-width: 420px;
             background: rgba(20, 26, 45, 0.95);
             padding: 2.5rem;
             border-radius: 1rem;
@@ -55,7 +56,8 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
         .auth-panel {
-            width: 420px;
+            width: 100%;
+            max-width: 420px;
             background: rgba(15, 20, 35, 0.85);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255,255,255,0.05);
@@ -111,12 +113,31 @@
             border-radius: 8px;
             border: 1px solid var(--border);
         }
+
+        /* MOBILE RESPONSIVE MEDIA QUERY */
+        @media (max-width: 480px) {
+            .auth-panel, .popup-panel {
+                padding: 1.5rem; /* Less padding on small screens to save space */
+            }
+            .otp-input {
+                width: 40px; /* Slightly narrower OTP boxes so they don't overflow */
+                height: 48px;
+                font-size: 1.1rem;
+            }
+            .logo-box {
+                width: 48px;
+                height: 48px;
+            }
+            #auth-logo h1 {
+                font-size: 32px;
+            }
+        }
     </style>
 </head>
 <body class="h-full">
-    <div id="auth-screen" class="h-full flex flex-col items-center justify-center auth-bg">
+    <div id="auth-screen" class="h-full w-full flex flex-col items-center justify-center auth-bg px-4">
         
-        <div id="success-popup" class="modal-overlay hidden">
+        <div id="success-popup" class="modal-overlay hidden px-4">
             <div class="card card-glow popup-panel">
                 <div class="icon-circle bg-blue-accent flex items-center justify-center text-white"><i data-lucide="mail-check"></i></div>
                 <h2 class="text-white font-bold text-xl mb-4">Reset Link Sent</h2>
@@ -125,7 +146,7 @@
             </div>
         </div>
 
-        <div id="resent-popup" class="modal-overlay hidden">
+        <div id="resent-popup" class="modal-overlay hidden px-4">
             <div class="card card-glow popup-panel">
                 <div class="icon-circle bg-green-accent flex items-center justify-center text-white"><i data-lucide="mail"></i></div>
                 <h2 class="text-white font-bold text-xl mb-4">Code Resent</h2>
@@ -178,7 +199,7 @@
             <h2 class="text-white font-bold text-xl mb-2">Verify Your Identity</h2>
             <p class="text-dim-sm mb-6">Enter the 6-digit code sent to your email</p>
             <form onsubmit="handleVerify(event)" novalidate>
-                <div class="flex justify-between gap-2 mb-4">
+                <div class="flex justify-between gap-1 sm:gap-2 mb-4">
                     <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 0)" onkeydown="handleOtpBack(event, 0)">
                     <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 1)" onkeydown="handleOtpBack(event, 1)">
                     <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 2)" onkeydown="handleOtpBack(event, 2)">
