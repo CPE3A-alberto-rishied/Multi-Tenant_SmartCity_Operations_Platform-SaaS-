@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BEAT – Dept Dashboard</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="css/styles2.css">
+</head>
+
+<body class="h-full flex bg-[#0a0e1a]">
+
+  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface">
+    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
+      <div class="flex items-center gap-3">
+        <div class="logo-box">B</div>
+        <div class="flex flex-col justify-center">
+          <div class="logo-text font-bold text-lg text-white leading-none mb-1">BEAT</div>
+          <div class="text-[11px] text-[#94a3b8] leading-none">Department Portal</div>
+        </div>
+      </div>
+    </div>
+    
+    <nav class="flex-1 py-4 overflow-y-auto">
+      <a href="dashboard2.html" class="sidebar-item active"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+      <a href="reports2.html" class="sidebar-item"><i data-lucide="alert-triangle"></i><span>Public Reports</span></a>
+      <a href="announcements2.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+      <a href="traffic2.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
+      <a href="analytics2.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
+    </nav>
+
+    <div class="user-footer">
+      <div class="flex items-center justify-between mb-5">
+        <div class="flex items-center gap-3">
+          <div id="nav-avatar" class="nav-avatar"></div>
+          <div>
+            <div class="user-footer-name">Loading...</div>
+            <div class="user-footer-sub">Loading...</div>
+          </div>
+        </div>
+        <a href="profile2.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
+      </div>
+      <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border theme-border hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
+        <i data-lucide="log-out" class="icon-sm"></i> Logout
+      </button>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a]">
+    <header class="h-[76px] px-8 flex items-center justify-between shrink-0 theme-surface theme-border-b">
+      <h1 class="text-xl font-semibold text-white">Dashboard Overview</h1>
+      <div class="flex items-center gap-4">
+        <div class="px-3 py-1.5 rounded-lg flex items-center gap-2.5 shadow-sm border theme-surface-2">
+          <i data-lucide="sun" class="w-3.5 h-3.5 text-yellow-500"></i>
+          <span class="text-xs font-semibold text-white">28°C</span>
+          <div class="w-px h-3 bg-gray-700"></div>
+          <span class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Mainly Clear</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-8 animate-in">
+      <div class="max-w-[1400px] mx-auto space-y-6">
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div class="border theme-border rounded-xl p-5 shadow-sm theme-surface">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-[#94a3b8] mb-3">Active Incidents</p>
+            <h2 class="text-3xl font-bold text-rose-500">0</h2>
+            <p class="text-xs text-[#94a3b8] mt-2">Live count</p>
+          </div>
+          <div class="border theme-border rounded-xl p-5 shadow-sm theme-surface">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-[#94a3b8] mb-3">Pending Approvals</p>
+            <h2 class="text-3xl font-bold text-white">0</h2>
+            <p class="text-xs text-[#94a3b8] mt-2">Staff announcements</p>
+          </div>
+          <div class="border theme-border rounded-xl p-5 shadow-sm theme-surface">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-[#94a3b8] mb-3">Total Reports (30D)</p>
+            <h2 class="text-3xl font-bold text-white">0</h2>
+            <p class="text-xs text-[#94a3b8] mt-2">Across all barangays</p>
+          </div>
+          <div class="border theme-border rounded-xl p-5 shadow-sm theme-surface">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-[#94a3b8] mb-3">Active Staff</p>
+            <h2 class="text-3xl font-bold text-emerald-500">1</h2>
+            <p class="text-xs text-[#94a3b8] mt-2">Online now</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="border theme-border rounded-xl p-6 shadow-sm theme-surface">
+            <div class="flex items-center gap-2 mb-6">
+              <i data-lucide="bar-chart-horizontal" class="w-4 h-4 text-blue-500"></i>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-[#94a3b8]">Congestion Index</h3>
+            </div>
+            <p class="text-sm text-[#94a3b8] italic">No active data to display.</p>
+          </div>
+
+          <div class="border theme-border rounded-xl p-6 shadow-sm theme-surface">
+            <div class="flex items-center gap-2 mb-6">
+              <i data-lucide="radio" class="w-4 h-4 text-emerald-500"></i>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-[#94a3b8]">Unit Dispatch Status</h3>
+            </div>
+            <p class="text-sm text-[#94a3b8] italic">No active dispatches.</p>
+          </div>
+
+          <div class="border theme-border rounded-xl p-6 shadow-sm theme-surface">
+            <div class="flex items-center justify-between mb-6">
+              <div class="flex items-center gap-2">
+                <i data-lucide="bell" class="w-4 h-4 text-purple-500"></i>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-[#94a3b8]">Live Reports Feed</h3>
+              </div>
+            </div>
+            <p class="text-sm text-[#94a3b8] italic">No live reports to display.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+<script src="js/app2.js"></script>
+</body>
+</html>

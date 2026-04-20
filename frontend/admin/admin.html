@@ -90,8 +90,9 @@
             position: absolute; left: 14px; top: 13px; width: 18px; height: 18px; color: #94a3b8;
         }
         .input-icon-right {
-            position: absolute; right: 14px; top: 13px; width: 18px; height: 18px; color: #94a3b8; cursor: pointer;
+            position: absolute; right: 14px; top: 13px; width: 18px; height: 18px; color: #94a3b8; cursor: pointer; transition: color 0.2s;
         }
+        .input-icon-right:hover { color: #ffffff; }
 
         /* Form Inputs */
         .auth-input-field {
@@ -107,6 +108,8 @@
         .auth-select-field {
             padding: 12px 14px;
             border-radius: 8px;
+            border: 1px solid var(--border);
+            cursor: pointer;
         }
         .auth-email-field {
             padding: 12px 16px;
@@ -142,7 +145,7 @@
                 <div class="icon-circle bg-blue-accent flex items-center justify-center text-white"><i data-lucide="mail-check"></i></div>
                 <h2 class="text-white font-bold text-xl mb-4">Reset Link Sent</h2>
                 <p class="text-dim-sm line-height-relaxed mb-8">Check your email for password reset instructions.</p>
-                <button onclick="closePopup()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-[10px]">Back to Login</button>
+                <button onclick="closePopup('success-popup')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-[10px]">Back to Login</button>
             </div>
         </div>
 
@@ -151,7 +154,7 @@
                 <div class="icon-circle bg-green-accent flex items-center justify-center text-white"><i data-lucide="mail"></i></div>
                 <h2 class="text-white font-bold text-xl mb-4">Code Resent</h2>
                 <p class="text-dim-sm mb-8">A new verification code has been sent to your email.</p>
-                <button onclick="closeResentPopup()" class="w-32 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 mx-auto rounded-[10px]">Got it</button>
+                <button onclick="closePopup('resent-popup')" class="w-32 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 mx-auto rounded-[10px]">Got it</button>
             </div>
         </div>
 
@@ -175,22 +178,21 @@
                     <label class="block text-[11px] font-bold mb-2 text-[#94a3b8] tracking-wider uppercase">Department</label>
                     <select id="login-dept" class="w-full bg-[#1e2536] text-white border border-gray-700 auth-select-field">
                         <option value="main">Main Admin</option>
-                        <option value="traffic">Traffic Department</option>
-                    </select>
+                        </select>
                 </div>
                 <div class="mb-2">
                     <label class="block text-[11px] font-bold mb-2 text-[#94a3b8] tracking-wider uppercase">Password</label>
                     <div class="relative flex flex-col">
                         <i data-lucide="lock" class="input-icon-left"></i>
                         <input id="login-pass" type="password" placeholder="Enter password" class="w-full bg-[#1e2536] text-white auth-input-pass" oninput="clearError('login-pass', 'pass-error')">
-                        <i data-lucide="eye" class="input-icon-right"></i>
+                        <i data-lucide="eye" class="input-icon-right" onclick="const p=document.getElementById('login-pass'); p.type=p.type==='password'?'text':'password';"></i>
                         <p id="pass-error" class="error-text hidden">This field is required</p>
                     </div>
                 </div>
                 <div class="flex justify-end mb-8">
                     <button type="button" onclick="showResetScreen()" class="text-xs font-semibold text-blue-500 hover:text-blue-400">Forgot password?</button>
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-[10px] shadow-lg">Sign In</button>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-[10px] shadow-lg transition-colors mb-2">Sign In</button>
             </form>
         </div>
 
@@ -208,11 +210,11 @@
                     <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 5)" onkeydown="handleOtpBack(event, 5)">
                 </div>
                 <p id="verify-error" class="error-text hidden mb-4">Please enter all 6 digits</p>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-[10px] mb-6">Verify Code</button>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-[10px] mb-6 transition-colors">Verify Code</button>
                 
-                <p class="text-[12px] mb-8" style="color:var(--text-dim)">Didn't receive it? <button type="button" onclick="showResentPopup()" class="text-blue-500 font-semibold hover:text-blue-400">Resend</button></p>
+                <p class="text-[12px] mb-8 text-[#94a3b8]">Didn't receive it? <button type="button" onclick="showResentPopup(event)" class="text-blue-500 font-semibold hover:text-blue-400">Resend</button></p>
                 
-                <button type="button" onclick="showLoginScreen()" class="flex items-center gap-2 text-blue-500 text-[13px] font-semibold mx-auto hover:text-blue-400"><i data-lucide="arrow-left" style="width:14px"></i> Back</button>
+                <button type="button" onclick="showLoginScreen()" class="flex items-center justify-center gap-2 text-blue-500 text-[13px] font-semibold mx-auto hover:text-blue-400"><i data-lucide="arrow-left" style="width:14px"></i> Back</button>
             </form>
         </div>
 
@@ -225,12 +227,29 @@
                     <input id="reset-email" type="email" placeholder="admin@beat.gov.ph" class="w-full bg-[#1e2536] text-white auth-email-field" oninput="clearError('reset-email', 'reset-error')">
                     <p id="reset-error" class="error-text hidden">Enter a valid email address</p>
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-[10px] mb-6">Send Reset Link</button>
-                <button type="button" onclick="showLoginScreen()" class="flex items-center gap-2 text-blue-500 text-[13px] font-semibold mx-auto hover:text-blue-400"><i data-lucide="arrow-left" style="width:14px"></i> Back</button>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-[10px] mb-6 transition-colors">Send Reset Link</button>
+                <button type="button" onclick="showLoginScreen()" class="flex items-center justify-center gap-2 text-blue-500 text-[13px] font-semibold mx-auto hover:text-blue-400"><i data-lucide="arrow-left" style="width:14px"></i> Back</button>
             </form>
         </div>
     </div>
+    
     <script src="js/app.js"></script>
-    <script>lucide.createIcons();</script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => { 
+            if(window.lucide) lucide.createIcons(); 
+            
+            // DYNAMIC LOGIN DROPDOWN: Loads created Departments from memory!
+            const loginDept = document.getElementById('login-dept');
+            if (loginDept) {
+                const savedDepts = JSON.parse(localStorage.getItem('beat_departments')) || [];
+                savedDepts.forEach(dept => {
+                    const opt = document.createElement('option');
+                    opt.value = dept.toLowerCase();
+                    opt.text = dept + " Department";
+                    loginDept.appendChild(opt);
+                });
+            }
+        });
+    </script>
 </body>
 </html>
