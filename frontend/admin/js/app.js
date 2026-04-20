@@ -1369,3 +1369,149 @@ document.addEventListener('DOMContentLoaded', () => {
         filterAnnouncements(); 
     }
 });
+
+// ==========================================
+// AUTHENTICATION & POPUP UI LOGIC
+// ==========================================
+
+// Clears the red error rings when a user starts typing
+function clearError(inputId, errorId) {
+    const input = document.getElementById(inputId);
+    const error = document.getElementById(errorId);
+    if (input) input.classList.remove('input-error');
+    if (error) error.classList.add('hidden');
+}
+
+// 1. Handles the Sign In button
+function handleLogin(e) {
+    e.preventDefault();
+    const user = document.getElementById('login-user');
+    const pass = document.getElementById('login-pass');
+    let valid = true;
+
+    // Check if ID is empty
+    if (!user.value.trim()) {
+        user.classList.add('input-error');
+        document.getElementById('user-error').classList.remove('hidden');
+        valid = false;
+    }
+    
+    // Check if Password is empty
+    if (!pass.value.trim()) {
+        pass.classList.add('input-error');
+        document.getElementById('pass-error').classList.remove('hidden');
+        valid = false;
+    }
+
+    // If valid, transition to the 2FA Verify screen
+    if (valid) {
+        document.getElementById('login-card').classList.add('hidden');
+        document.getElementById('verify-card').classList.remove('hidden');
+        
+        // Auto-focus the first OTP box after a tiny delay
+        setTimeout(() => {
+            const firstOtp = document.querySelector('.otp-input');
+            if (firstOtp) firstOtp.focus();
+        }, 50);
+    }
+}
+
+// 2. Forgot Password Flow
+function showResetScreen() {
+    document.getElementById('login-card').classList.add('hidden');
+    document.getElementById('reset-card').classList.remove('hidden');
+}
+
+function handleReset(e) {
+    e.preventDefault();
+    const email = document.getElementById('reset-email');
+    
+    if (!email.value.includes('@')) {
+        email.classList.add('input-error');
+        document.getElementById('reset-error').classList.remove('hidden');
+    } else {
+        // Show success modal
+        document.getElementById('success-popup').classList.remove('hidden');
+    }
+}
+
+// Closes the Reset Success popup and returns to login
+function closePopup() {
+    document.getElementById('success-popup').classList.add('hidden');
+    showLoginScreen();
+}
+
+// Returns to the main login form from anywhere
+function showLoginScreen() {
+    document.getElementById('verify-card').classList.add('hidden');
+    document.getElementById('reset-card').classList.add('hidden');
+    document.getElementById('login-card').classList.remove('hidden');
+}
+
+// 3. 2FA Resend Popups (THIS FIXES YOUR BUG!)
+function showResentPopup() {
+    document.getElementById('resent-popup').classList.remove('hidden');
+}
+
+function closeResentPopup() {
+    // Hide the popup
+    document.getElementById('resent-popup').classList.add('hidden');
+    
+    // Clear out the OTP boxes so they can try again
+    document.querySelectorAll('.otp-input').forEach(inp => inp.value = '');
+    
+    // Put their cursor back in the first box automatically
+    setTimeout(() => {
+        const firstOtp = document.querySelector('.otp-input');
+        if (firstOtp) firstOtp.focus();
+    }, 50);
+}
+
+// 4. OTP Box Behavior (Auto-tabbing and Backspacing)
+function handleOtp(element, index) {
+    document.getElementById('verify-error').classList.add('hidden');
+    
+    // If they typed a number, jump to the next box
+    if (element.value.length === 1) {
+        const next = element.nextElementSibling;
+        if (next && next.classList.contains('otp-input')) {
+            next.focus();
+        }
+    }
+}
+
+function handleOtpBack(e, index) {
+    // If they hit backspace on an empty box, jump to the previous box
+    if (e.key === 'Backspace' && e.target.value === '') {
+        const prev = e.target.previousElementSibling;
+        if (prev && prev.classList.contains('otp-input')) {
+            prev.focus();
+        }
+    }
+}
+
+// 5. Final Verification (Entering the Dashboard)
+function handleVerify(e) {
+    e.preventDefault();
+    const inputs = document.querySelectorAll('.otp-input');
+    const code = Array.from(inputs).map(i => i.value).join('');
+
+    if (code.length === 6) {
+        // SUCCESS! Hide the whole Auth screen and show the Dashboard
+        document.getElementById('auth-screen').style.display = 'none';
+        
+        const appShell = document.getElementById('app');
+        if (appShell) {
+            appShell.style.display = 'flex';
+            appShell.classList.remove('hidden');
+        }
+        
+        // Trigger the SPA navigation functions (from your existing app.js)
+        if (typeof buildNav === 'function') buildNav();
+        if (typeof navigateTo === 'function') navigateTo('dashboard');
+        
+    } else {
+        // Show error if they didn't fill out all 6 boxes
+        document.getElementById('verify-error').classList.remove('hidden');
+    }
+}
