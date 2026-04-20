@@ -62,6 +62,39 @@
             transform: translateY(-2px);
             color: var(--white) !important;
         }
+
+        /* --- NEW: MOBILE RESPONSIVE FIXES --- */
+        
+        /* 1. Prevent the giant clock from breaking the box layout on phones */
+        .clock-display {
+            font-size: clamp(3rem, 12vw, 4.5rem) !important; 
+        }
+
+        @media (max-width: 640px) {
+            /* 2. Force the Live Feed Items to wrap their text on small screens */
+            .feed-item-box {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 8px !important;
+                padding: 16px !important;
+            }
+            .feed-sep { display: none; }
+            .feed-item-box > div {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 4px;
+                width: 100%;
+            }
+            .feed-item-box > div > span:last-child {
+                margin-left: 0 !important; /* Removes awkward spacing on mobile */
+            }
+            
+            /* 3. Tweak general padding for phone screens */
+            section {
+                padding-left: 16px !important;
+                padding-right: 16px !important;
+            }
+        }
     </style>
 </head>
 <body class="flex flex-col h-full overflow-auto">
@@ -97,7 +130,7 @@
             
             <section style="padding: 60px 24px 80px 24px; position:relative; z-index:1;">
                 <div style="max-width:1200px; margin:0 auto;">
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:flex-start;" class="hero-grid">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
                         <div>
                             <div class="section-label" style="margin-bottom:12px;">Broadcast of Events, Alerts, & Traffic</div>
                             <h1 class="section-title" style="font-size:clamp(3rem,6vw,5.5rem); line-height:0.95; margin:0 0 20px;">
@@ -148,7 +181,7 @@
             </section>
 
             <section class="py-16" style="padding-left: 24px; padding-right: 24px; position:relative; z-index:1;">
-                <div style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns: 1.2fr 1fr; gap:60px;" class="hero-grid">
+                <div class="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-12 lg:gap-[60px]">
                     <div>
                         <div class="section-label" style="margin-bottom:8px;">Operational Framework</div>
                         <h2 class="section-title" style="font-size:2.5rem; margin-bottom:12px;">URBAN VIGILANCE & RESPONSE</h2>
@@ -181,7 +214,8 @@
                     <div>
                         <div class="section-label" style="margin-bottom:8px;">Today's Real-time Metrics</div>
                         <h2 class="section-title" style="font-size:2rem; margin-bottom:32px;">CITY LIVE STATUS</h2>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="stat-box enlarged-card">
                                 <i data-lucide="thermometer" class="stat-icon-large" style="color:#facc15;"></i>
                                 <div class="stat-content-wrap">
@@ -221,7 +255,7 @@
                     <h2 class="section-title" style="font-size:2.5rem; margin-bottom:12px; text-align:center;">WEEKLY WEATHER FORECAST</h2>
                     <div class="blue-line" style="margin:0 auto 40px;"></div>
                     
-                    <div style="display:grid; grid-template-columns: repeat(7, 1fr); gap:12px;">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
                         <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #fbbf24;">
                             <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">MON</div>
                             <i data-lucide="sun" style="width: 24px; height: 24px; color: #fbbf24; margin: 0 auto 10px;"></i>
@@ -258,7 +292,7 @@
                             <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">28°C</div>
                             <div style="font-size: 0.65rem; color: var(--gray); font-weight: 600;">PARTLY</div>
                         </div>
-                        <div class="widget-card" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #fbbf24;">
+                        <div class="widget-card lg:col-span-1 sm:col-span-3 col-span-2" style="padding: 20px 10px; text-align: center; border-bottom: 3px solid #fbbf24;">
                             <div style="font-family: 'Barlow Condensed'; font-weight: 700; color: var(--gray); font-size: 0.8rem; margin-bottom: 10px;">SUN</div>
                             <i data-lucide="sun" style="width: 24px; height: 24px; color: #fbbf24; margin: 0 auto 10px;"></i>
                             <div style="font-family: 'Bebas Neue'; font-size: 1.5rem; color: white;">30°C</div>
@@ -398,7 +432,7 @@
 
     <footer class="footer-bg" style="padding: 60px 24px 20px;">
         <div style="max-width:1200px; margin:0 auto;">
-            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:48px; margin-bottom:48px;" class="footer-grid">
+            <div class="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] gap-10 md:gap-12 mb-12">
                 <div>
                     <div class="logo-text" style="font-size:1.8rem; margin-bottom:16px;">B<span class="logo-dot">E</span>AT</div>
                     <p style="color:var(--gray); font-size:0.95rem; line-height:1.7; max-width:320px;">Your trusted neighborhood watch platform. Keeping communities safe through real-time updates.</p>

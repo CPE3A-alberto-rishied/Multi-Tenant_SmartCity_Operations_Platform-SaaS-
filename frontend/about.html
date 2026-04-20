@@ -14,14 +14,13 @@
             40% {transform: translateY(-10px);}
             60% {transform: translateY(-5px);}
         }
-        /* Tightened spacing */
         .section-spacer { padding-top: 60px; padding-bottom: 60px; }
     </style>
 </head>
 <body class="flex flex-col h-full overflow-auto">
     
-    <header class="main-header">
-        <div class="header-container">
+    <header style="background: rgba(5,10,20,0.97); border-bottom: 1px solid rgba(26,86,219,0.25); position:sticky; top:0; z-index:100; backdrop-filter:blur(12px);">
+        <div style="max-width:1200px; margin:0 auto; padding: 0 24px; display:flex; align-items:center; justify-content:space-between; height:64px;">
             <div class="logo-text" style="cursor:pointer;" onclick="window.location.href='index.html'">
                 B<span class="logo-dot">E</span>AT
             </div>
@@ -35,14 +34,25 @@
         </div>
     </header>
 
+    <div class="ticker-wrap" style="padding: 6px 0; position: relative; z-index: 2;">
+        <div class="ticker-inner">
+            <span class="ticker-item">🔵 B.E.A.T. PASIG SYSTEM FULLY OPERATIONAL <span class="ticker-sep">|</span></span>
+            <span class="ticker-item">📣 Town Hall Meeting — Saturday 9:00 AM <span class="ticker-sep">|</span></span>
+            <span class="ticker-item">⚠️ Road Closure on Main Ave Until Friday <span class="ticker-sep">|</span></span>
+            <span class="ticker-item">✅ New Safe Zone Established — Downtown Park <span class="ticker-sep">|</span></span>
+            <span class="ticker-item">📋 Monthly Report Published — View Now <span class="ticker-sep">|</span></span>
+            <span class="ticker-item">🔵 B.E.A.T. PASIG SYSTEM FULLY OPERATIONAL <span class="ticker-sep">|</span></span>
+        </div>
+    </div>
+
     <main style="flex:1; display:flex; flex-direction:column;">
         <div class="internal-page-bg" style="flex:1;">
             <div class="grid-overlay"></div>
             
-            <div style="position:relative; z-index:1; padding: 20px 24px; min-height: 85vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                <div style="max-width:1100px; margin:0 auto; text-align:center;">
+            <div class="relative z-10 px-4 py-10 md:px-6 md:py-12 min-h-[85vh] flex flex-col justify-center items-center">
+                <div class="max-w-[1100px] mx-auto text-center">
                     <div class="section-label" style="letter-spacing: 0.3em; color:var(--blue); margin-bottom: 8px;">SaaS ARCHITECTURE</div>
-                    <h1 class="section-title" style="font-size:clamp(2.5rem, 6vw, 5rem); line-height:1; margin:0 0 24px;">
+                    <h1 class="section-title" style="font-size:clamp(2.5rem, 8vw, 5rem); line-height:1; margin:0 0 24px;">
                         B.E.A.T. PASIG<br>COMMUNITY INTELLIGENCE
                     </h1>
                     <p style="color:var(--gray); font-size:1.1rem; max-width:900px; margin:0 auto; line-height:1.7; opacity:0.9;">
@@ -55,58 +65,59 @@
                 </div>
             </div>
 
-            <div class="section-spacer" style="position:relative; z-index:1; padding-left: 24px; padding-right: 24px;">
-                <div style="max-width:1200px; margin:0 auto;">
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:30px;">
-                        <div class="widget-card" style="padding:40px; text-align:left; border-left:4px solid var(--blue);">
-                            <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+            <div class="section-spacer relative z-10 px-6">
+                <div class="max-w-[1200px] mx-auto">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="widget-card p-8 md:p-10 text-left border-l-4 border-[var(--blue)]">
+                            <div class="flex items-center gap-4 mb-4">
                                 <i data-lucide="target" style="color:var(--blue); width:28px; height:28px;"></i>
-                                <h2 style="font-family:'Bebas Neue'; font-size:2.2rem; color:white; letter-spacing:0.05em;">MISSION</h2>
+                                <h2 style="font-family:'Bebas Neue'; font-size:2.2rem; color:white; letter-spacing:0.05em; margin:0;">MISSION</h2>
                             </div>
-                            <p style="color:var(--gray); line-height:1.6;">To build a secure, high-integrity reporting pipeline that ensures community concerns reach the Pasig Command Center with zero latency.</p>
+                            <p style="color:var(--gray); line-height:1.6; margin:0;">To build a secure, high-integrity reporting pipeline that ensures community concerns reach the Pasig Command Center with zero latency.</p>
                         </div>
-                        <div class="widget-card" style="padding:40px; text-align:left; border-left:4px solid var(--blue);">
-                            <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                        <div class="widget-card p-8 md:p-10 text-left border-l-4 border-[var(--blue)]">
+                            <div class="flex items-center gap-4 mb-4">
                                 <i data-lucide="eye" style="color:var(--blue); width:28px; height:28px;"></i>
-                                <h2 style="font-family:'Bebas Neue'; font-size:2.2rem; color:white; letter-spacing:0.05em;">VISION</h2>
+                                <h2 style="font-family:'Bebas Neue'; font-size:2.2rem; color:white; letter-spacing:0.05em; margin:0;">VISION</h2>
                             </div>
-                            <p style="color:var(--gray); line-height:1.6;">To set the standard for smart-city safety initiatives, leveraging advanced engineering to cultivate a safer, more connected urban environment.</p>
+                            <p style="color:var(--gray); line-height:1.6; margin:0;">To set the standard for smart-city safety initiatives, leveraging advanced engineering to cultivate a safer, more connected urban environment.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="section-spacer" style="position:relative; z-index:1; padding-left: 24px; padding-right: 24px;">
-                <div style="max-width:1200px; margin:0 auto;">
+            <div class="section-spacer relative z-10 px-6">
+                <div class="max-w-[1200px] mx-auto">
                     <div class="section-label" style="color:var(--blue); text-align: center; margin-bottom: 8px;">SYSTEM CAPABILITIES</div>
                     <h2 class="section-title" style="font-size:3rem; margin-bottom:40px; text-align: center;">CORE FEATURES</h2>
-                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:20px;">
-                        <div class="widget-card" style="padding:30px;">
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="widget-card p-8">
                             <i data-lucide="shield-alert" style="color:var(--blue); margin-bottom:15px;"></i>
                             <h4 style="font-family:'Barlow Condensed'; font-weight:700; color:white; font-size:1.3rem; margin-bottom:8px; text-transform:uppercase;">Incident Reporting</h4>
                             <p style="font-size:0.9rem; color:var(--gray);">Encrypted submission portal for reporting public hazards and security concerns directly to authorities.</p>
                         </div>
-                        <div class="widget-card" style="padding:30px;">
+                        <div class="widget-card p-8">
                             <i data-lucide="map-pin" style="color:var(--blue); margin-bottom:15px;"></i>
                             <h4 style="font-family:'Barlow Condensed'; font-weight:700; color:white; font-size:1.3rem; margin-bottom:8px; text-transform:uppercase;">Geo-Tagged Alerts</h4>
                             <p style="font-size:0.9rem; color:var(--gray);">Precise location-based broadcasting that ensures residents receive time-sensitive alerts for their specific zone.</p>
                         </div>
-                        <div class="widget-card" style="padding:30px;">
+                        <div class="widget-card p-8">
                             <i data-lucide="activity" style="color:var(--blue); margin-bottom:15px;"></i>
                             <h4 style="font-family:'Barlow Condensed'; font-weight:700; color:white; font-size:1.3rem; margin-bottom:8px; text-transform:uppercase;">Live Status Feed</h4>
                             <p style="font-size:0.9rem; color:var(--gray);">A centralized dashboard monitoring city metrics, weather conditions, and community patrol updates.</p>
                         </div>
-                        <div class="widget-card" style="padding:30px;">
+                        <div class="widget-card p-8">
                             <i data-lucide="database" style="color:var(--blue); margin-bottom:15px;"></i>
                             <h4 style="font-family:'Barlow Condensed'; font-weight:700; color:white; font-size:1.3rem; margin-bottom:8px; text-transform:uppercase;">Secure Data Logs</h4>
                             <p style="font-size:0.9rem; color:var(--gray);">High-integrity relational database management ensuring all community reports are securely archived and trackable.</p>
                         </div>
-                        <div class="widget-card" style="padding:30px;">
+                        <div class="widget-card p-8">
                             <i data-lucide="smartphone" style="color:var(--blue); margin-bottom:15px;"></i>
                             <h4 style="font-family:'Barlow Condensed'; font-weight:700; color:white; font-size:1.3rem; margin-bottom:8px; text-transform:uppercase;">Mobile Optimization</h4>
                             <p style="font-size:0.9rem; color:var(--gray);">Fully responsive interface designed for rapid reporting on-the-go across all mobile and tablet devices.</p>
                         </div>
-                        <div class="widget-card" style="padding:30px;">
+                        <div class="widget-card p-8">
                             <i data-lucide="clock" style="color:var(--blue); margin-bottom:15px;"></i>
                             <h4 style="font-family:'Barlow Condensed'; font-weight:700; color:white; font-size:1.3rem; margin-bottom:8px; text-transform:uppercase;">24/7 Availability</h4>
                             <p style="font-size:0.9rem; color:var(--gray);">Automated system uptime monitoring to ensure the command interface remains operational at all times.</p>
@@ -115,40 +126,41 @@
                 </div>
             </div>
 
-            <div class="section-spacer" style="position:relative; z-index:1; padding-left: 24px; padding-right: 24px;">
-                <div style="max-width:1200px; margin:0 auto;">
+            <div class="section-spacer relative z-10 px-6">
+                <div class="max-w-[1200px] mx-auto">
                     <div class="section-label" style="color:var(--blue); text-align: center; margin-bottom: 8px;">DEVELOPMENT TEAM</div>
                     <h2 class="section-title" style="font-size:3rem; margin-bottom:40px; text-align: center;">THE ENGINEERING BOARD</h2>
-                    <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:15px;" class="hero-grid">
-                        <div class="widget-card" style="padding:25px 10px; text-align:center;">
+                    
+                    <div class="flex flex-wrap justify-center gap-6">
+                        <div class="widget-card p-6 text-center w-full sm:w-[45%] md:w-[30%] lg:w-[18%]">
                             <div style="width:90px; height:90px; border-radius:50%; overflow:hidden; margin:0 auto 15px; border:2px solid var(--blue);">
                                 <img src="../assets/2x2_Alberto.jpg" alt="Alberto" style="width:100%; height:100%; object-fit:cover;">
                             </div>
                             <h4 style="font-family:'Bebas Neue'; font-size:1.3rem; color:white; line-height:1.1;">RISHIED S.<br>ALBERTO</h4>
                             <p style="font-size:0.65rem; color:var(--blue); font-weight:700; margin-top:5px; text-transform:uppercase;">Computer Engineer</p>
                         </div>
-                        <div class="widget-card" style="padding:25px 10px; text-align:center;">
+                        <div class="widget-card p-6 text-center w-full sm:w-[45%] md:w-[30%] lg:w-[18%]">
                             <div style="width:90px; height:90px; border-radius:50%; overflow:hidden; margin:0 auto 15px; border:2px solid var(--blue);">
                                 <img src="../assets/2x2_Atibagos.jpg" alt="Atibagos" style="width:100%; height:100%; object-fit:cover;">
                             </div>
                             <h4 style="font-family:'Bebas Neue'; font-size:1.3rem; color:white; line-height:1.1;">RAFAEL PHILIP S.<br>ATIBAGOS</h4>
                             <p style="font-size:0.65rem; color:var(--blue); font-weight:700; margin-top:5px; text-transform:uppercase;">Computer Engineer</p>
                         </div>
-                        <div class="widget-card" style="padding:25px 10px; text-align:center;">
+                        <div class="widget-card p-6 text-center w-full sm:w-[45%] md:w-[30%] lg:w-[18%]">
                             <div style="width:90px; height:90px; border-radius:50%; overflow:hidden; margin:0 auto 15px; border:2px solid var(--blue);">
                                 <img src="../assets/2x2_Del_Rosario.png" alt="Del Rosario" style="width:100%; height:100%; object-fit:cover;">
                             </div>
                             <h4 style="font-family:'Bebas Neue'; font-size:1.3rem; color:white; line-height:1.1;">THARA D.<br>DEL ROSARIO</h4>
                             <p style="font-size:0.65rem; color:var(--blue); font-weight:700; margin-top:5px; text-transform:uppercase;">Computer Engineer</p>
                         </div>
-                        <div class="widget-card" style="padding:25px 10px; text-align:center;">
+                        <div class="widget-card p-6 text-center w-full sm:w-[45%] md:w-[30%] lg:w-[18%]">
                             <div style="width:90px; height:90px; border-radius:50%; overflow:hidden; margin:0 auto 15px; border:2px solid var(--blue);">
                                 <img src="../assets/2x2_Migallos.png" alt="Migallos" style="width:100%; height:100%; object-fit:cover;">
                             </div>
                             <h4 style="font-family:'Bebas Neue'; font-size:1.3rem; color:white; line-height:1.1;">ARVIN N.<br>MIGALLOS</h4>
                             <p style="font-size:0.65rem; color:var(--blue); font-weight:700; margin-top:5px; text-transform:uppercase;">Computer Engineer</p>
                         </div>
-                        <div class="widget-card" style="padding:25px 10px; text-align:center;">
+                        <div class="widget-card p-6 text-center w-full sm:w-[45%] md:w-[30%] lg:w-[18%]">
                             <div style="width:90px; height:90px; border-radius:50%; overflow:hidden; margin:0 auto 15px; border:2px solid var(--blue);">
                                 <img src="../assets/2x2_Trinidad.png" alt="Trinidad" style="width:100%; height:100%; object-fit:cover;">
                             </div>
@@ -161,9 +173,9 @@
         </div>
     </main>
 
-    <footer class="footer-bg" style="padding: 60px 24px 20px;">
-        <div style="max-width:1200px; margin:0 auto;">
-            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:48px; margin-bottom:48px;" class="footer-grid">
+    <footer class="footer-bg px-6 py-12 md:py-16">
+        <div class="max-w-[1200px] mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr] gap-10 md:gap-12 mb-12">
                 <div>
                     <div class="logo-text" style="font-size:1.8rem; margin-bottom:16px;">B<span class="logo-dot">E</span>AT</div>
                     <p style="color:var(--gray); font-size:0.95rem; line-height:1.7; max-width:320px;">Your trusted neighborhood watch platform. Keeping communities safe through real-time updates.</p>
@@ -173,7 +185,7 @@
                     <div class="blue-line" style="margin-bottom:20px;"></div>
                     <div style="display:flex; flex-direction:column; gap:12px;">
                         <a href="index.html" class="nav-link">Home</a>
-                        <span class="nav-link">Live Map</span>
+                        <a href="map.html" class="nav-link">Live Map</a>
                         <a href="report.html" class="nav-link">Report</a>
                         <a href="news.html" class="nav-link">News</a>
                         <a href="about.html" class="nav-link">About</a>
@@ -195,6 +207,7 @@
         </div>
     </footer>
 
+    <script src="initial.js"></script>
     <script>if (window.lucide) lucide.createIcons();</script>
 </body>
 </html>
