@@ -8,13 +8,12 @@
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
- <style>
+  <style>
     body { font-family: 'DM Sans', sans-serif !important; }
     
     /* SIDEBAR */
     .sidebar { width: 260px !important; flex-shrink: 0 !important; }
     
-    /* ✅ PERFECT SIZING: 14.5px text, 20px icons, clean padding */
     .sidebar-item { 
       display: flex !important; align-items: center !important; gap: 12px !important;
       padding: 12px 18px !important; font-size: 14.5px !important; 
@@ -35,14 +34,13 @@
     .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
     .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; }
     .hidden { display: none !important; }
-    .modal-card { background: #151b2d; border: 1px solid #2d3748; border-radius: 1.25rem; }
     
     /* Input Styling */
     .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 8px 12px; transition: all 0.2s; }
     .modal-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
     .input-error { border-color: #ef4444 !important; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important; }
     
-    /* ✅ ULTIMATE AUTOFILL FIX: Prevents browser from turning inputs black/transparent */
+    /* AUTOFILL FIX */
     input:-webkit-autofill,
     input:-webkit-autofill:hover, 
     input:-webkit-autofill:focus, 
@@ -54,7 +52,7 @@
         transition: background-color 5000s ease-in-out 0s;
     }
     
-    /* CUSTOM SELECT ARROW */
+    /* Custom Select & Date Overrides */
     select { 
       appearance: none; 
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); 
@@ -63,22 +61,32 @@
       background-size: 1em; 
       padding-right: 2.5rem !important;
     }
+    input[type="date"] { color-scheme: dark; }
 
-    /* Tables & Toggles */
-    .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+    /* Scrollable Reports Styling */
+    .reports-scroll { max-height: 500px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #374151 transparent; }
+    .report-card { background: #1e2536; border: 1px solid #374151; transition: transform 0.2s; }
+    .report-card:hover { transform: translateX(4px); border-color: #3b82f6; }
+
+    /* Switch Component */
+    .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; inset: 0; background-color: #374151; transition: .4s; border-radius: 24px; }
-    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
     input:checked + .slider { background-color: #22c55e; }
-    input:checked + .slider:before { transform: translateX(20px); }
+    input:checked + .slider:before { transform: translateX(18px); }
   </style>
 </head>
+
 <body class="h-full flex bg-[#0a0e1a]">
-  <aside id="sidebar" class="sidebar flex flex-col h-full">
-    <div class="p-5 border-b" style="border-color:var(--border)">
+  <aside id="sidebar" class="sidebar flex flex-col h-full" style="background:var(--surface); border-right: 1px solid var(--border)">
+    <div class="h-[76px] px-5 flex items-center border-b shrink-0" style="border-color:var(--border)">
       <div class="flex items-center gap-3">
-        <div style="background:var(--accent);width:36px;height:36px;border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
-        <div><div class="font-bold text-lg tracking-widest text-white">BEAT</div><div style="color:var(--text-dim);font-size:11px">Admin Control Center</div></div>
+        <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
+        <div class="flex flex-col justify-center">
+          <div class="logo-text font-bold text-lg text-white tracking-widest leading-none mb-1">BEAT</div>
+          <div style="color:var(--text-dim); font-size:11px" class="leading-none">Admin Control Center</div>
+        </div>
       </div>
     </div>
     <nav class="flex-1 py-4 overflow-y-auto">
@@ -89,18 +97,415 @@
       <a href="traffic.html" class="sidebar-item active"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
       <a href="analytics.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
     </nav>
-    <div class="p-5 border-t mt-auto" style="border-color:var(--border)">
+    <div class="user-footer">
       <div class="flex items-center justify-between mb-5">
         <div class="flex items-center gap-3">
-          <div id="nav-avatar" style="background:#2563eb;width:42px;height:42px;border-radius:50%;background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">MA</div>
-          <div><div class="text-sm font-bold text-white">Main Admin</div><div style="color:#94a3b8;font-size:11px">System Administrator</div></div>
+          <div id="nav-avatar" style="background:#2563eb; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">MA</div>
+          <div>
+            <div class="user-footer-name">Main Admin</div>
+            <div class="user-footer-sub">System Administrator</div>
+          </div>
         </div>
-        <a href="profile.html" class="text-[#94a3b8] hover:text-blue-500 transition-colors"><i data-lucide="settings" style="width:18px;height:18px"></i></a>
+        <a href="profile.html" class="settings-link"><i data-lucide="settings" style="width:18px; height:18px"></i></a>
       </div>
-      <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white"><i data-lucide="log-out" style="width:16px;height:16px"></i> Logout</button>
+      <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
+        <i data-lucide="log-out" style="width:16px; height:16px"></i> Logout
+      </button>
     </div>
   </aside>
-  <main class="flex-1 overflow-y-auto"><header class="px-8 py-5 border-b" style="border-color:var(--border);background:var(--surface)"><h1 class="text-xl font-semibold text-white flex items-center gap-2"><i data-lucide="car"></i>Traffic and Road Control</h1></header><div class="p-8 animate-in"><div class="card"><h3 class="font-semibold flex items-center gap-2 mb-4"><i data-lucide="traffic-cone" style="color:var(--warn)"></i> Master Road List</h3><div style="overflow-x:auto"><table><thead><tr><th>Road Name</th><th>Segment</th><th>Status</th></tr></thead><tbody id="roads-table-body"></tbody></table></div></div></div></main>
-  <script src="js/app.js"></script><script>document.addEventListener('DOMContentLoaded', () => { populateTraffic(); lucide.createIcons(); });</script>
+
+  <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] relative">
+    <header class="h-[76px] px-8 flex items-center justify-between border-b shrink-0" style="border-color:var(--border); background:var(--surface)">
+      <h1 class="text-xl font-semibold text-white flex items-center gap-2"><i data-lucide="car"></i> Traffic Control</h1>
+      
+      <div class="flex items-center gap-4">
+        <button class="px-3 py-1.5 rounded-lg flex items-center gap-2.5 shadow-sm border hover:bg-gray-800 transition-all" style="background:var(--surface2); border-color:var(--border)">
+          <i data-lucide="sun" class="w-3.5 h-3.5 text-yellow-500"></i>
+          <span class="text-xs font-semibold text-white">28°C</span>
+          <div class="w-px h-3 bg-gray-700"></div>
+          <span class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Sunny</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-8 animate-in">
+      <div class="max-w-[1400px] mx-auto space-y-6">
+        
+        <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div class="relative w-full md:w-1/2 flex items-center">
+            <i data-lucide="search" class="absolute left-3 w-4 h-4 text-gray-400"></i>
+            <input type="text" id="roadSearch" placeholder="Search for a specific road or intersection..." 
+                   class="w-full h-10 bg-[#1e2536] border border-gray-700 rounded-lg pl-10 pr-4 text-sm text-white focus:border-blue-500 outline-none transition-all">
+          </div>
+          <div class="flex gap-2">
+            <button id="newEntryBtn" class="h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold flex items-center gap-2 transition-all shadow-lg">
+              <i data-lucide="plus" class="w-4 h-4"></i> New Entry
+            </button>
+            <button id="refreshBtn" class="h-10 px-3 bg-[#1e2536] border border-gray-700 text-white rounded-lg hover:bg-gray-800 transition-all" title="Refresh Table">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 border rounded-xl p-6 shadow-sm" style="background:var(--surface); border-color:var(--border)">
+            <h3 class="font-semibold text-white mb-4 flex items-center gap-2"><i data-lucide="list"></i> Master Road List</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm text-slate-300">
+                <thead class="bg-[#1e2536] text-[#94a3b8]">
+                  <tr>
+                    <th class="px-4 py-3 rounded-l-lg">Road Name</th>
+                    <th class="px-4 py-3 text-center">Status</th>
+                    <th class="px-4 py-3 text-center">Auto-Alert</th>
+                    <th class="px-4 py-3 rounded-r-lg text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="roads-table-body" class="divide-y divide-gray-700/30">
+                  </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="border rounded-xl p-6 shadow-sm" style="background:var(--surface); border-color:var(--border)">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-semibold text-white flex items-center gap-2"><i data-lucide="megaphone" class="text-red-400"></i> Local Reports</h3>
+              <span class="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full font-bold">LIVE</span>
+            </div>
+            
+            <div class="reports-scroll pr-2 space-y-3">
+              <div class="report-card p-3 rounded-lg">
+                <div class="flex justify-between text-[11px] mb-1">
+                  <span class="text-blue-400 font-bold">ACCIDENT</span>
+                  <span class="text-gray-500">2m ago</span>
+                </div>
+                <p class="text-xs text-white">Minor fender bender at Crossing. Expect delays.</p>
+              </div>
+              
+              <div class="report-card p-3 rounded-lg">
+                <div class="flex justify-between text-[11px] mb-1">
+                  <span class="text-yellow-400 font-bold">CONSTRUCTION</span>
+                  <span class="text-gray-500">15m ago</span>
+                </div>
+                <p class="text-xs text-white">Road repairs near University gate, lane closed.</p>
+              </div>
+
+              <div class="report-card p-3 rounded-lg">
+                <div class="flex justify-between text-[11px] mb-1">
+                  <span class="text-green-400 font-bold">CLEAR</span>
+                  <span class="text-gray-500">1h ago</span>
+                </div>
+                <p class="text-xs text-white">Bypass road now clear of previous debris.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="newEntryModal" class="modal-overlay hidden">
+      <div class="border w-[550px] max-w-[90%] rounded-2xl p-8 max-h-[90vh] overflow-y-auto shadow-2xl" style="background:var(--surface); border-color:var(--border)">
+        <h2 class="text-white font-bold text-xl mb-6 flex items-center gap-2 justify-center">
+          <i data-lucide="plus-circle" class="text-blue-500 w-6 h-6"></i> Add New Road
+        </h2>
+        <div class="space-y-4 text-left">
+          <div>
+            <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Road Name</label>
+            <input type="text" id="newRoadName" class="modal-input text-sm" placeholder="e.g., Ortigas Avenue">
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Traffic Status</label>
+            <select id="newRoadStatus" class="modal-input text-sm cursor-pointer">
+              <option value="Clear">Clear</option>
+              <option value="Moderate">Moderate</option>
+              <option value="Heavy">Heavy Traffic</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Enable Auto-Alert</label>
+            <label class="switch">
+              <input type="checkbox" id="newRoadAlert" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="flex justify-end gap-3 mt-8 pt-4">
+          <button id="cancelEntryBtn" class="px-6 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">Cancel</button>
+          <button id="saveEntryBtn" class="px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg">Save Entry</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="deleteConfirmModal" class="modal-overlay hidden">
+      <div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
+        <div style="background:#ef4444; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-red-500/20">
+          <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+        </div>
+        <h2 class="text-white font-bold text-xl mb-3">Confirm Deletion</h2>
+        <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to delete <span id="deleteRoadNameDisplay" class="font-bold text-white"></span>? This action cannot be undone.</p>
+        
+        <div class="flex gap-3">
+          <button id="cancelDeleteBtn" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
+          <button id="confirmDeleteBtn" class="flex-1 bg-[#ef4444] hover:bg-red-600 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Delete</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => { 
+      if (typeof populateTraffic === 'function') populateTraffic(); 
+      if (window.lucide) lucide.createIcons();
+
+      const tbody = document.getElementById('roads-table-body');
+      
+      // Initialize saved roads from local storage
+      let customRoads = JSON.parse(localStorage.getItem('customRoads')) || [];
+
+      // --- LIVE SEARCH FUNCTIONALITY ---
+      const searchInput = document.getElementById('roadSearch');
+      searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const rows = tbody.querySelectorAll('tr');
+        
+        rows.forEach(row => {
+          const roadNameCell = row.querySelector('td:first-child');
+          if (roadNameCell) {
+            const roadName = roadNameCell.textContent.toLowerCase();
+            if (roadName.includes(searchTerm)) {
+              row.style.display = '';
+            } else {
+              row.style.display = 'none';
+            }
+          }
+        });
+      });
+
+      // --- AUTOMATIC DATA & CUSTOM ROADS INTEGRATION ---
+      async function loadRoadData() {
+        try {
+          // 1. Load Simulated mock data
+          const pasigData = [
+            { name: "C. Raymundo Ave", status: "Heavy", alert: true },
+            { name: "Ortigas Ave Ext", status: "Moderate", alert: true },
+            { name: "Shaw Blvd", status: "Clear", alert: false }
+          ];
+
+          pasigData.forEach(road => {
+            let statusColor = '';
+            if (road.status === 'Clear') statusColor = 'text-green-400 bg-green-500/10';
+            else if (road.status === 'Moderate') statusColor = 'text-yellow-400 bg-yellow-500/10';
+            else if (road.status === 'Heavy') statusColor = 'text-orange-400 bg-orange-500/10';
+            else if (road.status === 'Closed') statusColor = 'text-red-400 bg-red-500/10';
+
+            const newRow = document.createElement('tr');
+            newRow.className = "hover:bg-white/[0.02] transition-colors";
+            newRow.innerHTML = `
+              <td class="px-4 py-3 font-medium text-white">${road.name}</td>
+              <td class="px-4 py-3 text-center">
+                <span class="px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase ${statusColor}">
+                  ${road.status}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <label class="switch">
+                  <input type="checkbox" data-name="${road.name}" ${road.alert ? 'checked' : ''}>
+                  <span class="slider"></span>
+                </label>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <i data-lucide="lock" class="w-4 h-4 text-gray-600 mx-auto" title="System Data - Cannot Delete"></i>
+              </td>
+            `;
+            tbody.prepend(newRow);
+          });
+
+          // 2. Load custom user-added roads from localStorage
+          customRoads.forEach(road => {
+            let statusColor = '';
+            if (road.status === 'Clear') statusColor = 'text-green-400 bg-green-500/10';
+            else if (road.status === 'Moderate') statusColor = 'text-yellow-400 bg-yellow-500/10';
+            else if (road.status === 'Heavy') statusColor = 'text-orange-400 bg-orange-500/10';
+            else if (road.status === 'Closed') statusColor = 'text-red-400 bg-red-500/10';
+
+            const newRow = document.createElement('tr');
+            newRow.className = "hover:bg-white/[0.02] transition-colors";
+            newRow.innerHTML = `
+              <td class="px-4 py-3 font-medium text-white">${road.name}</td>
+              <td class="px-4 py-3 text-center">
+                <span class="px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase ${statusColor}">
+                  ${road.status}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <label class="switch">
+                  <input type="checkbox" data-name="${road.name}" ${road.alert ? 'checked' : ''}>
+                  <span class="slider"></span>
+                </label>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <button class="delete-road-btn text-gray-500 hover:text-red-500 transition-colors" data-name="${road.name}" title="Delete Custom Entry">
+                  <i data-lucide="trash-2" class="w-4 h-4 mx-auto pointer-events-none"></i>
+                </button>
+              </td>
+            `;
+            tbody.prepend(newRow);
+          });
+
+          if (window.lucide) window.lucide.createIcons();
+          
+        } catch (error) {
+          console.error("Failed to load data:", error);
+        }
+      }
+      
+      // Execute the function automatically on load
+      loadRoadData();
+
+      // --- SAVE TOGGLE CHANGES TO LOCAL STORAGE ---
+      tbody.addEventListener('change', (e) => {
+        if (e.target.tagName === 'INPUT' && e.target.type === 'checkbox') {
+          const roadName = e.target.getAttribute('data-name');
+          
+          const roadIndex = customRoads.findIndex(r => r.name === roadName);
+          
+          if (roadIndex !== -1) {
+            customRoads[roadIndex].alert = e.target.checked;
+            localStorage.setItem('customRoads', JSON.stringify(customRoads));
+          }
+        }
+      });
+
+      // --- CUSTOM DELETE CONFIRMATION LOGIC ---
+      const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+      const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+      const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+      const deleteRoadNameDisplay = document.getElementById('deleteRoadNameDisplay');
+      
+      let roadToDelete = null;
+      let rowToDelete = null;
+
+      tbody.addEventListener('click', (e) => {
+        const deleteBtn = e.target.closest('.delete-road-btn');
+        if (deleteBtn) {
+          roadToDelete = deleteBtn.getAttribute('data-name');
+          rowToDelete = deleteBtn.closest('tr');
+          deleteRoadNameDisplay.textContent = roadToDelete;
+          deleteConfirmModal.classList.remove('hidden');
+        }
+      });
+
+      const closeDeleteModal = () => {
+        deleteConfirmModal.classList.add('hidden');
+        roadToDelete = null;
+        rowToDelete = null;
+      };
+
+      cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+
+      confirmDeleteBtn.addEventListener('click', () => {
+        if (roadToDelete && rowToDelete) {
+          // Remove from array
+          customRoads = customRoads.filter(r => r.name !== roadToDelete);
+          // Save to local storage
+          localStorage.setItem('customRoads', JSON.stringify(customRoads));
+          // Remove row from UI
+          rowToDelete.remove();
+          
+          closeDeleteModal();
+        }
+      });
+
+      // --- REFRESH BUTTON INTERACTIVITY ---
+      const refreshBtn = document.getElementById('refreshBtn');
+
+      refreshBtn.addEventListener('click', () => {
+        const currentIcon = refreshBtn.querySelector('svg, i');
+        if (currentIcon) currentIcon.classList.add('animate-spin');
+
+        tbody.innerHTML = '';
+        searchInput.value = '';
+
+        setTimeout(() => {
+          loadRoadData();
+          if (typeof populateTraffic === 'function') populateTraffic(); 
+          
+          const updatedIcon = refreshBtn.querySelector('svg, i');
+          if (updatedIcon) updatedIcon.classList.remove('animate-spin');
+        }, 800);
+      });
+
+      // --- NEW ENTRY LOGIC ---
+      const modal = document.getElementById('newEntryModal');
+      const newEntryBtn = document.getElementById('newEntryBtn');
+      const cancelEntryBtn = document.getElementById('cancelEntryBtn');
+      const saveEntryBtn = document.getElementById('saveEntryBtn');
+      const roadNameInput = document.getElementById('newRoadName');
+
+      newEntryBtn.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+        roadNameInput.focus();
+      });
+
+      const closeModal = () => {
+        modal.classList.add('hidden');
+        roadNameInput.value = ''; 
+      };
+      
+      cancelEntryBtn.addEventListener('click', closeModal);
+
+      saveEntryBtn.addEventListener('click', () => {
+        const name = roadNameInput.value.trim();
+        const status = document.getElementById('newRoadStatus').value;
+        const alertEnabled = document.getElementById('newRoadAlert').checked;
+
+        if (!name) return alert('Please enter a road name.');
+
+        customRoads.push({ name, status, alert: alertEnabled });
+        localStorage.setItem('customRoads', JSON.stringify(customRoads));
+
+        let statusColor = '';
+        if (status === 'Clear') statusColor = 'text-green-400 bg-green-500/10';
+        else if (status === 'Moderate') statusColor = 'text-yellow-400 bg-yellow-500/10';
+        else if (status === 'Heavy') statusColor = 'text-orange-400 bg-orange-500/10';
+        else if (status === 'Closed') statusColor = 'text-red-400 bg-red-500/10';
+
+        const newRow = document.createElement('tr');
+        newRow.className = "hover:bg-white/[0.02] transition-colors";
+        newRow.innerHTML = `
+          <td class="px-4 py-3 font-medium text-white">${name}</td>
+          <td class="px-4 py-3 text-center">
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase ${statusColor}">
+              ${status}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-center">
+            <label class="switch">
+              <input type="checkbox" data-name="${name}" ${alertEnabled ? 'checked' : ''}>
+              <span class="slider"></span>
+            </label>
+          </td>
+          <td class="px-4 py-3 text-center">
+            <button class="delete-road-btn text-gray-500 hover:text-red-500 transition-colors" data-name="${name}" title="Delete Custom Entry">
+              <i data-lucide="trash-2" class="w-4 h-4 mx-auto pointer-events-none"></i>
+            </button>
+          </td>
+        `;
+
+        tbody.prepend(newRow);
+        
+        // Re-initialize lucide icons so the new trash icon renders immediately
+        if (window.lucide) window.lucide.createIcons();
+        
+        searchInput.value = '';
+        const rows = tbody.querySelectorAll('tr');
+        rows.forEach(row => row.style.display = '');
+
+        closeModal();
+      });
+    });
+  </script>
 </body>
 </html>
