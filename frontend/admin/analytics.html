@@ -57,6 +57,39 @@
     .audit-container::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
     .audit-container::-webkit-scrollbar-thumb:hover { background: #4b5563; }
 
+    /* =========================================
+       EXTRACTED INLINE STYLES 
+       ========================================= */
+       
+    /* Theme Variables Applied */
+    .bg-surface { background: var(--surface); }
+    .border-theme { border-color: var(--border); }
+    .text-accent { color: var(--accent); }
+    
+    /* UI Elements */
+    .logo-box-sm { 
+      background: var(--accent); 
+      width: 36px; 
+      height: 36px; 
+      border-radius: 10px; 
+    }
+    .avatar-circle { 
+      background: #2563eb; 
+      width: 42px; 
+      height: 42px; 
+      border-radius: 50%; 
+      background-size: cover; 
+    }
+    .text-dim-xs { color: var(--text-dim); font-size: 11px; }
+    
+    /* Icon Sizes */
+    .icon-xs { width: 16px; height: 16px; }
+    .icon-sm { width: 18px; height: 18px; }
+    
+    /* Input Padding Adjustments */
+    .search-input-py { padding-top: 8px; padding-bottom: 8px; }
+    .dropdown-py { padding: 4px 8px; }
+
     /* PRINT SPECIFIC STYLING */
     @media print {
         /* Hide everything except the audit trail */
@@ -100,13 +133,13 @@
   </style>
 </head>
 <body class="h-full flex bg-[#0a0e1a]">
-  <aside id="sidebar" class="sidebar flex flex-col h-full border-r border-gray-800/50" style="background:var(--surface)">
-    <div class="h-[76px] px-5 flex items-center border-b shrink-0" style="border-color:var(--border)">
+  <aside id="sidebar" class="sidebar flex flex-col h-full border-r border-gray-800/50 bg-surface">
+    <div class="h-[76px] px-5 flex items-center border-b shrink-0 border-theme">
       <div class="flex items-center gap-3">
-        <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
+        <div class="logo-box-sm flex items-center justify-center font-bold text-white text-sm">B</div>
         <div class="flex flex-col justify-center">
           <div class="logo-text font-bold text-lg text-white tracking-widest leading-none mb-1">BEAT</div>
-          <div style="color:var(--text-dim); font-size:11px" class="leading-none">Admin Control Center</div>
+          <div class="text-dim-xs leading-none">Admin Control Center</div>
         </div>
       </div>
     </div>
@@ -122,28 +155,28 @@
     <div class="user-footer">
       <div class="flex items-center justify-between mb-5">
         <div class="flex items-center gap-3">
-          <div id="nav-avatar" style="background:#2563eb; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">MA</div>
+          <div id="nav-avatar" class="avatar-circle flex items-center justify-center text-white font-bold text-sm shadow-lg">MA</div>
           <div>
             <div class="user-footer-name">Main Admin</div>
             <div class="user-footer-sub">System Administrator</div>
           </div>
         </div>
-        <a href="profile.html" class="settings-link"><i data-lucide="settings" style="width:18px; height:18px"></i></a>
+        <a href="profile.html" class="settings-link"><i data-lucide="settings" class="icon-sm"></i></a>
       </div>
       <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
-        <i data-lucide="log-out" style="width:16px; height:16px"></i> Logout
+        <i data-lucide="log-out" class="icon-xs"></i> Logout
       </button>
     </div>
   </aside>
 
   <main class="flex-1 overflow-y-auto">
-    <header class="px-8 h-[76px] flex items-center justify-between border-b shrink-0" style="border-color:var(--border);background:var(--surface)">
+    <header class="px-8 h-[76px] flex items-center justify-between border-b shrink-0 border-theme bg-surface">
       <h1 class="text-xl font-semibold flex items-center gap-2 text-white">
         <i data-lucide="bar-chart-3"></i>
         Analytics & Audit
       </h1>
       <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 bg-[#1e2536] hover:bg-gray-800 text-white text-sm font-medium rounded-lg border border-gray-700 transition-colors">
-        <i data-lucide="printer" style="width:16px; height:16px"></i> Print / Export Logs
+        <i data-lucide="printer" class="icon-xs"></i> Print / Export Logs
       </button>
     </header>
 
@@ -151,15 +184,15 @@
       
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <div id="audit-section" class="audit-card lg:col-span-2 card border border-gray-800/50 rounded-xl p-6 shadow-sm flex flex-col h-[600px]" style="background:var(--surface);">
+        <div id="audit-section" class="audit-card lg:col-span-2 card border border-gray-800/50 rounded-xl p-6 shadow-sm flex flex-col h-[600px] bg-surface">
           <div class="flex items-center justify-between mb-4">
             <h3 class="font-semibold flex items-center gap-2 text-white text-lg">
-              <i data-lucide="scroll-text" style="color:var(--accent)"></i>
+              <i data-lucide="scroll-text" class="text-accent"></i>
               System Audit Trail
             </h3>
             <div class="search-container relative w-72">
-              <i data-lucide="search" class="absolute left-3 top-2.5 text-gray-500" style="width:16px; height:16px"></i>
-              <input type="text" id="auditSearch" placeholder="Search logs by admin, action, IP..." class="modal-input !mt-0 !pl-9 text-sm" style="padding-top:8px; padding-bottom:8px;">
+              <i data-lucide="search" class="absolute left-3 top-2.5 text-gray-500 icon-xs"></i>
+              <input type="text" id="auditSearch" placeholder="Search logs by admin, action, IP..." class="modal-input !mt-0 !pl-9 text-sm search-input-py">
             </div>
           </div>
           
@@ -241,10 +274,10 @@
 
         <div class="charts-container flex flex-col gap-6 h-[600px]">
           
-          <div class="card border border-gray-800/50 rounded-xl p-5 shadow-sm flex flex-col shrink-0 h-[260px]" style="background:var(--surface)">
+          <div class="card border border-gray-800/50 rounded-xl p-5 shadow-sm flex flex-col shrink-0 h-[260px] bg-surface">
             <div class="flex items-center justify-between mb-3 shrink-0">
               <h3 class="font-semibold flex items-center gap-2 text-white">
-                <i data-lucide="pie-chart" style="color:var(--accent)"></i>
+                <i data-lucide="pie-chart" class="text-accent"></i>
                 Report Categories
               </h3>
             </div>
@@ -253,13 +286,13 @@
             </div>
           </div>
 
-          <div class="card border border-gray-800/50 rounded-xl p-6 shadow-sm flex flex-col flex-1" style="background:var(--surface)">
+          <div class="card border border-gray-800/50 rounded-xl p-6 shadow-sm flex flex-col flex-1 bg-surface">
             <div class="flex items-center justify-between mb-4">
               <h3 class="font-semibold flex items-center gap-2 text-white">
-                <i data-lucide="activity" style="color:var(--accent)"></i>
+                <i data-lucide="activity" class="text-accent"></i>
                 Report Frequency
               </h3>
-              <select id="freqDropdown" onchange="updateFrequencyChart()" class="modal-input !mt-0 !w-auto text-xs cursor-pointer" style="padding:4px 8px;">
+              <select id="freqDropdown" onchange="updateFrequencyChart()" class="modal-input !mt-0 !w-auto text-xs cursor-pointer dropdown-py">
                 <option value="This Week">This Week</option>
                 <option value="This Month">This Month</option>
                 <option value="This Year">This Year</option>
