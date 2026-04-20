@@ -605,55 +605,53 @@ function executeSubmitReport() {
     const timeStr = `${hours}:${minStr} ${ampm}`;
 
     // TEMPLATE FOR INCOMING REPORTS (No Return Reason)
-    // Inside your fetch loop in app.js
-const newCardHTML = `
-    <div class="report-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors animate-in" 
-         style="background:var(--surface); border-color:var(--border)" 
-         onclick="openReportDetails(this)" 
-         data-id="${report._id}" 
-         data-email="${escapeHTML(report.reporter_email)}" 
-         data-contact="${escapeHTML(report.contact_number)}">
-      
-      <div class="flex justify-between items-start mb-4">
-        <div>
-          <p class="text-xs font-bold text-white report-date">${new Date(report.createdAt).toLocaleDateString()}</p>
-          <p class="text-xs text-[#94a3b8]">${new Date(report.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+    const newCardHTML = `
+        <div class="report-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors animate-in" 
+             style="background:var(--surface); border-color:var(--border)" 
+             onclick="openReportDetails(this)" 
+             data-email="${escapeHTML(email)}" 
+             data-contact="${escapeHTML(contact)}">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <p class="text-xs font-bold text-white report-date">${dateStr}</p>
+              <p class="text-xs text-[#94a3b8]">${timeStr}</p>
+            </div>
+            <span class="badge-status bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all">New</span>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-4 hover:text-blue-400 transition-colors">${escapeHTML(subject)}</h3>
+          <div class="space-y-1 text-sm mb-4">
+            <p><span class="text-[#94a3b8]">Name of reportee:</span> <span class="text-white font-semibold">${escapeHTML(name)}</span></p>
+            <p><span class="text-[#94a3b8]">Location:</span> <span class="text-white font-semibold">${escapeHTML(location)}</span></p>
+          </div>
+          <div class="text-sm mb-6">
+            <p class="text-[#94a3b8] mb-1">Description:</p>
+            <p class="text-slate-300 leading-relaxed line-clamp-3">${escapeHTML(desc)}</p>
+          </div>
+          <div class="mt-auto pt-4 border-t space-y-4 text-sm" style="border-color:var(--border)" onclick="event.stopPropagation()">
+            <div>
+              <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2">FORWARD TO</p>
+              <select class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500 cursor-pointer transition-all" onfocus="storePrevValue(this)" onchange="handleForward(this)">
+                <option value="" disabled selected hidden>Select department...</option>
+                ${departments.map(d => `<option value="${d}">${d}</option>`).join('')}
+              </select>
+            </div>
+            <div class="flex items-center justify-between mt-4">
+              <p class="text-[11px] font-bold text-white uppercase tracking-wider">Mark as Resolved</p>
+              <label class="switch" onclick="event.stopPropagation()">
+                <input type="checkbox" onchange="handleReportToggle(event, this)">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
         </div>
-        <span class="badge-status bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all">${report.status || 'Pending'}</span>
-      </div>
-      
-      <h3 class="text-lg font-bold text-white mb-4 hover:text-blue-400 transition-colors">${escapeHTML(report.report_subject)}</h3>
-      
-      <div class="space-y-1 text-sm mb-4">
-        <p><span class="text-[#94a3b8]">Name of reportee:</span> <span class="text-white font-semibold">${escapeHTML(report.reporter_name)}</span></p>
-        <p><span class="text-[#94a3b8]">Location:</span> <span class="text-white font-semibold">${escapeHTML(report.report_location)}</span></p>
-      </div>
-      
-      <div class="text-sm mb-6">
-        <p class="text-[#94a3b8] mb-1">Description:</p>
-        <p class="text-slate-300 leading-relaxed line-clamp-3">${escapeHTML(report.report_description)}</p>
-      </div>
-      
-      <div class="mt-auto pt-4 border-t space-y-4 text-sm" style="border-color:var(--border)" onclick="event.stopPropagation()">
-        <div>
-          <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2">FORWARD TO</p>
-          <select class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500 cursor-pointer transition-all" onfocus="storePrevValue(this)" onchange="handleForward(this)">
-            <option value="" disabled selected hidden>Select department...</option>
-            <option value="Traffic">Traffic</option>
-            <option value="DRRMO">DRRMO</option>
-          </select>
-        </div>
-        
-        <div class="flex items-center justify-between mt-4">
-          <p class="text-[11px] font-bold text-white uppercase tracking-wider">Mark as Resolved</p>
-          <label class="switch" onclick="event.stopPropagation()">
-            <input type="checkbox" onchange="handleReportToggle(event, this)" ${report.status === 'Resolved' ? 'checked' : ''}>
-            <span class="slider"></span>
-          </label>
-        </div>
-      </div>
-    </div>
-`;
+    `;
+
+    const grid = document.getElementById('reports-grid');
+    if (grid) grid.insertAdjacentHTML('afterbegin', newCardHTML);
+
+    clearAndCloseReport();
+    if(window.lucide) lucide.createIcons();
+}
 
 function clearAndCloseReport() {
     ['report-name', 'report-email', 'report-contact', 'report-location', 'report-subject', 'report-desc'].forEach(id => {
@@ -769,50 +767,29 @@ function handleReportToggle(e, checkbox) {
     }
 }
 
-async function confirmResolution() {
+function confirmResolution() {
     if (pendingReportToggle) {
         const card = pendingReportToggle.closest('.report-card');
-        const reportId = card.getAttribute('data-id'); // Get the MongoDB ID
-        
-        try {
-            // 1. Tell the server to update the database
-            const response = await fetch(`https://beat-pasig-api.onrender.com/api/report/${reportId}`, {
-                method: 'PUT', // or PATCH, depending on what Arvin setup
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: 'Resolved' })
-            });
-
-            const result = await response.json();
-
-            // 2. If the database updated successfully, change the UI
-            if (result.success) {
-                const badge = card.querySelector('.badge-status');
-                const select = card.querySelector('select');
-                
-                if (badge && !badge.hasAttribute('data-orig-class')) {
-                    badge.setAttribute('data-orig-class', badge.className);
-                    badge.setAttribute('data-orig-text', badge.innerText);
-                }
-                if (badge) {
-                    badge.className = 'badge-status bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all';
-                    badge.innerText = 'Resolved';
-                }
-                if (select) {
-                    select.disabled = true;
-                    select.classList.add('opacity-50', 'cursor-not-allowed');
-                }
-
-                card.classList.add('opacity-70');
-                filterReports();
-            } else {
-                alert("Failed to update status in database.");
-                pendingReportToggle.checked = false; // Revert the switch if DB fails
+        if (card) {
+            const badge = card.querySelector('.badge-status');
+            const select = card.querySelector('select');
+            
+            if (badge && !badge.hasAttribute('data-orig-class')) {
+                badge.setAttribute('data-orig-class', badge.className);
+                badge.setAttribute('data-orig-text', badge.innerText);
             }
-        } catch (error) {
-            console.error("Error updating report:", error);
-            pendingReportToggle.checked = false; 
+            if (badge) {
+                badge.className = 'badge-status bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all';
+                badge.innerText = 'Resolved';
+            }
+            if (select) {
+                select.disabled = true;
+                select.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+
+            card.classList.add('opacity-70');
+            filterReports();
         }
-        
         pendingReportToggle = null; 
     }
     closeModal('resolve-modal');
