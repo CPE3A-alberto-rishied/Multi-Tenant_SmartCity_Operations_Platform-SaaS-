@@ -6,6 +6,7 @@
   <title>BEAT - Dept Announcements</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
 </head>
 <body class="h-full flex bg-[#0a0e1a]">
@@ -15,40 +16,42 @@
       <div class="flex items-center gap-3">
         <div class="logo-box">B</div>
         <div class="flex flex-col justify-center">
-          <div class="logo-text font-bold text-lg text-white leading-none mb-1">BEAT</div>
-          <div class="text-[11px] text-[#94a3b8] leading-none">Department Portal</div>
+          <div class="logo-text font-bold text-white">BEAT</div>
+          <div class="sidebar-subtext">Department Portal</div>
         </div>
       </div>
     </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
       <a href="dashboard2.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
-      <a href="reports2.html" class="sidebar-item"><i data-lucide="alert-triangle"></i><span>Public Reports</span></a>
+      <a href="reports2.html" class="sidebar-item"><i data-lucide="file-text"></i><span>Public Reports</span></a>
       <a href="announcements2.html" class="sidebar-item active"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
       <a href="traffic2.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
       <a href="analytics2.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
     </nav>
 
     <div class="user-footer">
-      <div class="flex items-center justify-between mb-5">
-        <div class="flex items-center gap-3">
-          <div id="nav-avatar" class="nav-avatar"></div>
-          <div>
-            <div class="user-footer-name">Loading...</div>
-            <div class="user-footer-sub">Loading...</div>
-          </div>
+        <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-3">
+                <div id="nav-avatar" class="nav-avatar"></div>
+                <div>
+                  <div class="user-footer-name">Loading...</div>
+                  <div class="user-footer-sub">Loading...</div>
+                </div>
+            </div>
+            <a href="profile2.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
         </div>
-        <a href="profile2.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
-      </div>
-      <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border theme-border hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
-        <i data-lucide="log-out" class="icon-sm"></i> Logout
-      </button>
+        <button onclick="doLogout()" class="btn-logout">
+            <i data-lucide="log-out" class="icon-sm"></i> Logout
+        </button>
     </div>
   </aside>
 
   <main class="flex-1 overflow-y-auto flex flex-col relative">
-    <header class="px-8 h-[76px] flex items-center border-b shrink-0 theme-surface theme-border-b">
-      <h1 class="text-xl font-semibold text-white flex items-center gap-2">Announcement Manager</h1>
+    <header class="px-8 h-[76px] flex items-center shrink-0 theme-surface theme-border-b">
+      <h1 class="text-xl font-semibold text-white flex items-center gap-2">
+        <i data-lucide="megaphone" class="icon-lg"></i> Announcement Manager
+      </h1>
     </header>
 
     <div class="p-8 flex-1 relative flex flex-col">
@@ -158,6 +161,6 @@
   <div id="confirm-action-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div id="action-icon-bg" class="modal-icon-circle"><i id="action-icon"></i></div><h2 id="action-title" class="text-white font-bold text-xl mb-3">Confirm Action?</h2><p id="action-desc" class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure?</p><div class="flex gap-3"><button onclick="closeModal('confirm-action-modal')" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="executeCardAction()" id="btn-action-confirm" class="flex-1 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Confirm</button></div></div></div>
   <div id="success-submit-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-green"><i data-lucide="check-circle"></i></div><h2 class="text-white font-bold text-xl mb-3">Success</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Your announcement action was completed successfully.</p><button onclick="closeModal('success-submit-modal')" class="w-full bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Done</button></div></div>
 
-<script src="js/app2.js"></script>
+  <script src="js/app2.js"></script>
 </body>
 </html>

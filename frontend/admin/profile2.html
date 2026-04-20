@@ -6,6 +6,7 @@
   <title>BEAT - Dept Profile</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
 </head>
 <body class="h-full flex bg-[#0a0e1a]">
@@ -20,15 +21,15 @@
       <div class="flex items-center gap-3">
         <div class="logo-box">B</div>
         <div class="flex flex-col justify-center">
-          <div class="logo-text font-bold text-lg text-white leading-none mb-1">BEAT</div>
-          <div class="text-[11px] text-[#94a3b8] leading-none">Department Portal</div>
+          <div class="logo-text font-bold text-white">BEAT</div>
+          <div class="sidebar-subtext">Department Portal</div>
         </div>
       </div>
     </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
         <a href="dashboard2.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
-        <a href="reports2.html" class="sidebar-item"><i data-lucide="alert-triangle"></i><span>Public Reports</span></a>
+        <a href="reports2.html" class="sidebar-item"><i data-lucide="file-text"></i><span>Public Reports</span></a>
         <a href="announcements2.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
         <a href="traffic2.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
         <a href="analytics2.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
@@ -37,15 +38,15 @@
     <div class="user-footer">
         <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
-                <div id="nav-avatar" class="nav-avatar"></div>
+                <div id="nav-avatar" class="nav-avatar">T</div>
                 <div>
-                  <div class="user-footer-name">Loading...</div>
-                  <div class="user-footer-sub">Loading...</div>
+                  <div class="user-footer-name">Traffic</div>
+                  <div class="user-footer-sub">Traffic Department</div>
                 </div>
             </div>
             <a href="profile2.html" class="settings-link active"><i data-lucide="settings" class="icon-md"></i></a>
         </div>
-        <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border theme-border hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
+        <button onclick="doLogout()" class="btn-logout">
             <i data-lucide="log-out" class="icon-sm"></i> Logout
         </button>
     </div>
@@ -53,14 +54,16 @@
 
   <main class="flex-1 overflow-y-auto flex flex-col items-center relative">
     <header class="w-full px-8 h-[76px] flex items-center shrink-0 theme-surface theme-border-b">
-      <h1 class="text-xl font-semibold text-white flex items-center gap-2"><i data-lucide="user"></i>Department Profile</h1>
+      <h1 class="text-xl font-semibold text-white flex items-center gap-2">
+        <i data-lucide="user" class="icon-lg"></i> Department Profile
+      </h1>
     </header>
 
     <div class="p-8 animate-in w-full max-w-2xl">
       <div class="profile-card rounded-2xl p-10 flex flex-col items-center shadow-lg relative">
         
         <div class="relative group mb-6">
-          <div id="profile-display" class="profile-display-circle"></div>
+          <div id="profile-display" class="profile-display-circle">T</div>
           <label for="avatar-input" class="absolute bottom-1 right-1 bg-blue-600 p-2.5 rounded-full cursor-pointer border-2 border-[#1e2536] hover:bg-blue-700 transition-colors">
             <i data-lucide="camera" class="text-white icon-sm"></i>
             <input type="file" id="avatar-input" class="hidden" accept="image/*" onchange="previewAvatar(this)">
@@ -68,12 +71,12 @@
         </div>
 
         <div class="text-center mb-10">
-          <h2 id="display-name" class="text-white text-2xl font-bold">Loading...</h2>
+          <h2 id="display-name" class="text-white text-2xl font-bold">Traffic</h2>
           
           <div class="badge-stack">
-            <span id="display-dept" class="text-[11px] font-bold tracking-widest bg-blue-600/20 text-blue-400 px-3 py-1.5 rounded-full uppercase w-max border border-blue-500/20">Loading...</span>
-            <span id="display-id" class="text-[11px] font-bold tracking-widest bg-gray-700/50 text-[#94a3b8] px-3 py-1.5 rounded-full uppercase w-max border border-gray-600/50">Loading...</span>
-            <span id="display-email" class="text-[11px] font-bold tracking-widest bg-gray-800/30 text-[#94a3b8] px-3 py-1.5 rounded-full lowercase w-max">Loading...</span>
+            <span id="display-dept" class="text-[11px] font-bold tracking-widest bg-blue-600/20 text-blue-400 px-3 py-1.5 rounded-full uppercase w-max border border-blue-500/20">DEPT: TRAFFIC</span>
+            <span id="display-id" class="text-[11px] font-bold tracking-widest bg-gray-700/50 text-[#94a3b8] px-3 py-1.5 rounded-full uppercase w-max border border-gray-600/50">ID: 2023104513</span>
+            <span id="display-email" class="text-[11px] font-bold tracking-widest bg-gray-800/30 text-[#94a3b8] px-3 py-1.5 rounded-full lowercase w-max">admin@beat.gov.ph</span>
           </div>
         </div>
 
@@ -81,11 +84,11 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">Full Name</label>
-              <input type="text" id="prof-username" class="modal-input text-sm">
+              <input type="text" id="prof-username" class="modal-input text-sm" value="Traffic" data-original="Traffic">
             </div>
             <div>
               <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">Email Address (Read-Only)</label>
-              <input type="email" id="prof-email" class="modal-input text-sm" readonly>
+              <input type="email" id="prof-email" class="modal-input text-sm" value="admin@beat.gov.ph" readonly>
             </div>
           </div>
 
@@ -122,13 +125,14 @@
     document.addEventListener('DOMContentLoaded', () => { 
         if(window.lucide) lucide.createIcons(); 
         
-        const activeName = localStorage.getItem('activeUserName') || 'Dept Admin';
-        const activeDept = localStorage.getItem('activeDepartment') || 'Department';
-        const activeId = localStorage.getItem('activeUserId') || 'EMP-000';
+        // This block dynamically checks memory, but defaults to the visual standard you requested
+        const activeName = localStorage.getItem('activeUserName') || 'Traffic';
+        const activeDept = localStorage.getItem('activeDepartment') || 'Traffic';
+        const activeId = localStorage.getItem('activeUserId') || '2023104513';
         const activeEmail = localStorage.getItem('activeUserEmail') || 'admin@beat.gov.ph';
         
         document.getElementById('display-name').innerText = activeName;
-        document.getElementById('display-dept').innerText = `Dept: ${activeDept}`;
+        document.getElementById('display-dept').innerText = `DEPT: ${activeDept.replace(' Department', '').trim()}`;
         document.getElementById('display-id').innerText = `ID: ${activeId}`;
         document.getElementById('display-email').innerText = activeEmail;
         
@@ -138,6 +142,12 @@
         
         const initial = activeName.charAt(0).toUpperCase();
         document.getElementById('profile-display').innerText = initial;
+        
+        // Update sidebar as well
+        document.querySelectorAll('.user-footer-name').forEach(el => el.innerText = activeName);
+        document.querySelectorAll('.user-footer-sub').forEach(el => el.innerText = activeDept.includes('Department') ? activeDept : activeDept + ' Department');
+        const navAv = document.getElementById('nav-avatar');
+        if(navAv) navAv.innerText = initial;
     });
 
     function previewAvatar(input) {
@@ -197,7 +207,7 @@
             localStorage.setItem('activeUserName', newName);
             
             let admins = JSON.parse(localStorage.getItem('beat_admins')) || [];
-            let currentId = localStorage.getItem('activeUserId');
+            let currentId = localStorage.getItem('activeUserId') || '2023104513';
             let adminRecord = admins.find(a => a.id === currentId);
             if (adminRecord) {
                 adminRecord.username = newName;
