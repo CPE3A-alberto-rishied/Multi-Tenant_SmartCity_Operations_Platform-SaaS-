@@ -7,66 +7,204 @@
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
+ <style>
+    body { font-family: 'DM Sans', sans-serif !important; }
+    
+    /* SIDEBAR */
+    .sidebar { width: 260px !important; flex-shrink: 0 !important; }
+    
+    .sidebar-item { 
+      display: flex !important; align-items: center !important; gap: 12px !important;
+      padding: 12px 18px !important; font-size: 14.5px !important; 
+      font-weight: 500 !important; color: #94a3b8 !important;
+      text-decoration: none !important; border-left: 3px solid transparent !important;
+    }
+    .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
+    .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
+    .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
+    
+    /* USER FOOTER FIXED */
+    .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
+    .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
+    .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
+    .settings-link { color: #94a3b8; transition: color 0.2s; display: flex; align-items: center; }
+    .settings-link:hover { color: #3b82f6; }
+
+    .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
+    
+    /* Input Styling */
+    .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 8px 12px; transition: all 0.2s; }
+    .modal-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
+    .input-error { border-color: #ef4444 !important; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important; }
+    
+    /* AUTOFILL FIX */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus, 
+    input:-webkit-autofill:active,
+    select:-webkit-autofill {
+        -webkit-box-shadow: 0 0 0px 1000px #1e2536 inset !important;
+        -webkit-text-fill-color: #ffffff !important;
+        caret-color: white !important;
+        transition: background-color 5000s ease-in-out 0s;
+    }
+
+    /* CUSTOM SCROLLBAR FOR AUDIT TABLE */
+    .audit-container::-webkit-scrollbar { width: 6px; }
+    .audit-container::-webkit-scrollbar-track { background: transparent; }
+    .audit-container::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
+    .audit-container::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+
+    /* =========================================
+       EXTRACTED INLINE STYLES 
+       ========================================= */
+       
+    /* Theme Variables Applied */
+    .bg-surface { background: var(--surface); }
+    .border-theme { border-color: var(--border); }
+    .text-accent { color: var(--accent); }
+    
+    /* UI Elements */
+    .logo-box-sm { 
+      background: var(--accent); 
+      width: 36px; 
+      height: 36px; 
+      border-radius: 10px; 
+    }
+    .avatar-circle { 
+      background: #2563eb; 
+      width: 42px; 
+      height: 42px; 
+      border-radius: 50%; 
+      background-size: cover; 
+    }
+    .text-dim-xs { color: var(--text-dim); font-size: 11px; }
+    
+    /* Icon Sizes */
+    .icon-xs { width: 16px; height: 16px; }
+    .icon-sm { width: 18px; height: 18px; }
+    
+    /* Input Padding Adjustments */
+    .search-input-py { padding-top: 8px; padding-bottom: 8px; }
+    .dropdown-py { padding: 4px 8px; }
+
+    /* PRINT SPECIFIC STYLING */
+    @media print {
+        .sidebar, header, .charts-container, .search-container { display: none !important; }
+        body, main { background: white !important; color: black !important; display: block !important; }
+        .audit-card { width: 100% !important; margin: 0 !important; padding: 0 !important; border: none !important; background: white !important; box-shadow: none !important; height: auto !important; }
+        .audit-card h3 { color: black !important; margin-bottom: 20px !important; }
+        .audit-card h3 svg, .audit-card h3 i { display: none !important; } 
+        .audit-container { overflow: visible !important; max-height: none !important; padding-right: 0 !important; }
+        table { width: 100% !important; border-collapse: collapse !important; }
+        thead { display: table-header-group !important; } 
+        tr { page-break-inside: avoid !important; }
+        th { background-color: #f3f4f6 !important; color: black !important; border-bottom: 2px solid #000 !important; padding: 12px !important; }
+        td { border-bottom: 1px solid #ccc !important; color: black !important; padding: 12px !important; }
+        span[class*="bg-"] { border: 1px solid #666 !important; background: transparent !important; color: black !important; padding: 2px 6px !important; }
+        * { color: black !important; }
+    }
+
+    /* =========================================
+       MOBILE RESPONSIVE DASHBOARD FIXES 
+       ========================================= */
+    @media (max-width: 1024px) {
+        .audit-card, .charts-container { height: auto !important; min-height: 450px; }
+    }
+
+    @media (max-width: 768px) {
+        body { flex-direction: column !important; }
+        
+        /* Convert Sidebar to Swipeable Top Navigation */
+        .sidebar { width: 100% !important; height: auto !important; border-right: none !important; border-bottom: 1px solid var(--border); z-index: 40; }
+        .sidebar nav { display: flex; flex-direction: row !important; overflow-x: auto; padding: 0 16px 16px 16px !important; gap: 8px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        .sidebar nav::-webkit-scrollbar { display: none; }
+        .sidebar-item { padding: 8px 16px !important; white-space: nowrap; border-left: none !important; border-bottom: 2px solid transparent !important; background: var(--surface2) !important; border-radius: 8px; flex-shrink: 0; }
+        .sidebar-item.active { border-bottom-color: #3b82f6 !important; }
+        .user-footer { display: none !important; }
+        
+        /* Adjust Header */
+        header { height: auto !important; padding: 16px !important; flex-direction: column; align-items: flex-start !important; gap: 12px; }
+        .animate-in { padding: 16px !important; }
+        
+        /* Adjust Panels */
+        .audit-card { height: 500px !important; }
+        .charts-container { height: auto !important; gap: 16px !important; }
+        .charts-container > .card { height: 350px !important; }
+        
+        /* Audit Table Fixes (Prevents Squishing) */
+        .audit-container { overflow-x: auto !important; padding-right: 0 !important; }
+        table { min-width: 700px; }
+        
+        /* Wrap Titles and Search Bars */
+        #audit-section > div:first-child { flex-direction: column; align-items: flex-start !important; gap: 12px; }
+        .search-container { width: 100% !important; }
+        .charts-container .flex.items-center.justify-between { flex-wrap: wrap; gap: 8px; }
+    }
+  </style>
 </head>
 <body class="h-full flex bg-[#0a0e1a]">
-  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface">
-    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
+  <aside id="sidebar" class="sidebar flex flex-col h-full border-r border-gray-800/50 bg-surface">
+    <div class="h-[76px] px-5 flex items-center border-b shrink-0 border-theme">
       <div class="flex items-center gap-3">
-        <div class="logo-box">B</div>
+        <div class="logo-box-sm flex items-center justify-center font-bold text-white text-sm">B</div>
         <div class="flex flex-col justify-center">
-          <div class="logo-text font-bold text-lg text-white leading-none mb-1">BEAT</div>
-          <div class="text-[11px] text-[#94a3b8] leading-none">Department Portal</div>
+          <div class="logo-text font-bold text-lg text-white tracking-widest leading-none mb-1">BEAT</div>
+          <div class="text-dim-xs leading-none">Admin Control Center</div>
         </div>
       </div>
     </div>
     <nav class="flex-1 py-4 overflow-y-auto">
-      <a href="dashboard2.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
-      <a href="reports2.html" class="sidebar-item"><i data-lucide="alert-triangle"></i><span>Public Reports</span></a>
-      <a href="announcements2.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
-      <a href="traffic2.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
-      <a href="analytics2.html" class="sidebar-item active"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
+      <a href="dashboard.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+      <a href="reports.html" class="sidebar-item"><i data-lucide="alert-triangle"></i><span>Public Reports</span></a>
+      <a href="announcements.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+      <a href="traffic.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
+      <a href="analytics.html" class="sidebar-item active"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
     </nav>
+    
     <div class="user-footer">
       <div class="flex items-center justify-between mb-5">
         <div class="flex items-center gap-3">
-          <div id="nav-avatar" class="nav-avatar">DA</div>
+          <div id="nav-avatar" class="avatar-circle flex items-center justify-center text-white font-bold text-sm shadow-lg">TM</div>
           <div>
-            <div class="user-footer-name">Dept Admin</div>
-            <div class="user-footer-sub">Traffic Department</div>
+            <div class="user-footer-name">Traffic Manager</div>
+            <div class="user-footer-sub">Road Controls</div>
           </div>
         </div>
-        <a href="profile2.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
+        <a href="profile.html" class="settings-link"><i data-lucide="settings" class="icon-sm"></i></a>
       </div>
-      <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border theme-border hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
-        <i data-lucide="log-out" class="icon-sm"></i> Logout
+      <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
+        <i data-lucide="log-out" class="icon-xs"></i> Logout
       </button>
     </div>
   </aside>
 
   <main class="flex-1 overflow-y-auto">
-    <header class="px-8 h-[76px] flex items-center justify-between shrink-0 theme-surface theme-border-b">
+    <header class="px-8 h-[76px] flex items-center justify-between border-b shrink-0 border-theme bg-surface">
       <h1 class="text-xl font-semibold flex items-center gap-2 text-white">
         <i data-lucide="bar-chart-3"></i>
         Analytics & Audit
       </h1>
-      <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 bg-[#1e2536] hover:bg-gray-800 text-white text-sm font-medium rounded-lg border theme-border transition-colors">
-        <i data-lucide="printer" class="icon-sm"></i> Print / Export Logs
+      <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 bg-[#1e2536] hover:bg-gray-800 text-white text-sm font-medium rounded-lg border border-gray-700 transition-colors">
+        <i data-lucide="printer" class="icon-xs"></i> Print / Export Logs
       </button>
     </header>
 
     <div class="p-8 animate-in">
+      
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <div id="audit-section" class="audit-card lg:col-span-2 border theme-border rounded-xl p-6 shadow-sm flex flex-col h-[600px] theme-surface">
+        <div id="audit-section" class="audit-card lg:col-span-2 card border border-gray-800/50 rounded-xl p-6 shadow-sm flex flex-col h-[600px] bg-surface">
           <div class="flex items-center justify-between mb-4">
             <h3 class="font-semibold flex items-center gap-2 text-white text-lg">
-              <i data-lucide="scroll-text" class="text-blue-500"></i>
+              <i data-lucide="scroll-text" class="text-accent"></i>
               System Audit Trail
             </h3>
             <div class="search-container relative w-72">
-              <i data-lucide="search" class="absolute left-3 top-2.5 text-gray-500 icon-sm"></i>
-              <input type="text" id="auditSearch" placeholder="Search logs by action..." class="modal-input !mt-0 !pl-9 text-sm" style="padding-top:8px; padding-bottom:8px;">
+              <i data-lucide="search" class="absolute left-3 top-2.5 text-gray-500 icon-xs"></i>
+              <input type="text" id="auditSearch" placeholder="Search logs by admin, action, IP..." class="modal-input !mt-0 !pl-9 text-sm search-input-py">
             </div>
           </div>
           
@@ -81,16 +219,53 @@
                 </tr>
               </thead>
               <tbody id="auditTableBody">
+                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
+                  <td class="px-4 py-4 text-white">Today, 10:24 AM</td>
+                  <td class="px-4 py-4">Traffic Manager</td>
+                  <td class="px-4 py-4"><span class="bg-red-500/10 text-red-400 px-2 py-1 rounded text-xs mr-2">Incident Report</span>Verified accident report #410 on C5 Road</td>
+                  <td class="px-4 py-4">192.168.1.44</td>
+                </tr>
+                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
+                  <td class="px-4 py-4 text-white">Today, 09:15 AM</td>
+                  <td class="px-4 py-4">Traffic Manager</td>
+                  <td class="px-4 py-4"><span class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded text-xs mr-2">Announcement</span>Published "EDSA Southbound Heavy Traffic"</td>
+                  <td class="px-4 py-4">192.168.1.44</td>
+                </tr>
+                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
+                  <td class="px-4 py-4 text-white">Yesterday, 14:20 PM</td>
+                  <td class="px-4 py-4">Traffic Manager</td>
+                  <td class="px-4 py-4"><span class="bg-yellow-500/10 text-yellow-400 px-2 py-1 rounded text-xs mr-2">Incident Report</span>Logged new roadwork report #408 at Quezon Ave</td>
+                  <td class="px-4 py-4">192.168.1.44</td>
+                </tr>
+                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
+                  <td class="px-4 py-4 text-white">Apr 17, 08:00 AM</td>
+                  <td class="px-4 py-4">Traffic Manager</td>
+                  <td class="px-4 py-4"><span class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded text-xs mr-2">Announcement</span>Published "Morning Road Closures"</td>
+                  <td class="px-4 py-4">192.168.1.44</td>
+                </tr>
+                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
+                  <td class="px-4 py-4 text-white">Apr 15, 14:15 PM</td>
+                  <td class="px-4 py-4">Traffic Manager</td>
+                  <td class="px-4 py-4"><span class="bg-green-500/10 text-green-400 px-2 py-1 rounded text-xs mr-2">Incident Report</span>Resolved flooded area report #395</td>
+                  <td class="px-4 py-4">192.168.1.44</td>
+                </tr>
+                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
+                  <td class="px-4 py-4 text-white">Apr 14, 18:45 PM</td>
+                  <td class="px-4 py-4">Traffic Manager</td>
+                  <td class="px-4 py-4"><span class="bg-red-500/10 text-red-400 px-2 py-1 rounded text-xs mr-2">Alert</span>Triggered emergency signal on Route A</td>
+                  <td class="px-4 py-4">192.168.1.44</td>
+                </tr>
               </tbody>
             </table>
           </div>
         </div>
 
         <div class="charts-container flex flex-col gap-6 h-[600px]">
-          <div class="border theme-border rounded-xl p-5 shadow-sm flex flex-col shrink-0 h-[260px] theme-surface">
+          
+          <div class="card border border-gray-800/50 rounded-xl p-5 shadow-sm flex flex-col shrink-0 h-[260px] bg-surface">
             <div class="flex items-center justify-between mb-3 shrink-0">
               <h3 class="font-semibold flex items-center gap-2 text-white">
-                <i data-lucide="pie-chart" class="text-blue-500"></i>
+                <i data-lucide="pie-chart" class="text-accent"></i>
                 Report Categories
               </h3>
             </div>
@@ -99,13 +274,13 @@
             </div>
           </div>
 
-          <div class="border theme-border rounded-xl p-6 shadow-sm flex flex-col flex-1 theme-surface">
+          <div class="card border border-gray-800/50 rounded-xl p-6 shadow-sm flex flex-col flex-1 bg-surface">
             <div class="flex items-center justify-between mb-4">
               <h3 class="font-semibold flex items-center gap-2 text-white">
-                <i data-lucide="activity" class="text-blue-500"></i>
+                <i data-lucide="activity" class="text-accent"></i>
                 Report Frequency
               </h3>
-              <select id="freqDropdown" onchange="updateFrequencyChart()" class="modal-input !mt-0 !w-auto text-xs cursor-pointer" style="padding:4px 8px;">
+              <select id="freqDropdown" onchange="updateFrequencyChart()" class="modal-input !mt-0 !w-auto text-xs cursor-pointer dropdown-py">
                 <option value="This Week">This Week</option>
                 <option value="This Month">This Month</option>
                 <option value="This Year">This Year</option>
@@ -115,15 +290,19 @@
               <canvas id="frequencyChart"></canvas>
             </div>
           </div>
+          
         </div>
+        
       </div>
     </div>
   </main>
 
-<script src="js/app2.js"></script>
+<script src="js/app.js"></script>
 <script>
   lucide.createIcons();
   
+  function doLogout() { window.location.href = 'admin.html'; }
+
   document.getElementById('auditSearch').addEventListener('keyup', function() {
     let filter = this.value.toLowerCase();
     let rows = document.querySelectorAll('#auditTableBody tr');
@@ -135,23 +314,46 @@
   });
 
   let freqChart;
+
   document.addEventListener("DOMContentLoaded", function() {
+    
     const ctxCat = document.getElementById('categoriesChart').getContext('2d');
     new Chart(ctxCat, {
       type: 'doughnut',
       data: {
         labels: ['Accidents', 'Traffic Jams', 'Road Works', 'Hazards'],
         datasets: [{
-          data: [0, 0, 0, 0], 
-          backgroundColor: ['#ef4444', '#eab308', '#3b82f6', '#10b981'],
-          borderWidth: 0, hoverOffset: 4
+          data: [151, 192, 85, 42],
+          backgroundColor: [
+            '#ef4444', 
+            '#eab308', 
+            '#3b82f6', 
+            '#10b981'  
+          ],
+          borderWidth: 0,
+          hoverOffset: 4
         }]
       },
       options: {
-        responsive: true, maintainAspectRatio: false, cutout: '70%',
-        layout: { padding: { top: 0, bottom: 0 } },
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '70%', 
+        layout: {
+          padding: { top: 0, bottom: 0 } 
+        },
         plugins: {
-          legend: { position: 'right', align: 'center', labels: { color: '#94a3b8', boxWidth: 10, font: { size: 11 }, padding: 12, usePointStyle: true, pointStyle: 'circle' } }
+          legend: {
+            position: 'right',
+            align: 'center',
+            labels: { 
+              color: '#94a3b8', 
+              boxWidth: 10,
+              font: { size: 11 },
+              padding: 12,
+              usePointStyle: true,
+              pointStyle: 'circle'
+            }
+          }
         }
       }
     });
@@ -163,12 +365,14 @@
         labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
         datasets: [{
           label: 'Reports Received',
-          data: [0, 0, 0, 0, 0, 0, 0],
-          backgroundColor: '#3b82f6', borderRadius: 4,
+          data: [45, 59, 80, 81, 56, 55, 40],
+          backgroundColor: '#3b82f6',
+          borderRadius: 4,
         }]
       },
       options: {
-        responsive: true, maintainAspectRatio: false,
+        responsive: true,
+        maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
           y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
@@ -183,14 +387,15 @@
     
     if (selection === 'This Week') {
       freqChart.data.labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      freqChart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0];
+      freqChart.data.datasets[0].data = [45, 59, 80, 81, 56, 55, 40];
     } else if (selection === 'This Month') {
       freqChart.data.labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-      freqChart.data.datasets[0].data = [0, 0, 0, 0];
+      freqChart.data.datasets[0].data = [210, 350, 290, 420];
     } else if (selection === 'This Year') {
       freqChart.data.labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      freqChart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      freqChart.data.datasets[0].data = [1200, 1500, 1100, 1800, 2100, 2300, 2500, 2200, 1900, 1600, 1400, 1700];
     }
+    
     freqChart.update();
   }
 </script>
