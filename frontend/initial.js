@@ -75,6 +75,7 @@ function nextMonth() { curDate.setMonth(curDate.getMonth() + 1); renderCal(); }
 renderCal();
 
 // Function to handle form submission
+// Function to handle the incident report submission
 async function submitReport(event) {
     event.preventDefault(); 
     
@@ -83,7 +84,7 @@ async function submitReport(event) {
     const data = Object.fromEntries(formData.entries());
 
     try {
-        // Must point to the specific /api/report endpoint
+        // Points to your Render backend
         const response = await fetch('https://beat-pasig-api.onrender.com/api/report', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -93,22 +94,25 @@ async function submitReport(event) {
         const result = await response.json();
 
         if (result.success) {
-            // Trigger the modal built in report.html
+            // ✅ 1. SHOW THE SUCCESS MODAL
             const modal = document.getElementById('success-modal');
             if (modal) {
                 modal.style.display = 'flex';
             }
-            form.reset(); // Clear form after success
+            
+            // ✅ 2. RESET THE FORM
+            form.reset();
+            form.classList.remove('was-validated'); 
         } else {
-            alert("Submission failed. Error: " + result.error);
+            alert("Submission failed: " + result.error);
         }
     } catch (error) {
         console.error("Connection Error:", error);
-        alert("Server is currently unreachable. Please check your internet.");
+        alert("Failed to connect to the BEAT server. Please check your internet.");
     }
 }
 
-// Function to close the modal
+// Function to manually close the success modal
 function closeModal() {
     const modal = document.getElementById('success-modal');
     if (modal) {
