@@ -27,6 +27,7 @@ function doLogout() {
     window.location.href = 'admin.html'; 
 }
 
+// Close custom dropdowns when clicking outside
 document.addEventListener('click', (e) => {
     if (!e.target.closest('.custom-dropdown-container')) {
         document.querySelectorAll('.cat-dropdown-menu').forEach(el => el.classList.add('hidden'));
@@ -39,7 +40,10 @@ document.addEventListener('click', (e) => {
 // ==========================================
 let departments = []; 
 let currentFilter = "All Departments";
+let currentSearchQuery = "";
 let mockData = { admins: [] }; 
+
+let userToDelete = null;
 
 function checkDeptBeforeStaff() {
     if (departments.length === 0) { openModal('no-dept-modal'); } 
@@ -60,6 +64,11 @@ function handleSort(val) {
     populateAdmins();
 }
 
+function handleSearch(val) {
+    currentSearchQuery = val.toLowerCase();
+    populateAdmins();
+}
+
 function updateDepartmentDropdowns() {
     const filterSelect = document.getElementById('dept-filter');
     const modalSelect = document.getElementById('staff-dept');
@@ -73,8 +82,16 @@ function populateAdmins() {
     if(!activeTbody || !disabledTbody) return;
 
     let adminsToDisplay = mockData.admins;
+    
     if (currentFilter !== "All Departments") {
-        adminsToDisplay = mockData.admins.filter(a => a.dept === currentFilter);
+        adminsToDisplay = adminsToDisplay.filter(a => a.dept === currentFilter);
+    }
+
+    if (currentSearchQuery) {
+        adminsToDisplay = adminsToDisplay.filter(a => 
+            a.username.toLowerCase().includes(currentSearchQuery) || 
+            a.id.toLowerCase().includes(currentSearchQuery)
+        );
     }
 
     const activeAdmins = adminsToDisplay.filter(a => a.status === "Active");
@@ -93,7 +110,7 @@ function populateAdmins() {
         
     disabledTbody.innerHTML = disabledAdmins.map(a => `
         <tr class="hover:bg-white/5 opacity-60">
-            <td class="px-5 py-4 w-10"><i data-lucide="trash-2" class="w-4 h-4 text-red-500/60 hover:text-red-500 cursor-pointer transition-colors"></i></td>
+            <td class="px-5 py-4 w-10"><i data-lucide="trash-2" class="w-4 h-4 text-red-500/60 hover:text-red-500 cursor-pointer transition-colors" onclick="promptDeleteUser('${a.username}')"></i></td>
             <td class="font-bold py-4 px-5 text-white">${a.username}</td>
             <td class="text-[#94a3b8]">${a.id}</td>
             <td class="text-[#94a3b8]">${a.email}</td>
@@ -103,6 +120,22 @@ function populateAdmins() {
         </tr>`).join('');
     
     if (window.lucide) lucide.createIcons(); 
+}
+
+function promptDeleteUser(username) {
+    userToDelete = username;
+    const nameSpan = document.getElementById('delete-user-name');
+    if(nameSpan) nameSpan.innerText = username;
+    openModal('confirm-delete-user-modal');
+}
+
+function executeDeleteUser() {
+    if(userToDelete) {
+        mockData.admins = mockData.admins.filter(a => a.username !== userToDelete);
+        userToDelete = null;
+        populateAdmins();
+    }
+    closeModal('confirm-delete-user-modal');
 }
 
 function executeDeleteDept() {
@@ -569,7 +602,6 @@ let currentActionCard = null;
 let currentActionType = '';
 let currentUploadedImage = null; 
 
-// Start entirely blank for custom categories
 let annCategories = []; 
 let selectedFilterCategory = 'all';
 let selectedFormCategory = '';
@@ -621,7 +653,6 @@ function selectCategory(type, val, text) {
         document.getElementById('filter-category-text').classList.remove('text-[#94a3b8]');
         if(val === 'all') document.getElementById('filter-category-text').classList.add('text-[#94a3b8]');
         document.getElementById('filter-category-menu').classList.add('hidden');
-        checkCategoryRemovable('filter');
         filterAnnouncements();
     } else {
         selectedFormCategory = val;
@@ -634,27 +665,6 @@ function selectCategory(type, val, text) {
         const error = document.getElementById('ann-category-error');
         if(container) container.classList.remove('input-error');
         if(error) error.classList.add('hidden');
-        checkCategoryRemovable('form');
-    }
-}
-
-function checkCategoryRemovable(source) {
-    if (source === 'filter') {
-        const val = selectedFilterCategory;
-        const btn = document.getElementById('btn-remove-filter-cat');
-        if (val !== 'all' && val !== '') {
-            btn.classList.remove('hidden');
-        } else {
-            btn.classList.add('hidden');
-        }
-    } else if (source === 'form') {
-        const val = selectedFormCategory;
-        const btn = document.getElementById('btn-remove-form-cat');
-        if (val !== '') {
-            btn.classList.remove('hidden');
-        } else {
-            btn.classList.add('hidden');
-        }
     }
 }
 
@@ -662,16 +672,6 @@ function promptDeleteCategory(e, catName) {
     e.stopPropagation();
     document.querySelectorAll('.cat-dropdown-menu').forEach(el => el.classList.add('hidden'));
     categoryToDelete = catName;
-    openModal('confirm-delete-cat-modal');
-}
-
-function removeCategory(source) {
-    if (source === 'filter') {
-        categoryToDelete = selectedFilterCategory;
-    } else {
-        categoryToDelete = selectedFormCategory;
-    }
-    if (!categoryToDelete || categoryToDelete === 'all') return;
     openModal('confirm-delete-cat-modal');
 }
 
@@ -686,7 +686,6 @@ function executeDeleteCategory() {
         document.getElementById('ann-category-text').innerText = 'Select a category...';
         document.getElementById('ann-category-text').classList.add('text-[#94a3b8]');
         document.getElementById('ann-category-text').classList.remove('text-white');
-        document.getElementById('btn-remove-form-cat').classList.add('hidden');
     }
     
     renderCategoryDropdowns();
@@ -1043,9 +1042,6 @@ function openAnnForm(mode, card = null) {
     selectCategory('form', '', 'Select a category...');
     removeImage('ann-cover-preview');
 
-    const btnFormRemove = document.getElementById('btn-remove-form-cat');
-    if (btnFormRemove) btnFormRemove.classList.add('hidden');
-
     const container = document.getElementById('content-blocks-container');
     container.innerHTML = '';
     annBlockCount = 0;
@@ -1067,7 +1063,6 @@ function openAnnForm(mode, card = null) {
         inputTitle.value = card.querySelector('.ann-title').innerText;
         const category = card.querySelector('.ann-badge').innerText;
         selectCategory('form', category, category);
-        checkCategoryRemovable('form');
 
         const coverImg = card.getAttribute('data-cover-image');
         if(coverImg) {
