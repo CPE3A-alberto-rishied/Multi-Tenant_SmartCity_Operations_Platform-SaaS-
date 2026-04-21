@@ -56,6 +56,7 @@ document.addEventListener('click', (e) => {
 // AUTHENTICATION LOGIC (admin.html)
 // ==========================================
 let currentLoggingInId = "";
+
 async function handleLogin(event) {
     event.preventDefault();
 
@@ -64,8 +65,8 @@ async function handleLogin(event) {
     const selectedDept = document.getElementById('login-dept').value;
 
     try {
-        // Change this URL if your backend is hosted somewhere else
-        const response = await fetch('https://beat-pasig-api.onrender.com/api/login', {
+        // Updated to point to the correct 2FA login route
+        const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -73,27 +74,22 @@ async function handleLogin(event) {
             body: JSON.stringify({ 
                 id: userId, 
                 password: userPass, 
-                dept: selectedDept // Matches your MongoDB field name
+                dept: selectedDept 
             })
         });
 
         const data = await response.json();
 
         if (response.ok && data.success) {
-            // Save the verified department to localStorage
-            localStorage.setItem('activeDepartment', data.department);
+            // SUCCESS: Credentials matched, Email was sent!
+            currentLoggingInId = data.adminId; // Store ID temporarily for verification
             
-            // Redirect based on the verified department
-            if (data.department === 'Main Admin') {
-                window.location.href = 'dashboard.html';
-            } else if (data.department === 'Traffic') {
-                window.location.href = 'dashboard2.html';
-            } else if (data.department === 'DRRMO') {
-                window.location.href = 'dashboard3.html';
-            }
+            // UI Transition: Hide Login Card, Show 2FA Verify Card
+            document.getElementById('login-card').classList.add('hidden');
+            document.getElementById('verify-card').classList.remove('hidden');
         } else {
-            // If the backend sends back an error (wrong pass, wrong dept), alert the user
-            alert(data.message);
+            // FAILED: Show the error from the server
+            alert(data.error || data.message || 'Invalid credentials or department mismatch.');
         }
 
     } catch (error) {
@@ -106,8 +102,15 @@ async function handleVerify(e) {
     e.preventDefault();
     const inputs = document.querySelectorAll('.otp-input');
     const otpCode = Array.from(inputs).map(i => i.value).join('');
+    const errorMsg = document.getElementById('verify-error');
 
-    if (otpCode.length < 6) return;
+    if (otpCode.length < 6) {
+        if(errorMsg) {
+            errorMsg.innerText = "Please enter all 6 digits";
+            errorMsg.classList.remove('hidden');
+        }
+        return;
+    }
 
     try {
         const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/verify', {
@@ -117,15 +120,38 @@ async function handleVerify(e) {
         });
 
         const result = await response.json();
-        if (result.success) {
-            localStorage.setItem('activeDepartment', result.dept);
-            window.location.href = result.dept === 'Main Admin' ? "dashboard.html" : "dashboard2.html";
+        if (response.ok && result.success) {
+            // 2FA SUCCESSFUL! Save session to LocalStorage
+            const verifiedDept = result.department || result.dept;
+            localStorage.setItem('activeDepartment', verifiedDept);
+            
+            // Redirect based on the verified department (3-way partition)
+            if (verifiedDept === 'Main Admin') {
+                window.location.href = 'dashboard.html';
+            } else if (verifiedDept === 'Traffic') {
+                window.location.href = 'dashboard2.html';
+            } else if (verifiedDept === 'DRRMO') {
+                window.location.href = 'dashboard3.html';
+            }
         } else {
-            alert("Incorrect code. Please try again.");
-            inputs.forEach(i => i.value = ''); // Clear inputs
+            // OTP FAILED: Wrong or expired code
+            if(errorMsg) {
+                errorMsg.innerText = result.error || "Incorrect code. Please try again.";
+                errorMsg.classList.remove('hidden');
+            }
+            
+            // Trigger the red shake animation on the OTP boxes
+            inputs.forEach(input => {
+                input.classList.add('input-error');
+                setTimeout(() => input.classList.remove('input-error'), 500); 
+                input.value = ''; // Clear inputs
+            });
             inputs[0].focus();
         }
-    } catch (error) { alert("Connection lost."); }
+    } catch (error) { 
+        console.error(error);
+        alert("Connection lost."); 
+    }
 }
 
 function handleReset(e) {
