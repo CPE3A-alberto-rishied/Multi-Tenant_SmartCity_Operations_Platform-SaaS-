@@ -8,12 +8,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ==========================================
 // 1. DATABASE CONNECTION
+// ==========================================
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('✅ BEAT Cloud Connected'))
+    .then(() => console.log('✅ BEAT Cloud Connected via Mongoose'))
     .catch(err => console.error('❌ MongoDB Error:', err));
 
-// 2. SCHEMA & MODEL
+// ==========================================
+// 2. SCHEMAS & MODELS
+// ==========================================
 const reportSchema = new mongoose.Schema({
     reporter_name: String,
     reporter_email: String,
@@ -26,7 +30,19 @@ const reportSchema = new mongoose.Schema({
 });
 const Report = mongoose.model('Report', reportSchema);
 
+const adminSchema = new mongoose.Schema({
+    id: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    email: String,
+    dept: String,
+    otp: String,          // Temporary verification code
+    otpExpires: Date      // Code expiration time
+});
+const Admin = mongoose.model('Admin', adminSchema);
+
+// ==========================================
 // 3. EMAIL SETUP
+// ==========================================
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -35,12 +51,15 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// 4. POST ROUTE
+// ==========================================
+// 4. ROUTES
+// ==========================================
+
+// --- SUBMIT PUBLIC REPORT ---
 app.post('/api/report', async (req, res) => {
     try {
         const { reporter_name, reporter_email, contact_number, report_subject, report_location, report_description } = req.body;
 
-        // A. Server-side Validation
         if (!reporter_name || !reporter_email || !contact_number || !report_subject || !report_location || !report_description) {
             return res.status(400).json({ success: false, error: "All fields are required." });
         }
@@ -51,27 +70,23 @@ app.post('/api/report', async (req, res) => {
             return res.status(400).json({ success: false, error: "Contact must be exactly 11 digits." });
         }
 
-        // B. Save to MongoDB
         const newReport = new Report(req.body);
         await newReport.save();
 
-        // ✅ C. Send Success Response IMMEDIATELY for the Modal
         res.status(200).json({ success: true });
 
-        // D. Background Emails
-        // User Email
+        // Background Emails
         transporter.sendMail({
-            from: `"BEAT Pasig Support" <${process.env.EMAIL_USER}>`,
+            from: "BEAT Pasig Support" <${process.env.EMAIL_USER}>,
             to: reporter_email,
-            subject: `Confirmation: Report Received - ${report_subject}`,
-            html: `<p>Hi ${reporter_name}, your report has been successfully logged.</p>`
+            subject: Confirmation: Report Received - ${report_subject},
+            html: <p>Hi ${reporter_name}, your report has been successfully logged.</p>
         }).catch(e => console.error("User Mail Error:", e));
 
-        // Reverted Admin Alert format
         transporter.sendMail({
-            from: `"BEAT SYSTEM" <${process.env.EMAIL_USER}>`,
+            from: "BEAT SYSTEM" <${process.env.EMAIL_USER}>,
             to: process.env.ADMIN_EMAIL,
-            subject: `🚨 New BEAT Report: ${report_subject}`,
+            subject: 🚨 New BEAT Report: ${report_subject},
             html: `
                 <p><b>New Incident Logged</b></p>
                 <p><b>From:</b> ${reporter_name}</p>
@@ -85,81 +100,17 @@ app.post('/api/report', async (req, res) => {
     }
 });
 
-// GET Route for Admin Reports
+// --- GET ALL REPORTS ---
 app.get('/api/reports/all', async (req, res) => {
     try {
-        const reports = await Report.find().sort({ createdAt: -1 }); // Newest first
+        const reports = await Report.find().sort({ createdAt: -1 });
         res.status(200).json({ success: true, data: reports });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
 });
-// 1. ADMIN SCHEMA
-// 1. Add OTP fields to the Schema
-const adminSchema = new mongoose.Schema({
-    id: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    email: String,
-    dept: String,
-    otp: String,          // Temporary verification code
-    otpExpires: Date      // Code expiration time
-});
-const Admin = mongoose.model('Admin', adminSchema);
 
-// 2. Modified Login Route (Sends Email)
-app.post('/api/admin/login', async (req, res) => {
-    try {
-        const { id, password, dept } = req.body;
-        const foundAdmin = await Admin.findOne({ id, dept });
-
-        if (!foundAdmin || foundAdmin.password !== password) {
-            return res.status(401).json({ success: false, error: "Invalid credentials." });
-        }
-
-        // GENERATE 6-DIGIT CODE
-        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-        foundAdmin.otp = otpCode;
-        foundAdmin.otpExpires = Date.now() + 600000; // Valid for 10 minutes
-        await foundAdmin.save();
-
-        // SEND EMAIL VIA GMAIL
-        await transporter.sendMail({
-            from: `"BEAT Security" <${process.env.EMAIL_USER}>`,
-            to: foundAdmin.email,
-            subject: "B.E.A.T. Admin Verification Code",
-            html: `<h3>Verification Code: <b>${otpCode}</b></h3><p>This code expires in 10 minutes.</p>`
-        });
-
-        res.status(200).json({ success: true, adminId: foundAdmin.id });
-    } catch (error) {
-        res.status(500).json({ success: false, error: "Server Error during 2FA." });
-    }
-});
-
-// 3. NEW: Verification Route
-app.post('/api/admin/verify', async (req, res) => {
-    try {
-        const { adminId, otpCode } = req.body;
-        const admin = await Admin.findOne({ id: adminId });
-
-        if (!admin || admin.otp !== otpCode || Date.now() > admin.otpExpires) {
-            return res.status(400).json({ success: false, error: "Invalid or expired code." });
-        }
-
-        // Clear OTP after success
-        admin.otp = undefined;
-        admin.otpExpires = undefined;
-        await admin.save();
-
-        res.status(200).json({ success: true, dept: admin.dept });
-    } catch (error) {
-        res.status(500).json({ success: false, error: "Verification failed." });
-    }
-});
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-
-// UPDATE REPORT STATUS ROUTE
+// --- UPDATE REPORT STATUS ---
 app.put('/api/report/:id', async (req, res) => {
     try {
         const { status } = req.body;
@@ -174,59 +125,76 @@ app.put('/api/report/:id', async (req, res) => {
     }
 });
 
-const { MongoClient } = require('mongodb');
-const cors = require('cors'); // Allows your frontend to talk to your backend
-
-const app = express();
-app.use(express.json());
-app.use(cors());
-
-// Replace with your actual MongoDB connection string and database name
-const uri = "YOUR_MONGODB_CONNECTION_STRING";
-const client = new MongoClient(uri);
-
-app.post('/api/login', async (req, res) => {
-    // 1. Receive data from the frontend
-    const { id, password, dept } = req.body;
-
+// --- ADMIN LOGIN (3-Way Verification + OTP) ---
+app.post('/api/admin/login', async (req, res) => {
     try {
-        await client.connect();
-        const database = client.db('beat_database'); // Use your actual DB name
-        const users = database.collection('users');  // Use your actual collection name
+        const { id, password, dept } = req.body;
+        
+        // Find admin by ID first to give specific error messages
+        const foundAdmin = await Admin.findOne({ id: id });
 
-        // 2. Find the user by their 'id'
-        const user = await users.findOne({ id: id });
-
-        if (!user) {
-            return res.status(401).json({ success: false, message: "ID Number not found." });
+        if (!foundAdmin) {
+            return res.status(401).json({ success: false, error: "ID Number not found." });
         }
 
-        // 3. Verify the password (matching your plain text format)
-        if (user.password !== password) {
-            return res.status(401).json({ success: false, message: "Incorrect password." });
+        if (foundAdmin.password !== password) {
+            return res.status(401).json({ success: false, error: "Incorrect password." });
         }
 
-        // 4. Verify the department matches what the user selected in the dropdown
-        if (user.dept !== dept) {
+        // Verify the department matches the dropdown selection
+        if (foundAdmin.dept !== dept) {
             return res.status(401).json({ 
                 success: false, 
-                message: `Access Denied: This ID belongs to ${user.dept}, not ${dept}.` 
+                error: Access Denied: This ID belongs to ${foundAdmin.dept}, not ${dept}. 
             });
         }
 
-        // 5. If everything matches, grant access!
-        res.json({ success: true, department: user.dept });
+        // Generate 6-Digit Code
+        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+        foundAdmin.otp = otpCode;
+        foundAdmin.otpExpires = Date.now() + 600000; // Valid for 10 minutes
+        await foundAdmin.save();
 
+        // Send Email via Nodemailer
+        await transporter.sendMail({
+            from: "BEAT Security" <${process.env.EMAIL_USER}>,
+            to: foundAdmin.email,
+            subject: "B.E.A.T. Admin Verification Code",
+            html: <h3>Verification Code: <b>${otpCode}</b></h3><p>This code expires in 10 minutes.</p>
+        });
+
+        res.status(200).json({ success: true, adminId: foundAdmin.id });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: "Internal server error." });
-    } finally {
-        // Ensure the connection closes
-        await client.close(); 
+        console.error("Login Error:", error);
+        res.status(500).json({ success: false, error: "Server Error during Login." });
     }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Authentication server running on port ${PORT}`);
+// --- ADMIN OTP VERIFICATION ---
+app.post('/api/admin/verify', async (req, res) => {
+    try {
+        const { adminId, otpCode } = req.body;
+        const admin = await Admin.findOne({ id: adminId });
+
+        if (!admin || admin.otp !== otpCode || Date.now() > admin.otpExpires) {
+            return res.status(400).json({ success: false, error: "Invalid or expired code." });
+        }
+
+        // Clear OTP after success
+        admin.otp = undefined;
+        admin.otpExpires = undefined;
+        await admin.save();
+
+        // Send back the verified department for frontend routing
+        res.status(200).json({ success: true, department: admin.dept });
+    } catch (error) {
+        console.error("Verify Error:", error);
+        res.status(500).json({ success: false, error: "Verification failed." });
+    }
 });
+
+// ==========================================
+// 5. START SERVER
+// ==========================================
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(🚀 Server running on port ${PORT}));
