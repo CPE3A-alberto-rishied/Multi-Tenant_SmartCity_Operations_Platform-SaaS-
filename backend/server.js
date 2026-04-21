@@ -173,3 +173,61 @@ app.put('/api/report/:id', async (req, res) => {
         res.status(500).json({ success: false, error: "Failed to update status" });
     }
 });
+
+const express = require('express');
+const { MongoClient } = require('mongodb');
+const cors = require('cors'); // Allows your frontend to talk to your backend
+
+const app = express();
+app.use(express.json());
+app.use(cors());
+
+// Replace with your actual MongoDB connection string and database name
+const uri = "YOUR_MONGODB_CONNECTION_STRING";
+const client = new MongoClient(uri);
+
+app.post('/api/login', async (req, res) => {
+    // 1. Receive data from the frontend
+    const { id, password, dept } = req.body;
+
+    try {
+        await client.connect();
+        const database = client.db('beat_database'); // Use your actual DB name
+        const users = database.collection('users');  // Use your actual collection name
+
+        // 2. Find the user by their 'id'
+        const user = await users.findOne({ id: id });
+
+        if (!user) {
+            return res.status(401).json({ success: false, message: "ID Number not found." });
+        }
+
+        // 3. Verify the password (matching your plain text format)
+        if (user.password !== password) {
+            return res.status(401).json({ success: false, message: "Incorrect password." });
+        }
+
+        // 4. Verify the department matches what the user selected in the dropdown
+        if (user.dept !== dept) {
+            return res.status(401).json({ 
+                success: false, 
+                message: `Access Denied: This ID belongs to ${user.dept}, not ${dept}.` 
+            });
+        }
+
+        // 5. If everything matches, grant access!
+        res.json({ success: true, department: user.dept });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal server error." });
+    } finally {
+        // Ensure the connection closes
+        await client.close(); 
+    }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Authentication server running on port ${PORT}`);
+});

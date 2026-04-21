@@ -4,6 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BEAT - Admin Control Center</title>
+    
+    <script>
+    if (localStorage.getItem('activeDepartment')) {
+        const dept = localStorage.getItem('activeDepartment');
+        if (dept === 'Main Admin') {
+            window.location.href = 'dashboard.html';
+        } else if (dept === 'Traffic') {
+            window.location.href = 'dashboard2.html';
+        } else if (dept === 'DRRMO') {
+            window.location.href = 'dashboard3.html';
+        }
+    }
+    </script>
+
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -177,8 +191,10 @@
                 <div class="mb-5">
                     <label class="block text-[11px] font-bold mb-2 text-[#94a3b8] tracking-wider uppercase">Department</label>
                     <select id="login-dept" class="w-full bg-[#1e2536] text-white border border-gray-700 auth-select-field">
-                        <option value="main">Main Admin</option>
-                        </select>
+                        <option value="Main Admin">Main Admin</option>
+                        <option value="Traffic">Traffic</option>
+                        <option value="DRRMO">DRRMO</option>
+                    </select>
                 </div>
                 <div class="mb-2">
                     <label class="block text-[11px] font-bold mb-2 text-[#94a3b8] tracking-wider uppercase">Password</label>
@@ -243,10 +259,13 @@
             if (loginDept) {
                 const savedDepts = JSON.parse(localStorage.getItem('beat_departments')) || [];
                 savedDepts.forEach(dept => {
-                    const opt = document.createElement('option');
-                    opt.value = dept.toLowerCase();
-                    opt.text = dept + " Department";
-                    loginDept.appendChild(opt);
+                    // Check if it already exists to prevent duplication
+                    if (!Array.from(loginDept.options).some(opt => opt.value === dept)) {
+                        const opt = document.createElement('option');
+                        opt.value = dept; // Ensure this casing matches DB exactly if dynamically added
+                        opt.text = dept + " Department";
+                        loginDept.appendChild(opt);
+                    }
                 });
             }
         });
