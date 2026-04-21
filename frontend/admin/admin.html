@@ -12,7 +12,7 @@
         const dept = localStorage.getItem('activeDepartment');
         window.location.href = (dept === 'Main Admin') ? 'dashboard.html' : 'dashboard2.html';
     }
-</script>
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles2.css">
     <style>
@@ -104,7 +104,9 @@
                     <label class="block text-[11px] font-bold mb-2 text-[#94a3b8] tracking-wider uppercase">Department</label>
                     <select id="login-dept" class="w-full bg-[#1e2536] text-white border border-gray-700 px-4 py-3 rounded-lg outline-none cursor-pointer focus:border-blue-500 transition-all">
                         <option value="Main Admin">Main Admin</option>
-                        </select>
+                        <option value="Traffic">Traffic</option>
+                        <option value="DRRMO">DRRMO</option>
+                    </select>
                 </div>
                 <div class="mb-2">
                     <label class="block text-[11px] font-bold mb-2 text-[#94a3b8] tracking-wider uppercase">Password</label>
@@ -161,18 +163,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => { 
             if(window.lucide) lucide.createIcons(); 
-            
-            // DYNAMIC DEPARTMENTS: Matches the format sent to the backend
-            const loginDept = document.getElementById('login-dept');
-            if (loginDept) {
-                const savedDepts = JSON.parse(localStorage.getItem('beat_departments')) || [];
-                savedDepts.forEach(dept => {
-                    const opt = document.createElement('option');
-                    opt.value = dept; // e.g., "Traffic"
-                    opt.text = dept;
-                    loginDept.appendChild(opt);
-                });
-            }
         });
     </script>
 </body>
