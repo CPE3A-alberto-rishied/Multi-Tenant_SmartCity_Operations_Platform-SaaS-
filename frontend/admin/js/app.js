@@ -1557,6 +1557,9 @@ function executeAnnFormSubmit() {
 
 // ====== PAGE LOAD INITIALIZER ======
 document.addEventListener('DOMContentLoaded', () => { 
+    if (localStorage.getItem('activeDepartment')) {
+        document.body.classList.remove('auth-guarded');
+    }
     if(window.lucide) lucide.createIcons(); 
     
     // 1. ADD THIS: Triggers the MongoDB fetch for Public Reports

@@ -197,7 +197,42 @@ input:checked + .slider:before { transform: translateX(20px); }
 /* ============================
    SPECIFIC COMPONENT STYLES
    ============================ */
-.report-card { background: #1e2536; border: 1px solid #374151; transition: transform 0.2s, border-color 0.2s; }
+/* Darken the date input and its picker */
+#filter-date {
+  color-scheme: dark; /* Forces the browser's native picker into dark mode */
+}
+
+/* Custom coloring for the date text in the card to match your requested dark look */
+.report-date-dark {
+  color: #475569 !important; /* Slate-600 */
+}
+
+/* Optional: Targets the calendar icon inside the input */
+#filter-date::-webkit-calendar-picker-indicator {
+  filter: invert(1); /* Makes the icon white/visible on dark background */
+  cursor: pointer;
+}
+/* 1. Add the security class */
+.auth-guarded { 
+    display: none !important; 
+}
+
+/* 2. Fix the broken Tailwind notation */
+.report-date {
+    color: #64748b !important; 
+}
+
+/* Target the subtext/labels directly without bracket notation */
+.report-card p {
+    color: #475569 !important;
+}
+
+/* Ensure the department box looks identical to the return reason box */
+.dept-display-box {
+    background-color: #1e2536;
+    border: 1px solid #374151;
+    color: #cbd5e1; /* slate-300 */
+}
 .report-card:hover { border-color: #3b82f6; }
 
 .profile-card { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(16px); border: 1px solid var(--border); }

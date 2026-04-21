@@ -6,7 +6,39 @@
   <title>BEAT - Dept Announcements</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
+  <style>
+    /* CRITICAL FIX: Ensure all modal overlays are fixed to the screen and stack correctly */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.85);
+      display: flex; 
+      align-items: center;
+      justify-content: center;
+      /* Higher z-index to stay on top of the main UI */
+      z-index: 10000;
+      pointer-events: auto;
+    }
+
+    /* Completely removes the overlay when hidden so sidebar is clickable */
+    .modal-overlay.hidden {
+      display: none !important;
+      pointer-events: none !important;
+    }
+
+    /* Extra priority for the confirmation and success popups so they appear ABOVE the forms */
+    #confirm-submit-modal, #confirm-action-modal, #success-submit-modal, #confirm-back-modal {
+      z-index: 20000 !important;
+    }
+
+    /* Red Glow for Required Fields */
+    .input-error {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+    }
+  </style>
 </head>
 <body class="h-full flex bg-[#0a0e1a]">
 
@@ -15,47 +47,49 @@
       <div class="flex items-center gap-3">
         <div class="logo-box">B</div>
         <div class="flex flex-col justify-center">
-          <div class="logo-text font-bold text-lg text-white leading-none mb-1">BEAT</div>
-          <div class="text-[11px] text-[#94a3b8] leading-none">Department Portal</div>
+          <div class="logo-text font-bold text-white">BEAT</div>
+          <div class="sidebar-subtext">Department Portal</div>
         </div>
       </div>
     </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
       <a href="dashboard2.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
-      <a href="reports2.html" class="sidebar-item"><i data-lucide="alert-triangle"></i><span>Public Reports</span></a>
+      <a href="reports2.html" class="sidebar-item"><i data-lucide="file-text"></i><span>Public Reports</span></a>
       <a href="announcements2.html" class="sidebar-item active"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
       <a href="traffic2.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
       <a href="analytics2.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
     </nav>
 
     <div class="user-footer">
-      <div class="flex items-center justify-between mb-5">
-        <div class="flex items-center gap-3">
-          <div id="nav-avatar" class="nav-avatar"></div>
-          <div>
-            <div class="user-footer-name">Loading...</div>
-            <div class="user-footer-sub">Loading...</div>
-          </div>
+        <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-3">
+                <div id="nav-avatar" class="nav-avatar"></div>
+                <div>
+                  <div class="user-footer-name">Loading...</div>
+                  <div class="user-footer-sub">Loading...</div>
+                </div>
+            </div>
+            <a href="profile2.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
         </div>
-        <a href="profile2.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
-      </div>
-      <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border theme-border hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
-        <i data-lucide="log-out" class="icon-sm"></i> Logout
-      </button>
+        <button onclick="doLogout()" class="btn-logout">
+            <i data-lucide="log-out" class="icon-sm"></i> Logout
+        </button>
     </div>
   </aside>
 
   <main class="flex-1 overflow-y-auto flex flex-col relative">
-    <header class="px-8 h-[76px] flex items-center border-b shrink-0 theme-surface theme-border-b">
-      <h1 class="text-xl font-semibold text-white flex items-center gap-2">Announcement Manager</h1>
+    <header class="px-8 h-[76px] flex items-center shrink-0 theme-surface theme-border-b">
+      <h1 class="text-xl font-semibold text-white flex items-center gap-2">
+        <i data-lucide="megaphone" class="icon-lg"></i> Announcement Manager
+      </h1>
     </header>
 
     <div class="p-8 flex-1 relative flex flex-col">
       <div id="view-list" class="animate-in block w-full">
         <div class="border-b border-gray-800 flex gap-2 mb-6">
             <button id="tab-btn-live" onclick="switchAnnTab('live')" class="px-4 py-3 text-sm font-semibold text-blue-500 border-b-2 border-blue-500 -mb-[1px] flex items-center gap-2 transition-colors"><i data-lucide="radio" class="icon-sm"></i> Live Announcements</button>
-            <button id="tab-btn-queue" onclick="switchAnnTab('queue')" class="px-4 py-3 text-sm font-semibold text-[#94a3b8] hover:text-white border-b-2 border-transparent -mb-[1px] flex items-center gap-2 transition-colors"><i data-lucide="clock" class="icon-sm"></i> Approval Queue</button>
+            <button id="tab-btn-queue" onclick="switchAnnTab('queue')" class="px-4 py-3 text-sm font-semibold text-[#94a3b8] hover:text-white border-b-2 border-transparent -mb-[1px] flex items-center gap-2 transition-colors"><i data-lucide="clock" class="icon-sm"></i> Waiting for Approval</button>
             <button id="tab-btn-denied" onclick="switchAnnTab('denied')" class="px-4 py-3 text-sm font-semibold text-[#94a3b8] hover:text-white border-b-2 border-transparent -mb-[1px] flex items-center gap-2 transition-colors"><i data-lucide="trash-2" class="icon-sm"></i> Denied/Taken Down</button>
         </div>
 
@@ -94,7 +128,7 @@
                <div>
                  <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">TITLE <span class="text-red-500">*</span></label>
                  <input type="text" id="ann-title" placeholder="Enter announcement title" class="modal-input text-sm" oninput="clearReqError(this)">
-                 <p class="text-[10px] text-red-500 hidden mt-1">Required field</p>
+                 <p id="ann-title-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p>
                </div>
                <div>
                  <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">CATEGORY <span class="text-red-500">*</span></label>
@@ -150,7 +184,23 @@
     </div>
   </main>
 
-  <div id="create-category-modal" class="modal-overlay hidden"><div class="border rounded-2xl p-8 w-[400px] shadow-2xl text-left theme-surface"><h2 class="text-white font-bold text-xl mb-6 flex items-center gap-2"><i data-lucide="folder-plus" class="text-blue-500 icon-lg"></i> Create Category</h2><div class="space-y-4"><div><label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Category Name <span class="text-red-500">*</span></label><input type="text" id="new-category-name" placeholder="e.g. Weather Alert" class="modal-input text-sm" oninput="clearReqError(this)"><p class="text-[10px] text-red-500 hidden mt-1">Required field</p></div></div><div class="flex justify-end gap-3 mt-8"><button onclick="closeModal('create-category-modal')" class="px-5 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">Cancel</button><button onclick="saveCategory()" class="px-5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg">Save Category</button></div></div></div>
+  <div id="create-category-modal" class="modal-overlay hidden" onclick="event.stopPropagation()">
+      <div class="border rounded-2xl p-8 w-[400px] shadow-2xl text-left theme-surface" onclick="event.stopPropagation()">
+          <h2 class="text-white font-bold text-xl mb-6 flex items-center gap-2"><i data-lucide="folder-plus" class="text-blue-500 icon-lg"></i> Create Category</h2>
+          <div class="space-y-4">
+              <div>
+                  <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Category Name <span class="text-red-500">*</span></label>
+                  <input type="text" id="new-category-name" placeholder="e.g. Weather Alert" class="modal-input text-sm" oninput="this.classList.remove('input-error'); document.getElementById('new-category-error').classList.add('hidden')">
+                  <p id="new-category-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p>
+              </div>
+          </div>
+          <div class="flex justify-end gap-3 mt-8">
+              <button onclick="closeModal('create-category-modal')" class="px-5 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">Cancel</button>
+              <button onclick="saveCategory()" class="px-5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg">Save Category</button>
+          </div>
+      </div>
+  </div>
+
   <div id="no-category-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-yellow"><i data-lucide="alert-circle"></i></div><h2 class="text-white font-bold text-xl mb-3">No Categories Found</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">You need to create at least one category before you can publish an announcement.</p><div class="flex gap-3"><button onclick="closeModal('no-category-modal')" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="closeModal('no-category-modal'); openModal('create-category-modal')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Create Category</button></div></div></div>
   <div id="confirm-delete-cat-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-red"><i data-lucide="trash-2"></i></div><h2 class="text-white font-bold text-xl mb-3">Delete Category?</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to remove this category from the dropdown? Existing announcements will keep their category labels.</p><div class="flex gap-3"><button onclick="closeModal('confirm-delete-cat-modal')" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="executeDeleteCategory()" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Delete</button></div></div></div>
   <div id="confirm-submit-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-blue"><i data-lucide="send"></i></div><h2 id="confirm-submit-title" class="text-white font-bold text-xl mb-3">Submit for Review?</h2><p id="confirm-submit-desc" class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to submit this announcement?</p><div class="flex gap-3"><button onclick="closeModal('confirm-submit-modal')" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="executeAnnFormSubmit()" id="btn-confirm-submit" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Confirm</button></div></div></div>
@@ -158,6 +208,6 @@
   <div id="confirm-action-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div id="action-icon-bg" class="modal-icon-circle"><i id="action-icon"></i></div><h2 id="action-title" class="text-white font-bold text-xl mb-3">Confirm Action?</h2><p id="action-desc" class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure?</p><div class="flex gap-3"><button onclick="closeModal('confirm-action-modal')" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="executeCardAction()" id="btn-action-confirm" class="flex-1 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Confirm</button></div></div></div>
   <div id="success-submit-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-green"><i data-lucide="check-circle"></i></div><h2 class="text-white font-bold text-xl mb-3">Success</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Your announcement action was completed successfully.</p><button onclick="closeModal('success-submit-modal')" class="w-full bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Done</button></div></div>
 
-<script src="js/app2.js"></script>
+  <script src="js/app2.js"></script>
 </body>
 </html>

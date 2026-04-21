@@ -84,6 +84,16 @@ app.post('/api/report', async (req, res) => {
         if (!res.headersSent) res.status(500).json({ success: false, error: error.message });
     }
 });
+
+// GET Route for Admin Reports
+app.get('/api/reports/all', async (req, res) => {
+    try {
+        const reports = await Report.find().sort({ createdAt: -1 }); // Newest first
+        res.status(200).json({ success: true, data: reports });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
 // 1. ADMIN SCHEMA
 // 1. Add OTP fields to the Schema
 const adminSchema = new mongoose.Schema({
@@ -148,3 +158,18 @@ app.post('/api/admin/verify', async (req, res) => {
 });
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+// UPDATE REPORT STATUS ROUTE
+app.put('/api/report/:id', async (req, res) => {
+    try {
+        const { status } = req.body;
+        const updatedReport = await Report.findByIdAndUpdate(
+            req.params.id, 
+            { status: status }, 
+            { new: true }
+        );
+        res.status(200).json({ success: true, data: updatedReport });
+    } catch (error) {
+        res.status(500).json({ success: false, error: "Failed to update status" });
+    }
+});
