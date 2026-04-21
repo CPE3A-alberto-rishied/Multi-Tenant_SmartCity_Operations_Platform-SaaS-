@@ -38,6 +38,10 @@ function escapeHTML(str) {
 }
 
 function doLogout() { 
+    // 1. Clear the session data from memory
+    localStorage.removeItem('activeDepartment');
+    
+    // 2. Redirect to the login screen
     window.location.href = 'admin.html'; 
 }
 // Close custom dropdowns when clicking outside
@@ -429,13 +433,16 @@ function cancelStatusChange() {
 // REPORTS PAGE SPECIFIC LOGIC
 // ==========================================
 
+// REPLACE your existing openReportDetails(card) with this
 function openReportDetails(card) {
     if(!card) return;
     
+    // 1. Extract data from the clicked card
     const title = card.querySelector('h3').innerText;
     const badge = card.querySelector('.badge-status');
     const dateText = card.querySelector('.report-date').innerText;
     const timeText = card.querySelector('.report-date').nextElementSibling.innerText;
+    
     const pTags = card.querySelectorAll('.space-y-1 p');
     let name = "Unknown", loc = "Unknown";
     if(pTags.length >= 2) {
@@ -449,6 +456,7 @@ function openReportDetails(card) {
         desc = descLabel.nextElementSibling.innerText;
     }
 
+    // Pull hidden data attributes
     const email = card.getAttribute('data-email') || "Not provided";
     const contact = card.getAttribute('data-contact') || "Not provided";
 
@@ -458,7 +466,9 @@ function openReportDetails(card) {
         forwarded = select.options[select.selectedIndex].text;
     }
 
+    // 2. Inject data into the Modal
     document.getElementById('modal-detail-title').innerText = title;
+    
     const modalBadge = document.getElementById('modal-detail-status');
     if(modalBadge && badge) {
         modalBadge.className = badge.className;
@@ -477,17 +487,103 @@ function openReportDetails(card) {
     document.getElementById('modal-detail-forwarded').innerText = forwarded;
     document.getElementById('modal-detail-desc').innerText = desc;
 
-    const returnBox = card.querySelector('.border-red-500');
+    // Hide Return box for standard reports
     const modalReturnBox = document.getElementById('modal-detail-return-box');
-    if (returnBox && modalReturnBox) {
-        const reasonText = returnBox.querySelector('p:nth-child(2)').innerText.replace(' See More', '');
-        document.getElementById('modal-detail-return-reason').innerText = reasonText;
-        modalReturnBox.classList.remove('hidden');
-    } else if (modalReturnBox) {
+    if (modalReturnBox) {
         modalReturnBox.classList.add('hidden');
     }
 
+    // 3. Show the Modal
     openModal('view-report-modal');
+}
+
+// ADD this function to fetch the list of reports
+async function fetchAdminReports() {
+    const grid = document.getElementById('reports-grid');
+    if (!grid) return;
+
+    try {
+        const response = await fetch('https://beat-pasig-api.onrender.com/api/reports/all');
+        const result = await response.json();
+
+        if (result.success) {
+            grid.innerHTML = ''; // Clear the grid
+
+            result.data.forEach(report => {
+                const dateObj = new Date(report.createdAt);
+                const dateStr = dateObj.toLocaleDateString();
+                const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                // Match status colors to your UI
+                const statusStyles = {
+                    'Pending': 'bg-orange-500/10 text-orange-400 border-orange-500/20',
+                    'Resolved': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+                    'Returned': 'bg-red-500/10 text-red-400 border-red-500/20'
+                };
+                const currentStyle = statusStyles[report.status] || 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+
+                // Construct the full HTML card
+                const cardHTML = `
+                <div class="report-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors" 
+                     style="background:rgba(15, 23, 42, 0.5); border-color:rgba(51, 65, 85, 0.5)" 
+                     onclick="openReportDetails('${report._id}')">
+                    
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-xs font-bold text-white report-date">${dateStr}</p>
+                            <p class="text-[10px] text-[#94a3b8]">${timeStr}</p>
+                        </div>
+                        <span class="badge-status ${currentStyle} px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border">
+                            ${report.status || 'PENDING'}
+                        </span>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-white mb-4 uppercase tracking-tight">${escapeHTML(report.report_subject)}</h3>
+                    
+                    <div class="space-y-1 text-sm mb-4">
+                        <p><span class="text-[#94a3b8]">Name of reportee:</span> <span class="text-white font-semibold">${escapeHTML(report.reporter_name)}</span></p>
+                        <p><span class="text-[#94a3b8]">Location:</span> <span class="text-white font-semibold">${escapeHTML(report.report_location)}</span></p>
+                    </div>
+
+                    ${report.status === 'Returned' && report.return_reason ? `
+                        <div class="mb-4 p-4 bg-gray-900/50 border-l-4 border-red-500 rounded-r-lg">
+                            <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest mb-1">RETURN REASON:</p>
+                            <p class="text-xs text-[#94a3b8] italic">${escapeHTML(report.return_reason)}</p>
+                        </div>` : ''}
+
+                    <div class="text-sm mb-6">
+                        <p class="text-[#94a3b8] mb-1">Description:</p>
+                        <p class="text-slate-300 leading-relaxed line-clamp-3">${escapeHTML(report.report_description)}</p>
+                    </div>
+
+                    <div class="mt-auto pt-4 border-t space-y-4 text-sm" style="border-color:rgba(51, 65, 85, 0.5)" onclick="event.stopPropagation()">
+                        <div>
+                            <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2">FORWARD TO</p>
+                            <select class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500 cursor-pointer" 
+                                    onchange="handleForward(this, '${report._id}')">
+                                <option value="" disabled selected>${report.forwarded_to || 'Select department...'}</option>
+                                <option value="Traffic">Traffic</option>
+                                <option value="DRRMO">DRRMO</option>
+                                <option value="Engineering">Engineering</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center justify-between mt-4">
+                            <p class="text-[11px] font-bold text-white uppercase tracking-wider">Mark as Resolved</p>
+                            <label class="switch">
+                                <input type="checkbox" ${report.status === 'Resolved' ? 'checked' : ''} onchange="handleReportToggle(event, this)">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>`;
+                grid.insertAdjacentHTML('beforeend', cardHTML);
+            });
+
+            if (window.lucide) lucide.createIcons();
+        }
+    } catch (error) {
+        console.error("Failed to load reports:", error);
+    }
 }
 
 function validateNewReport(e) {
@@ -517,6 +613,10 @@ function executeSubmitReport() {
     closeModal('confirm-report-modal');
     openModal('success-report-modal');
     
+    // Hide the empty state placeholder if it exists
+    const emptyState = document.getElementById('no-reports-empty');
+    if (emptyState) emptyState.classList.add('hidden');
+    
     const name = document.getElementById('report-name').value;
     const email = document.getElementById('report-email').value;
     const contact = document.getElementById('report-contact').value;
@@ -528,54 +628,65 @@ function executeSubmitReport() {
     const dateStr = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
     let hours = now.getHours();
     const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    hours = hours ? hours : 12; 
+    hours = hours % 12 || 12; 
     const minStr = now.getMinutes().toString().padStart(2, '0');
     const timeStr = `${hours}:${minStr} ${ampm}`;
 
-    const newCardHTML = `
-        <div class="report-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors" style="background:var(--surface); border-color:var(--border)" onclick="openReportDetails(this)" data-email="${email}" data-contact="${contact}">
-          <div class="flex justify-between items-start mb-4">
-            <div>
-              <p class="text-xs font-bold text-white report-date">${dateStr}</p>
-              <p class="text-xs text-[#94a3b8]">${timeStr}</p>
-            </div>
-            <span class="badge-status bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all">New</span>
-          </div>
-          <h3 class="text-lg font-bold text-white mb-4 hover:text-blue-400 transition-colors">${escapeHTML(subject)}</h3>
-          <div class="space-y-1 text-sm mb-4">
-            <p><span class="text-[#94a3b8]">Name of reportee:</span> <span class="text-white font-semibold">${escapeHTML(name)}</span></p>
-            <p><span class="text-[#94a3b8]">Location:</span> <span class="text-white font-semibold">${escapeHTML(location)}</span></p>
-          </div>
-          <div class="text-sm mb-6">
-            <p class="text-[#94a3b8] mb-1">Description:</p>
-            <p class="text-slate-300 leading-relaxed line-clamp-3">${escapeHTML(desc)}</p>
-          </div>
-          <div class="mt-auto pt-4 border-t space-y-4 text-sm" style="border-color:var(--border)" onclick="event.stopPropagation()">
-            <div>
-              <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2">FORWARD TO</p>
-              <select class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500 cursor-pointer transition-all" onfocus="storePrevValue(this)" onchange="handleForward(this)">
-                <option value="" disabled selected hidden>Select department...</option>
-                ${departments.map(d => `<option value="${d}">${d}</option>`).join('')}
-              </select>
-            </div>
-            <div class="flex items-center justify-between mt-4">
-              <p class="text-[11px] font-bold text-white uppercase tracking-wider">Mark as Resolved</p>
-              <label class="switch" onclick="event.stopPropagation()">
-                <input type="checkbox" onchange="handleReportToggle(event, this)">
-                <span class="slider"></span>
-              </label>
-            </div>
-          </div>
+    // TEMPLATE FOR INCOMING REPORTS (No Return Reason)
+    // Ensure your card template looks exactly like this:
+const newCardHTML = `
+    <div class="report-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors animate-in" 
+         style="background:var(--surface); border-color:var(--border)" 
+         onclick="openReportDetails(this)" 
+         data-email="${escapeHTML(report.reporter_email)}" 
+         data-contact="${escapeHTML(report.contact_number)}">
+      
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <p class="text-xs font-bold text-white report-date">${new Date(report.createdAt).toLocaleDateString()}</p>
+          <p class="text-xs text-[#94a3b8]">${new Date(report.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
         </div>
-    `;
+        <span class="badge-status bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all">${report.status || 'Pending'}</span>
+      </div>
+      
+      <h3 class="text-lg font-bold text-white mb-4 hover:text-blue-400 transition-colors">${escapeHTML(report.report_subject)}</h3>
+      
+      <div class="space-y-1 text-sm mb-4">
+        <p><span class="text-[#94a3b8]">Name of reportee:</span> <span class="text-white font-semibold">${escapeHTML(report.reporter_name)}</span></p>
+        <p><span class="text-[#94a3b8]">Location:</span> <span class="text-white font-semibold">${escapeHTML(report.report_location)}</span></p>
+      </div>
+      
+      <div class="text-sm mb-6">
+        <p class="text-[#94a3b8] mb-1">Description:</p>
+        <p class="text-slate-300 leading-relaxed line-clamp-3">${escapeHTML(report.report_description)}</p>
+      </div>
+      
+      <div class="mt-auto pt-4 border-t space-y-4 text-sm" style="border-color:var(--border)" onclick="event.stopPropagation()">
+        <div>
+          <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2">FORWARD TO</p>
+          <select class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500 cursor-pointer transition-all" onfocus="storePrevValue(this)" onchange="handleForward(this)">
+            <option value="" disabled selected hidden>Select department...</option>
+            <option value="Traffic">Traffic</option>
+            <option value="DRRMO">DRRMO</option>
+            <option value="Engineering">Engineering</option>
+          </select>
+        </div>
+        <div class="flex items-center justify-between mt-4">
+          <p class="text-[11px] font-bold text-white uppercase tracking-wider">Mark as Resolved</p>
+          <label class="switch" onclick="event.stopPropagation()">
+            <input type="checkbox" onchange="handleReportToggle(event, this)">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+`;
 
     const grid = document.getElementById('reports-grid');
     if (grid) grid.insertAdjacentHTML('afterbegin', newCardHTML);
 
     clearAndCloseReport();
     if(window.lucide) lucide.createIcons();
-    filterReports();
 }
 
 function clearAndCloseReport() {
@@ -1448,13 +1559,18 @@ function executeAnnFormSubmit() {
 document.addEventListener('DOMContentLoaded', () => { 
     if(window.lucide) lucide.createIcons(); 
     
-    // Load Manage Admins Logic
+    // 1. ADD THIS: Triggers the MongoDB fetch for Public Reports
+    if(document.getElementById('reports-grid')) {
+        fetchAdminReports();
+    }
+    
+    // 2. Existing: Load Manage Admins Logic
     if(document.getElementById('dept-filter') && typeof updateDepartmentDropdowns === 'function') {
         updateDepartmentDropdowns(); 
         populateAdmins(); 
     }
     
-    // Load Announcements Logic
+    // 3. Existing: Load Announcements Logic
     if(document.getElementById('filter-calendar') && typeof renderCategoryDropdowns === 'function') {
         renderCategoryDropdowns();
         filterAnnouncements(); 
