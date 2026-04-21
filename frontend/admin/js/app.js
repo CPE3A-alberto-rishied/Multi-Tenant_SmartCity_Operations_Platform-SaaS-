@@ -433,7 +433,6 @@ function cancelStatusChange() {
 // REPORTS PAGE SPECIFIC LOGIC
 // ==========================================
 
-// REPLACE your existing openReportDetails(card) with this
 function openReportDetails(card) {
     if(!card) return;
     
@@ -497,7 +496,6 @@ function openReportDetails(card) {
     openModal('view-report-modal');
 }
 
-// ADD this function to fetch the list of reports
 async function fetchAdminReports() {
     const grid = document.getElementById('reports-grid');
     if (!grid) return;
@@ -613,7 +611,6 @@ function executeSubmitReport() {
     closeModal('confirm-report-modal');
     openModal('success-report-modal');
     
-    // Hide the empty state placeholder if it exists
     const emptyState = document.getElementById('no-reports-empty');
     if (emptyState) emptyState.classList.add('hidden');
     
@@ -632,33 +629,31 @@ function executeSubmitReport() {
     const minStr = now.getMinutes().toString().padStart(2, '0');
     const timeStr = `${hours}:${minStr} ${ampm}`;
 
-    // TEMPLATE FOR INCOMING REPORTS (No Return Reason)
-    // Ensure your card template looks exactly like this:
-const newCardHTML = `
+    const newCardHTML = `
     <div class="report-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors animate-in" 
          style="background:var(--surface); border-color:var(--border)" 
          onclick="openReportDetails(this)" 
-         data-email="${escapeHTML(report.reporter_email)}" 
-         data-contact="${escapeHTML(report.contact_number)}">
+         data-email="${escapeHTML(email)}" 
+         data-contact="${escapeHTML(contact)}">
       
       <div class="flex justify-between items-start mb-4">
         <div>
-          <p class="text-xs font-bold text-white report-date">${new Date(report.createdAt).toLocaleDateString()}</p>
-          <p class="text-xs text-[#94a3b8]">${new Date(report.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+          <p class="text-xs font-bold text-white report-date">${dateStr}</p>
+          <p class="text-xs text-[#94a3b8]">${timeStr}</p>
         </div>
-        <span class="badge-status bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all">${report.status || 'Pending'}</span>
+        <span class="badge-status bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all">Pending</span>
       </div>
       
-      <h3 class="text-lg font-bold text-white mb-4 hover:text-blue-400 transition-colors">${escapeHTML(report.report_subject)}</h3>
+      <h3 class="text-lg font-bold text-white mb-4 hover:text-blue-400 transition-colors">${escapeHTML(subject)}</h3>
       
       <div class="space-y-1 text-sm mb-4">
-        <p><span class="text-[#94a3b8]">Name of reportee:</span> <span class="text-white font-semibold">${escapeHTML(report.reporter_name)}</span></p>
-        <p><span class="text-[#94a3b8]">Location:</span> <span class="text-white font-semibold">${escapeHTML(report.report_location)}</span></p>
+        <p><span class="text-[#94a3b8]">Name of reportee:</span> <span class="text-white font-semibold">${escapeHTML(name)}</span></p>
+        <p><span class="text-[#94a3b8]">Location:</span> <span class="text-white font-semibold">${escapeHTML(location)}</span></p>
       </div>
       
       <div class="text-sm mb-6">
         <p class="text-[#94a3b8] mb-1">Description:</p>
-        <p class="text-slate-300 leading-relaxed line-clamp-3">${escapeHTML(report.report_description)}</p>
+        <p class="text-slate-300 leading-relaxed line-clamp-3">${escapeHTML(desc)}</p>
       </div>
       
       <div class="mt-auto pt-4 border-t space-y-4 text-sm" style="border-color:var(--border)" onclick="event.stopPropagation()">
@@ -680,7 +675,7 @@ const newCardHTML = `
         </div>
       </div>
     </div>
-`;
+    `;
 
     const grid = document.getElementById('reports-grid');
     if (grid) grid.insertAdjacentHTML('afterbegin', newCardHTML);
@@ -1555,6 +1550,87 @@ function executeAnnFormSubmit() {
     }
 }
 
+
+// ==========================================
+// MAPBOX & CHART.JS TRAFFIC EXTRACTION HACK
+// ==========================================
+let globalTrafficChart = null;
+
+function initTrafficChart() {
+    const ctx = document.getElementById('trafficCongestionChart');
+    if (!ctx) return;
+
+    globalTrafficChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Light', 'Moderate', 'Heavy / Severe'],
+            datasets: [{
+                data: [0, 0, 0], // Starting empty
+                backgroundColor: ['#10b981', '#3b82f6', '#f43f5e'],
+                borderWidth: 0,
+                cutout: '75%'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let total = context.chart._metasets[context.datasetIndex].total;
+                            let value = context.raw;
+                            let percentage = total > 0 ? Math.round((value / total) * 100) + '%' : '0%';
+                            return ` ${context.label}: ${percentage}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function extractAndUpdateTrafficData(mapInstance) {
+    if (!globalTrafficChart || !mapInstance.getLayer('traffic')) return;
+
+    // Scan the features visible in the current bounding box
+    const features = mapInstance.queryRenderedFeatures({ layers: ['traffic'] });
+    let counts = { low: 0, moderate: 0, heavy: 0, severe: 0 };
+
+    features.forEach(f => {
+        const congestion = f.properties.congestion;
+        if (counts[congestion] !== undefined) {
+            counts[congestion]++;
+        }
+    });
+
+    const total = counts.low + counts.moderate + counts.heavy + counts.severe;
+    const heavySevereCombined = counts.heavy + counts.severe;
+
+    // 1. Update the Chart JS instance
+    globalTrafficChart.data.datasets[0].data = [
+        counts.low,
+        counts.moderate,
+        heavySevereCombined
+    ];
+    globalTrafficChart.update();
+
+    // 2. Update the HTML Legend Percentages
+    if (total > 0) {
+        const getPct = (val) => Math.round((val / total) * 100) + '%';
+        
+        const lightEl = document.getElementById('stat-light');
+        const modEl = document.getElementById('stat-moderate');
+        const heavyEl = document.getElementById('stat-heavy');
+        
+        if(lightEl) lightEl.innerText = getPct(counts.low);
+        if(modEl) modEl.innerText = getPct(counts.moderate);
+        if(heavyEl) heavyEl.innerText = getPct(heavySevereCombined);
+    }
+}
+
+
 // ====== PAGE LOAD INITIALIZER ======
 document.addEventListener('DOMContentLoaded', () => { 
     if (localStorage.getItem('activeDepartment')) {
@@ -1562,6 +1638,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if(window.lucide) lucide.createIcons(); 
     
+    // INITIALIZE CHART JS FOR DASHBOARD
+    initTrafficChart();
+
     // 1. ADD THIS: Triggers the MongoDB fetch for Public Reports
     if(document.getElementById('reports-grid')) {
         fetchAdminReports();
