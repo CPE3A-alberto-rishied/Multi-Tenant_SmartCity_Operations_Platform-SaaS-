@@ -38,6 +38,10 @@ function escapeHTML(str) {
 }
 
 function doLogout() { 
+    // 1. Clear the session data from memory
+    localStorage.removeItem('activeDepartment');
+    
+    // 2. Redirect to the login screen
     window.location.href = 'admin.html'; 
 }
 // Close custom dropdowns when clicking outside
