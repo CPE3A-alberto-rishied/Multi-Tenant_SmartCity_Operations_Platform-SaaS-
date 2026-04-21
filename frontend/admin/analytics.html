@@ -2,20 +2,20 @@
 <html lang="en" class="h-full">
 <head>
   <meta charset="UTF-8">
+  <script>
+        (function() {
+            const session = localStorage.getItem('activeDepartment');
+            if (!session) {
+                // Stop the browser from loading anything else and redirect
+                window.location.replace('admin.html'); 
+            }
+        })();
+    </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BEAT - Analytics & Audit</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    (function() {
-        const session = localStorage.getItem('activeDepartment');
-        
-        if (!session) {
-            window.location.href = 'admin.html';
-        }
-    })();
-</script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
  <style>
