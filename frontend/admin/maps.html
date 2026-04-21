@@ -6,164 +6,69 @@
         (function() {
             const session = localStorage.getItem('activeDepartment');
             if (!session) {
-                // Stop the browser from loading anything else and redirect
                 window.location.replace('admin.html'); 
             }
         })();
     </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BEAT - Maps</title>
+  
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
+
   <link rel="stylesheet" href="css/styles2.css">
- <style>
-    body { font-family: 'DM Sans', sans-serif !important; overflow: hidden; }
+  <style>
+    body { font-family: 'DM Sans', sans-serif !important; overflow: hidden; background-color: #0a0e1a; }
     
-    /* SIDEBAR */
-    .sidebar { width: 260px !important; flex-shrink: 0 !important; }
-    
-    .sidebar-item { 
-      display: flex !important; align-items: center !important; gap: 12px !important;
-      padding: 12px 18px !important; font-size: 14.5px !important; 
-      font-weight: 500 !important; color: #94a3b8 !important;
-      text-decoration: none !important; border-left: 3px solid transparent !important;
-    }
+    /* EXACT COPY FROM PROFILE.HTML */
+    .sidebar { width: 260px !important; flex-shrink: 0 !important; background: var(--surface); }
+    .sidebar-item { display: flex !important; align-items: center !important; gap: 12px !important; padding: 12px 18px !important; font-size: 14.5px !important; font-weight: 500 !important; color: #94a3b8 !important; text-decoration: none !important; border-left: 3px solid transparent !important; }
     .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
     .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
     .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
     
-    /* USER FOOTER FIXED */
     .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
     .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
     .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
-    .settings-link { color: #94a3b8; transition: color 0.2s; display: flex; align-items: center; }
-    .settings-link:hover { color: #3b82f6; }
-
+    .settings-link { color: #3b82f6; transition: color 0.2s; display: flex; align-items: center; } 
+    
     .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
-    
-    /* Input Styling */
-    .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 8px 12px; transition: all 0.2s; }
-    .modal-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
-    .input-error { border-color: #ef4444 !important; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important; }
-    
-    /* AUTOFILL FIX */
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover, 
-    input:-webkit-autofill:focus, 
-    input:-webkit-autofill:active,
-    select:-webkit-autofill {
-        -webkit-box-shadow: 0 0 0px 1000px #1e2536 inset !important;
-        -webkit-text-fill-color: #ffffff !important;
-        caret-color: white !important;
-        transition: background-color 5000s ease-in-out 0s;
-    }
 
-    /* CUSTOM SCROLLBAR FOR AUDIT TABLE */
-    .audit-container::-webkit-scrollbar { width: 6px; height: 6px; }
-    .audit-container::-webkit-scrollbar-track { background: transparent; }
-    .audit-container::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
-    .audit-container::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+    /* Map wrapper fix: Ensuring absolute parent has flex-grow */
+    .map-wrapper { position: relative; flex-grow: 1; width: 100%; height: 100%; background: #070d19; overflow: hidden; }
+    #map { position: absolute; top: 0; bottom: 0; left: 0; right: 0; z-index: 1; }
 
-    /* =========================================
-       EXTRACTED INLINE STYLES 
-       ========================================= */
-       
-    /* Theme Variables Applied */
-    .bg-surface { background: var(--surface); }
-    .border-theme { border-color: var(--border); }
-    .text-accent { color: var(--accent); }
-    
-    /* UI Elements */
-    .logo-box-sm { 
-      background: var(--accent); 
-      width: 36px; 
-      height: 36px; 
-      border-radius: 10px; 
-    }
-    .avatar-circle { 
-      background: #2563eb; 
-      width: 42px; 
-      height: 42px; 
-      border-radius: 50%; 
-      background-size: cover; 
-    }
-    .text-dim-xs { color: var(--text-dim); font-size: 11px; }
-    
-    /* Icon Sizes */
-    .icon-xs { width: 16px; height: 16px; }
-    .icon-sm { width: 18px; height: 18px; }
-    
-    /* Input Padding Adjustments */
-    .search-input-py { padding-top: 8px; padding-bottom: 8px; }
-    .dropdown-py { padding: 4px 8px; }
-
-    /* PRINT SPECIFIC STYLING */
-    @media print {
-        .sidebar, header, .charts-container, .search-container { display: none !important; }
-        body, main { background: white !important; color: black !important; display: block !important; overflow: visible !important; }
-        .audit-card { width: 100% !important; margin: 0 !important; padding: 0 !important; border: none !important; background: white !important; box-shadow: none !important; height: auto !important; }
-        .audit-card h3 { color: black !important; margin-bottom: 20px !important; }
-        .audit-card h3 svg, .audit-card h3 i { display: none !important; } 
-        .audit-container { overflow: visible !important; max-height: none !important; padding-right: 0 !important; }
-        table { width: 100% !important; border-collapse: collapse !important; }
-        thead { display: table-header-group !important; } 
-        tr { page-break-inside: avoid !important; }
-        th { background-color: #f3f4f6 !important; color: black !important; border-bottom: 2px solid #000 !important; padding: 12px !important; }
-        td { border-bottom: 1px solid #ccc !important; color: black !important; padding: 12px !important; }
-        span[class*="bg-"] { border: 1px solid #666 !important; background: transparent !important; color: black !important; padding: 2px 6px !important; }
-        * { color: black !important; }
-    }
-
-    /* =========================================
-       MOBILE RESPONSIVE DASHBOARD FIXES 
-       ========================================= */
-    @media (max-width: 1024px) {
-        .audit-card, .charts-container { height: auto !important; min-height: 450px; }
-    }
-
-    @media (max-width: 768px) {
-        /* Fix Layout Stacking */
-        body { flex-direction: column !important; }
-        
-        /* Adjust Header */
-        header { height: auto !important; padding: 16px !important; flex-direction: column; align-items: flex-start !important; gap: 12px; }
-        .animate-in { padding: 16px !important; }
-        
-        /* Adjust Panels */
-        .audit-card { height: 500px !important; }
-        .charts-container { height: auto !important; gap: 16px !important; }
-        .charts-container > .card { height: 350px !important; }
-        
-        /* Audit Table Fixes (Prevents Squishing) */
-        .audit-container { overflow-x: auto !important; padding-right: 0 !important; }
-        table { min-width: 700px; }
-        
-        /* Wrap Titles and Search Bars */
-        #audit-section > div:first-child { flex-direction: column; align-items: flex-start !important; gap: 12px; }
-        .search-container { width: 100% !important; }
-        .charts-container .flex.items-center.justify-between { flex-wrap: wrap; gap: 8px; }
-    }
+    /* UI Overlays */
+    .map-overlay-panel { position: absolute; top: 20px; left: 20px; z-index: 10; width: 280px; background: rgba(10, 22, 40, 0.95); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .barangay-select { width: 100%; background: #1e2536; border: 1px solid #374151; color: white; padding: 10px; border-radius: 8px; font-family: 'Barlow Condensed'; text-transform: uppercase; outline: none; }
+    .map-legend { position: absolute; bottom: 30px; right: 20px; z-index: 10; background: rgba(10, 22, 40, 0.95); border: 1px solid var(--border); border-radius: 8px; padding: 15px; display: grid; gap: 8px; }
+    .legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.75rem; color: white; font-family: 'Barlow Condensed'; text-transform: uppercase; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .section-label { color: #94a3b8; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
   </style>
 </head>
-<body class="h-full flex bg-[#0a0e1a]">
+<body class="h-full flex">
 
   <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
 
-  <aside id="sidebar" class="sidebar flex flex-col h-full absolute lg:relative z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 border-r border-gray-800/50 bg-surface">
-    <div class="h-[76px] px-5 flex items-center border-b shrink-0 border-theme">
+  <aside id="sidebar" class="sidebar flex flex-col h-full absolute lg:relative z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300" style="background:var(--surface); border-right: 1px solid var(--border)">
+    <div class="h-[76px] px-5 flex items-center border-b shrink-0" style="border-color:var(--border)">
       <div class="flex items-center gap-3">
-        <div class="logo-box-sm flex items-center justify-center font-bold text-white text-sm">B</div>
+        <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
         <div class="flex flex-col justify-center">
-          <div class="logo-text font-bold text-lg text-white tracking-widest leading-none mb-1">BEAT</div>
-          <div class="text-dim-xs leading-none">Admin Control Center</div>
+          <div class="logo-text font-bold text-lg text-white leading-none mb-1">BEAT</div>
+          <div class="text-[11px] text-[#94a3b8] leading-none">Admin Control Center</div>
         </div>
       </div>
       <button class="lg:hidden ml-auto text-gray-400 hover:text-white" onclick="toggleSidebar()">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
     </div>
+    
     <nav class="flex-1 py-4 overflow-y-auto">
       <a href="dashboard.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
       <a href="manage_admin.html" class="sidebar-item"><i data-lucide="users"></i><span>Manage Admins</span></a>
@@ -188,270 +93,103 @@
             <i data-lucide="log-out" style="width:16px; height:16px"></i> Logout
         </button>
     </div>
+    
   </aside>
 
-  <main class="flex-1 overflow-y-auto flex flex-col min-w-0 bg-[#0a0e1a]">
-    <header class="px-4 sm:px-8 h-[76px] flex items-center justify-between border-b shrink-0 border-theme bg-surface">
-      <div class="flex items-center gap-3">
-        <button class="lg:hidden text-gray-400 hover:text-white" onclick="toggleSidebar()">
-          <i data-lucide="menu" class="w-6 h-6"></i>
-        </button>
-        <h1 class="text-xl font-semibold flex items-center gap-2 text-white">
-          <i data-lucide="bar-chart-3" class="hidden sm:block"></i>
-          Maps
-        </h1>
-      </div>
-      <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 bg-[#1e2536] hover:bg-gray-800 text-white text-sm font-medium rounded-lg border border-gray-700 transition-colors">
-        <i data-lucide="printer" class="icon-xs"></i> <span class="hidden sm:inline">Print / Export Logs</span>
+  <main class="flex-1 flex flex-col min-w-0">
+    <header class="w-full px-4 sm:px-8 h-[76px] flex items-center border-b shrink-0" style="border-color:var(--border);background:var(--surface)">
+      <button class="lg:hidden text-gray-400 hover:text-white mr-4" onclick="toggleSidebar()">
+        <i data-lucide="menu" class="w-6 h-6"></i>
       </button>
+      <h1 class="text-xl font-semibold text-white flex items-center gap-2"><i data-lucide="map" class="text-[#94a3b8] w-6 h-6"></i>Maps</h1>
     </header>
 
-    <div class="p-4 sm:p-8 animate-in max-w-[1600px] mx-auto w-full">
-      
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <div id="audit-section" class="audit-card lg:col-span-2 card border border-gray-800/50 rounded-xl p-4 sm:p-6 shadow-sm flex flex-col h-[600px] bg-surface">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-semibold flex items-center gap-2 text-white text-lg">
-              <i data-lucide="scroll-text" class="text-accent"></i>
-              System Audit Trail
-            </h3>
-            <div class="search-container relative w-72">
-              <i data-lucide="search" class="absolute left-3 top-2.5 text-gray-500 icon-xs"></i>
-              <input type="text" id="auditSearch" placeholder="Search logs by admin, action, IP..." class="modal-input !mt-0 !pl-9 text-sm search-input-py w-full">
+    <div class="map-wrapper">
+        <div id="map"></div>
+
+        <div class="map-overlay-panel">
+            <div class="section-label" style="margin-bottom: 8px;">Jump to District</div>
+            <select class="barangay-select" onchange="zoomToBarangay(this.value)">
+                <option value="">-- Select Barangay --</option>
+                <option value="bagong-ilog">Bagong Ilog</option>
+                <option value="kapasigan">Kapasigan</option>
+                <option value="kapitolyo">Kapitolyo</option>
+                <option value="manggahan">Manggahan</option>
+                <option value="pinagbuhatan">Pinagbuhatan</option>
+                <option value="rosario">Rosario</option>
+                <option value="san-joaquin">San Joaquin</option>
+                <option value="ugong">Ugong</option>
+                <option value="pineda">Pineda</option>
+                <option value="santa-lucia">Santa Lucia</option>
+                <option value="caniogan">Caniogan</option>
+            </select>
+            <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-[11px] text-[#94a3b8] font-bold uppercase tracking-wider">Patrols</span>
+                    <span class="text-blue-500 font-bold font-mono text-sm">08</span>
+                </div>
             </div>
-          </div>
-          
-          <div class="audit-container overflow-y-auto flex-1 pr-2 w-full">
-            <table class="w-full text-left text-sm text-gray-400 whitespace-nowrap sm:whitespace-normal">
-              <thead class="text-xs uppercase bg-[#1e2536] text-gray-300 sticky top-0 z-10">
-                <tr>
-                  <th class="px-4 py-3 rounded-l-lg">Date & Time</th>
-                  <th class="px-4 py-3">Admin</th>
-                  <th class="px-4 py-3">Action Details</th>
-                  <th class="px-4 py-3 rounded-r-lg">IP Address</th>
-                </tr>
-              </thead>
-              <tbody id="auditTableBody">
-                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
-                  <td class="px-4 py-4 text-white">Today, 10:24 AM</td>
-                  <td class="px-4 py-4">Main Admin</td>
-                  <td class="px-4 py-4"><span class="bg-green-500/10 text-green-400 px-2 py-1 rounded text-xs mr-2">Status Update</span>Marked Report #402 as Resolved</td>
-                  <td class="px-4 py-4">192.168.1.10</td>
-                </tr>
-                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
-                  <td class="px-4 py-4 text-white">Today, 09:15 AM</td>
-                  <td class="px-4 py-4">Traffic Manager</td>
-                  <td class="px-4 py-4"><span class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded text-xs mr-2">Announcement</span>Published "EDSA Southbound Heavy Traffic"</td>
-                  <td class="px-4 py-4">192.168.1.44</td>
-                </tr>
-                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
-                  <td class="px-4 py-4 text-white">Yesterday, 16:40 PM</td>
-                  <td class="px-4 py-4">System Auto</td>
-                  <td class="px-4 py-4"><span class="bg-purple-500/10 text-purple-400 px-2 py-1 rounded text-xs mr-2">Backup</span>Automated database backup completed</td>
-                  <td class="px-4 py-4">Localhost</td>
-                </tr>
-                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
-                  <td class="px-4 py-4 text-white">Yesterday, 14:20 PM</td>
-                  <td class="px-4 py-4">Main Admin</td>
-                  <td class="px-4 py-4"><span class="bg-yellow-500/10 text-yellow-400 px-2 py-1 rounded text-xs mr-2">Login</span>Successful login to dashboard</td>
-                  <td class="px-4 py-4">192.168.1.10</td>
-                </tr>
-                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
-                  <td class="px-4 py-4 text-white">Apr 18, 11:10 AM</td>
-                  <td class="px-4 py-4">Support Agent</td>
-                  <td class="px-4 py-4"><span class="bg-red-500/10 text-red-400 px-2 py-1 rounded text-xs mr-2">Deleted</span>Removed spam report #399</td>
-                  <td class="px-4 py-4">192.168.1.22</td>
-                </tr>
-                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
-                  <td class="px-4 py-4 text-white">Apr 17, 08:00 AM</td>
-                  <td class="px-4 py-4">Traffic Manager</td>
-                  <td class="px-4 py-4"><span class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded text-xs mr-2">Announcement</span>Published "Morning Road Closures"</td>
-                  <td class="px-4 py-4">192.168.1.44</td>
-                </tr>
-                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
-                  <td class="px-4 py-4 text-white">Apr 16, 22:30 PM</td>
-                  <td class="px-4 py-4">Main Admin</td>
-                  <td class="px-4 py-4"><span class="bg-indigo-500/10 text-indigo-400 px-2 py-1 rounded text-xs mr-2">Settings</span>Updated system routing parameters</td>
-                  <td class="px-4 py-4">192.168.1.10</td>
-                </tr>
-                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
-                  <td class="px-4 py-4 text-white">Apr 15, 14:15 PM</td>
-                  <td class="px-4 py-4">Support Agent</td>
-                  <td class="px-4 py-4"><span class="bg-green-500/10 text-green-400 px-2 py-1 rounded text-xs mr-2">Status Update</span>Marked Report #395 as In Progress</td>
-                  <td class="px-4 py-4">192.168.1.22</td>
-                </tr>
-                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
-                  <td class="px-4 py-4 text-white">Apr 15, 09:00 AM</td>
-                  <td class="px-4 py-4">System Auto</td>
-                  <td class="px-4 py-4"><span class="bg-purple-500/10 text-purple-400 px-2 py-1 rounded text-xs mr-2">Backup</span>Automated database backup completed</td>
-                  <td class="px-4 py-4">Localhost</td>
-                </tr>
-                <tr class="border-b border-gray-800/50 hover:bg-[#1e2536]/50">
-                  <td class="px-4 py-4 text-white">Apr 14, 18:45 PM</td>
-                  <td class="px-4 py-4">Traffic Manager</td>
-                  <td class="px-4 py-4"><span class="bg-red-500/10 text-red-400 px-2 py-1 rounded text-xs mr-2">Alert</span>Triggered emergency signal on Route A</td>
-                  <td class="px-4 py-4">192.168.1.44</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
         </div>
 
-        <div class="charts-container flex flex-col gap-6 h-auto lg:h-[600px]">
-          
-          <div class="card border border-gray-800/50 rounded-xl p-5 shadow-sm flex flex-col shrink-0 h-[300px] lg:h-[260px] bg-surface">
-            <div class="flex items-center justify-between mb-3 shrink-0">
-              <h3 class="font-semibold flex items-center gap-2 text-white">
-                <i data-lucide="pie-chart" class="text-accent"></i>
-                Report Categories
-              </h3>
-            </div>
-            <div class="flex-1 relative w-full min-h-0">
-              <canvas id="categoriesChart"></canvas>
-            </div>
-          </div>
-
-          <div class="card border border-gray-800/50 rounded-xl p-4 sm:p-6 shadow-sm flex flex-col flex-1 h-[300px] lg:h-auto bg-surface">
-            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-              <h3 class="font-semibold flex items-center gap-2 text-white">
-                <i data-lucide="activity" class="text-accent"></i>
-                Report Frequency
-              </h3>
-              <select id="freqDropdown" onchange="updateFrequencyChart()" class="modal-input !mt-0 !w-auto text-xs cursor-pointer dropdown-py">
-                <option value="This Week">This Week</option>
-                <option value="This Month">This Month</option>
-                <option value="This Year">This Year</option>
-              </select>
-            </div>
-            <div class="flex-1 flex items-center justify-center relative w-full">
-              <canvas id="frequencyChart"></canvas>
-            </div>
-          </div>
-          
+        <div class="map-legend">
+            <div class="legend-item"><span class="dot" style="background: #4ade80;"></span> Smooth</div>
+            <div class="legend-item"><span class="dot" style="background: #facc15;"></span> Moderate</div>
+            <div class="legend-item"><span class="dot" style="background: #f87171;"></span> Heavy</div>
         </div>
-        
-      </div>
     </div>
   </main>
 
-<script src="js/app.js"></script>
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    if(window.lucide) lucide.createIcons();
-  });
-  
-  function doLogout() { window.location.href = 'admin.html'; }
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if(window.lucide) lucide.createIcons();
 
-  // Handle Mobile Sidebar Toggle
-  function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('sidebar-overlay');
-      
-      if (sidebar.classList.contains('-translate-x-full')) {
-          sidebar.classList.remove('-translate-x-full');
-          if(overlay) overlay.classList.remove('hidden');
-      } else {
-          sidebar.classList.add('-translate-x-full');
-          if(overlay) overlay.classList.add('hidden');
-      }
-  }
+        mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag';
+        
+        const map = new mapboxgl.Map({
+            container: 'map', 
+            style: 'mapbox://styles/mapbox/dark-v11', 
+            center: [121.0825, 14.5764], 
+            zoom: 12.5,
+            pitch: 45,
+            trackResize: true
+        });
 
-  document.getElementById('auditSearch').addEventListener('keyup', function() {
-    let filter = this.value.toLowerCase();
-    let rows = document.querySelectorAll('#auditTableBody tr');
-    
-    rows.forEach(row => {
-      let text = row.textContent.toLowerCase();
-      row.style.display = text.includes(filter) ? '' : 'none';
+        const resizeInterval = setInterval(() => { map.resize(); }, 500);
+        setTimeout(() => { clearInterval(resizeInterval); }, 2500);
+
+        map.on('load', () => {
+            map.resize();
+            map.addSource('live-traffic', { type: 'vector', url: 'mapbox://mapbox.mapbox-traffic-v1' });
+            map.addLayer({
+                'id': 'traffic-lines', 'type': 'line', 'source': 'live-traffic', 'source-layer': 'traffic',
+                'paint': {
+                    'line-width': 3,
+                    'line-color': [ 'match', ['get', 'congestion'], 'low', '#4ade80', 'moderate', '#facc15', 'heavy', '#f87171', 'severe', '#334155', 'transparent' ]
+                }
+            });
+        });
+
+        window.zoomToBarangay = function(val) {
+            const barangayData = { 'bagong-ilog': [121.0689, 14.5652], 'kapasigan': [121.0741, 14.5644], 'kapitolyo': [121.0592, 14.5712] };
+            if (!val) { map.flyTo({ center: [121.0825, 14.5764], zoom: 12.5 }); return; }
+            map.flyTo({ center: barangayData[val] || [121.0825, 14.5764], zoom: 14.5, pitch: 60 });
+        };
     });
-  });
 
-  let freqChart;
-
-  document.addEventListener("DOMContentLoaded", function() {
-    
-    const ctxCat = document.getElementById('categoriesChart').getContext('2d');
-    new Chart(ctxCat, {
-      type: 'doughnut',
-      data: {
-        labels: ['Accidents', 'Traffic Jams', 'Road Works', 'Hazards'],
-        datasets: [{
-          data: [151, 192, 85, 42],
-          backgroundColor: [
-            '#ef4444', 
-            '#eab308', 
-            '#3b82f6', 
-            '#10b981'  
-          ],
-          borderWidth: 0,
-          hoverOffset: 4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '70%', 
-        layout: {
-          padding: { top: 0, bottom: 0 } 
-        },
-        plugins: {
-          legend: {
-            position: 'right',
-            align: 'center',
-            labels: { 
-              color: '#94a3b8', 
-              boxWidth: 10,
-              font: { size: 11 },
-              padding: 12,
-              usePointStyle: true,
-              pointStyle: 'circle'
-            }
-          }
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        if (sidebar.classList.contains('-translate-x-full')) {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
         }
-      }
-    });
-
-    const ctxFreq = document.getElementById('frequencyChart').getContext('2d');
-    freqChart = new Chart(ctxFreq, {
-      type: 'bar',
-      data: {
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        datasets: [{
-          label: 'Reports Received',
-          data: [45, 59, 80, 81, 56, 55, 40],
-          backgroundColor: '#3b82f6',
-          borderRadius: 4,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
-          x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
-        }
-      }
-    });
-  });
-
-  function updateFrequencyChart() {
-    const selection = document.getElementById('freqDropdown').value;
-    
-    if (selection === 'This Week') {
-      freqChart.data.labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      freqChart.data.datasets[0].data = [45, 59, 80, 81, 56, 55, 40];
-    } else if (selection === 'This Month') {
-      freqChart.data.labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-      freqChart.data.datasets[0].data = [210, 350, 290, 420];
-    } else if (selection === 'This Year') {
-      freqChart.data.labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      freqChart.data.datasets[0].data = [1200, 1500, 1100, 1800, 2100, 2300, 2500, 2200, 1900, 1600, 1400, 1700];
     }
-    
-    freqChart.update();
-  }
-</script>
+
+    function doLogout() { localStorage.removeItem('activeDepartment'); window.location.href = 'admin.html'; }
+  </script>
 </body>
 </html>
