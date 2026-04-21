@@ -56,43 +56,50 @@ document.addEventListener('click', (e) => {
 // AUTHENTICATION LOGIC (admin.html)
 // ==========================================
 let currentLoggingInId = "";
-async function handleLogin(e) {
-    e.preventDefault(); 
-    
-    const userEl = document.getElementById('login-user');
-    const passEl = document.getElementById('login-pass');
-    const deptEl = document.getElementById('login-dept');
-    
-    const userErr = document.getElementById('user-error');
-    const passErr = document.getElementById('pass-error');
+async function handleLogin(event) {
+    event.preventDefault();
 
-    // Basic local validation
-    if (!userEl.value.trim() || !passEl.value.trim()) {
-        if (!userEl.value.trim()) userEl.classList.add('input-error'), userErr.classList.remove('hidden');
-        if (!passEl.value.trim()) passEl.classList.add('input-error'), passErr.classList.remove('hidden');
-        return;
-    }
+    const userId = document.getElementById('login-user').value;
+    const userPass = document.getElementById('login-pass').value;
+    const selectedDept = document.getElementById('login-dept').value;
 
     try {
-        const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/login', {
+        // Change this URL if your backend is hosted somewhere else
+        const response = await fetch('http://localhost:3000/api/login', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                id: userEl.value.trim(),
-                password: passEl.value,
-                dept: deptEl.options[deptEl.selectedIndex].text.replace(" Department", "")
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                id: userId, 
+                password: userPass, 
+                dept: selectedDept // Matches your MongoDB field name
             })
         });
 
-        const result = await response.json();
-        if (result.success) {
-            currentLoggingInId = result.adminId; // Store for verification
-            document.getElementById('login-card').classList.add('hidden');
-            document.getElementById('verify-card').classList.remove('hidden');
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            // Save the verified department to localStorage
+            localStorage.setItem('activeDepartment', data.department);
+            
+            // Redirect based on the verified department
+            if (data.department === 'Main Admin') {
+                window.location.href = 'dashboard.html';
+            } else if (data.department === 'Traffic') {
+                window.location.href = 'dashboard2.html';
+            } else if (data.department === 'DRRMO') {
+                window.location.href = 'dashboard3.html';
+            }
         } else {
-            alert(result.error);
+            // If the backend sends back an error (wrong pass, wrong dept), alert the user
+            alert(data.message);
         }
-    } catch (error) { console.error(error); }
+
+    } catch (error) {
+        console.error('Error connecting to server:', error);
+        alert('Cannot connect to the server. Make sure your backend is running.');
+    }
 }
 
 async function handleVerify(e) {

@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BEAT - Analytics & Audit</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles2.css">
+</head>
+<body class="h-full flex bg-[#0a0e1a]">
+  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface">
+    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
+      <div class="flex items-center gap-3">
+        <div class="logo-box">B</div>
+        <div class="flex flex-col justify-center">
+          <div class="logo-text font-bold text-white">BEAT</div>
+          <div class="sidebar-subtext">Department Portal</div>
+        </div>
+      </div>
+    </div>
+    
+    <nav class="flex-1 py-4 overflow-y-auto">
+      <a href="dashboard2.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+      <a href="reports2.html" class="sidebar-item"><i data-lucide="file-text"></i><span>Public Reports</span></a>
+      <a href="announcements2.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+      <a href="traffic2.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
+      <a href="analytics2.html" class="sidebar-item active"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
+    </nav>
+
+    <div class="user-footer">
+        <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-3">
+                <div id="nav-avatar" class="nav-avatar"></div>
+                <div>
+                  <div class="user-footer-name">Loading...</div>
+                  <div class="user-footer-sub">Loading...</div>
+                </div>
+            </div>
+            <a href="profile2.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
+        </div>
+        <button onclick="doLogout()" class="btn-logout">
+            <i data-lucide="log-out" class="icon-sm"></i> Logout
+        </button>
+    </div>
+  </aside>
+
+  <main class="flex-1 overflow-y-auto">
+    <header class="px-8 h-[76px] flex items-center justify-between shrink-0 theme-surface theme-border-b">
+      <h1 class="text-xl font-semibold flex items-center gap-2 text-white">
+        <i data-lucide="bar-chart-3" class="icon-lg"></i>
+        Analytics & Audit
+      </h1>
+      <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 bg-[#1e2536] hover:bg-gray-800 text-white text-sm font-medium rounded-lg border theme-border transition-colors">
+        <i data-lucide="printer" class="icon-sm"></i> Print / Export Logs
+      </button>
+    </header>
+
+    <div class="p-8 animate-in">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div id="audit-section" class="audit-card lg:col-span-2 border theme-border rounded-xl p-6 shadow-sm flex flex-col h-[600px] theme-surface">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold flex items-center gap-2 text-white text-lg">
+              <i data-lucide="scroll-text" class="text-blue-500"></i>
+              System Audit Trail
+            </h3>
+            <div class="search-container relative w-72">
+              <i data-lucide="search" class="absolute left-3 top-2.5 text-gray-500 icon-sm"></i>
+              <input type="text" id="auditSearch" placeholder="Search logs by action..." class="modal-input !mt-0 !pl-9 text-sm" style="padding-top:8px; padding-bottom:8px;">
+            </div>
+          </div>
+          
+          <div class="audit-container overflow-y-auto flex-1 pr-2">
+            <table class="w-full text-left text-sm text-gray-400">
+              <thead class="text-xs uppercase bg-[#1e2536] text-gray-300 sticky top-0 z-10">
+                <tr>
+                  <th class="px-4 py-3 rounded-l-lg">Date & Time</th>
+                  <th class="px-4 py-3">Admin</th>
+                  <th class="px-4 py-3">Action Details</th>
+                  <th class="px-4 py-3 rounded-r-lg">IP Address</th>
+                </tr>
+              </thead>
+              <tbody id="auditTableBody">
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="charts-container flex flex-col gap-6 h-[600px]">
+          <div class="border theme-border rounded-xl p-5 shadow-sm flex flex-col shrink-0 h-[260px] theme-surface">
+            <div class="flex items-center justify-between mb-3 shrink-0">
+              <h3 class="font-semibold flex items-center gap-2 text-white">
+                <i data-lucide="pie-chart" class="text-blue-500"></i>
+                Report Categories
+              </h3>
+            </div>
+            <div class="flex-1 relative w-full min-h-0">
+              <canvas id="categoriesChart"></canvas>
+            </div>
+          </div>
+
+          <div class="border theme-border rounded-xl p-6 shadow-sm flex flex-col flex-1 theme-surface">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-semibold flex items-center gap-2 text-white">
+                <i data-lucide="activity" class="text-blue-500"></i>
+                Report Frequency
+              </h3>
+              <select id="freqDropdown" onchange="updateFrequencyChart()" class="modal-input !mt-0 !w-auto text-xs cursor-pointer" style="padding:4px 8px;">
+                <option value="This Week">This Week</option>
+                <option value="This Month">This Month</option>
+                <option value="This Year">This Year</option>
+              </select>
+            </div>
+            <div class="flex-1 flex items-center justify-center relative w-full">
+              <canvas id="frequencyChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/app2.js"></script>
+  <script>
+    lucide.createIcons();
+    
+    document.getElementById('auditSearch').addEventListener('keyup', function() {
+      let filter = this.value.toLowerCase();
+      let rows = document.querySelectorAll('#auditTableBody tr');
+      
+      rows.forEach(row => {
+        let text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
+      });
+    });
+
+    let freqChart;
+    document.addEventListener("DOMContentLoaded", function() {
+      const ctxCat = document.getElementById('categoriesChart').getContext('2d');
+      new Chart(ctxCat, {
+        type: 'doughnut',
+        data: {
+          labels: ['Accidents', 'Traffic Jams', 'Road Works', 'Hazards'],
+          datasets: [{
+            data: [0, 0, 0, 0], 
+            backgroundColor: ['#ef4444', '#eab308', '#3b82f6', '#10b981'],
+            borderWidth: 0, hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false, cutout: '70%',
+          layout: { padding: { top: 0, bottom: 0 } },
+          plugins: {
+            legend: { position: 'right', align: 'center', labels: { color: '#94a3b8', boxWidth: 10, font: { size: 11 }, padding: 12, usePointStyle: true, pointStyle: 'circle' } }
+          }
+        }
+      });
+
+      const ctxFreq = document.getElementById('frequencyChart').getContext('2d');
+      freqChart = new Chart(ctxFreq, {
+        type: 'bar',
+        data: {
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          datasets: [{
+            label: 'Reports Received',
+            data: [0, 0, 0, 0, 0, 0, 0], 
+            backgroundColor: '#3b82f6', borderRadius: 4,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+          }
+        }
+      });
+    });
+
+    function updateFrequencyChart() {
+      const selection = document.getElementById('freqDropdown').value;
+      
+      if (selection === 'This Week') {
+        freqChart.data.labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        freqChart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0];
+      } else if (selection === 'This Month') {
+        freqChart.data.labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+        freqChart.data.datasets[0].data = [0, 0, 0, 0];
+      } else if (selection === 'This Year') {
+        freqChart.data.labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        freqChart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      }
+      freqChart.update();
+    }
+  </script>
+</body>
+</html>
