@@ -92,24 +92,49 @@
         }
     </style>
 </head>
-<body class="flex flex-col h-full overflow-auto">
-    <header class="main-header">
-        <div class="header-container">
-            <div style="cursor:pointer; display:flex; align-items:center; gap:10px;" onclick="window.location.href='index.html'">
-                <img src="assets/beat_logo.png" alt="BEAT Logo" style="height: 40px; width: auto; object-fit: contain;">
-
-                <img src="assets/beat_text.png" alt="BEAT Text" style="height: 50px; width: auto; object-fit: contain; opacity: 0.9;">
+<body class="flex flex-col h-full overflow-auto bg-[#0a0e1a]">
+    
+    
+</head>
+<body class="flex flex-col h-full overflow-auto bg-[#0a0e1a]">
+    
+    <header class="main-header" style="position: sticky; top: 0; z-index: 999; background-color: #0a0e1a; border-bottom: 1px solid #1f2937;">
+        <div class="header-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            
+            <div style="cursor:pointer; display:flex; align-items:center; gap:10px;" class="relative z-[110]" onclick="window.location.href='index.html'">
+                <img src="assets/beat_logo.png" alt="BEAT Logo" class="h-12 md:h-[40px] w-auto object-contain">
+                <img src="assets/beat_text.png" alt="BEAT Text" class="h-14 md:h-[50px] w-auto object-contain opacity-90">
             </div>
-            <nav style="display:flex; gap:28px; align-items:center;" class="hidden md:flex">
-                <a href="index.html" class="nav-link active">Home</a>
+
+            <nav class="hidden md:flex" style="gap:28px; align-items:center;">
+                <a href="index.html" class="nav-link">Home</a>
                 <a href="map.html" class="nav-link">Map</a>
                 <a href="report.html" class="nav-link">Report</a>
                 <a href="news.html" class="nav-link">News</a>
-                <a href="about.html" class="nav-link">About</a>
+                <a href="about.html" class="nav-link active">About</a>
             </nav>
+
+            <div class="md:hidden flex items-center relative z-[110]">
+                <button type="button" onclick="toggleMobileMenu()" style="background:none; border:none; color:white; padding:8px; cursor:pointer;">
+                    <svg id="menu-open-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+                    <svg id="menu-close-icon" class="hidden" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden" style="background-color: #0f1629; border-bottom: 1px solid #1f2937; position: absolute; width: 100%; left: 0; top: 100%; z-index: 90; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);">
+            <div style="padding: 24px 16px; display: flex; flex-direction: column; gap: 8px;">
+                <a href="index.html" style="display:block; padding:12px 16px; color:#d1d5db; font-weight:bold; border-radius:8px; text-transform:uppercase; text-decoration:none; letter-spacing: 0.1em;">Home</a>
+                <a href="map.html" style="display:block; padding:12px 16px; color:#d1d5db; font-weight:bold; border-radius:8px; text-transform:uppercase; text-decoration:none; letter-spacing: 0.1em;">Map</a>
+                <a href="report.html" style="display:block; padding:12px 16px; color:#d1d5db; font-weight:bold; border-radius:8px; text-transform:uppercase; text-decoration:none; letter-spacing: 0.1em;">Report</a>
+                <a href="news.html" style="display:block; padding:12px 16px; color:#d1d5db; font-weight:bold; border-radius:8px; text-transform:uppercase; text-decoration:none; letter-spacing: 0.1em;">News</a>
+                <a href="about.html" style="display:block; padding:12px 16px; color:#3b82f6; font-weight:bold; background-color:rgba(59,130,246,0.1); border-radius:8px; text-transform:uppercase; text-decoration:none; letter-spacing: 0.1em;">About</a>
+                <div style="padding-top:24px; margin-top:16px; border-top:1px solid #1f2937;">
+                    <a href="login.php" style="display:block; width:100%; text-align:center; padding:12px 16px; background-color:#1f2937; color:white; font-weight:bold; border-radius:8px; text-transform:uppercase; text-decoration:none; letter-spacing: 0.1em;">Admin Login</a>
+                </div>
+            </div>
         </div>
     </header>
-
     <div class="ticker-wrap">
         <div class="ticker-inner">
             <span class="ticker-item">🔵 Community Patrol Active Tonight <span class="ticker-sep">|</span></span>
@@ -275,31 +300,7 @@
                         </div>
 
                         <div id="news-flash-feed" style="display:flex; flex-direction:column; gap:12px;">
-                            <div class="widget-card feed-item-box">
-                                <span class="feed-category" style="color: #fb923c;">ROAD WORK</span>
-                                <span class="feed-sep">|</span>
-                                <div style="flex-grow: 1; display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="color:var(--white); font-size:1rem;">Street light outage reported in <span style="color:var(--accent); font-weight: 600;">Zone 4</span></span>
-                                    <span style="font-family:'Barlow Condensed'; font-weight: 700; color:var(--gray); font-size: 0.85rem; margin-left: 20px;">10:42 AM</span>
-                                </div>
                             </div>
-                            <div class="widget-card feed-item-box">
-                                <span class="feed-category" style="color: #22c55e;">SECURITY</span>
-                                <span class="feed-sep">|</span>
-                                <div style="flex-grow: 1; display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="color:var(--white); font-size:1rem;">Patrol unit <span style="color:var(--accent); font-weight: 600;">ALPHA-9</span> finished rounds</span>
-                                    <span style="font-family:'Barlow Condensed'; font-weight: 700; color:var(--gray); font-size: 0.85rem; margin-left: 20px;">09:15 AM</span>
-                                </div>
-                            </div>
-                            <div class="widget-card feed-item-box">
-                                <span class="feed-category" style="color: var(--blue);">TRAFFIC</span>
-                                <span class="feed-sep">|</span>
-                                <div style="flex-grow: 1; display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="color:var(--white); font-size:1rem;">Traffic congestion cleared at <span style="color:var(--accent); font-weight: 600;">C5 Interchange</span></span>
-                                    <span style="font-family:'Barlow Condensed'; font-weight: 700; color:var(--gray); font-size: 0.85rem; margin-left: 20px;">08:30 AM</span>
-                                </div>
-                            </div>
-                        </div>
 
                         <div style="text-align: center; margin-top: 40px;">
                             <button class="btn-primary" style="padding: 12px 36px;" onclick="window.location.href='news.html'">VIEW ALL ACTIVITY</button>
@@ -423,7 +424,24 @@
     <script>
         if (window.lucide) lucide.createIcons();
 
-        // 1. Weather Logic Helper
+        // 1. MOBILE HAMBURGER MENU TOGGLE
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const openIcon = document.getElementById('menu-open-icon');
+            const closeIcon = document.getElementById('menu-close-icon');
+            
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                openIcon.classList.add('hidden');    // Hide Hamburger
+                closeIcon.classList.remove('hidden'); // Show X
+            } else {
+                menu.classList.add('hidden');
+                openIcon.classList.remove('hidden');  // Show Hamburger
+                closeIcon.classList.add('hidden');    // Hide X
+            }
+        }
+
+        // 2. Weather Logic Helper
         function getWeatherStyle(wmoCode) {
             if (wmoCode === 0) return { text: 'CLEAR', icon: 'sun', color: '#fbbf24' };
             if (wmoCode >= 1 && wmoCode <= 3) return { text: 'CLOUDY', icon: 'cloud-sun', color: '#fbbf24' };
@@ -434,7 +452,7 @@
             return { text: 'CLOUDY', icon: 'cloud', color: '#8899bb' };
         }
 
-        // 2. Fetch Live Weather, Forecast & Real Mapbox Traffic
+        // 3. Fetch Live Weather, Forecast & Real Mapbox Traffic
         async function fetchLiveMetrics() {
             try {
                 // --- A. OPEN-METEO WEATHER FETCH ---
@@ -484,10 +502,7 @@
                 }
 
                 // --- B. MAPBOX REAL-TIME TRAFFIC FETCH ---
-                // IMPORTANT: Replace this with your actual Mapbox token
                 const MAPBOX_TOKEN = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag'; 
-                
-                // Coordinates for a major route (e.g., C5 Pasig)
                 const startCoords = '121.0664,14.5630'; 
                 const endCoords = '121.0770,14.5890';
 
@@ -531,18 +546,16 @@
             }
         }
 
-        // 3. Fetch Latest News Flash from Database (via Arvin's API)
+        // 4. Fetch Latest News Flash from Database
         async function fetchLatestNewsFlash() {
             const feedContainer = document.getElementById('news-flash-feed');
             if (!feedContainer) return;
 
             try {
-                // Ensure this points to the correct API url your team is using!
                 const response = await fetch('https://beat-pasig-api.onrender.com/api/latest-news');
                 const result = await response.json();
 
                 if (result.success && result.data && result.data.length > 0) {
-                    // Clear the hardcoded placeholder cards
                     feedContainer.innerHTML = '';
 
                     const getCategoryStyle = (category) => {
@@ -558,7 +571,6 @@
 
                     result.data.forEach(article => {
                         const catColor = getCategoryStyle(article.category);
-                        
                         const dateObj = new Date(article.created_at);
                         const timeString = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
@@ -577,11 +589,10 @@
                     });
                 }
             } catch (error) {
-                console.error("Could not fetch live news flash. Displaying fallbacks.", error);
+                console.error("Could not fetch live news flash.", error);
             }
         }
 
-        // Initialize everything when the page loads
         document.addEventListener('DOMContentLoaded', () => {
             fetchLiveMetrics();
             fetchLatestNewsFlash();
