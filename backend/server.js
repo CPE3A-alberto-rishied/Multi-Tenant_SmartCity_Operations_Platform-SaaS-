@@ -174,7 +174,6 @@ app.put('/api/report/:id', async (req, res) => {
     }
 });
 
-const express = require('express');
 const { MongoClient } = require('mongodb');
 const cors = require('cors'); // Allows your frontend to talk to your backend
 
