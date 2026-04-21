@@ -212,13 +212,19 @@ input:checked + .slider:before { transform: translateX(20px); }
   filter: invert(1); /* Makes the icon white/visible on dark background */
   cursor: pointer;
 }
-/* Darken the report date and time text */
-.report-date {
-    color: #64748b !important; /* A darker slate gray */
+/* 1. Add the security class */
+.auth-guarded { 
+    display: none !important; 
 }
 
-.report-card p.text-[#94a3b8] {
-    color: #475569; /* Darker subtext for the time and labels */
+/* 2. Fix the broken Tailwind notation */
+.report-date {
+    color: #64748b !important; 
+}
+
+/* Target the subtext/labels directly without bracket notation */
+.report-card p {
+    color: #475569 !important;
 }
 
 /* Ensure the department box looks identical to the return reason box */
