@@ -5,19 +5,17 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
+
+// 1. MIDDLEWARE
 app.use(cors());
 app.use(express.json());
 
-// ==========================================
-// 1. DATABASE CONNECTION
-// ==========================================
+// 2. DATABASE CONNECTION
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('✅ BEAT Cloud Connected via Mongoose'))
+    .then(() => console.log('✅ BEAT Cloud Connected'))
     .catch(err => console.error('❌ MongoDB Error:', err));
 
-// ==========================================
-// 2. SCHEMAS & MODELS
-// ==========================================
+// 3. SCHEMAS & MODELS
 const reportSchema = new mongoose.Schema({
     reporter_name: String,
     reporter_email: String,
@@ -35,14 +33,12 @@ const adminSchema = new mongoose.Schema({
     password: { type: String, required: true },
     email: String,
     dept: String,
-    otp: String,          // Temporary verification code
-    otpExpires: Date      // Code expiration time
+    otp: String,
+    otpExpires: Date
 });
 const Admin = mongoose.model('Admin', adminSchema);
 
-// ==========================================
-// 3. EMAIL SETUP
-// ==========================================
+// 4. EMAIL SETUP
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -51,23 +47,15 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// ==========================================
-// 4. ROUTES
-// ==========================================
+// 5. ROUTES
 
-// --- SUBMIT PUBLIC REPORT ---
+// --- Report Routes ---
 app.post('/api/report', async (req, res) => {
     try {
         const { reporter_name, reporter_email, contact_number, report_subject, report_location, report_description } = req.body;
 
         if (!reporter_name || !reporter_email || !contact_number || !report_subject || !report_location || !report_description) {
             return res.status(400).json({ success: false, error: "All fields are required." });
-        }
-        if (!/^[a-zA-Z\s]+$/.test(reporter_name)) {
-            return res.status(400).json({ success: false, error: "Name must be letters only." });
-        }
-        if (!/^\d{11}$/.test(contact_number)) {
-            return res.status(400).json({ success: false, error: "Contact must be exactly 11 digits." });
         }
 
         const newReport = new Report(req.body);
@@ -77,22 +65,11 @@ app.post('/api/report', async (req, res) => {
 
         // Background Emails
         transporter.sendMail({
-            from: "BEAT Pasig Support" <${process.env.EMAIL_USER}>,
+            from: `"BEAT Pasig Support" <${process.env.EMAIL_USER}>`,
             to: reporter_email,
-            subject: Confirmation: Report Received - ${report_subject},
-            html: <p>Hi ${reporter_name}, your report has been successfully logged.</p>
+            subject: `Confirmation: Report Received - ${report_subject}`,
+            html: `<p>Hi ${reporter_name}, your report has been successfully logged.</p>`
         }).catch(e => console.error("User Mail Error:", e));
-
-        transporter.sendMail({
-            from: "BEAT SYSTEM" <${process.env.EMAIL_USER}>,
-            to: process.env.ADMIN_EMAIL,
-            subject: 🚨 New BEAT Report: ${report_subject},
-            html: `
-                <p><b>New Incident Logged</b></p>
-                <p><b>From:</b> ${reporter_name}</p>
-                <p><b>Location:</b> ${report_location}</p>
-                <p><b>Details:</b> ${report_description}</p>`
-        }).catch(e => console.error("Admin Mail Error:", e));
 
     } catch (error) {
         console.error("Server Error:", error);
@@ -100,7 +77,6 @@ app.post('/api/report', async (req, res) => {
     }
 });
 
-// --- GET ALL REPORTS ---
 app.get('/api/reports/all', async (req, res) => {
     try {
         const reports = await Report.find().sort({ createdAt: -1 });
@@ -110,67 +86,44 @@ app.get('/api/reports/all', async (req, res) => {
     }
 });
 
-// --- UPDATE REPORT STATUS ---
 app.put('/api/report/:id', async (req, res) => {
     try {
         const { status } = req.body;
-        const updatedReport = await Report.findByIdAndUpdate(
-            req.params.id, 
-            { status: status }, 
-            { new: true }
-        );
+        const updatedReport = await Report.findByIdAndUpdate(req.params.id, { status }, { new: true });
         res.status(200).json({ success: true, data: updatedReport });
     } catch (error) {
         res.status(500).json({ success: false, error: "Failed to update status" });
     }
 });
 
-// --- ADMIN LOGIN (3-Way Verification + OTP) ---
+// --- Admin Login & 2FA Routes ---
 app.post('/api/admin/login', async (req, res) => {
     try {
         const { id, password, dept } = req.body;
-        
-        // Find admin by ID first to give specific error messages
-        const foundAdmin = await Admin.findOne({ id: id });
+        const foundAdmin = await Admin.findOne({ id, dept });
 
-        if (!foundAdmin) {
-            return res.status(401).json({ success: false, error: "ID Number not found." });
+        if (!foundAdmin || foundAdmin.password !== password) {
+            return res.status(401).json({ success: false, error: "Invalid credentials." });
         }
 
-        if (foundAdmin.password !== password) {
-            return res.status(401).json({ success: false, error: "Incorrect password." });
-        }
-
-        // Verify the department matches the dropdown selection
-        if (foundAdmin.dept !== dept) {
-            return res.status(401).json({ 
-                success: false, 
-                error: Access Denied: This ID belongs to ${foundAdmin.dept}, not ${dept}. 
-            });
-        }
-
-        // Generate 6-Digit Code
         const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
         foundAdmin.otp = otpCode;
-        foundAdmin.otpExpires = Date.now() + 600000; // Valid for 10 minutes
+        foundAdmin.otpExpires = Date.now() + 600000; 
         await foundAdmin.save();
 
-        // Send Email via Nodemailer
         await transporter.sendMail({
-            from: "BEAT Security" <${process.env.EMAIL_USER}>,
+            from: `"BEAT Security" <${process.env.EMAIL_USER}>`,
             to: foundAdmin.email,
             subject: "B.E.A.T. Admin Verification Code",
-            html: <h3>Verification Code: <b>${otpCode}</b></h3><p>This code expires in 10 minutes.</p>
+            html: `<h3>Verification Code: <b>${otpCode}</b></h3><p>This code expires in 10 minutes.</p>`
         });
 
         res.status(200).json({ success: true, adminId: foundAdmin.id });
     } catch (error) {
-        console.error("Login Error:", error);
-        res.status(500).json({ success: false, error: "Server Error during Login." });
+        res.status(500).json({ success: false, error: "Server Error during 2FA." });
     }
 });
 
-// --- ADMIN OTP VERIFICATION ---
 app.post('/api/admin/verify', async (req, res) => {
     try {
         const { adminId, otpCode } = req.body;
@@ -180,21 +133,30 @@ app.post('/api/admin/verify', async (req, res) => {
             return res.status(400).json({ success: false, error: "Invalid or expired code." });
         }
 
-        // Clear OTP after success
         admin.otp = undefined;
         admin.otpExpires = undefined;
         await admin.save();
 
-        // Send back the verified department for frontend routing
-        res.status(200).json({ success: true, department: admin.dept });
+        res.status(200).json({ success: true, dept: admin.dept });
     } catch (error) {
-        console.error("Verify Error:", error);
         res.status(500).json({ success: false, error: "Verification failed." });
     }
 });
 
-// ==========================================
-// 5. START SERVER
-// ==========================================
+// Simple Login Route (using the same Admin model)
+app.post('/api/login', async (req, res) => {
+    const { id, password, dept } = req.body;
+    try {
+        const user = await Admin.findOne({ id });
+        if (!user || user.password !== password || user.dept !== dept) {
+            return res.status(401).json({ success: false, message: "Invalid ID, Password, or Department." });
+        }
+        res.json({ success: true, department: user.dept });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server error." });
+    }
+});
+
+// 6. START SERVER
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(🚀 Server running on port ${PORT}));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
