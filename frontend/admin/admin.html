@@ -6,6 +6,7 @@
     <title>BEAT - Admin Control Center</title>
     
     <script>
+    // AUTO-REDIRECT: If already logged in, skip the login page
     if (localStorage.getItem('activeDepartment')) {
         const dept = localStorage.getItem('activeDepartment');
         if (dept === 'Main Admin') {
@@ -53,6 +54,7 @@
             background: linear-gradient(135deg, #0a0e1a 0%, #1a1f3a 25%, #0f1428 50%, #1a254a 75%, #0a0e1a 100%);
             position: relative;
             overflow: hidden;
+            min-height: 100vh;
         }
         
         /* Cards */
@@ -111,6 +113,7 @@
             .otp-input { width: 40px; height: 48px; font-size: 1.1rem; }
             .logo-box { width: 48px; height: 48px; }
             #auth-logo h1 { font-size: 32px; }
+            .flex-otp { gap: 0.25rem; }
         }
     </style>
 </head>
@@ -191,7 +194,7 @@
             <p class="text-dim-sm mb-6">Enter the 6-digit code sent to your email</p>
             
             <form onsubmit="handleVerify(event)" novalidate>
-                <div class="flex justify-between gap-1 sm:gap-2 mb-4">
+                <div class="flex justify-between flex-otp gap-1 sm:gap-2 mb-4">
                     <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 0)" onkeydown="handleOtpBack(event, 0)">
                     <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 1)" onkeydown="handleOtpBack(event, 1)">
                     <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 2)" onkeydown="handleOtpBack(event, 2)">
@@ -227,19 +230,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => { 
             if(window.lucide) lucide.createIcons(); 
-            
-            const loginDept = document.getElementById('login-dept');
-            if (loginDept) {
-                const savedDepts = JSON.parse(localStorage.getItem('beat_departments')) || [];
-                savedDepts.forEach(dept => {
-                    if (!Array.from(loginDept.options).some(opt => opt.value === dept)) {
-                        const opt = document.createElement('option');
-                        opt.value = dept; 
-                        opt.text = dept + " Department";
-                        loginDept.appendChild(opt);
-                    }
-                });
-            }
         });
 
         // ==========================================
@@ -251,7 +241,6 @@
             const loginUser = document.getElementById('login-user');
             const loginPass = document.getElementById('login-pass');
             
-            // 1. Basic empty field validation (so loader doesn't show if they didn't type anything)
             let hasError = false;
             if (!loginUser.value.trim()) {
                 loginUser.classList.add('input-error');
@@ -269,23 +258,17 @@
             const loadingPopup = document.getElementById('loading-popup');
             const verifyCard = document.getElementById('verify-card');
             
-            // 2. Instantly hide the login card and show the Loading modal
             loginCard.classList.add('hidden');
             loadingPopup.classList.remove('hidden');
             
-            // 3. Await the actual background fetch to your server
             await handleLogin(e);
             
-            // 4. Hide the loading modal after the server responds
             loadingPopup.classList.add('hidden');
             
-            // 5. Check outcome: If handleLogin succeeded, it unhid verify-card.
             if (!verifyCard.classList.contains('hidden')) {
-                // Success! Focus the first OTP input
                 const firstOtp = document.querySelector('.otp-input');
                 if(firstOtp) firstOtp.focus();
             } else {
-                // Failed! (handleLogin already showed an alert). Restore the login card.
                 loginCard.classList.remove('hidden');
             }
         }
