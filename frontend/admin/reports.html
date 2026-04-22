@@ -4,9 +4,9 @@
   <script>
     (function() {
         const session = localStorage.getItem('activeDepartment');
-        // Kick them out if they are NOT logged in, OR if they are NOT the Main Admin
         if (!session || session !== 'Main Admin') {
-            window.location.replace('admin.html'); 
+            // Notice the new "?error=unauthorized" at the end
+            window.location.replace('admin.html?error=unauthorized'); 
         }
     })();
 </script>
