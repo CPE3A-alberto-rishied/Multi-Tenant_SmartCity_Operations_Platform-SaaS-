@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en" class="h-full">
 <head>
+  <script>
+    (function() {
+        const session = localStorage.getItem('activeDepartment');
+        // Kick them out if they are NOT logged in, OR if they are NOT the Main Admin
+        if (!session || session !== 'Main Admin') {
+            window.location.replace('admin.html'); 
+        }
+    })();
+</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BEAT – Dashboard Overview</title>
