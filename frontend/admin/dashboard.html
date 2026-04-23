@@ -69,23 +69,18 @@
 
   <aside id="sidebar" class="sidebar flex flex-col h-full fixed lg:relative z-[100] transform -translate-x-full lg:translate-x-0 transition-transform duration-300 top-0 left-0 theme-border-r theme-surface">
     
-   <div class="h-[76px] px-5 flex items-center justify-between shrink-0 theme-border-b">
+    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
       
       <div class="flex items-center gap-0.5">
-          <img src="../assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain" onerror="this.src='/assets/beat_logo2.png'">
-          <div class="flex flex-col justify-center items-start">
-              <img src="../assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1" onerror="this.src='/assets/beat_text2.png'">
-              <div style="color:#94a3b8; font-size:11px" class="leading-none">Admin Control Center</div>
-          </div>
+        <img src="../assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain" onerror="this.src='/assets/beat_logo2.png'">
+        <div class="flex flex-col justify-center items-start">
+          <img src="../assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1" onerror="this.src='/assets/beat_text2.png'">
+          <div style="color:var(--text-dim); font-size:11px" class="leading-none">Admin Control Center</div>
+        </div>
       </div>
       
-      <button type="button" class="lg:hidden text-gray-400 hover:text-white p-2" onclick="toggleSidebar()">
+      <button type="button" class="lg:hidden ml-auto text-gray-400 hover:text-white p-2" onclick="toggleSidebar()">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      </button>
-    </div>
-      
-      <button type="button" class="lg:hidden text-gray-400 hover:text-white p-2" onclick="toggleSidebar()">
-        <i data-lucide="x" class="w-5 h-5"></i>
       </button>
     </div>
     
