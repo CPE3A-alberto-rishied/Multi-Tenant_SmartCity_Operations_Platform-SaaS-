@@ -46,8 +46,18 @@
     .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
     .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
     
-    /* Modals */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; padding: 1rem; }
+    /* Modals - FIXED Z-INDEX */
+    .modal-overlay { 
+        position: fixed; 
+        inset: 0; 
+        background: rgba(0, 0, 0, 0.85); 
+        backdrop-filter: blur(8px); 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        z-index: 10000 !important; 
+        padding: 1rem; 
+    }
     .hidden { display: none !important; }
     
     /* Input Styling */
@@ -329,8 +339,35 @@
     </div>
   </div>
 
-  <script src="js/app.js"></script>
+<script src="js/app.js"></script>
+  
   <script>
+    // ==========================================
+    // FAILSAFE MODAL FUNCTIONS
+    // (These guarantee the buttons work even if app.js is broken)
+    // ==========================================
+    window.openModal = function(id) {
+        const modal = document.getElementById(id);
+        if (modal) modal.classList.remove('hidden');
+    };
+
+    window.closeModal = function(id) {
+        const modal = document.getElementById(id);
+        if (modal) modal.classList.add('hidden');
+    };
+
+    window.clearAndCloseReport = function() {
+        // Clear inputs if they exist
+        ['report-name', 'report-email', 'report-contact', 'report-location', 'report-subject', 'report-desc'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        closeModal('new-report-modal');
+    };
+
+    // ==========================================
+    // INITIALIZATION & SIDEBAR
+    // ==========================================
     document.addEventListener('DOMContentLoaded', () => { 
       if(window.lucide) lucide.createIcons(); 
       
@@ -347,7 +384,23 @@
       }
     });
 
-    // Handle Mobile Sidebar Toggle securely without touching app.js
+    // Handle Mobile Sidebar Toggle
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        if (sidebar.classList.contains('-translate-x-full')) {
+            sidebar.classList.remove('-translate-x-full');
+            if(overlay) overlay.classList.remove('hidden');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            if(overlay) overlay.classList.add('hidden');
+        }
+    }
+  </script>
+</body>
+</html>
+    // Handle Mobile Sidebar Toggle
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
