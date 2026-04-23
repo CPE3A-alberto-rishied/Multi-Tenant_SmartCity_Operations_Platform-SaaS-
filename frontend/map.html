@@ -13,6 +13,7 @@
 
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 
     <style>
         .map-container {
@@ -24,152 +25,81 @@
             width: 100%;
         }
         
-        #map { 
-            position: absolute;
-            top: 0; 
-            bottom: 0; 
-            width: 100%; 
-            z-index: 1; 
-        }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; z-index: 1; }
 
-        /* --- DESKTOP STYLES --- */
+        /* COMPACT PANEL */
         .map-overlay-panel {
             position: absolute;
-            top: 30px;
-            left: 30px;
+            top: 20px;
+            left: 20px;
             z-index: 10; 
-            width: 360px;
+            width: 320px;
             background: rgba(10, 22, 40, 0.95);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(26, 86, 219, 0.4);
             border-radius: 12px;
-            padding: 32px;
-            max-height: calc(100% - 60px);
+            padding: 20px;
+            max-height: calc(100% - 40px);
             overflow-y: auto;
         }
         
         .map-legend {
             position: absolute;
-            bottom: 40px;
-            right: 30px;
+            bottom: 30px;
+            right: 20px;
             z-index: 10; 
             background: rgba(10, 22, 40, 0.95);
             border: 1px solid rgba(26, 86, 219, 0.4);
             border-radius: 8px;
-            padding: 24px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px 24px;
-        }
-        
-        .legend-header {
-            grid-column: span 2;
-            margin-bottom: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 240px;
         }
         
         .barangay-select {
-            width: 100%;
-            background: rgba(5, 10, 20, 0.8);
-            border: 1px solid var(--blue);
-            color: white;
-            padding: 14px;
-            font-size: 1rem;
-            border-radius: 6px;
-            font-family: 'Barlow Condensed';
-            text-transform: uppercase;
-            outline: none;
-            margin-top: 10px;
+            width: 100%; background: rgba(5, 10, 20, 0.8); border: 1px solid var(--blue); color: white; padding: 10px;
+            font-size: 0.9rem; border-radius: 6px; font-family: 'Barlow Condensed'; text-transform: uppercase; outline: none; margin-top: 10px;
         }
         
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.85rem;
-            color: var(--white);
-            font-family: 'Barlow Condensed';
-            font-weight: 600;
-            text-transform: uppercase;
-        }
+        .legend-item { display: flex; align-items: center; gap: 12px; font-size: 0.85rem; color: var(--white); font-family: 'Barlow Condensed'; font-weight: 600; text-transform: uppercase; }
+        .dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+        .section-label { color: #94a3b8; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
         
-        .dot { width: 12px;
-            height: 12px; border-radius: 50%; box-shadow: 0 0 10px currentColor; flex-shrink: 0;
-        }
-        
-        .mapboxgl-popup-content {
-            padding: 10px 14px;
-            border-radius: 6px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
+        .mapboxgl-popup-content { padding: 12px 14px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); background: #1e293b !important; color: white !important; border: 1px solid rgba(255,255,255,0.1); }
+        .mapboxgl-popup-tip { border-top-color: #1e293b !important; border-bottom-color: #1e293b !important; }
+        .mapboxgl-popup-close-button { color: #94a3b8; font-size: 16px; top: 4px; right: 8px; }
+        .mapboxgl-popup-close-button:hover { color: white; background: transparent; }
 
-        /* --- UPDATED: MOBILE RESPONSIVE STYLES --- */
+        /* Custom Toggles */
+        .layer-switch { position: relative; display: inline-block; width: 34px; height: 20px; }
+        .layer-switch input { opacity: 0; width: 0; height: 0; }
+        .layer-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #374151; transition: .4s; border-radius: 34px; }
+        .layer-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .layer-slider { background-color: #3b82f6; }
+        input:checked + .layer-slider:before { transform: translateX(14px); }
+
+        /* SYNCED ADMIN MARKERS (Rendered on Public Map) */
+        .hazard-marker-active { width: 20px; height: 20px; background-color: #ef4444; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); animation: pulse-red 2s infinite; cursor: pointer; }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239,68,68, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(239,68,68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68, 0); } }
+
+        .weather-blue-marker { width: 16px; height: 16px; background-color: #3b82f6; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); animation: pulse-blue 2s infinite; cursor: pointer; }
+        @keyframes pulse-blue { 0% { box-shadow: 0 0 0 0 rgba(59,130,246, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(59,130,246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59,130,246, 0); } }
+
+        .pickup-marker { width: 16px; height: 16px; background-color: #a855f7; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 15px rgba(168, 85, 247, 0.8); animation: pulse-purple 2s infinite; cursor: pointer; }
+        @keyframes pulse-purple { 0% { box-shadow: 0 0 0 0 rgba(168,85,247, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(168,85,247, 0); } 100% { box-shadow: 0 0 0 0 rgba(168,85,247, 0); } }
+
+        /* FACILITIES */
+        .center-marker, .hospital-marker, .police-marker { width: 26px; height: 26px; border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.3s ease; }
+        .center-marker { background-color: #10b981; }
+        .hospital-marker { background-color: #ef4444; }
+        .police-marker { background-color: #3b82f6; }
+        .center-marker.pulsing, .hospital-marker.pulsing, .police-marker.pulsing { transform: scale(1.15); z-index: 10; box-shadow: 0 0 20px currentColor; }
+
         @media (max-width: 768px) {
-            .map-overlay-panel {
-                top: 10px;
-                left: 10px;
-                width: 280px;
-                padding: 16px;
-                background: rgba(10, 22, 40, 0.7);
-                backdrop-filter: blur(8px); 
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-                border: 1px solid rgba(96, 165, 250, 0.2);
-            }
-            
-            .map-overlay-panel .section-title {
-                font-size: 1.4rem !important;
-                margin-bottom: 10px !important;
-            }
-
-            .map-overlay-panel .section-label {
-                font-size: 0.65rem !important;
-            }
-
-            .barangay-select {
-                padding: 10px;
-                font-size: 0.85rem;
-            }
-
-            .map-legend {
-                bottom: 15px;
-                left: 10px;
-                right: 10px;
-                width: calc(100% - 20px);
-                padding: 12px 16px;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 8px;
-                background: rgba(10, 22, 40, 0.7);
-                backdrop-filter: blur(8px);
-                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
-                border: 1px solid rgba(96, 165, 250, 0.2);
-            }
-
-            .legend-header {
-                grid-column: span 3;
-                margin-bottom: 2px;
-            }
-
-            .legend-item {
-                font-size: 0.65rem;
-                gap: 6px;
-            }
-
-            .dot {
-                width: 8px;
-                height: 8px;
-            }
-
-            .mobile-hide {
-                display: none !important;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .map-legend {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .legend-header {
-                grid-column: span 2;
-            }
+            .map-overlay-panel { top: 10px; left: 10px; width: 280px; padding: 16px; background: rgba(10, 22, 40, 0.7); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); border: 1px solid rgba(96, 165, 250, 0.2); }
+            .map-legend { bottom: 15px; left: 10px; right: 10px; width: calc(100% - 20px); padding: 12px 16px; }
         }
     </style>
 </head>
@@ -177,12 +107,10 @@
     
     <header class="main-header" style="position: sticky; top: 0; z-index: 999; background-color: #0a0e1a; border-bottom: 1px solid #1f2937;">
         <div class="header-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-            
             <div style="cursor:pointer; display:flex; align-items:center; gap:10px;" class="relative z-[110]" onclick="window.location.href='index.html'">
                 <img src="assets/beat_logo.png" alt="BEAT Logo" class="h-12 md:h-[40px] w-auto object-contain">
                 <img src="assets/beat_text.png" alt="BEAT Text" class="h-14 md:h-[50px] w-auto object-contain opacity-90">
             </div>
-
             <nav class="hidden md:flex" style="gap:28px; align-items:center;">
                 <a href="index.html" class="nav-link">Home</a>
                 <a href="map.html" class="nav-link active">Map</a>
@@ -190,7 +118,6 @@
                 <a href="news.html" class="nav-link">News</a>
                 <a href="about.html" class="nav-link">About</a>
             </nav>
-
             <div class="md:hidden flex items-center relative z-[110]">
                 <button type="button" onclick="toggleMobileMenu()" style="background:none; border:none; color:white; padding:8px; cursor:pointer;">
                     <svg id="menu-open-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
@@ -206,23 +133,18 @@
                 <a href="report.html" style="display:block; padding:12px 16px; color:#d1d5db; font-weight:bold; border-radius:8px; text-transform:uppercase; text-decoration:none; letter-spacing: 0.1em;">Report</a>
                 <a href="news.html" style="display:block; padding:12px 16px; color:#d1d5db; font-weight:bold; border-radius:8px; text-transform:uppercase; text-decoration:none; letter-spacing: 0.1em;">News</a>
                 <a href="about.html" style="display:block; padding:12px 16px; color:#d1d5db; font-weight:bold; border-radius:8px; text-transform:uppercase; text-decoration:none; letter-spacing: 0.1em;">About</a>
-                <div style="padding-top:24px; margin-top:16px; border-top:1px solid #1f2937;">
-               </div>
             </div>
         </div>
     </header>
 
     <main class="map-container">
-        
         <div id="map"></div>
-
         <div class="grid-overlay" style="z-index: 2; pointer-events: none;"></div>
 
         <div class="map-overlay-panel">
-            <div class="section-label" style="margin-bottom: 12px; letter-spacing: 0.2em;">GEOSPATIAL NAVIGATOR</div>
-            <h2 class="section-title" style="font-size: 2.2rem; margin-bottom: 24px;">JUMP TO DISTRICT</h2>
+            <div class="section-label" style="margin-bottom: 8px;">GEOSPATIAL NAVIGATOR</div>
+            <h2 class="section-title" style="font-size: 1.8rem; margin-bottom: 12px; font-family: 'Bebas Neue', sans-serif; color: white;">JUMP TO DISTRICT</h2>
    
-            <label class="report-field-label" style="font-size: 0.75rem;">SELECT PASIG BARANGAY</label>
             <select class="barangay-select" onchange="zoomToBarangay(this.value)">
                 <option value="">-- ALL DISTRICTS --</option>
                 <option value="bagong-ilog">Bagong Ilog</option>
@@ -238,151 +160,497 @@
                 <option value="caniogan">Caniogan</option>
             </select>
 
-            <div class="mobile-hide" style="margin-top: 40px; border-top: 1px solid rgba(26, 86, 219, 0.2); padding-top: 1.5rem;">
-                <div class="section-label" style="font-size: 0.65rem; margin: 20px 0 15px;">LIVE SYSTEM STATS</div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                    <span style="color: var(--gray); font-size: 0.9rem; font-family: 'Barlow Condensed';">ACTIVE PATROLS</span>
-                    <span id="active-patrols-count" style="color: var(--blue); font-weight: 700; font-family: 'Bebas Neue'; font-size: 1.2rem;">08</span>
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(26, 86, 219, 0.2);">
+                <div class="flex items-center justify-between mb-4">
+                    <span style="color: white; font-family: 'Barlow Condensed'; font-weight: bold; letter-spacing: 1px; font-size: 0.9rem;">TRAFFIC DENSITY</span>
+                    <label class="layer-switch">
+                        <input type="checkbox" id="toggle-density" checked onchange="toggleLayer('density', this.checked)">
+                        <span class="layer-slider"></span>
+                    </label>
                 </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <span style="color: var(--gray); font-size: 0.9rem; font-family: 'Barlow Condensed';">SECURE ZONES</span>
-                    <span id="secure-zones-count" style="color: #22c55e; font-weight: 700; font-family: 'Bebas Neue'; font-size: 1.2rem;">24</span>
+                <div class="flex items-center justify-between mb-4">
+                    <span style="color: white; font-family: 'Barlow Condensed'; font-weight: bold; letter-spacing: 1px; font-size: 0.9rem;">TRAFFIC OPERATIONS</span>
+                    <label class="layer-switch">
+                        <input type="checkbox" id="toggle-ops" checked onchange="toggleLayer('ops', this.checked)">
+                        <span class="layer-slider"></span>
+                    </label>
+                </div>
+                <div class="flex items-center justify-between mb-4">
+                    <span style="color: white; font-family: 'Barlow Condensed'; font-weight: bold; letter-spacing: 1px; font-size: 0.9rem;">WEATHER ZONES</span>
+                    <label class="layer-switch">
+                        <input type="checkbox" id="toggle-weather" checked onchange="toggleLayer('weather', this.checked)">
+                        <span class="layer-slider"></span>
+                    </label>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span style="color: white; font-family: 'Barlow Condensed'; font-weight: bold; letter-spacing: 1px; font-size: 0.9rem;">EVACUATION FEATURES</span>
+                    <label class="layer-switch">
+                        <input type="checkbox" id="toggle-evac" checked onchange="toggleLayer('evac', this.checked)">
+                        <span class="layer-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div id="corridor-tool-container" style="margin-top: 20px; border-top: 1px solid rgba(26, 86, 219, 0.2); padding-top: 15px;">
+                <div class="section-label" style="margin-bottom: 12px; letter-spacing: 0.2em;">EVACUATION ROUTING</div>
+                
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <button type="button" id="btn-drop-checkpoint" style="width: 100%; background: rgba(59, 130, 246, 0.1); border: 1px solid var(--blue); color: white; padding: 10px; border-radius: 6px; font-family: 'Barlow Condensed'; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                        SET MOVEMENT ORIGIN
+                    </button>
+                    <p id="drop-status" style="font-size: 0.7rem; color: #a855f7; font-family: 'Barlow Condensed'; text-align: center; display: none;">Click anywhere on the map to set the origin point.</p>
+
+                    <div id="routing-options" style="display: none; flex-direction: column; gap: 8px; margin-top: 8px;">
+                        <input type="text" id="checkpoint-name" placeholder="Origin Landmark/Street" style="width: 100%; background: rgba(5, 10, 20, 0.8); border: 1px solid #374151; color: white; padding: 8px; border-radius: 6px; font-family: 'Barlow Condensed'; font-size: 0.85rem; outline: none;">
+                        
+                        <select id="target-center" style="width: 100%; background: rgba(5, 10, 20, 0.8); border: 1px solid #374151; color: white; padding: 8px; border-radius: 6px; font-family: 'Barlow Condensed'; font-size: 0.85rem; outline: none; cursor: pointer;">
+                            <option value="" disabled selected>Select Safe Zone...</option>
+                            <optgroup label="General Evacuation Centers">
+                                <option value="1">Rizal High School Gym</option>
+                                <option value="2">Pasig City Sports Complex</option>
+                                <option value="3">Kapitolyo High School</option>
+                                <option value="4">Manggahan Elementary</option>
+                                <option value="5">Santolan Elementary School</option>
+                                <option value="6">Rosario Sports Complex</option>
+                                <option value="7">San Joaquin Brgy Hall</option>
+                                <option value="8">Pinagbuhatan High School</option>
+                                <option value="9">Ugong Barangay Hall</option>
+                                <option value="10">Maybunga Covered Court</option>
+                                <option value="11">San Antonio Village Park</option>
+                                <option value="12">Kalawaan Elementary School</option>
+                                <option value="13">Dela Paz Evacuation Center</option>
+                                <option value="14">Santa Lucia High School Gym</option>
+                                <option value="15">Buting Elementary School</option>
+                            </optgroup>
+                            <optgroup label="Hospitals & Medical">
+                                <option value="h1">Rizal Medical Center</option>
+                                <option value="h2">The Medical City</option>
+                                <option value="h3">Pasig City General Hospital</option>
+                                <option value="h4">Pasig Doctors Medical Center</option>
+                            </optgroup>
+                            <optgroup label="Police Stations & HQ">
+                                <option value="p1">Pasig City Police Headquarters</option>
+                                <option value="p2">Police Station 1 - San Antonio</option>
+                                <option value="p3">Police Station 2 - Rosario</option>
+                                <option value="p4">Police Station 3 - Kapitolyo</option>
+                            </optgroup>
+                        </select>
+
+                        <button type="button" id="btn-dispatch" disabled style="width: 100%; background: #a855f7; color: white; border: none; padding: 10px; border-radius: 6px; font-family: 'Barlow Condensed'; font-size: 0.95rem; font-weight: 700; cursor: not-allowed; opacity: 0.5; margin-top: 5px;">
+                            ESTABLISH SAFE CORRIDOR
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="map-legend">
-            <div class="legend-header">
-                <div class="section-label" style="font-size: 0.7rem; letter-spacing: 0.15em;">MAP LEGEND</div>
-            </div>
+            <div class="section-label" style="margin-bottom: 2px;">TRAFFIC DENSITY</div>
+            <div class="legend-item"><span class="dot" style="background: #4ade80;"></span> SMOOTH</div>
+            <div class="legend-item"><span class="dot" style="background: #facc15;"></span> MODERATE</div>
+            <div class="legend-item"><span class="dot" style="background: #f87171;"></span> HEAVY</div>
             
-            <div class="legend-item"><span class="dot" style="color: #4ade80; background: #4ade80;"></span> SMOOTH FLOW</div>
-            <div class="legend-item"><span class="dot" style="color: #facc15; background: #facc15;"></span> MODERATE</div>
-            <div class="legend-item"><span class="dot" style="color: #f87171; background: #f87171;"></span> HEAVY/STALL</div>
-            <div class="legend-item"><span class="dot" style="color: #334155; background: #334155;"></span> CLOSED</div>
-
-            <div class="legend-item"><span class="dot" style="color: #3b82f6; background: #3b82f6;"></span> FLOOD</div>
-            <div class="legend-item"><span class="dot" style="color: #94a3b8; background: #94a3b8;"></span> POTHOLE</div>
-            <div class="legend-item"><span class="dot" style="color: #f97316; background: #f97316;"></span> FIRE</div>
+            <div style="width: 100%; height: 1px; background-color: rgba(255,255,255,0.15); margin: 8px 0;"></div>
+            
+            <div class="section-label" style="margin-bottom: 2px;">NETWORK OPERATIONS</div>
+            <div class="legend-item"><span class="dot" style="background: transparent; border: 2px dashed #ef4444;"></span> BLOCKED AREA / AVOID</div>
+            <div class="legend-item"><span class="dot" style="background: transparent; border: 2px dashed #3b82f6;"></span> DRRMO CUSTOM ZONE</div>
+            <div class="legend-item"><span class="dot" style="background: transparent; border: 2px dashed #a855f7;"></span> EVACUATION CORRIDOR</div>
         </div>
     </main>
 
     <script>
         if (window.lucide) lucide.createIcons();
 
-        // 1. MOBILE HAMBURGER MENU TOGGLE
         function toggleMobileMenu() {
             const menu = document.getElementById('mobile-menu');
             const openIcon = document.getElementById('menu-open-icon');
             const closeIcon = document.getElementById('menu-close-icon');
-            
             if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-                openIcon.classList.add('hidden');
-                closeIcon.classList.remove('hidden'); 
+                menu.classList.remove('hidden'); openIcon.classList.add('hidden'); closeIcon.classList.remove('hidden'); 
             } else {
-                menu.classList.add('hidden');
-                openIcon.classList.remove('hidden');  
-                closeIcon.classList.add('hidden');    
+                menu.classList.add('hidden'); openIcon.classList.remove('hidden'); closeIcon.classList.add('hidden');    
             }
         }
 
         mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag';
         
         const map = new mapboxgl.Map({
-            container: 'map', 
-            style: 'mapbox://styles/mapbox/dark-v11', 
-            center: [121.0825, 14.5764], 
-            zoom: 12.5,
-            pitch: 45
+            container: 'map', style: 'mapbox://styles/mapbox/dark-v11', center: [121.0825, 14.5764], zoom: 12.5, pitch: 45
         });
 
         map.addControl(new mapboxgl.NavigationControl(), 'top-right');
-        map.addControl(new mapboxgl.FullscreenControl(), 'top-right');
+
+        // Storage for Markers to toggle
+        let trafficMapObjects = {};
+        let weatherMapObjects = {};
+        let mapObjectsRescues = {};
+        let evacMarkersDOM = {};
+        let activeFacilityMarkers = [];
+
+        // Corridor Mapping Tool Variables
+        let tempPickupMarker = null;
+        let tempPickupCoords = null;
+
+        const evacCenters = [
+            { id: '1', name: 'Rizal High School Gym', coords: [121.0741, 14.5644], type: 'evac' },
+            { id: '2', name: 'Pasig City Sports Complex', coords: [121.0810, 14.5680], type: 'evac' },
+            { id: '3', name: 'Kapitolyo High School', coords: [121.0592, 14.5712], type: 'evac' },
+            { id: '4', name: 'Manggahan Elementary', coords: [121.0960, 14.6060], type: 'evac' },
+            { id: '5', name: 'Santolan Elementary School', coords: [121.0850, 14.6150], type: 'evac' },
+            { id: '6', name: 'Rosario Sports Complex', coords: [121.0880, 14.5900], type: 'evac' },
+            { id: '7', name: 'San Joaquin Brgy Hall', coords: [121.0760, 14.5510], type: 'evac' },
+            { id: '8', name: 'Pinagbuhatan High School', coords: [121.0920, 14.5520], type: 'evac' },
+            { id: '9', name: 'Ugong Barangay Hall', coords: [121.0750, 14.5850], type: 'evac' },
+            { id: '10', name: 'Maybunga Covered Court', coords: [121.0880, 14.5800], type: 'evac' },
+            { id: '11', name: 'San Antonio Village Park', coords: [121.0630, 14.5830], type: 'evac' },
+            { id: '12', name: 'Kalawaan Elementary School', coords: [121.0830, 14.5500], type: 'evac' },
+            { id: '13', name: 'Dela Paz Evacuation Center', coords: [121.1000, 14.6180], type: 'evac' },
+            { id: '14', name: 'Santa Lucia High School Gym', coords: [121.1010, 14.5840], type: 'evac' },
+            { id: '15', name: 'Buting Elementary School', coords: [121.0680, 14.5550], type: 'evac' },
+            { id: 'h1', name: 'Rizal Medical Center', coords: [121.0660, 14.5615], type: 'hospital' },
+            { id: 'h2', name: 'The Medical City', coords: [121.0605, 14.5880], type: 'hospital' },
+            { id: 'h3', name: 'Pasig City General Hospital', coords: [121.0825, 14.5764], type: 'hospital' },
+            { id: 'h4', name: 'Pasig Doctors Medical Center', coords: [121.0960, 14.6060], type: 'hospital' },
+            { id: 'p1', name: 'Pasig City Police Headquarters', coords: [121.0775, 14.5605], type: 'police' },
+            { id: 'p2', name: 'Police Station 1 - San Antonio', coords: [121.0630, 14.5830], type: 'police' },
+            { id: 'p3', name: 'Police Station 2 - Rosario', coords: [121.0880, 14.5900], type: 'police' },
+            { id: 'p4', name: 'Police Station 3 - Kapitolyo', coords: [121.0592, 14.5712], type: 'police' }
+        ];
 
         map.on('load', () => {
-            map.addSource('pasig-barangays', {
-                type: 'geojson',
-                data: './pasig_boundaries.geojson' 
-            });
-
-            map.addSource('live-traffic', {
-                type: 'vector',
-                url: 'mapbox://mapbox.mapbox-traffic-v1'
-            });
-
+            // Live Traffic Layer
+            map.addSource('live-traffic', { type: 'vector', url: 'mapbox://mapbox.mapbox-traffic-v1' });
             map.addLayer({
-                'id': 'barangay-highlight',
-                'type': 'fill',
-                'source': 'pasig-barangays',
-                'paint': {
-                    'fill-color': '#d946ef', 
-                    'fill-opacity': 0.45 
-                },
-                'filter': ['==', 'name', ''] 
-            });
-
-            map.addLayer({
-                'id': 'traffic-lines',
-                'type': 'line',
-                'source': 'live-traffic',
-                'source-layer': 'traffic',
+                'id': 'traffic-lines', 'type': 'line', 'source': 'live-traffic', 'source-layer': 'traffic',
                 'paint': {
                     'line-width': 3,
-                    'line-color': [
-                        'match',
-                        ['get', 'congestion'],
-                        'low', '#4ade80',      // Smooth Flow
-                        'moderate', '#facc15', // Moderate
-                        'heavy', '#f87171',    // Heavy
-                        'severe', '#334155',   // Closed/Severe
-                        'transparent'          // Fallback for empty roads
-                    ]
+                    'line-color': [ 'match', ['get', 'congestion'], 'low', '#4ade80', 'moderate', '#facc15', 'heavy', '#f87171', 'severe', '#334155', 'transparent' ]
                 }
             });
 
-            map.addLayer({
-                'id': 'barangay-borders',
-                'type': 'line',
-                'source': 'pasig-barangays',
-                'paint': {
-                    'line-color': '#06b6d4', 
-                    'line-width': 4,
-                    'line-opacity': 0.9 
+            // Admin Synced Sources & Layers
+            map.addSource('synced-blocked-lines', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+            map.addLayer({ 'id': 'synced-blocked-stroke', 'type': 'line', 'source': 'synced-blocked-lines', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#ef4444', 'line-width': 6, 'line-dasharray': [2, 2] } });
+
+            map.addSource('synced-danger-zones', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+            map.addLayer({ 'id': 'synced-danger-fill', 'type': 'fill', 'source': 'synced-danger-zones', 'paint': { 'fill-color': '#ef4444', 'fill-opacity': 0.25 } });
+            map.addLayer({ 'id': 'synced-danger-stroke', 'type': 'line', 'source': 'synced-danger-zones', 'paint': { 'line-color': '#ef4444', 'line-width': 3, 'line-dasharray': [2, 2] } });
+
+            map.addSource('synced-drrmo-drawn', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+            map.addLayer({ 'id': 'synced-drrmo-drawn-fill', 'type': 'fill', 'source': 'synced-drrmo-drawn', 'paint': { 'fill-color': '#3b82f6', 'fill-opacity': 0.3 } });
+            map.addLayer({ 'id': 'synced-drrmo-drawn-stroke', 'type': 'line', 'source': 'synced-drrmo-drawn', 'paint': { 'line-color': '#3b82f6', 'line-width': 3, 'line-dasharray': [2, 2] } });
+
+            // Synced Admin Rescues (Purple)
+            map.addSource('synced-admin-rescues', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+            map.addLayer({ 'id': 'synced-rescue-routes-highlight', 'type': 'line', 'source': 'synced-admin-rescues', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#a855f7', 'line-width': 12, 'line-opacity': 0.3 } });
+            map.addLayer({ 'id': 'synced-rescue-routes-line', 'type': 'line', 'source': 'synced-admin-rescues', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#a855f7', 'line-width': 4, 'line-dasharray': [2, 2] } });
+
+            // Local Tool Rescues (Purple)
+            map.addSource('local-rescue-routes', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+            map.addLayer({ 'id': 'local-rescue-routes-highlight', 'type': 'line', 'source': 'local-rescue-routes', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#a855f7', 'line-width': 12, 'line-opacity': 0.3 } });
+            map.addLayer({ 'id': 'local-rescue-routes-line', 'type': 'line', 'source': 'local-rescue-routes', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#a855f7', 'line-width': 4, 'line-dasharray': [2, 2] } });
+
+
+            // Render Interactive Facilities
+            evacCenters.forEach(center => {
+                const el = document.createElement('div');
+                let popupHTML = '';
+                
+                if (center.type === 'hospital') {
+                    el.className = 'hospital-marker';
+                    el.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>';
+                    popupHTML = `
+                        <div style="padding-bottom:4px; margin-bottom:4px; border-bottom:1px solid rgba(239,68,68,0.3);">
+                            <span style="font-size:10px; font-weight:bold; text-transform:uppercase; letter-spacing:1px; color:#ef4444;">Medical Facility</span>
+                        </div>
+                        <h3 style="font-weight:bold; font-size:14px; margin-bottom:4px; color:white;">${center.name}</h3>
+                        <span style="display:inline-block; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; padding:2px 8px; border-radius:4px; font-size:9px; font-weight:bold; text-transform:uppercase;">Active Safe Zone</span>
+                    `;
+                } else if (center.type === 'police') {
+                    el.className = 'police-marker';
+                    el.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
+                    popupHTML = `
+                        <div style="padding-bottom:4px; margin-bottom:4px; border-bottom:1px solid rgba(59,130,246,0.3);">
+                            <span style="font-size:10px; font-weight:bold; text-transform:uppercase; letter-spacing:1px; color:#3b82f6;">Law Enforcement</span>
+                        </div>
+                        <h3 style="font-weight:bold; font-size:14px; margin-bottom:4px; color:white;">${center.name}</h3>
+                        <span style="display:inline-block; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.3); color:#93c5fd; padding:2px 8px; border-radius:4px; font-size:9px; font-weight:bold; text-transform:uppercase;">Active Safe Zone</span>
+                    `;
+                } else {
+                    el.className = 'center-marker';
+                    el.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 20 10 4"/><path d="m5 20 9-16"/><path d="M3 20h18"/><path d="m12 15-3 5"/><path d="m12 15 3 5"/></svg>';
+                    popupHTML = `
+                        <div style="padding-bottom:4px; margin-bottom:4px; border-bottom:1px solid rgba(16,185,129,0.3);">
+                            <span style="font-size:10px; font-weight:bold; text-transform:uppercase; letter-spacing:1px; color:#10b981;">Evacuation Center</span>
+                        </div>
+                        <h3 style="font-weight:bold; font-size:14px; margin-bottom:4px; color:white;">${center.name}</h3>
+                        <span style="display:inline-block; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); color:#6ee7b7; padding:2px 8px; border-radius:4px; font-size:9px; font-weight:bold; text-transform:uppercase;">Accepting Evacuees</span>
+                    `;
                 }
+
+                const popup = new mapboxgl.Popup({ offset: 20 }).setHTML(popupHTML);
+                const marker = new mapboxgl.Marker(el).setLngLat(center.coords).setPopup(popup).addTo(map);
+                
+                evacMarkersDOM[center.id] = el;
+                activeFacilityMarkers.push(marker); 
             });
 
-            map.addLayer({
-                'id': '3d-buildings',
-                'source': 'composite',
-                'source-layer': 'building',
-                'filter': ['==', 'extrude', 'true'],
-                'type': 'fill-extrusion',
-                'minzoom': 14, 
-                'paint': {
-                    'fill-extrusion-color': '#1e293b', 
-                    'fill-extrusion-height': ['get', 'height'],
-                    'fill-extrusion-base': ['get', 'min_height'],
-                    'fill-extrusion-opacity': 0.8
+            // Initial renders
+            renderLiveHazards();
+            renderLiveRescues();
+        });
+
+        // -----------------------------------------------------
+        // TOGGLE LOGIC
+        // -----------------------------------------------------
+        window.toggleLayer = function(type, isVisible) {
+            const displayStyle = isVisible ? 'block' : 'none';
+            if (type === 'density') {
+                map.setLayoutProperty('traffic-lines', 'visibility', isVisible ? 'visible' : 'none');
+            } else if (type === 'ops') {
+                map.setLayoutProperty('synced-blocked-stroke', 'visibility', isVisible ? 'visible' : 'none');
+                map.setLayoutProperty('synced-danger-fill', 'visibility', isVisible ? 'visible' : 'none');
+                map.setLayoutProperty('synced-danger-stroke', 'visibility', isVisible ? 'visible' : 'none');
+                Object.values(trafficMapObjects).forEach(obj => { if (obj.marker) obj.marker.getElement().style.display = displayStyle; });
+            } else if (type === 'weather') {
+                map.setLayoutProperty('synced-drrmo-drawn-fill', 'visibility', isVisible ? 'visible' : 'none');
+                map.setLayoutProperty('synced-drrmo-drawn-stroke', 'visibility', isVisible ? 'visible' : 'none');
+                Object.values(weatherMapObjects).forEach(obj => { if (obj.marker) obj.marker.getElement().style.display = displayStyle; });
+            } else if (type === 'evac') {
+                map.setLayoutProperty('synced-rescue-routes-highlight', 'visibility', isVisible ? 'visible' : 'none');
+                map.setLayoutProperty('synced-rescue-routes-line', 'visibility', isVisible ? 'visible' : 'none');
+                if (map.getLayer('local-rescue-routes-highlight')) map.setLayoutProperty('local-rescue-routes-highlight', 'visibility', isVisible ? 'visible' : 'none');
+                if (map.getLayer('local-rescue-routes-line')) map.setLayoutProperty('local-rescue-routes-line', 'visibility', isVisible ? 'visible' : 'none');
+                
+                activeFacilityMarkers.forEach(marker => { marker.getElement().style.display = isVisible ? 'flex' : 'none'; });
+                Object.values(mapObjectsRescues).forEach(obj => { if (obj.marker) obj.marker.getElement().style.display = displayStyle; });
+                if (tempPickupMarker) tempPickupMarker.getElement().style.display = displayStyle;
+                
+                // Hide routing panel if evac is turned off
+                document.getElementById('corridor-tool-container').style.display = isVisible ? 'block' : 'none';
+            }
+        };
+
+        // -----------------------------------------------------
+        // RENDER ADMIN RESULTS (TRAFFIC & WEATHER)
+        // -----------------------------------------------------
+        function renderLiveHazards() {
+            if(!map.getSource('synced-blocked-lines')) return;
+
+            let hazards = JSON.parse(localStorage.getItem('beat_live_hazards')) || [];
+            let drrmoZones = JSON.parse(localStorage.getItem('beat_drrmo_zones')) || [];
+            
+            Object.values(trafficMapObjects).forEach(obj => { if(obj.marker) obj.marker.remove(); });
+            Object.values(weatherMapObjects).forEach(obj => { if(obj.marker) obj.marker.remove(); });
+            trafficMapObjects = {};
+            weatherMapObjects = {};
+
+            let lineFeatures = [], dangerZoneFeatures = [], blueZoneFeatures = [];
+            const isOpsVisible = document.getElementById('toggle-ops').checked;
+            const isWeatherVisible = document.getElementById('toggle-weather').checked;
+
+            // Traffic Blockades
+            const activeHazards = hazards.filter(h => h.status === 'active' && h.source !== 'evacuation');
+            activeHazards.forEach(hazard => {
+                const el = document.createElement('div'); el.className = 'hazard-marker-active';
+                if (!isOpsVisible) el.style.display = 'none';
+
+                const popupHTML = `<div style="color:white; font-family:'Barlow Condensed';"><h3 style="font-weight:bold; font-size:16px; margin-bottom:4px; text-transform:uppercase;">${hazard.title}</h3><p style="font-size:13px; color:#cbd5e1;">${hazard.desc}</p><span style="display:inline-block; margin-top:8px; font-weight:bold; font-size:11px; background:rgba(239,68,68,0.2); border:1px solid #ef4444; color:#fca5a5; padding:2px 8px; border-radius:4px;">AVOID THIS AREA</span></div>`;
+                const popup = new mapboxgl.Popup({ offset: 25, closeButton: false }).setHTML(popupHTML);
+                const marker = new mapboxgl.Marker(el).setLngLat(hazard.center).setPopup(popup).addTo(map);
+                
+                trafficMapObjects[hazard.id] = { marker, popup };
+
+                if (hazard.blockedLine) { lineFeatures.push(hazard.blockedLine); }
+                if (hazard.dangerZone) { dangerZoneFeatures.push(hazard.dangerZone); }
+            });
+
+            // DRRMO Blue Zones
+            drrmoZones.forEach(zone => {
+                const el = document.createElement('div'); el.className = `weather-blue-marker`;
+                if (!isWeatherVisible) el.style.display = 'none';
+
+                const popupHTML = `<div style="color:white; font-family:'Barlow Condensed';"><h3 style="font-weight:bold; font-size:16px; margin-bottom:4px; text-transform:uppercase;">${zone.title || zone.type}</h3><p style="font-size:13px; color:#cbd5e1;">${zone.desc}</p><span style="display:inline-block; margin-top:8px; font-weight:bold; font-size:11px; background:rgba(59,130,246,0.2); border:1px solid #3b82f6; color:#93c5fd; padding:2px 8px; border-radius:4px;">TYPE: ${zone.type.toUpperCase()}</span></div>`;
+                const popup = new mapboxgl.Popup({ offset: 25, closeButton: false }).setHTML(popupHTML);
+                const marker = new mapboxgl.Marker(el).setLngLat(zone.center).setPopup(popup).addTo(map);
+                weatherMapObjects['zone_' + zone.id] = { marker, popup };
+
+                blueZoneFeatures.push(zone.polygon);
+            });
+
+            map.getSource('synced-blocked-lines').setData({ 'type': 'FeatureCollection', 'features': lineFeatures });
+            map.getSource('synced-danger-zones').setData({ 'type': 'FeatureCollection', 'features': dangerZoneFeatures });
+            map.getSource('synced-drrmo-drawn').setData({ 'type': 'FeatureCollection', 'features': blueZoneFeatures });
+        }
+
+        // -----------------------------------------------------
+        // RENDER ADMIN EVACUATION ROUTES
+        // -----------------------------------------------------
+        function renderLiveRescues() {
+            if(!map.getSource('synced-admin-rescues')) return;
+            
+            let rescues = JSON.parse(localStorage.getItem('beat_live_rescues')) || [];
+            
+            Object.values(mapObjectsRescues || {}).forEach(obj => { if(obj.marker) obj.marker.remove(); });
+            mapObjectsRescues = {};
+
+            let routeFeatures = [];
+            const isEvacVisible = document.getElementById('toggle-evac').checked;
+
+            rescues.forEach(op => {
+                const el = document.createElement('div'); el.className = `pickup-marker`;
+                if (!isEvacVisible) el.style.display = 'none';
+
+                const popupHTML = `<div style="color:white; font-family:'Barlow Condensed';"><h3 style="font-weight:bold; font-size:16px; margin-bottom:4px; text-transform:uppercase;">${op.name}</h3><p style="font-size:13px; color:#cbd5e1;">Evacuating ~${op.evacuees} people to ${op.targetName}.</p><span style="display:inline-block; margin-top:8px; font-weight:bold; font-size:11px; background:rgba(168,85,247,0.2); border:1px solid #a855f7; color:#d8b4fe; padding:2px 8px; border-radius:4px;">ACTIVE CORRIDOR</span></div>`;
+                const popup = new mapboxgl.Popup({ offset: 25, closeButton: false }).setHTML(popupHTML);
+                const marker = new mapboxgl.Marker(el).setLngLat(op.pickupCoords).setPopup(popup).addTo(map);
+                
+                mapObjectsRescues[op.id] = { marker, popup };
+                if (op.route) routeFeatures.push(op.route);
+            });
+
+            map.getSource('synced-admin-rescues').setData({ type: 'FeatureCollection', features: routeFeatures });
+        }
+
+        // Listen for live updates from admin panels
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'beat_live_hazards' || e.key === 'beat_drrmo_zones') renderLiveHazards();
+            if (e.key === 'beat_live_rescues') renderLiveRescues(); 
+        });
+
+        // -----------------------------------------------------
+        // LOCAL ROUTING TOOL LOGIC
+        // -----------------------------------------------------
+        document.getElementById('btn-drop-checkpoint').addEventListener('click', (e) => {
+            if(tempPickupMarker) { tempPickupMarker.remove(); tempPickupMarker = null; }
+            tempPickupCoords = null;
+            if(map.getSource('local-rescue-routes')) {
+                map.getSource('local-rescue-routes').setData({ type: 'FeatureCollection', features: [] });
+            }
+            document.getElementById('checkpoint-name').value = '';
+            document.getElementById('target-center').value = '';
+            
+            const btnDispatch = document.getElementById('btn-dispatch');
+            btnDispatch.disabled = true;
+            btnDispatch.style.cursor = 'not-allowed';
+            btnDispatch.style.opacity = '0.5';
+            btnDispatch.innerText = 'ESTABLISH SAFE CORRIDOR';
+            
+            Object.values(evacMarkersDOM).forEach(el => el.classList.remove('pulsing'));
+
+            map.getCanvas().style.cursor = 'crosshair';
+            e.currentTarget.innerText = 'SELECT ON MAP...';
+            document.getElementById('drop-status').style.display = 'block';
+            document.getElementById('routing-options').style.display = 'none';
+
+            map.once('click', (ev) => {
+                tempPickupCoords = [ev.lngLat.lng, ev.lngLat.lat];
+                
+                const el = document.createElement('div');
+                el.className = 'pickup-marker';
+                el.style.opacity = '0.5';
+                tempPickupMarker = new mapboxgl.Marker(el).setLngLat(tempPickupCoords).addTo(map);
+                
+                map.getCanvas().style.cursor = '';
+                document.getElementById('drop-status').style.display = 'none';
+                document.getElementById('btn-drop-checkpoint').innerText = 'ORIGIN SELECTED - CLICK TO RESET';
+                
+                document.getElementById('routing-options').style.display = 'flex';
+
+                let nearestCenter = null;
+                let minDistance = Infinity;
+                
+                evacCenters.forEach(center => {
+                    let dist = turf.distance(turf.point(tempPickupCoords), turf.point(center.coords), {units: 'kilometers'});
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        nearestCenter = center;
+                    }
+                });
+
+                if (nearestCenter) {
+                    const dropdown = document.getElementById('target-center');
+                    dropdown.value = nearestCenter.id;
+                    dropdown.dispatchEvent(new Event('change')); 
                 }
+
+                checkFormCompletion();
             });
         });
 
-        const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false });
-        map.on('mouseenter', 'barangay-borders', () => {
-            map.getCanvas().style.cursor = 'pointer';
-        });
-        map.on('mouseleave', 'barangay-borders', () => {
-            map.getCanvas().style.cursor = '';
-            popup.remove();
-        });
-        map.on('mousemove', 'barangay-borders', (e) => {
-            const coordinates = e.lngLat;
-            popup.setLngLat(coordinates)
-                 .setHTML(`<div style="color: black; font-family: 'Barlow Condensed'; font-weight: bold; font-size: 14px;">PASIG GRID: ${coordinates.lng.toFixed(4)}, ${coordinates.lat.toFixed(4)}</div>`)
-                 .addTo(map);
+        function checkFormCompletion() {
+            const name = document.getElementById('checkpoint-name').value;
+            const center = document.getElementById('target-center').value;
+            const btnDispatch = document.getElementById('btn-dispatch');
+
+            if(name && center && tempPickupCoords) {
+                btnDispatch.disabled = false;
+                btnDispatch.style.cursor = 'pointer';
+                btnDispatch.style.opacity = '1';
+            } else {
+                btnDispatch.disabled = true;
+                btnDispatch.style.cursor = 'not-allowed';
+                btnDispatch.style.opacity = '0.5';
+            }
+        }
+
+        document.getElementById('checkpoint-name').addEventListener('input', checkFormCompletion);
+        
+        document.getElementById('target-center').addEventListener('change', (e) => {
+            checkFormCompletion();
+            const targetId = e.target.value;
+            const targetObj = evacCenters.find(c => c.id === targetId);
+            
+            if (targetObj) {
+                map.flyTo({ center: targetObj.coords, zoom: 15.5, pitch: 60, essential: true });
+                Object.values(evacMarkersDOM).forEach(el => el.classList.remove('pulsing'));
+                if (evacMarkersDOM[targetId]) {
+                    evacMarkersDOM[targetId].classList.add('pulsing');
+                }
+            }
         });
 
+        document.getElementById('btn-dispatch').addEventListener('click', async (e) => {
+            const targetId = document.getElementById('target-center').value;
+            const targetObj = evacCenters.find(c => c.id === targetId);
+
+            const btn = e.currentTarget;
+            btn.innerText = 'PLOTTING ROUTE...';
+            btn.disabled = true;
+            btn.style.cursor = 'not-allowed';
+            btn.style.opacity = '0.5';
+
+            let routeFeature;
+
+            try {
+                const query = await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${tempPickupCoords[0]},${tempPickupCoords[1]};${targetObj.coords[0]},${targetObj.coords[1]}?geometries=geojson&access_token=${mapboxgl.accessToken}`);
+                const response = await query.json();
+                
+                if (response.routes && response.routes[0]) {
+                    routeFeature = turf.feature(response.routes[0].geometry);
+                } else {
+                    throw new Error("No route found");
+                }
+            } catch (err) {
+                routeFeature = turf.lineString([tempPickupCoords, targetObj.coords]);
+            }
+
+            if(map.getSource('local-rescue-routes')) {
+                map.getSource('local-rescue-routes').setData({ type: 'FeatureCollection', features: [routeFeature] });
+            }
+
+            Object.values(evacMarkersDOM).forEach(el => el.classList.remove('pulsing'));
+            tempPickupMarker.getElement().style.opacity = '1';
+            
+            btn.innerText = 'CORRIDOR ESTABLISHED';
+
+            const bounds = new mapboxgl.LngLatBounds();
+            routeFeature.geometry.coordinates.forEach(coord => bounds.extend(coord));
+            map.fitBounds(bounds, { padding: 50, pitch: 45 });
+        });
+
+        // Jump to District Configuration
         const barangayData = {
             'bagong-ilog': { name: 'Bagong Ilog', center: [121.0689, 14.5652], zoom: 14.5 },
             'kapasigan': { name: 'Kapasigan', center: [121.0741, 14.5644], zoom: 15 },
@@ -392,52 +660,21 @@
             'rosario': { name: 'Rosario', center: [121.0882, 14.5904], zoom: 14 },
             'san-joaquin': { name: 'San Joaquin', center: [121.0757, 14.5522], zoom: 15 },
             'ugong': { name: 'Ugong', center: [121.0732, 14.5841], zoom: 14 },
-            'pineda': { name: 'Pineda', center: [121.0595, 14.5665], zoom: 15 },
-            'santa-lucia': { name: 'Santa Lucia', center: [121.1013, 14.5842], zoom: 14.5 },
-            'caniogan': { name: 'Caniogan', center: [121.0805, 14.5719], zoom: 14.5 }
+            'pineda': { name: 'Pineda', center: [121.0595, 14.5640], zoom: 15 },
+            'santa-lucia': { name: 'Santa Lucia', center: [121.1010, 14.5840], zoom: 15 },
+            'caniogan': { name: 'Caniogan', center: [121.0810, 14.5680], zoom: 15 }
         };
 
-        function zoomToBarangay(val) {
-            const statusText = document.querySelector('p[style*="Bebas Neue"]');
-            if (!val) {
-                map.setFilter('barangay-highlight', ['==', 'name', '']);
-                map.flyTo({ center: [121.0825, 14.5764], zoom: 12.5, pitch: 45, essential: true });
-                if(statusText) {
-                    statusText.innerText = "MONITORING ALL DISTRICTS";
-                    statusText.style.color = "var(--white)";
-                }
-                return;
+        window.zoomToBarangay = function(val) {
+            if (!val) { 
+                map.flyTo({ center: [121.0825, 14.5764], zoom: 12.5, pitch: 45 }); 
+                return; 
             }
-
-            const selectedData = barangayData[val];
-            map.setFilter('barangay-highlight', ['==', 'name', selectedData.name]);
-            map.flyTo({
-                center: selectedData.center,
-                zoom: selectedData.zoom,
-                pitch: 60, 
-                speed: 1.2,
-                curve: 1.5,
-                essential: true
-            });
-            if(statusText) {
-                statusText.innerText = "LOCATING " + selectedData.name.toUpperCase() + "...";
-                statusText.style.color = "#3b7de8"; 
+            const data = barangayData[val];
+            if (data) {
+                map.flyTo({ center: data.center, zoom: data.zoom, pitch: 60 });
             }
-        }
-        
-        async function updateSystemStats() {
-            try {
-                const response = await fetch('get_stats.php');
-                const data = await response.json();
-                const formatNum = (num) => num.toString().padStart(2, '0');
-
-                document.getElementById('active-patrols-count').innerText = formatNum(data.active_patrols);
-                document.getElementById('secure-zones-count').innerText = formatNum(data.secure_zones);
-            } catch (error) {}
-        }
-        
-        updateSystemStats();
-        setInterval(updateSystemStats, 5000);
+        };
     </script>
 </body>
 </html>
