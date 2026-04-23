@@ -23,7 +23,19 @@
   
   <style>
     /* Green Evacuation Center Markers */
-    .center-marker { width: 28px; height: 28px; background-color: #10b981; border: 3px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+    .center-marker { width: 28px; height: 28px; background-color: #10b981; border: 3px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .center-marker.pulsing { box-shadow: 0 0 20px rgba(16, 185, 129, 0.8); animation: pulse-green 2s infinite; border-color: #059669; transform: scale(1.15); z-index: 10; }
+    @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(16,185,129, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(16,185,129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16,185,129, 0); } }
+
+    /* Red Hospital Markers */
+    .hospital-marker { width: 28px; height: 28px; background-color: #ef4444; border: 3px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .hospital-marker.pulsing { box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); animation: pulse-red 2s infinite; border-color: #b91c1c; transform: scale(1.15); z-index: 10; }
+    @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239,68,68, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(239,68,68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68, 0); } }
+
+    /* Blue Police Markers */
+    .police-marker { width: 28px; height: 28px; background-color: #3b82f6; border: 3px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .police-marker.pulsing { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); animation: pulse-blue 2s infinite; border-color: #1d4ed8; transform: scale(1.15); z-index: 10; }
+    @keyframes pulse-blue { 0% { box-shadow: 0 0 0 0 rgba(59,130,246, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(59,130,246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59,130,246, 0); } }
     
     /* Yellow Origin Markers */
     .pickup-marker { width: 20px; height: 20px; background-color: #eab308; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px rgba(234, 179, 8, 0.8); animation: pulse-yellow 2s infinite; cursor: pointer; }
@@ -32,6 +44,9 @@
     /* Mapbox Popup Overrides */
     .mapboxgl-popup-content { background: #1e293b !important; color: white !important; border: 1px solid #10b981; border-radius: 8px; padding: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 240px; }
     .popup-yellow .mapboxgl-popup-content { border-color: #eab308 !important; }
+    .popup-hospital .mapboxgl-popup-content { border-color: #ef4444 !important; }
+    .popup-police .mapboxgl-popup-content { border-color: #3b82f6 !important; }
+    
     .mapboxgl-popup-tip { border-top-color: #1e293b !important; border-bottom-color: #1e293b !important; }
     .mapboxgl-popup-close-button { color: #94a3b8; font-size: 16px; top: 4px; right: 8px; }
     .mapboxgl-popup-close-button:hover { color: white; background: transparent; }
@@ -75,14 +90,14 @@
             <div class="flex items-center justify-between mb-1">
                 <h2 class="text-white font-bold text-lg flex items-center gap-2"><i data-lucide="map" class="text-yellow-500"></i> Corridor Mapping</h2>
             </div>
-            <p class="text-[11px] text-[#94a3b8] mb-6">Designate origin points and map safe evacuation corridors to active centers.</p>
+            <p class="text-[11px] text-[#94a3b8] mb-6">Designate origin points and map safe movement corridors to active centers.</p>
             
             <div class="space-y-4">
                 
                 <div class="p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative">
                     <div class="absolute -left-3 -top-3 w-6 h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">1</div>
                     <button type="button" id="btn-drop-checkpoint" class="w-full bg-[#1e293b] hover:bg-gray-700 text-yellow-500 text-xs font-bold py-3 rounded-lg border border-yellow-500/50 transition-all flex justify-center items-center gap-2 shadow-sm">
-                        <i data-lucide="map-pin" class="w-4 h-4"></i> Set Evacuation Origin
+                        <i data-lucide="map-pin" class="w-4 h-4"></i> Set Movement Origin
                     </button>
                     <p id="drop-status" class="text-[10px] text-yellow-400 mt-3 text-center font-bold tracking-wider hidden animate-pulse">Click anywhere on the map to set the origin point.</p>
                 </div>
@@ -95,10 +110,35 @@
                         
                         <select id="target-center" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-xs outline-none focus:border-emerald-500 cursor-pointer mt-1">
                             <option value="" disabled selected>Target Evacuation Center...</option>
-                            <option value="1">Rizal High School Gym</option>
-                            <option value="2">Pasig City Sports Complex</option>
-                            <option value="3">Kapitolyo High School</option>
-                            <option value="4">Manggahan Elementary</option>
+                            <optgroup label="General Evacuation Centers">
+                                <option value="1">Rizal High School Gym</option>
+                                <option value="2">Pasig City Sports Complex</option>
+                                <option value="3">Kapitolyo High School</option>
+                                <option value="4">Manggahan Elementary</option>
+                                <option value="5">Santolan Elementary School</option>
+                                <option value="6">Rosario Sports Complex</option>
+                                <option value="7">San Joaquin Brgy Hall</option>
+                                <option value="8">Pinagbuhatan High School</option>
+                                <option value="9">Ugong Barangay Hall</option>
+                                <option value="10">Maybunga Covered Court</option>
+                                <option value="11">San Antonio Village Park</option>
+                                <option value="12">Kalawaan Elementary School</option>
+                                <option value="13">Dela Paz Evacuation Center</option>
+                                <option value="14">Santa Lucia High School Gym</option>
+                                <option value="15">Buting Elementary School</option>
+                            </optgroup>
+                            <optgroup label="Hospitals & Medical">
+                                <option value="h1">Rizal Medical Center</option>
+                                <option value="h2">The Medical City</option>
+                                <option value="h3">Pasig City General Hospital</option>
+                                <option value="h4">Pasig Doctors Medical Center</option>
+                            </optgroup>
+                            <optgroup label="Police Stations & HQ">
+                                <option value="p1">Pasig City Police Headquarters</option>
+                                <option value="p2">Police Station 1 - San Antonio</option>
+                                <option value="p3">Police Station 2 - Rosario</option>
+                                <option value="p4">Police Station 3 - Kapitolyo</option>
+                            </optgroup>
                         </select>
                     </div>
                 </div>
@@ -129,9 +169,35 @@
             <select class="w-full bg-[#1e2536] border border-[#374151] text-white px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider outline-none cursor-pointer" onchange="zoomToBarangay(this.value)">
                 <option value="">-- Select Barangay --</option>
                 <option value="bagong-ilog">Bagong Ilog</option>
+                <option value="bagong-katipunan">Bagong Katipunan</option>
+                <option value="bambang">Bambang</option>
+                <option value="buting">Buting</option>
+                <option value="caniogan">Caniogan</option>
+                <option value="dela-paz">Dela Paz</option>
+                <option value="kalawaan">Kalawaan</option>
+                <option value="kapasigan">Kapasigan</option>
                 <option value="kapitolyo">Kapitolyo</option>
+                <option value="malinao">Malinao</option>
                 <option value="manggahan">Manggahan</option>
+                <option value="maybunga">Maybunga</option>
+                <option value="oranbo">Oranbo</option>
+                <option value="palatiw">Palatiw</option>
+                <option value="pinagbuhatan">Pinagbuhatan</option>
+                <option value="pineda">Pineda</option>
                 <option value="rosario">Rosario</option>
+                <option value="sagad">Sagad</option>
+                <option value="san-antonio">San Antonio</option>
+                <option value="san-joaquin">San Joaquin</option>
+                <option value="san-jose">San Jose</option>
+                <option value="san-miguel">San Miguel</option>
+                <option value="san-nicolas">San Nicolas</option>
+                <option value="santa-cruz">Santa Cruz</option>
+                <option value="santa-lucia">Santa Lucia</option>
+                <option value="santa-rosa">Santa Rosa</option>
+                <option value="santo-tomas">Santo Tomas</option>
+                <option value="santolan">Santolan</option>
+                <option value="sumilang">Sumilang</option>
+                <option value="ugong">Ugong</option>
             </select>
         </div>
     </div>
@@ -148,44 +214,101 @@
         container: 'map', style: 'mapbox://styles/mapbox/dark-v11', center: [121.0700, 14.5700], zoom: 13.5, pitch: 45
     });
 
-    // 1. Static Evacuation Centers (Safe Zones)
+    // 1. Static Evacuation Centers (Safe Zones, Hospitals, Police)
     const evacCenters = [
-        { id: '1', name: 'Rizal High School Gym', coords: [121.0741, 14.5644] },
-        { id: '2', name: 'Pasig City Sports Complex', coords: [121.0810, 14.5680] },
-        { id: '3', name: 'Kapitolyo High School', coords: [121.0592, 14.5712] },
-        { id: '4', name: 'Manggahan Elementary', coords: [121.0960, 14.6060] }
+        { id: '1', name: 'Rizal High School Gym', coords: [121.0741, 14.5644], type: 'evac' },
+        { id: '2', name: 'Pasig City Sports Complex', coords: [121.0810, 14.5680], type: 'evac' },
+        { id: '3', name: 'Kapitolyo High School', coords: [121.0592, 14.5712], type: 'evac' },
+        { id: '4', name: 'Manggahan Elementary', coords: [121.0960, 14.6060], type: 'evac' },
+        { id: '5', name: 'Santolan Elementary School', coords: [121.0850, 14.6150], type: 'evac' },
+        { id: '6', name: 'Rosario Sports Complex', coords: [121.0880, 14.5900], type: 'evac' },
+        { id: '7', name: 'San Joaquin Brgy Hall', coords: [121.0760, 14.5510], type: 'evac' },
+        { id: '8', name: 'Pinagbuhatan High School', coords: [121.0920, 14.5520], type: 'evac' },
+        { id: '9', name: 'Ugong Barangay Hall', coords: [121.0750, 14.5850], type: 'evac' },
+        { id: '10', name: 'Maybunga Covered Court', coords: [121.0880, 14.5800], type: 'evac' },
+        { id: '11', name: 'San Antonio Village Park', coords: [121.0630, 14.5830], type: 'evac' },
+        { id: '12', name: 'Kalawaan Elementary School', coords: [121.0830, 14.5500], type: 'evac' },
+        { id: '13', name: 'Dela Paz Evacuation Center', coords: [121.1000, 14.6180], type: 'evac' },
+        { id: '14', name: 'Santa Lucia High School Gym', coords: [121.1010, 14.5840], type: 'evac' },
+        { id: '15', name: 'Buting Elementary School', coords: [121.0680, 14.5550], type: 'evac' },
+        // Hospitals
+        { id: 'h1', name: 'Rizal Medical Center', coords: [121.0660, 14.5615], type: 'hospital' },
+        { id: 'h2', name: 'The Medical City', coords: [121.0605, 14.5880], type: 'hospital' },
+        { id: 'h3', name: 'Pasig City General Hospital', coords: [121.0825, 14.5764], type: 'hospital' },
+        { id: 'h4', name: 'Pasig Doctors Medical Center', coords: [121.0960, 14.6060], type: 'hospital' },
+        // Police Stations
+        { id: 'p1', name: 'Pasig City Police Headquarters', coords: [121.0775, 14.5605], type: 'police' },
+        { id: 'p2', name: 'Police Station 1 - San Antonio', coords: [121.0630, 14.5830], type: 'police' },
+        { id: 'p3', name: 'Police Station 2 - Rosario', coords: [121.0880, 14.5900], type: 'police' },
+        { id: 'p4', name: 'Police Station 3 - Kapitolyo', coords: [121.0592, 14.5712], type: 'police' }
     ];
 
     // State Variables
     let tempPickupMarker = null;
     let tempPickupCoords = null;
-    let activeRescues = [];
+    let activeRescues = JSON.parse(localStorage.getItem('beat_live_rescues')) || [];
     let routeLayersAndMarkers = {}; 
+    let evacMarkersDOM = {}; 
 
     map.on('load', () => {
         // Render Permanent Safe Zones
         evacCenters.forEach(center => {
             const el = document.createElement('div');
-            el.className = 'center-marker';
-            el.innerHTML = '<i data-lucide="tent" style="width:14px; height:14px;"></i>';
+            let popupHTML = '';
+            let popupClass = '';
 
-            const popupHTML = `
-                <div class="pb-1 mb-1 border-b border-emerald-500/30"><span class="text-[10px] font-bold uppercase tracking-widest text-emerald-500">Safe Zone</span></div>
-                <h3 class="font-bold text-white text-sm mb-1">${center.name}</h3>
-                <span class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">Accepting Evacuees</span>
-            `;
-            const popup = new mapboxgl.Popup({ offset: 20 }).setHTML(popupHTML);
-            new mapboxgl.Marker(el).setLngLat(center.coords).setPopup(popup).addTo(map);
+            if (center.type === 'hospital') {
+                el.className = 'hospital-marker';
+                el.innerHTML = '<i data-lucide="plus" style="width:14px; height:14px;"></i>';
+                popupClass = 'popup-hospital';
+                popupHTML = `
+                    <div class="pb-1 mb-1 border-b border-red-500/30"><span class="text-[10px] font-bold uppercase tracking-widest text-red-500">Medical Facility</span></div>
+                    <h3 class="font-bold text-white text-sm mb-1">${center.name}</h3>
+                    <span class="bg-red-500/10 border border-red-500/30 text-red-400 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">Active Safe Zone</span>
+                `;
+            } else if (center.type === 'police') {
+                el.className = 'police-marker';
+                el.innerHTML = '<i data-lucide="shield" style="width:14px; height:14px;"></i>';
+                popupClass = 'popup-police';
+                popupHTML = `
+                    <div class="pb-1 mb-1 border-b border-blue-500/30"><span class="text-[10px] font-bold uppercase tracking-widest text-blue-500">Law Enforcement</span></div>
+                    <h3 class="font-bold text-white text-sm mb-1">${center.name}</h3>
+                    <span class="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">Active Safe Zone</span>
+                `;
+            } else {
+                el.className = 'center-marker';
+                el.innerHTML = '<i data-lucide="tent" style="width:14px; height:14px;"></i>';
+                popupHTML = `
+                    <div class="pb-1 mb-1 border-b border-emerald-500/30"><span class="text-[10px] font-bold uppercase tracking-widest text-emerald-500">Safe Zone</span></div>
+                    <h3 class="font-bold text-white text-sm mb-1">${center.name}</h3>
+                    <span class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">Accepting Evacuees</span>
+                `;
+            }
+
+            const popup = new mapboxgl.Popup({ offset: 20, className: popupClass }).setHTML(popupHTML);
+            const marker = new mapboxgl.Marker(el).setLngLat(center.coords).setPopup(popup).addTo(map);
+            
+            evacMarkersDOM[center.id] = el;
         });
 
         // Dynamic Source for Routing Lines
         map.addSource('rescue-routes', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+        
+        // Highlight/Glow Layer for Routes
+        map.addLayer({
+            'id': 'rescue-routes-highlight', 'type': 'line', 'source': 'rescue-routes',
+            'layout': { 'line-join': 'round', 'line-cap': 'round' },
+            'paint': { 'line-color': '#eab308', 'line-width': 12, 'line-opacity': 0.3 }
+        });
+
+        // Main Dashed Line Layer for Routes
         map.addLayer({
             'id': 'rescue-routes-line', 'type': 'line', 'source': 'rescue-routes',
             'layout': { 'line-join': 'round', 'line-cap': 'round' },
             'paint': { 'line-color': '#eab308', 'line-width': 4, 'line-dasharray': [2, 2] }
         });
 
+        renderRescues();
         lucide.createIcons();
     });
 
@@ -215,11 +338,30 @@
             
             document.getElementById('step-2-box').classList.remove('opacity-50');
             lucide.createIcons();
+
+            // NEW AUTO-DETECT NEAREST CENTER LOGIC
+            let nearestCenter = null;
+            let minDistance = Infinity;
+            
+            evacCenters.forEach(center => {
+                let dist = turf.distance(turf.point(tempPickupCoords), turf.point(center.coords), {units: 'kilometers'});
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    nearestCenter = center;
+                }
+            });
+
+            if (nearestCenter) {
+                const dropdown = document.getElementById('target-center');
+                dropdown.value = nearestCenter.id;
+                dropdown.dispatchEvent(new Event('change')); // Trigger pan and pulse
+            }
+
             checkFormCompletion();
         });
     });
 
-    // 3. Form Validation
+    // 3. Form Validation & Target Center Pan/Pulse
     function checkFormCompletion() {
         const name = document.getElementById('checkpoint-name').value;
         const center = document.getElementById('target-center').value;
@@ -234,18 +376,60 @@
     }
 
     document.getElementById('checkpoint-name').addEventListener('input', checkFormCompletion);
-    document.getElementById('target-center').addEventListener('change', checkFormCompletion);
+    
+    // Trigger Pan and Pulse when a Center is chosen
+    document.getElementById('target-center').addEventListener('change', (e) => {
+        checkFormCompletion();
+        
+        const targetId = e.target.value;
+        const targetObj = evacCenters.find(c => c.id === targetId);
+        
+        if (targetObj) {
+            // Pan to the selected evacuation center
+            map.flyTo({ center: targetObj.coords, zoom: 15.5, pitch: 60, essential: true });
+            
+            // Remove pulsing from all markers
+            Object.values(evacMarkersDOM).forEach(el => el.classList.remove('pulsing'));
+            
+            // Add pulsing to the newly selected marker
+            if (evacMarkersDOM[targetId]) {
+                evacMarkersDOM[targetId].classList.add('pulsing');
+            }
+        }
+    });
 
-    // 4. Dispatching Route
-    document.getElementById('btn-dispatch').addEventListener('click', () => {
+    // 4. Dispatching Route & SYNC TO MAIN MAP
+    document.getElementById('btn-dispatch').addEventListener('click', async (e) => {
         const name = document.getElementById('checkpoint-name').value;
         const evacuees = document.getElementById('est-evacuees').value || 'Unknown';
         const targetId = document.getElementById('target-center').value;
         
         const targetObj = evacCenters.find(c => c.id === targetId);
-        
-        // Generate LineString for Route
-        const routeLine = turf.lineString([tempPickupCoords, targetObj.coords]);
+
+        // UI Loading State
+        const btn = e.currentTarget;
+        const originalBtnHTML = btn.innerHTML;
+        btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Plotting Route...';
+        btn.disabled = true;
+        lucide.createIcons();
+
+        let routeFeature;
+
+        try {
+            // Fetch actual road directions from Mapbox API
+            const query = await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${tempPickupCoords[0]},${tempPickupCoords[1]};${targetObj.coords[0]},${targetObj.coords[1]}?geometries=geojson&access_token=${mapboxgl.accessToken}`);
+            const response = await query.json();
+            
+            if (response.routes && response.routes[0]) {
+                routeFeature = turf.feature(response.routes[0].geometry);
+            } else {
+                throw new Error("No route found");
+            }
+        } catch (err) {
+            console.error("Routing failed, falling back to straight line:", err);
+            // Fallback to straight line if API fails
+            routeFeature = turf.lineString([tempPickupCoords, targetObj.coords]);
+        }
 
         const rescueOp = {
             id: 'res_' + Date.now(),
@@ -253,11 +437,27 @@
             evacuees: evacuees,
             targetName: targetObj.name,
             pickupCoords: tempPickupCoords,
-            route: routeLine,
+            route: routeFeature,
             timestamp: new Date().toLocaleTimeString()
         };
 
+        // Save locally for Evacuation Screen
         activeRescues.push(rescueOp);
+        localStorage.setItem('beat_live_rescues', JSON.stringify(activeRescues));
+
+        // BROADCAST TO MAIN ADMIN MAP AND TRAFFIC MAP 
+        let hazards = JSON.parse(localStorage.getItem('beat_live_hazards')) || [];
+        hazards.push({
+            id: rescueOp.id,
+            source: 'evacuation', // Tagged so maps.html and traffic.html can render it
+            title: `EVAC CORRIDOR: ${name}`,
+            desc: `Active safe route to ${targetObj.name}. Evacuating ~${evacuees} people.`,
+            center: tempPickupCoords,
+            blockedLine: routeFeature, // Main map natively reads this and draws the route!
+            status: 'active',
+            timestamp: rescueOp.timestamp
+        });
+        localStorage.setItem('beat_live_hazards', JSON.stringify(hazards));
 
         // Reset UI
         if(tempPickupMarker) { tempPickupMarker.remove(); tempPickupMarker = null; }
@@ -265,9 +465,15 @@
         document.getElementById('est-evacuees').value = '';
         document.getElementById('target-center').value = '';
         document.getElementById('btn-drop-checkpoint').innerHTML = '<i data-lucide="map-pin" class="w-4 h-4"></i> Set Evacuation Origin';
-        document.getElementById('btn-dispatch').disabled = true;
+        
+        btn.innerHTML = originalBtnHTML; // Restore button HTML
+        btn.disabled = true; // Keep disabled until next valid selection
+        
         document.getElementById('step-2-box').classList.add('opacity-50');
         document.getElementById('step-3-box').classList.add('opacity-50');
+        
+        // Stop the pulsing marker when route is established
+        Object.values(evacMarkersDOM).forEach(el => el.classList.remove('pulsing'));
         
         renderRescues();
     });
@@ -327,13 +533,61 @@
         lucide.createIcons();
     }
 
+    // 5. De-Syncing / Closing the Route
     window.resolveRescue = function(id) {
+        // Remove locally
         activeRescues = activeRescues.filter(r => r.id !== id);
+        localStorage.setItem('beat_live_rescues', JSON.stringify(activeRescues));
+
+        // Remove from Main Map Broadcast
+        let hazards = JSON.parse(localStorage.getItem('beat_live_hazards')) || [];
+        hazards = hazards.filter(h => h.id !== id);
+        localStorage.setItem('beat_live_hazards', JSON.stringify(hazards));
+
         renderRescues();
     };
 
+    // Auto-update across tabs
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'beat_live_rescues') {
+            activeRescues = JSON.parse(e.newValue) || [];
+            renderRescues();
+        }
+    });
+
     window.zoomToBarangay = function(val) {
-        const bd = { 'bagong-ilog': [121.0669, 14.5670], 'kapitolyo': [121.0590, 14.5710], 'manggahan': [121.0960, 14.6060], 'rosario': [121.0880, 14.5900] };
+        const bd = {
+            'bagong-ilog': [121.0669, 14.5670],
+            'bagong-katipunan': [121.0760, 14.5610],
+            'bambang': [121.0820, 14.5570],
+            'buting': [121.0680, 14.5550],
+            'caniogan': [121.0810, 14.5680],
+            'dela-paz': [121.1000, 14.6180],
+            'kalawaan': [121.0830, 14.5500],
+            'kapasigan': [121.0770, 14.5630],
+            'kapitolyo': [121.0590, 14.5710],
+            'malinao': [121.0780, 14.5600],
+            'manggahan': [121.0960, 14.6060],
+            'maybunga': [121.0880, 14.5800],
+            'oranbo': [121.0620, 14.5760],
+            'palatiw': [121.0860, 14.5620],
+            'pinagbuhatan': [121.0920, 14.5520],
+            'pineda': [121.0600, 14.5640],
+            'rosario': [121.0880, 14.5900],
+            'sagad': [121.0780, 14.5660],
+            'san-antonio': [121.0630, 14.5830],
+            'san-joaquin': [121.0760, 14.5510],
+            'san-jose': [121.0750, 14.5630],
+            'san-miguel': [121.0930, 14.5730],
+            'san-nicolas': [121.0780, 14.5580],
+            'santa-cruz': [121.0790, 14.5600],
+            'santa-lucia': [121.1010, 14.5840],
+            'santa-rosa': [121.0730, 14.5600],
+            'santo-tomas': [121.0800, 14.5580],
+            'santolan': [121.0850, 14.6150],
+            'sumilang': [121.0730, 14.5580],
+            'ugong': [121.0750, 14.5850]
+        };
         if (!val) { map.flyTo({ center: [121.0700, 14.5700], zoom: 13.5, pitch: 45 }); return; }
         map.flyTo({ center: bd[val] || [121.0700, 14.5700], zoom: 14.5, pitch: 60 });
     };
