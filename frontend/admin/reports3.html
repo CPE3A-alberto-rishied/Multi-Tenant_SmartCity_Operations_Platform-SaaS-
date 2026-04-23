@@ -4,7 +4,9 @@
   <script>
    (function() {
         const session = localStorage.getItem('activeDepartment');
-        if (!session) window.location.replace('admin.html?error=unauthorized'); 
+        if (!session || session !== 'DRRMO') { // Also secured specifically for DRRMO
+            window.location.replace('admin.html?error=unauthorized'); 
+        }
     })();
   </script>
   <meta charset="UTF-8">
@@ -21,14 +23,14 @@
 </head>
 <body class="h-full flex bg-[#0a0e1a]">
 
-  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface">
+  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-50">
     <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
         <div id="auth-logo" class="flex items-center gap-1.5">
             <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain">
             <div class="flex flex-col justify-center items-start">
                 <img src="/assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
-          <div class="sidebar-subtext">Admin Control Center</div>
-        </div>
+                <div style="color:#94a3b8; font-size:11px" class="leading-none">DRRMO Department</div>
+            </div>
       </div>
     </div>
 
@@ -58,22 +60,183 @@
             <div class="flex flex-wrap gap-3 items-center">
               <input type="date" id="filter-date" class="h-10 bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 text-sm outline-none cursor-pointer min-w-[160px]">
             </div>
-            <button type="button" onclick="openModal('new-report-modal')" class="h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg text-sm font-bold flex items-center gap-2 shadow-lg"><i data-lucide="plus" class="icon-sm"></i> File Incident</button>
+            <button type="button" onclick="openModal('new-report-modal')" class="h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg text-sm font-bold flex items-center gap-2 shadow-lg transition-colors"><i data-lucide="plus" class="icon-sm"></i> File Incident</button>
         </div>
+        
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-6" id="reports-grid">
-            <p class="text-[#94a3b8] text-sm italic">No emergency reports fetched for this view currently.</p>
+            <p id="empty-state-msg" class="text-[#94a3b8] text-sm italic col-span-full">No emergency reports fetched for this view currently.</p>
         </div>
     </div>
   </main>
 
   <div id="new-report-modal" class="modal-overlay hidden">
-    <div class="border theme-border w-[550px] max-w-[90%] rounded-2xl p-8 shadow-2xl theme-surface">
+    <div class="border theme-border w-[550px] max-w-[90%] rounded-2xl p-8 max-h-[90vh] overflow-y-auto shadow-2xl theme-surface bg-[#0a0e1a]">
       <h2 class="text-white font-bold text-xl mb-6 flex items-center gap-2 justify-center"><i data-lucide="file-plus" class="text-blue-500 icon-lg"></i> Submit Incident</h2>
-      <button type="button" onclick="closeModal('new-report-modal')" class="w-full bg-[#1e2536] border theme-border text-white font-bold py-2.5 rounded-xl text-sm">Cancel</button>
+      
+      <form id="new-report-form" class="space-y-4 text-left" onsubmit="handleNewReportSubmit(event)">
+        <div>
+          <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Reporter Name</label>
+          <input type="text" id="report-name" placeholder="Full name" class="w-full bg-[#0f172a] text-white border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 transition-colors" required>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Contact / Email</label>
+          <input type="text" id="report-contact" placeholder="+63 9XX XXX XXXX or email" class="w-full bg-[#0f172a] text-white border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 transition-colors" required>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Location</label>
+          <input type="text" id="report-location" placeholder="Exact address or landmark" class="w-full bg-[#0f172a] text-white border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 transition-colors" required>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Subject / Incident Type</label>
+          <input type="text" id="report-subject" placeholder="e.g. Flooding, Landslide, Fire" class="w-full bg-[#0f172a] text-white border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 transition-colors" required>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Description</label>
+          <textarea id="report-desc" rows="4" placeholder="Detailed description of the incident..." class="w-full bg-[#0f172a] text-white border border-gray-700 rounded-lg px-3 py-2 text-sm outline-none focus:border-blue-500 transition-colors resize-none" required></textarea>
+        </div>
+        
+        <div class="flex justify-end gap-3 mt-8 pt-4">
+          <button type="button" onclick="closeModal('new-report-modal')" class="px-6 bg-[#1e2536] border theme-border text-white font-bold py-2.5 rounded-xl text-sm hover:bg-gray-800 transition-colors">Cancel</button>
+          <button type="submit" class="px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm shadow-lg transition-all">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="view-report-modal" class="modal-overlay hidden" onclick="closeModal('view-report-modal')">
+    <div class="border theme-border w-[450px] max-w-[90%] rounded-2xl p-8 shadow-2xl text-left max-h-[90vh] overflow-y-auto theme-surface bg-[#0a0e1a]" onclick="event.stopPropagation()">
+      <h2 id="modal-detail-title" class="text-white font-bold text-2xl mb-4"></h2>
+      <div id="modal-detail-info" class="bg-[#1e2536] p-4 rounded-xl text-sm text-[#94a3b8] mb-6 border theme-border space-y-2"></div>
+      <p id="modal-detail-desc" class="text-slate-300 leading-relaxed"></p>
+      <button type="button" onclick="closeModal('view-report-modal')" class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-colors shadow-lg">Close</button>
     </div>
   </div>
 
   <script src="js/app2.js"></script>
-  <script>lucide.createIcons(); function doLogout() { localStorage.removeItem('activeDepartment'); window.location.href = 'admin.html'; }</script>
+  <script>
+    lucide.createIcons(); 
+    
+    function doLogout() { 
+        localStorage.removeItem('activeDepartment'); 
+        window.location.href = 'admin.html'; 
+    }
+
+    function openModal(id) {
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.add('hidden');
+    }
+
+    function handleNewReportSubmit(event) {
+        event.preventDefault(); 
+
+        const name = document.getElementById('report-name').value;
+        const contact = document.getElementById('report-contact').value;
+        const location = document.getElementById('report-location').value;
+        const subject = document.getElementById('report-subject').value;
+        const desc = document.getElementById('report-desc').value;
+
+        const emptyMsg = document.getElementById('empty-state-msg');
+        if (emptyMsg) emptyMsg.remove();
+
+        const grid = document.getElementById('reports-grid');
+        
+        const date = new Date();
+        const dateString = date.toLocaleDateString();
+        const timeString = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+        const safeSubj = escapeHTML(subject);
+        const safeDesc = escapeHTML(desc);
+        const safeLoc = escapeHTML(location);
+        const safeName = escapeHTML(name);
+        const safeContact = escapeHTML(contact);
+
+        // 🚨 Generate a unique ID for this specific card 🚨
+        const cardId = 'report_' + Date.now();
+
+        // 🚨 Updated Card HTML to include the specific 'Resolve' button 🚨
+        const cardHTML = `
+            <div id="${cardId}" class="report-card border border-gray-700 rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors bg-[#0f172a]" 
+                 onclick="openReportDetails('${safeSubj}', '${dateString} ${timeString}', '${safeDesc}', '${safeLoc}', '${safeName}', '${safeContact}')">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400">${dateString}</p>
+                        <p class="text-xs text-gray-500">${timeString}</p>
+                    </div>
+                    <span class="status-badge bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">New</span>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-4 truncate">${safeSubj}</h3>
+                <div class="space-y-1 text-sm mb-6">
+                    <p class="truncate"><span class="text-[#94a3b8]">Name:</span> <span class="text-white font-semibold">${safeName}</span></p>
+                    <p class="truncate"><span class="text-[#94a3b8]">Location:</span> <span class="text-white font-semibold">${safeLoc}</span></p>
+                </div>
+                <div class="text-sm mb-6">
+                    <p class="text-[#94a3b8] mb-1">Description:</p>
+                    <p class="text-slate-300 leading-relaxed line-clamp-3">${safeDesc}</p>
+                </div>
+                
+                <div class="mt-auto pt-4 border-t border-gray-700 action-container" onclick="event.stopPropagation()">
+                    <button type="button" onclick="markAsResolved('${cardId}')" class="w-full bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30 font-bold py-2 rounded-lg text-[10px] uppercase tracking-widest transition-colors">
+                        Mark as Resolved
+                    </button>
+                </div>
+            </div>
+        `;
+
+        grid.insertAdjacentHTML('afterbegin', cardHTML);
+
+        event.target.reset();
+        closeModal('new-report-modal');
+    }
+
+    // 🚨 Logic to resolve the specific card 🚨
+    function markAsResolved(cardId) {
+        const card = document.getElementById(cardId);
+        if (!card) return;
+
+        // 1. Change the badge to Green "Resolved"
+        const badge = card.querySelector('.status-badge');
+        if (badge) {
+            badge.innerText = 'Resolved';
+            badge.className = 'status-badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest';
+        }
+
+        // 2. Remove the button and show a completed checkmark instead
+        const actionContainer = card.querySelector('.action-container');
+        if (actionContainer) {
+            actionContainer.innerHTML = `
+                <div class="w-full text-center text-emerald-500 font-bold py-2 text-[10px] uppercase tracking-widest flex justify-center items-center gap-1.5">
+                    <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Resolved
+                </div>
+            `;
+            lucide.createIcons(); // Re-draw the checkmark icon
+        }
+    }
+
+    function openReportDetails(subject, datetime, desc, location, name, contact) {
+        document.getElementById('modal-detail-title').innerText = subject;
+        document.getElementById('modal-detail-info').innerHTML = `
+            <p><strong class="text-white">Reported:</strong> ${datetime}</p>
+            <p><strong class="text-white">By:</strong> ${name} (${contact})</p>
+            <p><strong class="text-white">Location:</strong> ${location}</p>
+        `;
+        document.getElementById('modal-detail-desc').innerText = desc;
+        openModal('view-report-modal');
+    }
+
+    function escapeHTML(str) {
+        return str.replace(/[&<>'"]/g, 
+            tag => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[tag] || tag)
+        );
+    }
+  </script>
 </body>
 </html>
