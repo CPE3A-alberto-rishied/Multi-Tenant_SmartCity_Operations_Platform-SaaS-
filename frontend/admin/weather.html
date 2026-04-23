@@ -45,15 +45,17 @@
 </head>
 
 <body class="h-full flex bg-[#0a0e1a]">
-        <div id="auth-logo" class="flex justify-center mb-10 mt-10">
-            <div class="flex items-center gap-1.5">
-                <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain">
-                <div class="flex flex-col justify-center items-start">
-                    <img src="/assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
-                    <div style="color:#94a3b8; font-size:11px" class="leading-none">Admin Control Center</div>
-                </div>
+  
+  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-50">
+    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
+        <div id="auth-logo" class="flex items-center gap-1.5">
+            <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain">
+            <div class="flex flex-col justify-center items-start">
+                <img src="/assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
+                <div style="color:#94a3b8; font-size:11px" class="leading-none">DRRMO Department</div>
             </div>
         </div>
+    </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
       <a href="dashboard3.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
@@ -65,7 +67,13 @@
 
     <div class="user-footer">
         <div class="flex items-center justify-between mb-5">
-            <div class="flex items-center gap-3"><div id="nav-avatar" class="nav-avatar bg-orange-600">D</div><div><div class="user-footer-name">DRRMO</div><div class="user-footer-sub">Disaster Management</div></div></div>
+            <div class="flex items-center gap-3">
+              <div id="nav-avatar" class="nav-avatar bg-orange-600">D</div>
+              <div>
+                <div class="user-footer-name">DRRMO</div>
+                <div class="user-footer-sub">Disaster Management</div>
+              </div>
+            </div>
             <a href="profile3.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
         </div>
         <button type="button" onclick="doLogout()" class="btn-logout"><i data-lucide="log-out" class="icon-sm"></i> Logout</button>
