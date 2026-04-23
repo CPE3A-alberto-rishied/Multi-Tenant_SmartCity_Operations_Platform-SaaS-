@@ -1421,12 +1421,9 @@ function handleAnnFormSubmit() {
         if(confirmBtnEl) confirmBtnEl.innerText = 'Publish';
     }
     openModal('confirm-submit-modal');
-}
-// --- 1. SENDS NEW ANNOUNCEMENT TO MONGODB ---
+}// --- 1. SENDS NEW ANNOUNCEMENT TO MONGODB ---
 async function executeAnnFormSubmit() {
     closeModal('confirm-submit-modal');
-    closeAnnForm(); 
-    openModal('success-submit-modal');
 
     const titleInput = document.getElementById('ann-title');
     const title = titleInput.value;
@@ -1452,15 +1449,23 @@ async function executeAnnFormSubmit() {
     const blocksJSON = escapeHTML(JSON.stringify(blocksData));
     
     let dbId = "";
-    // SEND TO DATABASE
+
+    // 👉 THIS IS THE MISSING PIECE: SEND TO DATABASE
     try {
         const response = await fetch('https://beat-pasig-api.onrender.com/api/announcements', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, category, coverImage, content: firstContent, blocks: blocksJSON, status: 'Queue' })
+            body: JSON.stringify({ 
+                title: title, 
+                category: category, 
+                coverImage: coverImage, 
+                content: firstContent, 
+                blocks: blocksJSON, 
+                status: 'Queue' 
+            })
         });
         const result = await response.json();
-        if(result.success) dbId = result.data._id; // Get the MongoDB ID
+        if(result.success) dbId = result.data._id; // Get the ID from MongoDB
     } catch(err) { console.error("DB Save Error:", err); }
 
     const now = new Date();
@@ -1470,11 +1475,12 @@ async function executeAnnFormSubmit() {
     const minStr = now.getMinutes().toString().padStart(2, '0');
     const dateStr = `Today ${hours}:${minStr}${ampm}`;
     const isoDate = now.toISOString();
+    const rawDateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
 
     if (currentAnnMode === 'create') {
         const cardHTML = `
         <div class="ann-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors theme-surface" 
-             onclick="openAnnDetails(this)" data-id="${dbId}" data-date="${isoDate}" data-cover-image="${coverImage}" data-blocks="${blocksJSON}">
+             onclick="openAnnDetails(this)" data-id="${dbId}" data-date="${isoDate}" data-raw-date="${rawDateStr}" data-cover-image="${coverImage}" data-blocks="${blocksJSON}">
             <div class="flex justify-between items-start mb-2">
               <h3 class="ann-title text-lg font-bold text-white">${escapeHTML(title)}</h3>
               <span class="ann-badge bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase">${escapeHTML(category)}</span>
@@ -1489,6 +1495,12 @@ async function executeAnnFormSubmit() {
             </div>
         </div>`;
         document.getElementById('grid-queue').insertAdjacentHTML('afterbegin', cardHTML);
+    } else if (currentAnnMode === 'edit' && currentEditingCard) {
+        currentEditingCard.querySelector('.ann-title').innerText = title;
+        currentEditingCard.querySelector('.ann-badge').innerText = category;
+        currentEditingCard.querySelector('.ann-desc').innerText = firstContent;
+        currentEditingCard.setAttribute('data-cover-image', coverImage);
+        currentEditingCard.setAttribute('data-blocks', blocksJSON);
     }
 
     // Reset Form
@@ -1496,25 +1508,33 @@ async function executeAnnFormSubmit() {
     removeImage('ann-cover-preview');
     document.getElementById('content-blocks-container').innerHTML = '';
     selectedFormCategory = '';
-    document.getElementById('ann-category-text').innerText = 'Select a category...';
+    const catText = document.getElementById('ann-category-text');
+    if (catText) {
+        catText.innerText = 'Select a category...';
+        catText.classList.add('text-[#94a3b8]');
+    }
     
+    closeAnnForm(); 
+    openModal('success-submit-modal');
     if(window.lucide) lucide.createIcons();
     switchAnnTab('queue');
     filterAnnouncements();
 }
+
 
 // --- 2. SENDS STATUS UPDATES (Approve/Reject) TO MONGODB ---
 async function executeCardAction() {
     closeModal('confirm-action-modal');
     if(!currentActionCard) return;
 
-    const dbId = currentActionCard.getAttribute('data-id');
+    // Grab the database ID we saved to the HTML card in the previous step
+    const dbId = currentActionCard.getAttribute('data-id'); 
     let newStatus = 'Queue';
     
     if (currentActionType === 'approve') newStatus = 'Live';
     if (currentActionType === 'reject' || currentActionType === 'takedown') newStatus = 'Denied';
 
-    // Update the database status
+    // 👉 THIS IS THE MISSING PIECE: UPDATE MONGODB STATUS
     if (dbId && currentActionType !== 'delete') {
         try {
             await fetch(`https://beat-pasig-api.onrender.com/api/announcements/${dbId}`, {
@@ -1525,8 +1545,8 @@ async function executeCardAction() {
         } catch(err) { console.error("DB Update Error:", err); }
     }
 
-    // Update UI
     const container = currentActionCard.querySelector('.action-container');
+
     if (currentActionType === 'approve') {
         currentActionCard.classList.remove('opacity-60');
         container.innerHTML = `
@@ -1535,13 +1555,16 @@ async function executeCardAction() {
         `;
         document.getElementById('grid-live').appendChild(currentActionCard);
         switchAnnTab('live');
+
     } else if (currentActionType === 'reject' || currentActionType === 'takedown') {
         currentActionCard.classList.add('opacity-60');
         container.innerHTML = `
-            <button onclick="triggerTakeBack(this)" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Take Back</button>
+            <button onclick="triggerTakeBack(this)" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Take Back</button>
+            <button onclick="triggerDelete(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete Permanently</button>
         `;
         document.getElementById('grid-denied').appendChild(currentActionCard);
         switchAnnTab('denied');
+
     } else if (currentActionType === 'takeback') {
         currentActionCard.classList.remove('opacity-60');
         container.innerHTML = `
@@ -1551,7 +1574,12 @@ async function executeCardAction() {
         `;
         document.getElementById('grid-queue').appendChild(currentActionCard);
         switchAnnTab('queue');
+
+    } else if (currentActionType === 'delete') {
+        currentActionCard.remove();
     }
+
+    openModal('action-success-modal');
     if(window.lucide) lucide.createIcons();
     filterAnnouncements();
 }
