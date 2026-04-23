@@ -220,20 +220,25 @@ function clearAndCloseStaff() {
 // 2. Fetch all admins from MongoDB
 async function fetchAllAdmins() {
     try {
-        const response = await fetch('https://beat-pasig-api.onrender.com/api/admins/all');
+        const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/all');
         const result = await response.json();
         
+        console.log("MongoDB Data Received:", result); // Check your browser console (F12) to see this!
+
         if (result.success) {
-            // result.admins should match your MongoDB response
+            // Mapping fields based on your MongoDB screenshot
             adminsFromDB = result.admins || result.data || []; 
-            populateAdmins(); // Refreshes the UI tables
+            populateAdmins(); 
+        } else {
+            console.error("API returned success:false", result);
         }
     } catch (error) {
-        console.error("MongoDB Fetch Error:", error);
+        console.error("Connection Error to MongoDB API:", error);
     }
 }
 
 // 3. Add Staff to MongoDB
+// ====== UPDATED: EXECUTE ADD STAFF WITH FEEDBACK ======
 async function executeAddStaff() {
     const newUser = {
         username: document.getElementById('staff-name').value,
@@ -252,12 +257,29 @@ async function executeAddStaff() {
         });
         
         const result = await response.json();
+        
+        // 1. Always close the confirmation modal
+        closeModal('confirm-staff-modal');
+
         if (result.success) {
-            clearAndCloseStaff();
-            closeModal('confirm-staff-modal');
-            fetchAllAdmins(); // Refresh from DB
+            // 2. Success path
+            clearAndCloseStaff(); 
+            fetchAllAdmins(); // Refresh table from MongoDB
+            openModal('success-create-modal');
+        } else {
+            // 3. Logical failure (e.g. Duplicate ID)
+            const errEl = document.getElementById('error-create-message');
+            if(errEl) errEl.innerText = result.error || "Failed to create account. Check if ID already exists.";
+            openModal('error-create-modal');
         }
-    } catch (error) { console.error("Add Error:", error); }
+    } catch (error) { 
+        // 4. Server/Network failure
+        console.error("Add Error:", error); 
+        closeModal('confirm-staff-modal');
+        const errEl = document.getElementById('error-create-message');
+        if(errEl) errEl.innerText = "Server connection lost. Please try again later.";
+        openModal('error-create-modal');
+    }
 }
 
 // 4. Toggle Status (Enable/Disable)
@@ -295,30 +317,58 @@ async function executeDeleteUser() {
 }
 
 // 6. Render Tables
+// ====== RENDER TABLES WITH DB FIELDS ======
 function populateAdmins() {
     const activeTbody = document.getElementById('active-admin-table-body');
     const disabledTbody = document.getElementById('disabled-admin-table-body');
     if(!activeTbody || !disabledTbody) return;
 
-    let list = adminsFromDB;
-    if (currentFilter !== "All Departments") list = list.filter(a => a.dept === currentFilter);
-    if (currentSearchQuery) list = list.filter(a => a.username.toLowerCase().includes(currentSearchQuery) || a.id.includes(currentSearchQuery));
+    activeTbody.innerHTML = '';
+    disabledTbody.innerHTML = '';
 
-    const renderRow = (a) => `
-        <tr class="border-b border-[#1e293b] hover:bg-white/5 transition-colors">
-            <td class="px-5 py-4 w-10">
-                ${a.status === 'Disabled' ? `<i data-lucide="trash-2" class="w-4 h-4 text-red-500/60 hover:text-red-500 cursor-pointer" onclick="promptDeleteUser('${a.id}', '${a.username}')"></i>` : ''}
-            </td> 
-            <td class="font-bold py-4 px-5 text-white">${escapeHTML(a.username)}</td>
-            <td class="text-[#94a3b8]">${escapeHTML(a.id)}</td>
-            <td class="text-[#94a3b8]">${escapeHTML(a.email)}</td>
-            <td class="text-[#94a3b8]">${escapeHTML(a.dept)}</td>
-            <td><span class="${a.status === 'Active' ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'} px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">${a.status}</span></td>
-            <td><label class="switch"><input type="checkbox" ${a.status === 'Active' ? 'checked' : ''} onchange="handleStatusToggle(this, '${a.id}')"><span class="slider"></span></label></td>
-        </tr>`;
+    // Apply Search & Filters
+    let filteredList = adminsFromDB;
+    if (currentFilter !== "All Departments") {
+        filteredList = filteredList.filter(a => a.dept === currentFilter);
+    }
+    if (currentSearchQuery) {
+        filteredList = filteredList.filter(a => 
+            a.username.toLowerCase().includes(currentSearchQuery) || 
+            a.id.includes(currentSearchQuery)
+        );
+    }
 
-    activeTbody.innerHTML = list.filter(a => a.status === "Active").map(renderRow).join('');
-    disabledTbody.innerHTML = list.filter(a => a.status !== "Active").map(renderRow).join('');
+    filteredList.forEach(admin => {
+        // Use field names exactly as they appear in Atlas
+        const row = `
+            <tr class="border-b border-[#1e293b] hover:bg-white/5 transition-colors">
+                <td class="px-5 py-4 w-10">
+                    ${admin.status !== 'Active' ? `<i data-lucide="trash-2" class="w-4 h-4 text-red-500/60 hover:text-red-500 cursor-pointer" onclick="promptDeleteUser('${admin.id}', '${admin.username}')"></i>` : ''}
+                </td> 
+                <td class="font-bold py-4 px-5 text-white">${escapeHTML(admin.username)}</td>
+                <td class="text-[#94a3b8]">${escapeHTML(admin.id)}</td>
+                <td class="text-[#94a3b8]">${escapeHTML(admin.email)}</td>
+                <td class="text-[#94a3b8]">${escapeHTML(admin.dept)}</td>
+                <td>
+                    <span class="${admin.status === 'Active' ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'} px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-current">
+                        ${admin.status}
+                    </span>
+                </td>
+                <td>
+                    <label class="switch">
+                        <input type="checkbox" ${admin.status === 'Active' ? 'checked' : ''} onchange="handleStatusToggle(this, '${admin.id}')">
+                        <span class="slider"></span>
+                    </label>
+                </td>
+            </tr>`;
+
+        if (admin.status === 'Active') {
+            activeTbody.insertAdjacentHTML('beforeend', row);
+        } else {
+            disabledTbody.insertAdjacentHTML('beforeend', row);
+        }
+    });
+
     if (window.lucide) lucide.createIcons();
 }
 

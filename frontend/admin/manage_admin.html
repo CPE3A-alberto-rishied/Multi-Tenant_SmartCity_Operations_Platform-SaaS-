@@ -293,5 +293,22 @@
         }
     }
   </script>
+  <div id="success-create-modal" class="modal-overlay hidden">
+  <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
+    <div style="background:#22c55e; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-green-500/20"><i data-lucide="check-circle"></i></div>
+    <h2 class="text-white font-bold text-xl mb-3">Account Created</h2>
+    <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">The new administrator account has been successfully synced to the MongoDB database.</p>
+    <button onclick="closeModal('success-create-modal')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Dismiss</button>
+  </div>
+</div>
+
+<div id="error-create-modal" class="modal-overlay hidden">
+  <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
+    <div style="background:#ef4444; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-red-500/20"><i data-lucide="alert-triangle"></i></div>
+    <h2 class="text-white font-bold text-xl mb-3">Creation Failed</h2>
+    <p id="error-create-message" class="text-[#94a3b8] text-sm mb-8 leading-relaxed">We encountered an issue while saving the account. Please check the ID or email for duplicates.</p>
+    <button onclick="closeModal('error-create-modal')" class="w-full bg-[#1e2536] border border-[#374151] text-white font-bold py-3 rounded-xl text-sm transition-colors">Close</button>
+  </div>
+</div>
 </body>
 </html>
