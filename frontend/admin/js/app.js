@@ -869,7 +869,6 @@ function cancelReportToggle(modalId) {
     closeModal(modalId);
 }
 
-
 // ==========================================
 // ANNOUNCEMENTS PAGE SPECIFIC LOGIC
 // ==========================================
@@ -879,23 +878,89 @@ let currentEditingCard = null;
 
 let currentActionCard = null;
 let currentActionType = '';
-let currentUploadedImage = null; 
 
-let annCategories = []; 
+// 1. SAVE CATEGORIES TO BROWSER MEMORY SO THEY SURVIVE RELOADS
+let annCategories = JSON.parse(localStorage.getItem('beat_ann_categories')) || []; 
 let selectedFilterCategory = 'all';
 let selectedFormCategory = '';
 let categoryToDelete = '';
+
+// 2. FETCH ANNOUNCEMENTS FROM MONGODB ON PAGE LOAD
+async function fetchAdminAnnouncements() {
+    try {
+        const response = await fetch('https://beat-pasig-api.onrender.com/api/announcements/all');
+        const result = await response.json();
+
+        if (result.success && result.data) {
+            const gridLive = document.getElementById('grid-live');
+            const gridQueue = document.getElementById('grid-queue');
+            const gridDenied = document.getElementById('grid-denied');
+            
+            if (gridLive) gridLive.innerHTML = '';
+            if (gridQueue) gridQueue.innerHTML = '';
+            if (gridDenied) gridDenied.innerHTML = '';
+
+            result.data.forEach(ann => {
+                const dateObj = new Date(ann.createdAt);
+                const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const dateStr = `${dateObj.toLocaleDateString()} ${timeStr}`;
+                const isoDate = dateObj.toISOString();
+                const rawDateStr = isoDate.split('T')[0];
+
+                let badgeClass = "bg-green-500/10 text-green-400 border border-green-500/20";
+                let actionButtons = '';
+                let targetGrid = '';
+
+                if (ann.status === 'Queue') {
+                    targetGrid = 'grid-queue';
+                    actionButtons = `
+                        <button onclick="triggerApprove(this)" class="flex-1 bg-transparent border border-green-500 hover:bg-green-500/10 text-green-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Approve</button>
+                        <button onclick="triggerReject(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"><i data-lucide="x" class="w-4 h-4"></i> Reject</button>
+                    `;
+                } else if (ann.status === 'Live') {
+                    targetGrid = 'grid-live';
+                    actionButtons = `
+                        <button onclick="triggerTakeDown(this)" class="bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center gap-2 ml-auto"><i data-lucide="trash-2" class="w-4 h-4"></i> Take Down</button>
+                    `;
+                } else if (ann.status === 'Denied') {
+                    targetGrid = 'grid-denied';
+                    badgeClass = "bg-red-500/10 text-red-400 border border-red-500/20";
+                    actionButtons = `
+                        <button onclick="triggerTakeBack(this)" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Take Back</button>
+                        <button onclick="triggerDelete(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete Permanently</button>
+                    `;
+                }
+
+                const cardHTML = `
+                <div class="ann-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors theme-surface ${ann.status === 'Denied' ? 'opacity-60' : ''}" 
+                     onclick="openAnnDetails(this)" data-id="${ann._id}" data-date="${isoDate}" data-raw-date="${rawDateStr}" data-blocks="${escapeHTML(ann.blocks || '[]')}">
+                    <div class="flex justify-between items-start mb-2">
+                      <h3 class="ann-title text-lg font-bold text-white">${escapeHTML(ann.title)}</h3>
+                      <span class="ann-badge ${badgeClass} px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase">${escapeHTML(ann.category)}</span>
+                    </div>
+                    <p class="text-xs text-[#94a3b8] mb-4">Published <span class="ann-date">${dateStr}</span></p>
+                    <div class="ann-content-hidden hidden">${escapeHTML(ann.content)}</div>
+                    <p class="ann-desc text-sm text-slate-300 leading-relaxed mb-6 line-clamp-2">${escapeHTML(ann.content)}</p>
+                    <div class="mt-auto pt-4 flex gap-3 action-container" onclick="event.stopPropagation()">
+                      ${actionButtons}
+                    </div>
+                </div>`;
+                
+                const gridEl = document.getElementById(targetGrid);
+                if (gridEl) gridEl.insertAdjacentHTML('beforeend', cardHTML);
+            });
+            if(window.lucide) lucide.createIcons();
+            filterAnnouncements();
+        }
+    } catch(e) { console.error("Error fetching admin announcements:", e); }
+}
 
 function renderCategoryDropdowns() {
     const filterMenu = document.getElementById('filter-category-menu');
     if (filterMenu) {
         let html = `<div class="p-2 text-sm text-[#94a3b8] hover:bg-gray-700 cursor-pointer transition-colors" onclick="selectCategory('filter', 'all', 'All Categories')">All Categories</div>`;
         annCategories.forEach(cat => {
-            html += `
-            <div class="p-2 text-sm text-white hover:bg-gray-700 cursor-pointer flex justify-between items-center group transition-colors" onclick="selectCategory('filter', '${escapeHTML(cat)}', '${escapeHTML(cat)}')">
-                <span class="truncate pr-2">${escapeHTML(cat)}</span>
-                <button onclick="promptDeleteCategory(event, '${escapeHTML(cat)}')" class="text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" title="Delete Category"><i data-lucide="minus-circle" class="w-4 h-4"></i></button>
-            </div>`;
+            html += `<div class="p-2 text-sm text-white hover:bg-gray-700 cursor-pointer flex justify-between items-center group transition-colors" onclick="selectCategory('filter', '${escapeHTML(cat)}', '${escapeHTML(cat)}')"><span class="truncate pr-2">${escapeHTML(cat)}</span><button onclick="promptDeleteCategory(event, '${escapeHTML(cat)}')" class="text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" title="Delete Category"><i data-lucide="minus-circle" class="w-4 h-4"></i></button></div>`;
         });
         filterMenu.innerHTML = html;
     }
@@ -904,11 +969,7 @@ function renderCategoryDropdowns() {
     if (formMenu) {
         let html = ``;
         annCategories.forEach(cat => {
-            html += `
-            <div class="p-2 text-sm text-white hover:bg-gray-700 cursor-pointer flex justify-between items-center group transition-colors" onclick="selectCategory('form', '${escapeHTML(cat)}', '${escapeHTML(cat)}')">
-                <span class="truncate pr-2">${escapeHTML(cat)}</span>
-                <button onclick="promptDeleteCategory(event, '${escapeHTML(cat)}')" class="text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" title="Delete Category"><i data-lucide="minus-circle" class="w-4 h-4"></i></button>
-            </div>`;
+            html += `<div class="p-2 text-sm text-white hover:bg-gray-700 cursor-pointer flex justify-between items-center group transition-colors" onclick="selectCategory('form', '${escapeHTML(cat)}', '${escapeHTML(cat)}')"><span class="truncate pr-2">${escapeHTML(cat)}</span><button onclick="promptDeleteCategory(event, '${escapeHTML(cat)}')" class="text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" title="Delete Category"><i data-lucide="minus-circle" class="w-4 h-4"></i></button></div>`;
         });
         formMenu.innerHTML = html;
     }
@@ -988,6 +1049,7 @@ function removeCategory(source) {
 
 function executeDeleteCategory() {
     annCategories = annCategories.filter(c => c !== categoryToDelete);
+    localStorage.setItem('beat_ann_categories', JSON.stringify(annCategories)); // SAVE TO MEMORY
     
     if (selectedFilterCategory === categoryToDelete) {
         selectCategory('filter', 'all', 'All Categories');
@@ -1018,6 +1080,7 @@ function saveCategory() {
     const newCat = input.value.trim();
     if (!annCategories.includes(newCat)) {
         annCategories.push(newCat);
+        localStorage.setItem('beat_ann_categories', JSON.stringify(annCategories)); // SAVE TO MEMORY
     }
     
     renderCategoryDropdowns();
@@ -1137,6 +1200,66 @@ function triggerDelete(btn) {
     setupActionModal('alert-triangle', '#ef4444', 'shadow-red-500/20', 'Delete Permanently?', 'This action cannot be undone. The announcement will be completely erased.', 'Delete', 'bg-transparent border border-red-500 text-red-500 hover:bg-red-500/10');
 }
 
+// 3. UPDATED CARD ACTION: PUT STATUS TO MONGODB
+async function executeCardAction() {
+    closeModal('confirm-action-modal');
+    if(!currentActionCard) return;
+
+    const dbId = currentActionCard.getAttribute('data-id'); 
+    let newStatus = 'Queue';
+    
+    if (currentActionType === 'approve') newStatus = 'Live';
+    if (currentActionType === 'reject' || currentActionType === 'takedown') newStatus = 'Denied';
+
+    if (dbId && currentActionType !== 'delete') {
+        try {
+            await fetch(`https://beat-pasig-api.onrender.com/api/announcements/${dbId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            });
+        } catch(err) { console.error("DB Update Error:", err); }
+    }
+
+    const container = currentActionCard.querySelector('.action-container');
+
+    if (currentActionType === 'approve') {
+        currentActionCard.classList.remove('opacity-60');
+        container.innerHTML = `
+            <button onclick="openAnnForm('edit', this.closest('.ann-card'))" class="bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2 px-8 rounded-lg text-sm transition-colors">Edit</button>
+            <button onclick="triggerTakeDown(this)" class="bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center gap-2 ml-auto"><i data-lucide="trash-2" class="w-4 h-4"></i> Take Down</button>
+        `;
+        document.getElementById('grid-live').appendChild(currentActionCard);
+        switchAnnTab('live');
+
+    } else if (currentActionType === 'reject' || currentActionType === 'takedown') {
+        currentActionCard.classList.add('opacity-60');
+        container.innerHTML = `
+            <button onclick="triggerTakeBack(this)" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Take Back</button>
+            <button onclick="triggerDelete(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete Permanently</button>
+        `;
+        document.getElementById('grid-denied').appendChild(currentActionCard);
+        switchAnnTab('denied');
+
+    } else if (currentActionType === 'takeback') {
+        currentActionCard.classList.remove('opacity-60');
+        container.innerHTML = `
+            <button onclick="triggerApprove(this)" class="flex-1 bg-transparent border border-green-500 hover:bg-green-500/10 text-green-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Approve</button>
+            <button onclick="openAnnForm('edit', this.closest('.ann-card'))" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">Edit</button>
+            <button onclick="triggerReject(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"><i data-lucide="x" class="w-4 h-4"></i> Reject</button>
+        `;
+        document.getElementById('grid-queue').appendChild(currentActionCard);
+        switchAnnTab('queue');
+
+    } else if (currentActionType === 'delete') {
+        currentActionCard.remove();
+    }
+
+    openModal('action-success-modal');
+    if(window.lucide) lucide.createIcons();
+    filterAnnouncements();
+}
+
 function openAnnDetails(card) {
     if(!card) return;
     
@@ -1147,7 +1270,6 @@ function openAnnDetails(card) {
     const badge = card.querySelector('.ann-badge');
     const dateText = card.querySelector('.ann-date').innerText;
     
-    const coverImgSrc = card.getAttribute('data-cover-image');
     const blocksDataStr = card.getAttribute('data-blocks');
     let blocksData = [];
     try { blocksData = JSON.parse(blocksDataStr.replace(/&quot;/g, '"').replace(/&#039;/g, "'")); } catch(e) {}
@@ -1158,42 +1280,22 @@ function openAnnDetails(card) {
     detailBadge.innerText = badge.innerText;
     document.getElementById('detail-date').innerText = dateText;
     
-    const coverContainer = document.getElementById('detail-cover-container');
-    if (coverImgSrc && coverImgSrc.trim() !== '') {
-        coverContainer.innerHTML = `<img src="${coverImgSrc}" class="w-full aspect-video max-h-[500px] object-cover object-center rounded-xl border border-gray-700 shadow-md">`;
-        coverContainer.classList.remove('hidden');
-    } else {
-        coverContainer.innerHTML = '';
-        coverContainer.classList.add('hidden');
-    }
-
     const contentContainer = document.getElementById('detail-content');
     contentContainer.innerHTML = '';
 
     if (blocksData.length === 0) {
         const fallbackContent = card.querySelector('.ann-content-hidden');
         if (fallbackContent) {
-            contentContainer.innerHTML = `<div class="mt-12 w-full flex"><div class="w-full"><p class="whitespace-pre-wrap text-slate-300 leading-relaxed">${fallbackContent.innerText}</p></div></div>`;
+            contentContainer.innerHTML = `<div class="mt-8 w-full flex"><div class="w-full"><p class="whitespace-pre-wrap text-slate-300 leading-relaxed">${fallbackContent.innerText}</p></div></div>`;
         }
     } else {
         blocksData.forEach((blk, idx) => {
-            let mtClass = idx === 0 ? "mt-12" : "mt-8";
+            let mtClass = idx === 0 ? "mt-8" : "mt-8 border-t border-gray-800 pt-8";
             
-            let blkHTML = `<div class="${mtClass} flex flex-col md:flex-row gap-6 items-start">`;
-            
-            if (blk.image) {
-                blkHTML += `<div class="w-full md:w-1/3 flex-shrink-0">
-                              <img src="${blk.image}" class="w-full aspect-video object-cover object-center rounded-lg border border-gray-700 shadow-sm">
-                            </div>`;
-            }
-            
-            let textWidthClass = blk.image ? "md:w-2/3" : "w-full";
-            blkHTML += `<div class="w-full ${textWidthClass} flex flex-col justify-center">`;
-            
+            let blkHTML = `<div class="${mtClass} flex flex-col w-full">`;
             if (blk.subtitle) blkHTML += `<h4 class="text-lg font-bold text-white mb-2">${escapeHTML(blk.subtitle)}</h4>`;
             blkHTML += `<p class="whitespace-pre-wrap text-slate-300 leading-relaxed">${escapeHTML(blk.content)}</p>`;
-            
-            blkHTML += `</div></div>`;
+            blkHTML += `</div>`;
             contentContainer.insertAdjacentHTML('beforeend', blkHTML);
         });
     }
@@ -1204,44 +1306,7 @@ function closeAnnDetails() {
     document.getElementById('view-list').classList.remove('hidden');
 }
 
-function handleImageUpload(input, previewId) {
-    if(input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = document.getElementById(previewId);
-            if (img) {
-                img.src = e.target.result;
-                img.classList.remove('hidden');
-            }
-            const removeBtn = document.getElementById(previewId.replace('preview', 'remove'));
-            if(removeBtn) removeBtn.classList.remove('hidden');
-            
-            if (previewId === 'ann-cover-preview') {
-                currentUploadedImage = e.target.result;
-            }
-        }
-        reader.readAsDataURL(input.files[0]);
-    }
-}
-
-function removeImage(previewId) {
-    const img = document.getElementById(previewId);
-    if (img) {
-        img.src = '';
-        img.classList.add('hidden');
-    }
-    const removeBtn = document.getElementById(previewId.replace('preview', 'remove'));
-    if(removeBtn) removeBtn.classList.add('hidden');
-    
-    if (previewId === 'ann-cover-preview') {
-        currentUploadedImage = null;
-    }
-}
-
-function getBlockHTML(id, subtitle = '', content = '', imageSrc = '') {
-    const imgClass = imageSrc ? "w-full aspect-video max-h-[250px] object-cover object-center mt-3 rounded-lg border border-gray-700 shadow-sm" : "hidden w-full aspect-video max-h-[250px] object-cover object-center mt-3 rounded-lg border border-gray-700 shadow-sm";
-    const removeClass = imageSrc ? "ml-4 text-red-400 hover:text-red-500 text-xs font-bold transition-colors" : "hidden ml-4 text-red-400 hover:text-red-500 text-xs font-bold transition-colors";
-    
+function getBlockHTML(id, subtitle = '', content = '') {
     return `
       <div class="ann-block border border-gray-700 bg-[#1e2536] rounded-lg p-5 mt-4" id="ann-block-${id}">
         <div class="flex justify-between items-center mb-4">
@@ -1249,19 +1314,6 @@ function getBlockHTML(id, subtitle = '', content = '', imageSrc = '') {
           <button type="button" onclick="document.getElementById('ann-block-${id}').remove()" class="text-red-400 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
         </div>
         <div class="space-y-4">
-           <div>
-             <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">MEDIA ATTACHMENT</label>
-             <div class="modal-input flex flex-col p-3" style="background:var(--surface); border-color:var(--border)">
-               <div class="flex items-center">
-                   <label class="bg-white text-black font-bold text-xs py-1.5 px-3 rounded cursor-pointer hover:bg-gray-200 transition-colors">
-                      Choose File
-                      <input type="file" class="hidden" accept="image/*" onchange="handleImageUpload(this, 'block-img-preview-${id}')">
-                   </label>
-                   <button type="button" class="${removeClass}" id="block-img-remove-${id}" onclick="removeImage('block-img-preview-${id}')"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-               </div>
-               <img id="block-img-preview-${id}" src="${imageSrc}" class="${imgClass}">
-             </div>
-           </div>
            <div>
              <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">SUBTITLE (OPTIONAL)</label>
              <input type="text" placeholder="Enter section subtitle" class="block-subtitle modal-input text-sm" value="${escapeHTML(subtitle)}" style="background:var(--surface); border-color:var(--border)">
@@ -1294,7 +1346,6 @@ function openAnnForm(mode, card = null) {
     clearReqError(inputTitle);
     inputTitle.value = '';
     selectCategory('form', '', 'Select a category...');
-    removeImage('ann-cover-preview');
 
     const container = document.getElementById('content-blocks-container');
     container.innerHTML = '';
@@ -1319,15 +1370,6 @@ function openAnnForm(mode, card = null) {
         selectCategory('form', category, category);
         checkCategoryRemovable('form');
 
-        const coverImg = card.getAttribute('data-cover-image');
-        if(coverImg) {
-            const preview = document.getElementById('ann-cover-preview');
-            preview.src = coverImg;
-            preview.classList.remove('hidden');
-            document.getElementById('ann-cover-remove').classList.remove('hidden');
-            currentUploadedImage = coverImg;
-        }
-
         const blocksDataStr = card.getAttribute('data-blocks');
         let blocksData = [];
         try { blocksData = JSON.parse(blocksDataStr.replace(/&quot;/g, '"').replace(/&#039;/g, "'")); } catch(e) {}
@@ -1338,7 +1380,7 @@ function openAnnForm(mode, card = null) {
         } else {
             blocksData.forEach((blk, idx) => {
                 annBlockCount = idx + 1;
-                container.insertAdjacentHTML('beforeend', getBlockHTML(annBlockCount, blk.subtitle, blk.content, blk.image));
+                container.insertAdjacentHTML('beforeend', getBlockHTML(annBlockCount, blk.subtitle, blk.content));
             });
         }
     }
@@ -1421,16 +1463,15 @@ function handleAnnFormSubmit() {
         if(confirmBtnEl) confirmBtnEl.innerText = 'Publish';
     }
     openModal('confirm-submit-modal');
-}// --- 1. SENDS NEW ANNOUNCEMENT TO MONGODB ---
+}
+
+// 4. UPDATED FORM SUBMISSION: POST TO MONGODB (TEXT ONLY)
 async function executeAnnFormSubmit() {
     closeModal('confirm-submit-modal');
 
     const titleInput = document.getElementById('ann-title');
     const title = titleInput.value;
     const category = selectedFormCategory;
-    
-    const coverPreview = document.getElementById('ann-cover-preview');
-    const coverImage = (coverPreview && !coverPreview.classList.contains('hidden')) ? coverPreview.src : '';
 
     const blocksData = [];
     const blockEls = document.querySelectorAll('.ann-block');
@@ -1439,73 +1480,30 @@ async function executeAnnFormSubmit() {
     blockEls.forEach((blk, idx) => {
         const sub = blk.querySelector('.block-subtitle').value;
         const txt = blk.querySelector('.block-content').value;
-        const imgEl = blk.querySelector('img[id^="block-img-preview-"]');
-        const img = (imgEl && !imgEl.classList.contains('hidden')) ? imgEl.src : '';
-        
-        blocksData.push({ subtitle: sub, content: txt, image: img });
+        blocksData.push({ subtitle: sub, content: txt, image: "" }); // Enforce Text Only
         if (idx === 0) firstContent = txt; 
     });
 
     const blocksJSON = escapeHTML(JSON.stringify(blocksData));
-    
-    let dbId = "";
 
-    // 👉 THIS IS THE MISSING PIECE: SEND TO DATABASE
+    // 👉 SEND TO MONGODB 
     try {
-        const response = await fetch('https://beat-pasig-api.onrender.com/api/announcements', {
+        await fetch('https://beat-pasig-api.onrender.com/api/announcements', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 title: title, 
                 category: category, 
-                coverImage: coverImage, 
+                coverImage: "", // Enforce Text Only
                 content: firstContent, 
                 blocks: blocksJSON, 
                 status: 'Queue' 
             })
         });
-        const result = await response.json();
-        if(result.success) dbId = result.data._id; // Get the ID from MongoDB
     } catch(err) { console.error("DB Save Error:", err); }
-
-    const now = new Date();
-    let hours = now.getHours();
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12 || 12; 
-    const minStr = now.getMinutes().toString().padStart(2, '0');
-    const dateStr = `Today ${hours}:${minStr}${ampm}`;
-    const isoDate = now.toISOString();
-    const rawDateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-
-    if (currentAnnMode === 'create') {
-        const cardHTML = `
-        <div class="ann-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors theme-surface" 
-             onclick="openAnnDetails(this)" data-id="${dbId}" data-date="${isoDate}" data-raw-date="${rawDateStr}" data-cover-image="${coverImage}" data-blocks="${blocksJSON}">
-            <div class="flex justify-between items-start mb-2">
-              <h3 class="ann-title text-lg font-bold text-white">${escapeHTML(title)}</h3>
-              <span class="ann-badge bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase">${escapeHTML(category)}</span>
-            </div>
-            <p class="text-xs text-[#94a3b8] mb-4">Published <span class="ann-date">${dateStr}</span></p>
-            <div class="ann-content-hidden hidden">${escapeHTML(firstContent)}</div>
-            <p class="ann-desc text-sm text-slate-300 leading-relaxed mb-6 line-clamp-2">${escapeHTML(firstContent)}</p>
-            <div class="mt-auto pt-4 flex gap-3 action-container" onclick="event.stopPropagation()">
-              <button onclick="triggerApprove(this)" class="flex-1 bg-transparent border border-green-500 hover:bg-green-500/10 text-green-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Approve</button>
-              <button onclick="openAnnForm('edit', this.closest('.ann-card'))" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">Edit</button>
-              <button onclick="triggerReject(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"><i data-lucide="x" class="w-4 h-4"></i> Reject</button>
-            </div>
-        </div>`;
-        document.getElementById('grid-queue').insertAdjacentHTML('afterbegin', cardHTML);
-    } else if (currentAnnMode === 'edit' && currentEditingCard) {
-        currentEditingCard.querySelector('.ann-title').innerText = title;
-        currentEditingCard.querySelector('.ann-badge').innerText = category;
-        currentEditingCard.querySelector('.ann-desc').innerText = firstContent;
-        currentEditingCard.setAttribute('data-cover-image', coverImage);
-        currentEditingCard.setAttribute('data-blocks', blocksJSON);
-    }
 
     // Reset Form
     titleInput.value = '';
-    removeImage('ann-cover-preview');
     document.getElementById('content-blocks-container').innerHTML = '';
     selectedFormCategory = '';
     const catText = document.getElementById('ann-category-text');
@@ -1516,72 +1514,11 @@ async function executeAnnFormSubmit() {
     
     closeAnnForm(); 
     openModal('success-submit-modal');
-    if(window.lucide) lucide.createIcons();
-    switchAnnTab('queue');
-    filterAnnouncements();
-}
-
-
-// --- 2. SENDS STATUS UPDATES (Approve/Reject) TO MONGODB ---
-async function executeCardAction() {
-    closeModal('confirm-action-modal');
-    if(!currentActionCard) return;
-
-    // Grab the database ID we saved to the HTML card in the previous step
-    const dbId = currentActionCard.getAttribute('data-id'); 
-    let newStatus = 'Queue';
     
-    if (currentActionType === 'approve') newStatus = 'Live';
-    if (currentActionType === 'reject' || currentActionType === 'takedown') newStatus = 'Denied';
-
-    // 👉 THIS IS THE MISSING PIECE: UPDATE MONGODB STATUS
-    if (dbId && currentActionType !== 'delete') {
-        try {
-            await fetch(`https://beat-pasig-api.onrender.com/api/announcements/${dbId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: newStatus })
-            });
-        } catch(err) { console.error("DB Update Error:", err); }
-    }
-
-    const container = currentActionCard.querySelector('.action-container');
-
-    if (currentActionType === 'approve') {
-        currentActionCard.classList.remove('opacity-60');
-        container.innerHTML = `
-            <button onclick="openAnnForm('edit', this.closest('.ann-card'))" class="bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2 px-8 rounded-lg text-sm transition-colors">Edit</button>
-            <button onclick="triggerTakeDown(this)" class="bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center gap-2 ml-auto"><i data-lucide="trash-2" class="w-4 h-4"></i> Take Down</button>
-        `;
-        document.getElementById('grid-live').appendChild(currentActionCard);
-        switchAnnTab('live');
-
-    } else if (currentActionType === 'reject' || currentActionType === 'takedown') {
-        currentActionCard.classList.add('opacity-60');
-        container.innerHTML = `
-            <button onclick="triggerTakeBack(this)" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Take Back</button>
-            <button onclick="triggerDelete(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete Permanently</button>
-        `;
-        document.getElementById('grid-denied').appendChild(currentActionCard);
-        switchAnnTab('denied');
-
-    } else if (currentActionType === 'takeback') {
-        currentActionCard.classList.remove('opacity-60');
-        container.innerHTML = `
-            <button onclick="triggerApprove(this)" class="flex-1 bg-transparent border border-green-500 hover:bg-green-500/10 text-green-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Approve</button>
-            <button onclick="openAnnForm('edit', this.closest('.ann-card'))" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">Edit</button>
-            <button onclick="triggerReject(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"><i data-lucide="x" class="w-4 h-4"></i> Reject</button>
-        `;
-        document.getElementById('grid-queue').appendChild(currentActionCard);
-        switchAnnTab('queue');
-
-    } else if (currentActionType === 'delete') {
-        currentActionCard.remove();
-    }
-
-    openModal('action-success-modal');
-    if(window.lucide) lucide.createIcons();
-    filterAnnouncements();
+    // FETCH LIVE FROM DB AGAIN to show the new item!
+    fetchAdminAnnouncements(); 
+    
+    switchAnnTab('queue');
 }
 
 // ==========================================
@@ -1663,7 +1600,6 @@ function extractAndUpdateTrafficData(mapInstance) {
     }
 }
 
-
 // ====== PAGE LOAD INITIALIZER ======
 document.addEventListener('DOMContentLoaded', () => { 
     if (localStorage.getItem('activeDepartment')) {
@@ -1671,23 +1607,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if(window.lucide) lucide.createIcons(); 
     
-    // INITIALIZE CHART JS FOR DASHBOARD
-    initTrafficChart();
-
-    // 1. ADD THIS: Triggers the MongoDB fetch for Public Reports
-    if(document.getElementById('reports-grid')) {
-        fetchAdminReports();
-    }
-    
-    // 2. Existing: Load Manage Admins Logic
+    // Load Manage Admins Logic
     if(document.getElementById('dept-filter') && typeof updateDepartmentDropdowns === 'function') {
         updateDepartmentDropdowns(); 
         populateAdmins(); 
     }
     
-    // 3. Existing: Load Announcements Logic
+    // Load Announcements Logic
     if(document.getElementById('filter-calendar') && typeof renderCategoryDropdowns === 'function') {
         renderCategoryDropdowns();
-        filterAnnouncements(); 
+        fetchAdminAnnouncements(); // Pulls fresh data from DB on every reload
     }
+    
+    // Existing Reports Logic
+    if(document.getElementById('reports-grid') && typeof fetchAdminReports === 'function') {
+        fetchAdminReports();
+    }
+    
+    // INITIALIZE CHART JS FOR DASHBOARD
+    initTrafficChart();
 });
