@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en" class="h-full">
 <head>
+  <script>
+    (function() {
+        const session = localStorage.getItem('activeDepartment');
+        if (!session || session !== 'Traffic') {
+            window.location.replace('admin.html?error=unauthorized'); 
+        }
+    })();
+  </script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BEAT - Dept Announcements</title>
@@ -75,10 +84,10 @@
     <div class="user-footer">
         <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
-                <div id="nav-avatar" class="nav-avatar"></div>
+                <div id="nav-avatar" class="nav-avatar">T</div>
                 <div>
-                  <div class="user-footer-name">Loading...</div>
-                  <div class="user-footer-sub">Loading...</div>
+                  <div class="user-footer-name">Traffic</div>
+                  <div class="user-footer-sub">Traffic Department</div>
                 </div>
             </div>
             <a href="profile2.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
@@ -220,5 +229,16 @@
   <div id="success-submit-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-green"><i data-lucide="check-circle"></i></div><h2 class="text-white font-bold text-xl mb-3">Success</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Your announcement action was completed successfully.</p><button onclick="closeModal('success-submit-modal')" class="w-full bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Done</button></div></div>
 
   <script src="js/app2.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => { 
+        if (window.lucide) lucide.createIcons(); 
+    });
+
+    function doLogout() {
+        localStorage.removeItem('activeDepartment'); // Wipe the session
+        window.location.href = 'admin.html'; // Kick back to login
+    }
+  </script>
 </body>
 </html>

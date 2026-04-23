@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en" class="h-full">
 <head>
+  <script>
+    (function() {
+        const session = localStorage.getItem('activeDepartment');
+        if (!session || session !== 'Traffic') {
+            window.location.replace('admin.html?error=unauthorized'); 
+        }
+    })();
+  </script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BEAT - Traffic and Road Control</title>
@@ -32,10 +41,10 @@
     <div class="user-footer">
         <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
-                <div id="nav-avatar" class="nav-avatar"></div>
+                <div id="nav-avatar" class="nav-avatar">T</div>
                 <div>
-                  <div class="user-footer-name">Loading...</div>
-                  <div class="user-footer-sub">Loading...</div>
+                  <div class="user-footer-name">Traffic</div>
+                  <div class="user-footer-sub">Traffic Department</div>
                 </div>
             </div>
             <a href="profile2.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
@@ -170,6 +179,11 @@
               }
             });
           });
+      }
+
+      function escapeHTML(str) {
+        if (!str) return '';
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
       }
 
       function loadRoadData() {
@@ -334,7 +348,7 @@
               <td class="px-4 py-3 font-medium text-white">${escapeHTML(name)}</td>
               <td class="px-4 py-3 text-center">
                 <span class="px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase ${statusColor}">
-                  ${status}
+                  ${escapeHTML(status)}
                 </span>
               </td>
               <td class="px-4 py-3 text-center">
@@ -363,6 +377,12 @@
           });
       }
     });
+
+    // 🚨 Added Logout Logic 🚨
+    function doLogout() {
+        localStorage.removeItem('activeDepartment'); // Wipe the session
+        window.location.href = 'admin.html'; // Kick back to login
+    }
   </script>
 </body>
 </html>
