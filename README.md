@@ -35,14 +35,13 @@ The system is designed to streamline emergency responses: citizens file public r
 * **State Management:** Browser `localStorage` for rapid cross-page state synchronization and session handling.
 
 ## 🚀 System Workflows
-
 1. **The Citizen:** Visits the public portal to view live accident heatmaps or submit a hazard report.
 2. **The Dispatcher:** The Main Admin reviews the report, assigns it to DRRMO or Traffic, and dispatches field units.
 3. **The Operator:** A Traffic/DRRMO admin isolates the hazard by drawing an exclusion zone on the map, syncing the danger zone to the main grid.
 4. **The Resolution:** The incident is cleared, the report is marked as "Resolved," and the system automatically generates an official update for the public City News page.
 
 ## 🧊 System Architecture
-
+```mermaid
 graph TD
     %% Styling
     classDef public fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#fff;
@@ -53,50 +52,40 @@ graph TD
 
     subgraph Client-Side [Frontend Architecture]
         direction TB
-        
         subgraph Public [Public Facing]
-            PUB[Citizen Portal<br>Home, Maps, Reports, News]:::public
+            PUB[Citizen Portal<br/>Home, Maps, Reports, News]:::public
         end
-
         subgraph Portals [Secure Department Portals]
-            ADMIN[Main Admin Center<br>Global Overseer]:::portal
-            TRAFFIC[Traffic Department<br>Congestion &amp; Heatmaps]:::portal
-            DRRMO[DRRMO Department<br>Evacuation &amp; Weather]:::portal
+            ADMIN[Main Admin Center<br/>Global Overseer]:::portal
+            TRAFFIC[Traffic Department<br/>Congestion & Heatmaps]:::portal
+            DRRMO[DRRMO Department<br/>Evacuation & Weather]:::portal
         end
-
-        LS[(Browser LocalStorage<br>Live State Sync)]:::storage
+        LS[(Browser LocalStorage<br/>Live State Sync)]:::storage
     end
 
     subgraph Server-Side [Backend Infrastructure]
-        API[Node.js &amp; Express API<br>Hosted on Render]:::backend
-        DB[(MongoDB<br>Cloud Database)]:::backend
+        API[Node.js & Express API<br/>Hosted on Render]:::backend
+        DB[(MongoDB<br/>Cloud Database)]:::backend
     end
 
     subgraph Third-Party [External Services]
-        MAP[Mapbox GL JS &amp; Turf.js<br>Geospatial Engine]:::external
-        CHART[Chart.js<br>Data Analytics]:::external
+        MAP[Mapbox GL JS & Turf.js<br/>Geospatial Engine]:::external
+        CHART[Chart.js<br/>Data Analytics]:::external
     end
 
-    %% User Interactions
-    PUB --&gt;|Submits Emergency Reports| API
-    PUB -.-&gt;|Reads Live News| LS
-
-    %% Secure API Calls
-    ADMIN &lt;--&gt;|Manage Users &amp; Triage Reports| API
-    TRAFFIC &lt;--&gt;|Update Hazard Status| API
-    DRRMO &lt;--&gt;|Update Evacuation Status| API
-    API &lt;--&gt;|CRUD Operations| DB
-
-    %% Cross-Tab State Syncing (The Bridge)
-    TRAFFIC -.-&gt;|Broadcasts Blocked Roads| LS
-    DRRMO -.-&gt;|Broadcasts Danger Zones| LS
-    ADMIN -.-&gt;|Reads Live Hazards| LS
-    DRRMO -.-&gt;|Publishes Resolved Incidents| LS
-
-    %% External API Routing
-    TRAFFIC --&gt;|Renders Maps &amp; Calculates Buffers| MAP
-    DRRMO --&gt;|Draws Polygons &amp; Heatmaps| MAP
-    ADMIN --&gt;|Displays Global City Map| MAP
-    PUB --&gt;|Views Public Layers| MAP
-    
-    TRAFFIC --&gt;|Renders Congestion Stats| CHART
+    PUB -->|Submits Emergency Reports| API
+    PUB -.->|Reads Live News| LS
+    ADMIN <-->|Manage Users & Triage Reports| API
+    TRAFFIC <-->|Update Hazard Status| API
+    DRRMO <-->|Update Evacuation Status| API
+    API <-->|CRUD Operations| DB
+    TRAFFIC -.->|Broadcasts Blocked Roads| LS
+    DRRMO -.->|Broadcasts Danger Zones| LS
+    ADMIN -.->|Reads Live Hazards| LS
+    DRRMO -.->|Publishes Resolved Incidents| LS
+    TRAFFIC -->|Renders Maps & Calculates Buffers| MAP
+    DRRMO -->|Draws Polygons & Heatmaps| MAP
+    ADMIN -->|Displays Global City Map| MAP
+    PUB -->|Views Public Layers| MAP
+    TRAFFIC -->|Renders Congestion Stats| CHART
+```
