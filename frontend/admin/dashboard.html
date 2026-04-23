@@ -8,7 +8,7 @@
             window.location.replace('admin.html?error=unauthorized'); 
         }
     })();
-  </script>
+</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BEAT – Dashboard Overview</title>
@@ -66,17 +66,6 @@
 
 <body class="h-full flex bg-[#0a0e1a]">
 
-<<<<<<< Updated upstream
-  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface">
-    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
-        <div id="auth-logo" class="flex items-center gap-1.5">
-            <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain">
-            <div class="flex flex-col justify-center items-start">
-                <img src="/assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
-                <div style="color:#94a3b8; font-size:11px" class="leading-none">Admin Control Center</div>
-            </div>
-        </div>
-=======
   <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
 
   <aside id="sidebar" class="sidebar flex flex-col h-full absolute lg:relative z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300" style="background:var(--surface); border-right: 1px solid var(--border)">
@@ -91,7 +80,6 @@
       <button class="lg:hidden ml-auto text-gray-400 hover:text-white" onclick="toggleSidebar()">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
->>>>>>> Stashed changes
     </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
@@ -99,6 +87,7 @@
       <a href="manage_admin.html" class="sidebar-item"><i data-lucide="users"></i><span>Manage Admins</span></a>
       <a href="reports.html" class="sidebar-item"><i data-lucide="alert-triangle"></i><span>Public Reports</span></a>
       <a href="announcements.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+      <a href="traffic.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
       <a href="maps.html" class="sidebar-item"><i data-lucide="map"></i><span>Maps</span></a>
     </nav>
     
@@ -158,11 +147,7 @@
               </a>
             </div>
             
-<<<<<<< Updated upstream
-            <div id="traffic-map" class="w-full flex-1 rounded-lg border overflow-hidden relative mb-5 shadow-inner min-h-[400px]" style="border-color:var(--border)"></div>
-=======
             <div id="traffic-map" class="w-full flex-1 rounded-lg border overflow-hidden relative mb-5 shadow-inner min-h-[250px]" style="border-color:var(--border)"></div>
->>>>>>> Stashed changes
             
             <div class="bg-[#0f172a]/80 border border-gray-800 rounded-lg p-4 flex items-center shrink-0 shadow-sm flex-wrap gap-4">
               <div class="w-20 h-20 sm:w-24 sm:h-24 relative flex-shrink-0 mx-auto sm:mx-0">
@@ -234,15 +219,8 @@
   <script src="js/app.js"></script>
 
   <script>
-    window.addEventListener('load', function() {
-        console.log("🚀 Initializing Dashboard Elements...");
+    lucide.createIcons();
 
-<<<<<<< Updated upstream
-        // 1. INIT ICONS SAFELY
-        try {
-            if (window.lucide) lucide.createIcons();
-        } catch (e) { console.error("Icon Error:", e); }
-=======
     // FIXED: Added Mobile Hamburger logic
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
@@ -416,216 +394,37 @@
             
             const reports = dummyDBResponse.recent; 
             totalReportsElement.innerText = dummyDBResponse.total30D;
->>>>>>> Stashed changes
 
-        // 2. INIT CHART.JS (With a Grey Placeholder State)
-        let globalTrafficChart = null;
-        try {
-            const ctx = document.getElementById('trafficCongestionChart');
-            if (ctx) {
-                globalTrafficChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['No Data (Zoom In)'],
-                        datasets: [{
-                            data: [1], 
-                            backgroundColor: ['#334155'], 
-                            borderWidth: 0,
-                            cutout: '75%'
-                        }]
-                    },
-                    options: { 
-                        responsive: true, 
-                        maintainAspectRatio: false, 
-                        plugins: { legend: { display: false }, tooltip: { enabled: false } } 
-                    }
-                });
+            feedContainer.innerHTML = ''; 
+
+            if(reports.length === 0) {
+                 feedContainer.innerHTML = '<p class="text-xs text-gray-500 pl-5">No recent reports found.</p>';
+                 return;
             }
-        } catch (e) { console.error("❌ Chart Error:", e); }
 
-        // 3. UPGRADED TRAFFIC EXTRACTION LOGIC
-        function extractAndUpdateTrafficData(mapInstance) {
-            if (!globalTrafficChart || !mapInstance.getLayer('traffic-lines')) return;
-            
-            const features = mapInstance.queryRenderedFeatures({ layers: ['traffic-lines'] });
-            let counts = { low: 0, moderate: 0, heavy: 0, severe: 0 };
-            let total = 0;
-            
-            features.forEach(f => {
-                if (f.properties && f.properties.congestion) {
-                    counts[f.properties.congestion]++;
-                    total++;
-                }
+            reports.forEach(report => {
+                const ringColor = report.severity === 'rose' ? 'ring-rose-500/10' : '';
+                const feedHtml = `
+                  <div class="relative pl-5 animate-in fade-in">
+                    <div class="absolute left-0 top-1.5 w-1.5 h-1.5 rounded-full bg-${report.severity}-500 ${ringColor ? `ring-4 ${ringColor}` : ''}"></div>
+                    <div class="flex justify-between items-start">
+                      <p class="text-sm font-semibold text-white leading-tight">${report.type}</p>
+                      <span class="text-[10px] font-mono text-[#94a3b8] uppercase whitespace-nowrap ml-2">${report.time}</span>
+                    </div>
+                    <p class="text-[10px] text-[#94a3b8] mt-1 uppercase tracking-wider">${report.location}</p>
+                  </div>
+                `;
+                feedContainer.insertAdjacentHTML('beforeend', feedHtml);
             });
 
-            const heavySevere = counts.heavy + counts.severe;
-
-            if (total > 0) {
-                globalTrafficChart.data.labels = ['Light', 'Moderate', 'Heavy / Severe'];
-                globalTrafficChart.data.datasets[0].data = [counts.low, counts.moderate, heavySevere];
-                globalTrafficChart.data.datasets[0].backgroundColor = ['#10b981', '#3b82f6', '#f43f5e']; 
-                globalTrafficChart.options.plugins.tooltip.enabled = true;
-                globalTrafficChart.update();
-
-                const getPct = (val) => Math.round((val / total) * 100) + '%';
-                document.getElementById('stat-light').innerText = getPct(counts.low);
-                document.getElementById('stat-moderate').innerText = getPct(counts.moderate);
-                document.getElementById('stat-heavy').innerText = getPct(heavySevere);
-            } else {
-                globalTrafficChart.data.labels = ['No Data (Zoom In)'];
-                globalTrafficChart.data.datasets[0].data = [1];
-                globalTrafficChart.data.datasets[0].backgroundColor = ['#334155'];
-                globalTrafficChart.options.plugins.tooltip.enabled = false;
-                globalTrafficChart.update();
-
-                document.getElementById('stat-light').innerText = '0%';
-                document.getElementById('stat-moderate').innerText = '0%';
-                document.getElementById('stat-heavy').innerText = '0%';
-            }
+        } catch (error) {
+            console.error("Error fetching reports from MongoDB:", error);
+            feedContainer.innerHTML = '<p class="text-xs text-red-400 pl-5">Failed to load reports from database.</p>';
+            totalReportsElement.innerText = 'Err';
         }
+    }
 
-        // 4. INIT MAPBOX SAFELY
-        try {
-            mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag'; 
-            
-            document.getElementById('traffic-map').style.minHeight = '400px';
-
-            const map = new mapboxgl.Map({
-                container: 'traffic-map', 
-                style: 'mapbox://styles/mapbox/dark-v11',
-                center: [121.0825, 14.5764], 
-                zoom: 14 // Increased zoom level so traffic lines render immediately
-            });
-
-            map.on('load', () => {
-                // 🔹 PASIG BOUNDARY LAYER (Matched to Main Website)
-                map.addSource('pasig-boundary', {
-                    type: 'geojson',
-                    data: 'pasig_boundaries.geojson' 
-                });
-
-                map.addLayer({
-                    'id': 'pasig-fill',
-                    'type': 'fill',
-                    'source': 'pasig-boundary',
-                    'paint': {
-                        'fill-color': '#3b82f6',
-                        'fill-opacity': 0.05
-                    }
-                });
-
-                // Solid Cyan Border
-                map.addLayer({
-                    'id': 'pasig-line',
-                    'type': 'line',
-                    'source': 'pasig-boundary',
-                    'paint': {
-                        'line-color': '#06b6d4', 
-                        'line-width': 4,
-                        'line-opacity': 0.9 
-                    }
-                });
-
-                // 🔹 3D BUILDINGS LAYER (Matched to Main Website)
-                map.addLayer({
-                    'id': '3d-buildings',
-                    'source': 'composite',
-                    'source-layer': 'building',
-                    'filter': ['==', 'extrude', 'true'],
-                    'type': 'fill-extrusion',
-                    'minzoom': 14, 
-                    'paint': {
-                        'fill-extrusion-color': '#1e293b', 
-                        'fill-extrusion-height': ['get', 'height'],
-                        'fill-extrusion-base': ['get', 'min_height'],
-                        'fill-extrusion-opacity': 0.8
-                    }
-                });
-
-                // 🔹 TRAFFIC LAYER
-                map.addSource('mapbox-traffic', {
-                    type: 'vector',
-                    url: 'mapbox://mapbox.mapbox-traffic-v1'
-                });
-
-                map.addLayer({
-                    id: 'traffic-lines',
-                    type: 'line',
-                    source: 'mapbox-traffic',
-                    'source-layer': 'traffic',
-                    paint: {
-                        'line-width': 3.5,
-                        'line-color': [
-                            'match', ['get', 'congestion'],
-                            'low', '#10b981',      
-                            'moderate', '#3b82f6', 
-                            'heavy', '#f43f5e',    
-                            'severe', '#9f1239',   
-                            'transparent' 
-                        ]
-                    }
-                });
-
-                map.on('moveend', () => extractAndUpdateTrafficData(map));
-                map.on('idle', () => extractAndUpdateTrafficData(map));
-            });
-        } catch (e) { console.error("❌ Mapbox Error:", e); }
-
-        // 5. FETCH DATABASE SAFELY
-        async function fetchReportsFromDB() {
-            const feedContainer = document.getElementById('reports-feed');
-            const totalReportsElement = document.getElementById('total-reports-count');
-            
-            try {
-                const response = await fetch('https://beat-pasig-api.onrender.com/api/reports/all');
-                const result = await response.json();
-                
-                const reports = Array.isArray(result) ? result : (result.data || []);
-                
-                if (totalReportsElement) totalReportsElement.innerText = reports.length;
-                if (feedContainer) feedContainer.innerHTML = ''; 
-
-                if(reports.length === 0) {
-                     if (feedContainer) feedContainer.innerHTML = '<p class="text-xs text-gray-500 pl-5">No recent reports found.</p>';
-                     return;
-                }
-
-                reports.slice(0, 6).forEach(report => {
-                    const status = report.status || 'Pending';
-                    let severityColor = 'blue';
-                    let ringColor = '';
-                    
-                    if (status === 'Pending') { severityColor = 'orange'; ringColor = 'ring-orange-500/10'; }
-                    else if (status === 'Resolved') { severityColor = 'emerald'; }
-                    else if (status === 'Returned') { severityColor = 'rose'; ringColor = 'ring-rose-500/10'; }
-                    
-                    const dateObj = new Date(report.createdAt);
-                    const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                    
-                    const safeSubject = (report.report_subject || 'Incident Report').replace(/</g, "&lt;");
-                    const safeLoc = (report.report_location || 'Pasig City').replace(/</g, "&lt;");
-
-                    const feedHtml = `
-                      <div class="relative pl-6 animate-in fade-in mb-6">
-                        <div class="absolute left-0 top-1.5 w-2 h-2 rounded-full bg-${severityColor}-500 ${ringColor ? `ring-4 ${ringColor}` : ''} -ml-[3px]"></div>
-                        <div class="flex justify-between items-start">
-                          <p class="text-sm font-semibold text-white leading-tight truncate pr-2">${safeSubject}</p>
-                          <span class="text-[10px] font-mono text-[#94a3b8] uppercase whitespace-nowrap shrink-0">${timeStr}</span>
-                        </div>
-                        <p class="text-[11px] text-[#94a3b8] mt-1 tracking-wide truncate">${safeLoc}</p>
-                      </div>
-                    `;
-                    feedContainer.insertAdjacentHTML('beforeend', feedHtml);
-                });
-            } catch (error) {
-                console.error("❌ DB Fetch Error:", error);
-                if (feedContainer) feedContainer.innerHTML = '<p class="text-xs text-red-400 pl-5">Failed to load reports from database.</p>';
-                if (totalReportsElement) totalReportsElement.innerText = 'Err';
-            }
-        }
-        
-        fetchReportsFromDB();
-    });
+    document.addEventListener('DOMContentLoaded', fetchReportsFromDB);
   </script>
 </body>
 </html>
