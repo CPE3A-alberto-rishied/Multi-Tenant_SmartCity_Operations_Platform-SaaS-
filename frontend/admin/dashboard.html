@@ -66,19 +66,19 @@
 
 <body class="h-full flex bg-[#0a0e1a]">
 
-  <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-[50] hidden lg:hidden" onclick="toggleSidebar()"></div>
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden" onclick="window.toggleSidebar()"></div>
 
-  <aside id="sidebar" class="sidebar flex flex-col h-full fixed lg:relative z-[60] transform -translate-x-full lg:translate-x-0 transition-transform duration-300 top-0 left-0 bg-[#0a0e1a] lg:bg-transparent" style="border-right: 1px solid var(--border)">
-    <div class="h-[76px] px-5 flex items-center shrink-0 border-b" style="border-color:var(--border)">
+  <aside id="sidebar" class="sidebar flex flex-col h-full fixed lg:relative z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 top-0 left-0 bg-[#0a0e1a] lg:bg-transparent" style="border-right: 1px solid var(--border)">
+    <div class="h-[76px] px-5 flex items-center justify-between shrink-0 border-b" style="border-color:var(--border)">
       <div class="flex items-center gap-3">
-        <img src="../assets/beat_logo.png" alt="BEAT Logo" class="h-10 w-auto object-contain" onerror="this.src='assets/beat_logo.png'">
+        <img src="../assets/beat_logo.png" onerror="this.src='/assets/beat_logo.png'" alt="BEAT Logo" style="height: 38px; width: 38px; object-fit: contain;">
         <div class="flex flex-col justify-center">
           <div class="logo-text font-bold text-lg text-white leading-none mb-1">BEAT</div>
-          <div class="text-[11px] text-[#94a3b8] leading-none">Admin Control Center</div>
+          <div class="text-[10px] text-[#94a3b8] leading-none uppercase tracking-wider">Admin Control Center</div>
         </div>
       </div>
-      <button type="button" class="lg:hidden ml-auto text-gray-400 hover:text-white p-2" onclick="toggleSidebar()">
-        <i data-lucide="x" class="w-5 h-5"></i>
+      <button type="button" class="lg:hidden text-gray-400 hover:text-white" onclick="window.toggleSidebar()">
+        <i data-lucide="x" class="w-6 h-6"></i>
       </button>
     </div>
     
@@ -110,10 +110,10 @@
 
   <main class="flex-1 overflow-y-auto flex flex-col relative min-w-0">
     
-    <header class="px-4 sm:px-8 h-[76px] flex items-center justify-between border-b shrink-0 relative z-10" style="border-color:var(--border); background:var(--surface)">
+    <header class="px-4 sm:px-8 h-[76px] flex items-center justify-between border-b shrink-0 bg-[#0a0e1a]" style="border-color:var(--border);">
       <div class="flex items-center">
-        <button type="button" class="lg:hidden text-gray-400 hover:text-white mr-4 p-2 relative z-50 cursor-pointer" onclick="toggleSidebar()">
-          <i data-lucide="menu" class="w-6 h-6"></i>
+        <button type="button" class="lg:hidden text-gray-400 hover:text-white mr-4 flex items-center justify-center w-10 h-10" onclick="window.toggleSidebar()">
+          <i data-lucide="menu" class="w-6 h-6 pointer-events-none"></i>
         </button>
         <h1 class="text-xl font-semibold text-white flex items-center gap-2">
           <i data-lucide="layout-grid" class="w-6 h-6 text-[#94a3b8] hidden sm:block"></i> Dashboard Overview
@@ -130,12 +130,12 @@
       </div>
     </header>
 
-    <div class="flex-1 p-4 sm:p-8 animate-in h-auto lg:h-full">
+    <div class="flex-1 p-4 sm:p-8">
       <div class="max-w-[1400px] mx-auto h-auto lg:h-full">
         
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-auto lg:h-full">
           
-          <div class="lg:col-span-2 border rounded-xl p-4 sm:p-6 shadow-sm flex flex-col h-auto lg:h-full min-h-[500px] lg:min-h-[400px]" style="background:var(--surface); border-color:var(--border)">
+          <div class="lg:col-span-2 border rounded-xl p-4 sm:p-6 shadow-sm flex flex-col h-auto lg:h-full min-h-[500px]" style="background:var(--surface); border-color:var(--border)">
             <div class="flex items-center justify-between mb-5 shrink-0">
               <div class="flex items-center gap-2">
                 <i data-lucide="bar-chart-horizontal" class="w-4 h-4 text-blue-500"></i>
@@ -147,7 +147,7 @@
               </a>
             </div>
             
-            <div id="traffic-map" class="w-full flex-1 rounded-lg border overflow-hidden relative mb-5 shadow-inner min-h-[250px] lg:min-h-0" style="border-color:var(--border)"></div>
+            <div id="traffic-map" class="w-full flex-1 rounded-lg border overflow-hidden relative mb-5 shadow-inner" style="border-color:var(--border); min-height: 280px;"></div>
             
             <div class="bg-[#0f172a]/80 border border-gray-800 rounded-lg p-4 flex items-center shrink-0 shadow-sm flex-wrap gap-4">
               <div class="w-20 h-20 sm:w-24 sm:h-24 relative flex-shrink-0 mx-auto sm:mx-0">
@@ -195,7 +195,7 @@
               </div>
             </div>
 
-            <div class="border rounded-xl p-5 sm:p-6 shadow-sm flex flex-col flex-1 overflow-hidden min-h-[350px] lg:min-h-0" style="background:var(--surface); border-color:var(--border)">
+            <div class="border rounded-xl p-5 sm:p-6 shadow-sm flex flex-col flex-1 overflow-hidden" style="background:var(--surface); border-color:var(--border); min-height: 350px;">
               <div class="flex items-center justify-between mb-6 shrink-0">
                 <div class="flex items-center gap-2">
                   <i data-lucide="bell" class="w-4 h-4 text-purple-500"></i>
@@ -219,9 +219,8 @@
   <script src="js/app.js"></script>
 
   <script>
-    lucide.createIcons();
-
-    function toggleSidebar() {
+    // Make Sidebar Toggle Globally Available First
+    window.toggleSidebar = function() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
         
@@ -232,7 +231,7 @@
             sidebar.classList.add('-translate-x-full');
             overlay.classList.add('hidden');
         }
-    }
+    };
 
     // ==========================================
     // 1. CHART.JS & MAPBOX INTEGRATION
@@ -298,82 +297,8 @@
         }
     }
 
+    // Insert your actual token here!
     mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag'; 
-    
-    try {
-        initTrafficChart();
-
-        const map = new mapboxgl.Map({
-            container: 'traffic-map', 
-            style: 'mapbox://styles/mapbox/dark-v11',
-            center: [121.0825, 14.5764],
-            zoom: 12.5
-        });
-
-        setTimeout(() => { map.resize(); }, 500);
-
-       map.on('load', () => {
-            try {
-                map.addSource('pasig-boundary', {
-                    type: 'geojson',
-                    data: '../pasig_boundaries.geojson' 
-                });
-
-                map.addLayer({
-                    'id': 'pasig-fill',
-                    'type': 'fill',
-                    'source': 'pasig-boundary',
-                    'paint': {
-                        'fill-color': '#3b82f6',
-                        'fill-opacity': 0.05
-                    }
-                });
-
-                map.addLayer({
-                    'id': 'pasig-line',
-                    'type': 'line',
-                    'source': 'pasig-boundary',
-                    'paint': {
-                        'line-color': '#3b82f6',
-                        'line-width': 2,
-                        'line-dasharray': [2, 2]
-                    }
-                });
-            } catch (err) {
-                console.warn("Pasig Boundaries GeoJSON not found, skipping highlight overlay.");
-            }
-
-            map.addSource('mapbox-traffic', {
-                type: 'vector',
-                url: 'mapbox://mapbox.mapbox-traffic-v1'
-            });
-
-            map.addLayer({
-                id: 'traffic-lines',
-                type: 'line',
-                source: 'mapbox-traffic',
-                'source-layer': 'traffic',
-                paint: {
-                    'line-width': 3,
-                    'line-color': [
-                        'match',
-                        ['get', 'congestion'],
-                        'low', '#10b981',      
-                        'moderate', '#3b82f6', 
-                        'heavy', '#f43f5e',    
-                        'severe', '#9f1239',   
-                        'transparent' 
-                    ]
-                }
-            });
-            
-            map.on('idle', () => {
-                extractAndUpdateTrafficData(map);
-            });
-        });
-    } catch (err) {
-        console.error("Mapbox failed to load. Ensure you added an access token.", err);
-    }
 
     // ==========================================
     // 2. MONGODB / BACKEND FETCH INTEGRATION
@@ -383,7 +308,6 @@
         const totalReportsElement = document.getElementById('total-reports-count');
         
         try {
-            // Check if backend actually works
             const response = await fetch('https://beat-pasig-api.onrender.com/api/reports/all').catch(() => null);
             
             let reports = [];
@@ -392,12 +316,11 @@
             if (response && response.ok) {
                 const result = await response.json();
                 if (result.success) {
-                    reports = result.data.slice(0, 10); // get 10 most recent
+                    reports = result.data.slice(0, 10);
                     totalCount = result.data.length;
                 }
             } 
             
-            // Fallback UI if no reports found in DB yet
             if (reports.length === 0) {
                 reports = [
                     { report_subject: 'Vehicular Accident', report_location: 'Brgy. San Antonio, C5 North', createdAt: new Date().toISOString(), status: 'Pending' },
@@ -415,7 +338,6 @@
                 if (report.status === 'Resolved') severityClass = 'emerald';
                 
                 const ringColor = severityClass === 'rose' ? 'ring-rose-500/10' : '';
-                
                 const d = new Date(report.createdAt);
                 const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -439,7 +361,79 @@
         }
     }
 
-    document.addEventListener('DOMContentLoaded', fetchReportsFromDB);
+    // Initialize Everything on Load
+    document.addEventListener('DOMContentLoaded', () => {
+        if(window.lucide) lucide.createIcons();
+        fetchReportsFromDB();
+
+        try {
+            initTrafficChart();
+            const map = new mapboxgl.Map({
+                container: 'traffic-map', 
+                style: 'mapbox://styles/mapbox/dark-v11',
+                center: [121.0825, 14.5764],
+                zoom: 12.5
+            });
+
+            setTimeout(() => { map.resize(); }, 500);
+
+           map.on('load', () => {
+                try {
+                    map.addSource('pasig-boundary', {
+                        type: 'geojson',
+                        data: '../pasig_boundaries.geojson' 
+                    });
+
+                    map.addLayer({
+                        'id': 'pasig-fill',
+                        'type': 'fill',
+                        'source': 'pasig-boundary',
+                        'paint': {
+                            'fill-color': '#3b82f6',
+                            'fill-opacity': 0.05
+                        }
+                    });
+
+                    map.addLayer({
+                        'id': 'pasig-line',
+                        'type': 'line',
+                        'source': 'pasig-boundary',
+                        'paint': {
+                            'line-color': '#3b82f6',
+                            'line-width': 2,
+                            'line-dasharray': [2, 2]
+                        }
+                    });
+                } catch (err) {}
+
+                map.addSource('mapbox-traffic', {
+                    type: 'vector',
+                    url: 'mapbox://mapbox.mapbox-traffic-v1'
+                });
+
+                map.addLayer({
+                    id: 'traffic-lines',
+                    type: 'line',
+                    source: 'mapbox-traffic',
+                    'source-layer': 'traffic',
+                    paint: {
+                        'line-width': 3,
+                        'line-color': [
+                            'match',
+                            ['get', 'congestion'],
+                            'low', '#10b981',      
+                            'moderate', '#3b82f6', 
+                            'heavy', '#f43f5e',    
+                            'severe', '#9f1239',   
+                            'transparent' 
+                        ]
+                    }
+                });
+                
+                map.on('idle', () => extractAndUpdateTrafficData(map));
+            });
+        } catch (err) {}
+    });
   </script>
 </body>
 </html>
