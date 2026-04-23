@@ -26,7 +26,7 @@ function escapeHTML(str) {
 }
 
 function doLogout() { 
-    window.location.href = 'admin.html'; 
+    window.location.href = '/admin'; 
 }
 // Close custom dropdowns when clicking outside
 document.addEventListener('click', (e) => {
@@ -37,7 +37,7 @@ document.addEventListener('click', (e) => {
 
 
 // ==========================================
-// AUTHENTICATION LOGIC (admin.html)
+// AUTHENTICATION LOGIC (/admin)
 // ==========================================
 function handleLogin(e) {
     e.preventDefault(); 
@@ -129,9 +129,9 @@ function handleVerify(e) {
         const activeDept = localStorage.getItem('activeDepartment');
         
         if (activeDept === 'Main Admin') {
-            window.location.href = "dashboard.html"; 
+            window.location.href = "/dashboard"; 
         } else {
-            window.location.href = "dashboard2.html"; 
+            window.location.href = "/dashboard2"; 
         }
     }
 }
@@ -1369,5 +1369,5 @@ document.addEventListener('DOMContentLoaded', () => {
 // so that inline HTML like <button onclick="doLogout()"> can trigger it
 window.doLogout = function() { 
     localStorage.removeItem('activeDepartment'); 
-    window.location.href = 'admin.html'; 
+    window.location.href = '/admin'; 
 };
