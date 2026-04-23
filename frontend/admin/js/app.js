@@ -187,7 +187,7 @@ function closePopup(popupId) {
 
 
 // ==========================================
-// MONGODB MANAGE ADMINS LOGIC
+// MONGODB MANAGE ADMINS LOGIC (COMPLETE & GLOBAL)
 // ==========================================
 let adminsFromDB = []; 
 let currentFilter = "All Departments";
@@ -195,7 +195,7 @@ let currentSearchQuery = "";
 let userToDeleteId = null; 
 let currentTargetUser = ""; 
 
-// 1. MISSING FUNCTIONS: SEARCH & SORT
+// 1. UTILITY: SEARCH & SORT
 function handleSearch(val) {
     currentSearchQuery = val.toLowerCase();
     populateAdmins();
@@ -206,35 +206,43 @@ function handleSort(val) {
     populateAdmins();
 }
 
-// 2. FETCH FROM MONGODB (With 404 Protection)
+// 2. FETCH DATA
 async function fetchAllAdmins() {
     try {
         const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/all');
-        
-        // If the server returns 404, the route doesn't exist on your backend
-        if (response.status === 404) {
-            console.error("CRITICAL: Route /api/admin/all not found on backend.");
-            return;
-        }
-
         const result = await response.json();
         if (result.success) {
-            adminsFromDB = result.admins || result.data || []; 
+            adminsFromDB = result.admins || []; 
             populateAdmins(); 
         }
     } catch (e) { console.error("Fetch Error:", e); }
 }
 
-// 3. GLOBAL CANCEL FUNCTION
-function clearAndCloseStaff() {
-    ['staff-name', 'staff-id', 'staff-email', 'staff-pass', 'staff-dept'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) { el.value = ""; el.classList.remove('input-error'); }
-    });
-    closeModal('add-staff-modal');
+// 3. VALIDATION (FIXES THE REFERENCE ERROR)
+function validateAddStaff() {
+    const name = document.getElementById('staff-name');
+    const id = document.getElementById('staff-id');
+    const email = document.getElementById('staff-email');
+    const pass = document.getElementById('staff-pass');
+    const dept = document.getElementById('staff-dept');
+    
+    let isValid = true;
+    
+    // Simple validation checks
+    if (!name.value.trim()) { name.classList.add('input-error'); isValid = false; }
+    if (!id.value.trim()) { id.classList.add('input-error'); isValid = false; }
+    if (!email.value.trim() || !email.value.includes('@')) { email.classList.add('input-error'); isValid = false; }
+    if (pass.value.length < 8) { pass.classList.add('input-error'); isValid = false; }
+    if (!dept.value) { dept.classList.add('input-error'); isValid = false; }
+
+    if (isValid) {
+        openModal('confirm-staff-modal'); // Proceed to confirmation
+    } else {
+        alert("Please fill in all fields correctly (Password min 8 chars).");
+    }
 }
 
-// 4. EXECUTE CREATION
+// 4. CREATE ACCOUNT
 async function executeAddStaff() {
     closeModal('confirm-staff-modal');
     const newUser = {
@@ -250,27 +258,29 @@ async function executeAddStaff() {
         const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/signup', {
             method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newUser)
         });
-
-        if (response.status === 404) {
-            throw new Error("Backend route /api/admin/signup is missing.");
-        }
-
         const result = await response.json();
+        
         if (result.success) {
-            clearAndCloseStaff(); fetchAllAdmins(); 
+            clearAndCloseStaff(); 
+            fetchAllAdmins(); 
             openModal('success-create-modal');
         } else {
-            document.getElementById('error-create-message').innerText = result.error || "Duplicate Email or ID.";
+            document.getElementById('error-create-message').innerText = result.error || "Duplicate ID or Email.";
             openModal('error-create-modal');
         }
-    } catch (e) { 
-        console.error("Signup Error:", e);
-        document.getElementById('error-create-message').innerText = "API Error: The backend route is not configured correctly.";
-        openModal('error-create-modal'); 
-    }
+    } catch (e) { openModal('error-create-modal'); }
 }
 
-// 5. RENDER TABLE
+// 5. CANCEL & CLEAR
+function clearAndCloseStaff() {
+    ['staff-name', 'staff-id', 'staff-email', 'staff-pass', 'staff-dept'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.value = ""; el.classList.remove('input-error'); }
+    });
+    closeModal('add-staff-modal');
+}
+
+// 6. RENDER TABLES
 function populateAdmins() {
     const activeTbody = document.getElementById('active-admin-table-body'),
           disabledTbody = document.getElementById('disabled-admin-table-body');
