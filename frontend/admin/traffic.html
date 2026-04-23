@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en" class="h-full">
 <head>
+  <script>
+    (function() {
+        const session = localStorage.getItem('activeDepartment');
+        if (!session || session !== 'Main Admin') {
+            // Notice the new "?error=unauthorized" at the end
+            window.location.replace('admin.html?error=unauthorized'); 
+        }
+    })();
+</script>
   <meta charset="UTF-8">
   <script>
         (function() {

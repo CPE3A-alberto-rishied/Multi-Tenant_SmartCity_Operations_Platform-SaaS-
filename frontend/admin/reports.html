@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en" class="h-full">
 <head>
+  <script>
+    (function() {
+        const session = localStorage.getItem('activeDepartment');
+        if (!session || session !== 'Main Admin') {
+            // Notice the new "?error=unauthorized" at the end
+            window.location.replace('admin.html?error=unauthorized'); 
+        }
+    })();
+</script>
   <meta charset="UTF-8">
   <script>
         (function() {
@@ -88,8 +97,7 @@
     input:checked + .slider:before { transform: translateX(18px); }
   </style>
 </head>
-
-<body class="h-full flex bg-[#0a0e1a] auth-guarded"> 
+<body class="h-full flex bg-[#0a0e1a]">
 
   <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
 

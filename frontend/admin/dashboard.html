@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en" class="h-full">
 <head>
+  <script>
+    (function() {
+        const session = localStorage.getItem('activeDepartment');
+        if (!session || session !== 'Main Admin') {
+            // Notice the new "?error=unauthorized" at the end
+            window.location.replace('admin.html?error=unauthorized'); 
+        }
+    })();
+</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BEAT – Dashboard Overview</title>
@@ -200,30 +209,137 @@
 
   <script src="js/app.js"></script>
 
+  <script src="js/app.js"></script>
+
   <script>
     lucide.createIcons();
 
     // ==========================================
-    // 1. MAPBOX TRAFFIC API INTEGRATION
+    // 1. CHART.JS & MAPBOX INTEGRATION
     // ==========================================
-    mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN'; 
+    let globalTrafficChart = null;
+
+    function initTrafficChart() {
+        const ctx = document.getElementById('trafficCongestionChart');
+        if (!ctx) return;
+
+        globalTrafficChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Light', 'Moderate', 'Heavy / Severe'],
+                datasets: [{
+                    data: [0, 0, 0], // Starting empty
+                    backgroundColor: ['#10b981', '#3b82f6', '#f43f5e'],
+                    borderWidth: 0,
+                    cutout: '75%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    function extractAndUpdateTrafficData(mapInstance) {
+        if (!globalTrafficChart || !mapInstance.getLayer('traffic-lines')) return;
+
+        // Scan the features visible in the current bounding box
+        const features = mapInstance.queryRenderedFeatures({ layers: ['traffic-lines'] });
+        let counts = { low: 0, moderate: 0, heavy: 0, severe: 0 };
+
+        features.forEach(f => {
+            const congestion = f.properties.congestion;
+            if (counts[congestion] !== undefined) {
+                counts[congestion]++;
+            }
+        });
+
+        const total = counts.low + counts.moderate + counts.heavy + counts.severe;
+        const heavySevereCombined = counts.heavy + counts.severe;
+
+        // 1. Update the Chart JS instance
+        globalTrafficChart.data.datasets[0].data = [
+            counts.low,
+            counts.moderate,
+            heavySevereCombined
+        ];
+        globalTrafficChart.update();
+
+        // 2. Update the HTML Legend Percentages
+        if (total > 0) {
+            const getPct = (val) => Math.round((val / total) * 100) + '%';
+            
+            const lightEl = document.getElementById('stat-light');
+            const modEl = document.getElementById('stat-moderate');
+            const heavyEl = document.getElementById('stat-heavy');
+            
+            if(lightEl) lightEl.innerText = getPct(counts.low);
+            if(modEl) modEl.innerText = getPct(counts.moderate);
+            if(heavyEl) heavyEl.innerText = getPct(heavySevereCombined);
+        }
+    }
+
+    // Insert your actual token here!
+    mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag'; 
     
     try {
+        initTrafficChart(); // Initialize the donut chart first
+
         const map = new mapboxgl.Map({
             container: 'traffic-map', 
             style: 'mapbox://styles/mapbox/dark-v11',
-            center: [121.0509, 14.5813], 
-            zoom: 12
+            center: [121.0825, 14.5764], // Centered on Pasig
+            zoom: 12.5
         });
 
-        map.on('load', () => {
+        // Add a slight delay to ensure the container is fully rendered before map resize
+        setTimeout(() => { map.resize(); }, 500);
+
+       map.on('load', () => {
+            // ==========================================
+            // 1. PASIG CITY BORDERS (Rendered Below)
+            // ==========================================
+            map.addSource('pasig-boundary', {
+                type: 'geojson',
+                // IMPORTANT: Adjust this path to exactly match your folder structure!
+                data: '../pasig_boundaries.geojson' 
+            });
+
+            // Subtle blue background fill
+            map.addLayer({
+                'id': 'pasig-fill',
+                'type': 'fill',
+                'source': 'pasig-boundary',
+                'paint': {
+                    'fill-color': '#3b82f6',
+                    'fill-opacity': 0.05
+                }
+            });
+
+            // Glowing dashed outline
+            map.addLayer({
+                'id': 'pasig-line',
+                'type': 'line',
+                'source': 'pasig-boundary',
+                'paint': {
+                    'line-color': '#3b82f6',
+                    'line-width': 2,
+                    'line-dasharray': [2, 2]
+                }
+            });
+
+            // ==========================================
+            // 2. LIVE TRAFFIC (Rendered On Top)
+            // ==========================================
             map.addSource('mapbox-traffic', {
                 type: 'vector',
                 url: 'mapbox://mapbox.mapbox-traffic-v1'
             });
 
             map.addLayer({
-                id: 'traffic',
+                id: 'traffic-lines',
                 type: 'line',
                 source: 'mapbox-traffic',
                 'source-layer': 'traffic',
@@ -236,16 +352,14 @@
                         'moderate', '#3b82f6', // Blue (Moderate)
                         'heavy', '#f43f5e',    // Rose (Heavy)
                         'severe', '#9f1239',   // Dark Red (Severe)
-                        '#ffffff' 
+                        'transparent' 
                     ]
                 }
             });
             
-            // FRONTEND HACK: Trigger data extraction when the map stops moving
+            // Extract data when the map stops moving to update the Donut Chart
             map.on('idle', () => {
-                if(typeof extractAndUpdateTrafficData === 'function') {
-                    extractAndUpdateTrafficData(map);
-                }
+                extractAndUpdateTrafficData(map);
             });
         });
     } catch (err) {
@@ -262,7 +376,7 @@
         try {
             // Simulated DB Response
             const dummyDBResponse = {
-                total30D: 184, // This value syncs with the Top Right Stat
+                total30D: 184, 
                 recent: [
                     { type: 'Vehicular Accident', location: 'Brgy. San Antonio, C5 North', time: '2m ago', severity: 'rose' },
                     { type: 'Illegal Parking', location: 'Emerald Ave, Ortigas', time: '15m ago', severity: 'slate' },
@@ -273,7 +387,6 @@
                 ]
             };
             
-            // Sync values to the frontend Live Stats
             const reports = dummyDBResponse.recent; 
             totalReportsElement.innerText = dummyDBResponse.total30D;
 
