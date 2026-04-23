@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  
+  <script>
+      (function() {
+          const session = localStorage.getItem('activeDepartment');
+          if (!session || session !== 'DRRMO') {
+              window.location.replace('admin.html?error=unauthorized'); 
+          }
+      })();
+  </script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BEAT - DRRMO Fleet Response</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles2.css">
+  <style>
+    body { font-family: 'DM Sans', sans-serif !important; overflow: hidden; }
+    
+    /* SIDEBAR */
+    .sidebar { width: 260px !important; flex-shrink: 0 !important; }
+    
+    .sidebar-item { 
+      display: flex !important; align-items: center !important; gap: 12px !important;
+      padding: 12px 18px !important; font-size: 14.5px !important; 
+      font-weight: 500 !important; color: #94a3b8 !important;
+      text-decoration: none !important; border-left: 3px solid transparent !important;
+    }
+    .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
+    .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
+    .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
+    
+    /* USER FOOTER */
+    .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
+    .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
+
+    /* Modals */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; padding: 1rem; }
+    .hidden { display: none !important; }
+    .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 8px 12px; transition: all 0.2s; }
+    .modal-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
+    
+    select { 
+      appearance: none; 
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); 
+      background-repeat: no-repeat; 
+      background-position: right 0.75rem center; 
+      background-size: 1em; 
+    }
+
+    /* Switch Component */
+    .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #374151; transition: .4s; border-radius: 24px; }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: #22c55e; }
+    input:checked + .slider:before { transform: translateX(18px); }
+  </style>
+</head>
+<body class="h-full flex bg-[#0a0e1a]">
+  
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+  <aside id="sidebar" class="sidebar flex flex-col h-full absolute lg:relative z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 theme-border-r theme-surface">
+    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
+      <div class="flex items-center gap-3">
+        <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
+        <div class="flex flex-col justify-center">
+          <div class="logo-text font-bold text-white">BEAT</div>
+          <div class="text-[11px] text-[#94a3b8] leading-none">Department Portal</div>
+        </div>
+      </div>
+      <button class="lg:hidden ml-auto text-gray-400 hover:text-white" onclick="toggleSidebar()">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+    
+    <nav class="flex-1 py-4 overflow-y-auto">
+      <a href="dashboard3.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+      <a href="reports3.html" class="sidebar-item"><i data-lucide="file-text"></i><span>Public Reports</span></a>
+      <a href="announcements3.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+      <a href="traffic3.html" class="sidebar-item active"><i data-lucide="truck"></i><span>Fleet Response Control</span></a>
+      <a href="analytics3.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
+    </nav>
+
+    <div class="user-footer">
+        <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-3">
+                <div style="background:#f59e0b; width:42px; height:42px; border-radius:50%;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">D</div>
+                <div>
+                  <div class="text-white font-semibold text-sm">DRRMO</div>
+                  <div class="text-[#94a3b8] text-[11px]">Emergency Response</div>
+                </div>
+            </div>
+            <a href="profile3.html" class="text-[#94a3b8] hover:text-[#3b82f6] transition-colors"><i data-lucide="settings" class="w-4 h-4"></i></a>
+        </div>
+        <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 text-white text-sm font-semibold hover:bg-gray-800 transition-colors">
+            <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+        </button>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] relative">
+    <header class="h-[76px] px-4 sm:px-8 flex items-center shrink-0 theme-surface border-b" style="border-color:var(--border)">
+      <button class="lg:hidden text-gray-400 hover:text-white mr-4" onclick="toggleSidebar()">
+        <i data-lucide="menu" class="w-6 h-6"></i>
+      </button>
+      <h1 class="text-xl font-semibold text-white flex items-center gap-2"><i data-lucide="truck" class="text-blue-500 w-6 h-6 hidden sm:block"></i> Fleet Response Control</h1>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-4 sm:p-8 animate-in">
+      <div class="max-w-[1400px] mx-auto space-y-6">
+        
+        <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div class="relative w-full md:w-1/2 flex items-center">
+            <i data-lucide="search" class="absolute left-3 text-gray-400 w-4 h-4"></i>
+            <input type="text" id="roadSearch" placeholder="Search for a specific road or intersection..." class="modal-input !mt-0 !pl-10">
+          </div>
+          <div class="flex gap-2 w-full sm:w-auto">
+            <button id="newEntryBtn" class="flex-1 sm:flex-none h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-lg">
+              <i data-lucide="plus" class="w-4 h-4"></i> New Entry
+            </button>
+            <button id="refreshBtn" class="h-10 px-3 bg-[#1e2536] border theme-border text-white rounded-lg hover:bg-gray-800 transition-all" title="Refresh Table">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 border theme-border rounded-xl p-6 shadow-sm theme-surface">
+            <h3 class="font-semibold text-white mb-4 flex items-center gap-2"><i data-lucide="list" class="w-4 h-4 text-[#94a3b8]"></i> Master Road List</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm text-slate-300 min-w-[500px]">
+                <thead class="bg-[#1e2536] text-[#94a3b8]">
+                  <tr>
+                    <th class="px-4 py-3 rounded-l-lg">Road Name</th>
+                    <th class="px-4 py-3 text-center">Status</th>
+                    <th class="px-4 py-3 text-center">Auto-Alert</th>
+                    <th class="px-4 py-3 rounded-r-lg text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="roads-table-body" class="divide-y divide-gray-700/30"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="border theme-border rounded-xl p-6 shadow-sm theme-surface">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-semibold text-white flex items-center gap-2"><i data-lucide="megaphone" class="text-red-400 w-4 h-4"></i> Local Reports</h3>
+            </div>
+            <div class="reports-scroll pr-2 space-y-3">
+              <p class="text-sm text-[#94a3b8] italic">No active reports.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="newEntryModal" class="modal-overlay hidden">
+      <div class="border theme-border w-[550px] max-w-[90%] rounded-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl theme-surface">
+        <h2 class="text-white font-bold text-xl mb-6 flex items-center gap-2 justify-center">
+          <i data-lucide="plus-circle" class="text-blue-500 w-6 h-6"></i> Add New Road
+        </h2>
+        <div class="space-y-4 text-left">
+          <div>
+            <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Road Name</label>
+            <input type="text" id="newRoadName" class="modal-input text-sm" placeholder="e.g., Ortigas Avenue">
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Traffic Status</label>
+            <select id="newRoadStatus" class="modal-input text-sm cursor-pointer">
+              <option value="Clear">Clear</option>
+              <option value="Moderate">Moderate</option>
+              <option value="Heavy Traffic">Heavy Traffic</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Enable Auto-Alert</label>
+            <label class="switch">
+              <input type="checkbox" id="newRoadAlert" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="flex justify-end gap-3 mt-8 pt-4">
+          <button id="cancelEntryBtn" class="px-6 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-2.5 rounded-xl text-sm transition-colors w-full sm:w-auto">Cancel</button>
+          <button id="saveEntryBtn" class="px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg w-full sm:w-auto">Save Entry</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="deleteConfirmModal" class="modal-overlay hidden">
+      <div class="border theme-border w-[400px] max-w-[90%] text-center p-8 rounded-2xl shadow-2xl theme-surface">
+        <div class="bg-red-500/10 text-red-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+        </div>
+        <h2 class="text-white font-bold text-xl mb-3">Confirm Deletion</h2>
+        <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to delete <span id="deleteRoadNameDisplay" class="font-bold text-white"></span>? This action cannot be undone.</p>
+        
+        <div class="flex flex-col sm:flex-row gap-3">
+          <button id="cancelDeleteBtn" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
+          <button id="confirmDeleteBtn" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Delete</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/app3.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => { 
+      if (window.lucide) lucide.createIcons();
+
+      const tbody = document.getElementById('roads-table-body');
+      let customRoads = JSON.parse(localStorage.getItem('customRoads')) || [];
+
+      const searchInput = document.getElementById('roadSearch');
+      if(searchInput) {
+          searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach(row => {
+              const roadNameCell = row.querySelector('td:first-child');
+              if (roadNameCell) {
+                row.style.display = roadNameCell.textContent.toLowerCase().includes(searchTerm) ? '' : 'none';
+              }
+            });
+          });
+      }
+
+      function escapeHTML(str) {
+        if (!str) return '';
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+      }
+
+      function loadRoadData() {
+        try {
+          customRoads.forEach(road => {
+            let statusColor = '';
+            if (road.status === 'Clear') statusColor = 'text-green-400 bg-green-500/10';
+            else if (road.status === 'Moderate') statusColor = 'text-yellow-400 bg-yellow-500/10';
+            else if (road.status === 'Heavy Traffic') statusColor = 'text-orange-400 bg-orange-500/10';
+            else if (road.status === 'Closed') statusColor = 'text-red-400 bg-red-500/10';
+
+            const newRow = document.createElement('tr');
+            newRow.className = "hover:bg-white/[0.02] transition-colors";
+            newRow.innerHTML = `
+              <td class="px-4 py-3 font-medium text-white">${escapeHTML(road.name)}</td>
+              <td class="px-4 py-3 text-center">
+                <span class="px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase ${statusColor}">
+                  ${escapeHTML(road.status)}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <label class="switch">
+                  <input type="checkbox" data-name="${escapeHTML(road.name)}" ${road.alert ? 'checked' : ''}>
+                  <span class="slider"></span>
+                </label>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <button class="delete-road-btn text-gray-500 hover:text-red-500 transition-colors" data-name="${escapeHTML(road.name)}" title="Delete Custom Entry">
+                  <i data-lucide="trash-2" class="w-4 h-4 mx-auto pointer-events-none"></i>
+                </button>
+              </td>
+            `;
+
+            tbody.prepend(newRow);
+            
+            if (window.lucide) window.lucide.createIcons();
+          });
+        } catch (error) { console.error("Failed to load data:", error); }
+      }
+      
+      if(tbody) loadRoadData();
+
+      if(tbody) {
+          tbody.addEventListener('change', (e) => {
+            if (e.target.tagName === 'INPUT' && e.target.type === 'checkbox') {
+              const roadName = e.target.getAttribute('data-name');
+              const roadIndex = customRoads.findIndex(r => r.name === roadName);
+              if (roadIndex !== -1) {
+                customRoads[roadIndex].alert = e.target.checked;
+                localStorage.setItem('customRoads', JSON.stringify(customRoads));
+              }
+            }
+          });
+      }
+
+      const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+      const deleteRoadNameDisplay = document.getElementById('deleteRoadNameDisplay');
+      let roadToDelete = null;
+      let rowToDelete = null;
+
+      if(tbody) {
+          tbody.addEventListener('click', (e) => {
+            const deleteBtn = e.target.closest('.delete-road-btn');
+            if (deleteBtn) {
+              roadToDelete = deleteBtn.getAttribute('data-name');
+              rowToDelete = deleteBtn.closest('tr');
+              deleteRoadNameDisplay.textContent = roadToDelete;
+              deleteConfirmModal.classList.remove('hidden');
+            }
+          });
+      }
+
+      const cancelDel = document.getElementById('cancelDeleteBtn');
+      if(cancelDel) {
+          cancelDel.addEventListener('click', () => {
+            deleteConfirmModal.classList.add('hidden');
+            roadToDelete = null; rowToDelete = null;
+          });
+      }
+
+      const confirmDel = document.getElementById('confirmDeleteBtn');
+      if(confirmDel) {
+          confirmDel.addEventListener('click', () => {
+            if (roadToDelete && rowToDelete) {
+              customRoads = customRoads.filter(r => r.name !== roadToDelete);
+              localStorage.setItem('customRoads', JSON.stringify(customRoads));
+              rowToDelete.remove();
+              deleteConfirmModal.classList.add('hidden');
+            }
+          });
+      }
+
+      const refreshBtn = document.getElementById('refreshBtn');
+      if(refreshBtn) {
+          refreshBtn.addEventListener('click', () => {
+            const currentIcon = refreshBtn.querySelector('svg, i');
+            if (currentIcon) currentIcon.classList.add('animate-spin');
+            tbody.innerHTML = '';
+            if(searchInput) searchInput.value = '';
+            setTimeout(() => {
+              loadRoadData();
+              if (currentIcon) currentIcon.classList.remove('animate-spin');
+            }, 800);
+          });
+      }
+
+      const modal = document.getElementById('newEntryModal');
+      const roadNameInput = document.getElementById('newRoadName');
+
+      const newEntBtn = document.getElementById('newEntryBtn');
+      if(newEntBtn) {
+          newEntBtn.addEventListener('click', () => {
+            modal.classList.remove('hidden');
+            roadNameInput.focus();
+          });
+      }
+
+      const cancelEntBtn = document.getElementById('cancelEntryBtn');
+      if(cancelEntBtn) {
+          cancelEntBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            roadNameInput.value = ''; 
+            roadNameInput.style.borderColor = '';
+          });
+      }
+
+      const saveEntBtn = document.getElementById('saveEntryBtn');
+      if(saveEntBtn) {
+          saveEntBtn.addEventListener('click', () => {
+            const name = roadNameInput.value.trim();
+            const status = document.getElementById('newRoadStatus').value;
+            const alertEnabled = document.getElementById('newRoadAlert').checked;
+
+            if (!name) { roadNameInput.style.borderColor = '#ef4444'; return; }
+
+            customRoads.push({ name, status, alert: alertEnabled });
+            localStorage.setItem('customRoads', JSON.stringify(customRoads));
+
+            let statusColor = '';
+            if (status === 'Clear') statusColor = 'text-green-400 bg-green-500/10';
+            else if (status === 'Moderate') statusColor = 'text-yellow-400 bg-yellow-500/10';
+            else if (status === 'Heavy Traffic') statusColor = 'text-orange-400 bg-orange-500/10';
+            else if (status === 'Closed') statusColor = 'text-red-400 bg-red-500/10';
+
+            const newRow = document.createElement('tr');
+            newRow.className = "hover:bg-white/[0.02] transition-colors";
+            newRow.innerHTML = `
+              <td class="px-4 py-3 font-medium text-white">${escapeHTML(name)}</td>
+              <td class="px-4 py-3 text-center">
+                <span class="px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase ${statusColor}">
+                  ${escapeHTML(status)}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <label class="switch">
+                  <input type="checkbox" data-name="${escapeHTML(name)}" ${alertEnabled ? 'checked' : ''}>
+                  <span class="slider"></span>
+                </label>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <button class="delete-road-btn text-gray-500 hover:text-red-500 transition-colors" data-name="${escapeHTML(name)}" title="Delete Custom Entry">
+                  <i data-lucide="trash-2" class="w-4 h-4 mx-auto pointer-events-none"></i>
+                </button>
+              </td>
+            `;
+
+            tbody.prepend(newRow);
+            if (window.lucide) window.lucide.createIcons();
+            
+            if(searchInput) searchInput.value = '';
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach(row => row.style.display = '');
+
+            modal.classList.add('hidden');
+            roadNameInput.value = ''; 
+            roadNameInput.style.borderColor = '';
+          });
+      }
+    });
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        if (sidebar.classList.contains('-translate-x-full')) {
+            sidebar.classList.remove('-translate-x-full');
+            if(overlay) overlay.classList.remove('hidden');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            if(overlay) overlay.classList.add('hidden');
+        }
+    }
+
+    function doLogout() {
+        localStorage.removeItem('activeDepartment');
+        window.location.href = 'admin.html';
+    }
+  </script>
+</body>
+</html>

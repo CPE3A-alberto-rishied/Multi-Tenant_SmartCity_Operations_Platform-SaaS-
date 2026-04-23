@@ -81,7 +81,23 @@ async function handleLogin(event) {
         const data = await response.json();
 
         if (response.ok && data.success) {
-            
+
+//            // --- 🚨 TEMPORARY 2FA BYPASS 🚨 ---
+//            if (selectedDept === 'Main Admin') {
+//                localStorage.setItem('activeDepartment', 'Main Admin');
+//                window.location.href = 'dashboard.html';
+//                return; // Stop the script here
+//            } else if (selectedDept === 'Traffic') {
+//                localStorage.setItem('activeDepartment', 'Traffic');
+//                window.location.href = 'dashboard2.html';
+//                return; // Stop the script here
+//            } else if (selectedDept === 'DRRMO') {
+//               localStorage.setItem('activeDepartment', 'DRRMO');
+//                window.location.href = 'dashboard3.html';
+//                return; // Stop the script here
+//            }
+            // -------------------------------------------------
+
             // SUCCESS: Credentials matched, Email was sent!
             currentLoggingInId = data.adminId; // Store ID temporarily for verification
             
