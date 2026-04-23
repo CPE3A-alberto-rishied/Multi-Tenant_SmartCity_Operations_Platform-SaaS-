@@ -42,7 +42,7 @@ The system is designed to streamline emergency responses: citizens file public r
 
 ## 🧊 System Architecture
 ```mermaid
-graph TD
+flowchart TD
     %% Styling
     classDef public fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#fff;
     classDef portal fill:#0f172a,stroke:#d946ef,stroke-width:2px,color:#fff;
@@ -52,40 +52,49 @@ graph TD
 
     subgraph Client-Side [Frontend Architecture]
         direction TB
+        
         subgraph Public [Public Facing]
-            PUB[Citizen Portal<br/>Home, Maps, Reports, News]:::public
+            PUB["Citizen Portal (Home, Maps, Reports, News)"]:::public
         end
+
         subgraph Portals [Secure Department Portals]
-            ADMIN[Main Admin Center<br/>Global Overseer]:::portal
-            TRAFFIC[Traffic Department<br/>Congestion & Heatmaps]:::portal
-            DRRMO[DRRMO Department<br/>Evacuation & Weather]:::portal
+            ADMIN["Main Admin Center (Global)"]:::portal
+            TRAFFIC["Traffic Dept (Congestion & Heatmaps)"]:::portal
+            DRRMO["DRRMO Dept (Evacuation & Alerts)"]:::portal
         end
-        LS[(Browser LocalStorage<br/>Live State Sync)]:::storage
+
+        LS[("Browser LocalStorage (Live State Sync)")]:::storage
     end
 
     subgraph Server-Side [Backend Infrastructure]
-        API[Node.js & Express API<br/>Hosted on Render]:::backend
-        DB[(MongoDB<br/>Cloud Database)]:::backend
+        API["Node.js & Express API (Render)"]:::backend
+        DB[("MongoDB (Cloud Database)")]:::backend
     end
 
     subgraph Third-Party [External Services]
-        MAP[Mapbox GL JS & Turf.js<br/>Geospatial Engine]:::external
-        CHART[Chart.js<br/>Data Analytics]:::external
+        MAP["Mapbox GL & Turf.js (Geospatial)"]:::external
+        CHART["Chart.js (Data Analytics)"]:::external
     end
 
+    %% User Interactions
     PUB -->|Submits Emergency Reports| API
     PUB -.->|Reads Live News| LS
+
+    %% Secure API Calls
     ADMIN <-->|Manage Users & Triage Reports| API
     TRAFFIC <-->|Update Hazard Status| API
     DRRMO <-->|Update Evacuation Status| API
     API <-->|CRUD Operations| DB
+
+    %% Cross-Tab State Syncing (The Bridge)
     TRAFFIC -.->|Broadcasts Blocked Roads| LS
-    DRRMO -.->|Broadcasts Danger Zones| LS
+    DRRMO -.->|Broadcasts Hazards & Resolved Incidents| LS
     ADMIN -.->|Reads Live Hazards| LS
-    DRRMO -.->|Publishes Resolved Incidents| LS
+
+    %% External API Routing
     TRAFFIC -->|Renders Maps & Calculates Buffers| MAP
     DRRMO -->|Draws Polygons & Heatmaps| MAP
     ADMIN -->|Displays Global City Map| MAP
     PUB -->|Views Public Layers| MAP
+    
     TRAFFIC -->|Renders Congestion Stats| CHART
-```
