@@ -13,21 +13,45 @@
   
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+  <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.0/mapbox-gl-draw.css" type="text/css">
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.0/mapbox-gl-draw.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
+
+  <style>
+    /* Custom Toggle Switch for Map Layers */
+    .layer-switch { position: relative; display: inline-block; width: 34px; height: 20px; }
+    .layer-switch input { opacity: 0; width: 0; height: 0; }
+    .layer-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #374151; transition: .4s; border-radius: 34px; }
+    .layer-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .layer-slider { background-color: #f97316; }
+    input:checked + .layer-slider:before { transform: translateX(14px); }
+
+    /* Blue Marker for Drawn Zones */
+    .weather-blue-marker { width: 24px; height: 24px; background-color: #3b82f6; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); animation: pulse-blue 2s infinite; cursor: pointer; }
+    @keyframes pulse-blue { 0% { box-shadow: 0 0 0 0 rgba(59,130,246, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(59,130,246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59,130,246, 0); } }
+
+    /* Mapbox Popup Overrides */
+    .mapboxgl-popup-content { background: #1e293b !important; color: white !important; border: 1px solid #3b82f6; border-radius: 8px; padding: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 220px; }
+    .mapboxgl-popup-tip { border-top-color: #1e293b !important; border-bottom-color: #1e293b !important; }
+    .mapboxgl-popup-close-button { color: #94a3b8; font-size: 16px; top: 4px; right: 8px; }
+    .mapboxgl-popup-close-button:hover { color: white; background: transparent; }
+  </style>
 </head>
 
 <body class="h-full flex bg-[#0a0e1a]">
-  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface">
+  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-50">
     <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
-        <div id="auth-logo" class="flex items-center gap-1.5">
-            <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain">
-            <div class="flex flex-col justify-center items-start">
-                <img src="/assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
-          <div class="sidebar-subtext">Admin Control Center</div>
+      <div class="flex items-center gap-3">
+        <div class="logo-box bg-orange-600 text-white">B</div>
+        <div class="flex flex-col justify-center">
+          <div class="logo-text font-bold text-white">BEAT</div>
+          <div class="sidebar-subtext">Department Portal</div>
         </div>
       </div>
     </div>
@@ -51,47 +75,114 @@
 
   <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] relative">
     
-    <div class="absolute top-6 left-6 z-10 w-96 flex flex-col gap-4 max-h-[90vh]">
-        <div class="theme-surface border theme-border rounded-2xl p-6 shadow-2xl backdrop-blur-md bg-opacity-95 flex-shrink-0">
-            <div class="flex items-center justify-between mb-1">
-                <h2 class="text-white font-bold text-lg flex items-center gap-2"><i data-lucide="cloud-lightning" class="text-orange-500"></i> Environmental Hazards</h2>
-            </div>
-            <p class="text-[11px] text-[#94a3b8] mb-6">Live telemetry from Open-Meteo API for Pasig City.</p>
-            
-            <div class="space-y-4">
-                
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-[#0f172a] border border-gray-800 p-4 rounded-xl text-center">
-                        <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Heat Index</p>
-                        <h3 id="api-heat" class="text-2xl font-bold text-white flex items-center justify-center gap-1">--<span class="text-sm">°C</span></h3>
-                    </div>
-                    <div class="bg-[#0f172a] border border-gray-800 p-4 rounded-xl text-center">
-                        <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">AQI (US)</p>
-                        <h3 id="api-aqi" class="text-2xl font-bold text-white">--</h3>
-                    </div>
-                    <div class="bg-[#0f172a] border border-gray-800 p-4 rounded-xl text-center">
-                        <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">PM 2.5</p>
-                        <h3 id="api-pm" class="text-xl font-bold text-gray-300">--</h3>
-                    </div>
-                    <div class="bg-[#0f172a] border border-gray-800 p-4 rounded-xl text-center">
-                        <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Carbon Monoxide</p>
-                        <h3 id="api-co" class="text-xl font-bold text-gray-300">--</h3>
-                    </div>
-                </div>
+    <div class="absolute top-6 left-6 z-10 w-[400px] flex flex-col gap-4 max-h-[90vh] overflow-y-auto pr-2 pb-6">
 
-                <div id="danger-alert" class="hidden bg-red-500/10 border border-red-500/30 p-4 rounded-xl mt-4">
-                    <div class="flex items-center gap-2 mb-2">
-                        <i data-lucide="alert-triangle" class="text-red-500 w-5 h-5 animate-pulse"></i>
-                        <h4 class="text-red-500 font-bold text-sm uppercase tracking-wider">CRITICAL HAZARD LEVEL</h4>
-                    </div>
-                    <p id="danger-reason" class="text-xs text-red-400 mb-4 leading-relaxed"></p>
-                    <button class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2.5 rounded-lg shadow-lg transition-all flex justify-center items-center gap-2">
-                        <i data-lucide="radio" class="w-4 h-4"></i> Issue "Stay Indoors" Alert
-                    </button>
-                </div>
+        <div class="theme-surface border theme-border rounded-2xl p-6 shadow-2xl backdrop-blur-md bg-opacity-95 flex-shrink-0">
+            <h2 class="text-white font-bold text-sm flex items-center gap-2 mb-4"><i data-lucide="map-pin" class="text-blue-500"></i> Custom Zone Mapping</h2>
+            <p class="text-[10px] text-[#94a3b8] mb-4">Draw an exclusion area and attach an advisory. This will ONLY reflect on the Main Admin's map.</p>
+            
+            <div class="space-y-3">
+                <select id="draw-type" class="w-full bg-[#0f172a] text-white border border-gray-700 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 transition-colors cursor-pointer">
+                    <option value="Flood Risk Area">Flood Risk Area</option>
+                    <option value="Fire Hazard Zone">Fire Hazard Zone</option>
+                    <option value="Chemical Spill">Chemical Spill</option>
+                    <option value="Landslide Warning">Landslide Warning</option>
+                    <option value="Evacuation Perimeter">Evacuation Perimeter</option>
+                </select>
                 
+                <input type="text" id="zone-title" placeholder="Advisory Title (Optional)" class="w-full bg-[#0f172a] text-white border border-gray-700 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 transition-colors" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
+                <textarea id="zone-desc" rows="2" placeholder="Instructions for the public..." class="w-full bg-[#0f172a] text-white border border-gray-700 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 transition-colors resize-none"></textarea>
+                
+                <button id="btn-draw-zone" class="w-full bg-[#1e293b] hover:bg-gray-700 text-blue-400 text-xs font-bold py-2.5 rounded-lg border border-blue-500/50 transition-all flex justify-center items-center gap-2 shadow-sm">
+                    <i data-lucide="pen-tool" class="w-4 h-4"></i> 1. Draw Area (Polygon)
+                </button>
+                
+                <button id="btn-broadcast-zone" disabled class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-lg shadow-lg transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i data-lucide="upload-cloud" class="w-4 h-4"></i> 2. Broadcast to Main Map
+                </button>
             </div>
         </div>
+
+        <div id="active-zones-container" class="hidden theme-surface border theme-border rounded-2xl p-4 shadow-2xl flex-shrink-0">
+            <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-3 flex items-center justify-between">
+                Active Map Zones <span id="zone-count" class="bg-blue-500 text-white px-2 py-0.5 rounded-full text-[10px]">0</span>
+            </h3>
+            <div id="zones-list" class="space-y-3 max-h-[250px] overflow-y-auto pr-2"></div>
+        </div>
+
+        <div id="sync-toast" class="bg-blue-500/10 border border-blue-500/30 text-blue-400 p-4 rounded-xl text-sm font-semibold flex items-center gap-3 hidden shadow-lg backdrop-blur-md transition-opacity mt-4">
+            <i data-lucide="check-circle" class="w-5 h-5"></i> Map Zone Synced!
+        </div>
+
+    </div>
+
+    <div class="absolute top-6 right-6 z-10 w-72 flex flex-col gap-4">
+        
+        <div class="theme-surface border theme-border rounded-xl p-5 shadow-2xl backdrop-blur-md bg-opacity-95 flex-shrink-0">
+            <h2 class="text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 mb-4"><i data-lucide="layers" class="text-blue-400 w-4 h-4"></i> Map Layer Controls</h2>
+            <div class="space-y-3">
+                <div class="flex items-center justify-between bg-[#0f172a] border border-gray-800 p-3 rounded-lg hover:border-gray-600 transition-colors">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="thermometer-sun" class="text-rose-500 w-4 h-4"></i>
+                        <span class="text-[11px] font-bold text-white uppercase tracking-wider">Heat Map</span>
+                    </div>
+                    <label class="layer-switch" style="transform: scale(0.85); transform-origin: right;">
+                        <input type="checkbox" id="toggle-heat" onchange="toggleMapLayer('heat', this.checked)">
+                        <span class="layer-slider"></span>
+                    </label>
+                </div>
+                <div class="flex items-center justify-between bg-[#0f172a] border border-gray-800 p-3 rounded-lg hover:border-gray-600 transition-colors">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="wind" class="text-gray-400 w-4 h-4"></i>
+                        <span class="text-[11px] font-bold text-white uppercase tracking-wider">AQI Density</span>
+                    </div>
+                    <label class="layer-switch" style="transform: scale(0.85); transform-origin: right;">
+                        <input type="checkbox" id="toggle-aqi" onchange="toggleMapLayer('aqi', this.checked)">
+                        <span class="layer-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="theme-surface border theme-border rounded-xl p-5 shadow-2xl backdrop-blur-md bg-opacity-95">
+            <div class="text-[11px] font-bold text-[#94a3b8] uppercase tracking-wider mb-3 flex items-center gap-2">
+                <i data-lucide="map" class="w-4 h-4 text-blue-500"></i> Jump to District
+            </div>
+            <select class="w-full bg-[#1e2536] border border-[#374151] text-white px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider outline-none cursor-pointer" onchange="zoomToBarangay(this.value)">
+                <option value="">-- Select Barangay --</option>
+                <option value="bagong-ilog">Bagong Ilog</option>
+                <option value="bagong-katipunan">Bagong Katipunan</option>
+                <option value="bambang">Bambang</option>
+                <option value="buting">Buting</option>
+                <option value="caniogan">Caniogan</option>
+                <option value="dela-paz">Dela Paz</option>
+                <option value="kalawaan">Kalawaan</option>
+                <option value="kapasigan">Kapasigan</option>
+                <option value="kapitolyo">Kapitolyo</option>
+                <option value="malinao">Malinao</option>
+                <option value="manggahan">Manggahan</option>
+                <option value="maybunga">Maybunga</option>
+                <option value="oranbo">Oranbo</option>
+                <option value="palatiw">Palatiw</option>
+                <option value="pinagbuhatan">Pinagbuhatan</option>
+                <option value="pineda">Pineda</option>
+                <option value="rosario">Rosario</option>
+                <option value="sagad">Sagad</option>
+                <option value="san-antonio">San Antonio</option>
+                <option value="san-joaquin">San Joaquin</option>
+                <option value="san-jose">San Jose</option>
+                <option value="san-miguel">San Miguel</option>
+                <option value="san-nicolas">San Nicolas</option>
+                <option value="santa-cruz">Santa Cruz</option>
+                <option value="santa-lucia">Santa Lucia</option>
+                <option value="santa-rosa">Santa Rosa</option>
+                <option value="santo-tomas">Santo Tomas</option>
+                <option value="santolan">Santolan</option>
+                <option value="sumilang">Sumilang</option>
+                <option value="ugong">Ugong</option>
+            </select>
+        </div>
+        
     </div>
 
     <div id="map" class="w-full h-full"></div>
@@ -101,63 +192,242 @@
   <script>
     lucide.createIcons();
     mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag';
+    
+    const PASIG_CENTER = [121.0700, 14.5700];
+    
     const map = new mapboxgl.Map({
-        container: 'map', style: 'mapbox://styles/mapbox/dark-v11', center: [121.0700, 14.5700], zoom: 12.5, pitch: 45
+        container: 'map', style: 'mapbox://styles/mapbox/dark-v11', center: PASIG_CENTER, zoom: 13.5, pitch: 45
     });
 
-    // OPEN-METEO API INTEGRATION
-    async function fetchEnvironmentalData() {
-        try {
-            // Pasig City Coordinates
-            const lat = 14.57; const lon = 121.06;
-            
-            // Fetch Weather (Apparent Temp / Heat Index)
-            const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=apparent_temperature&timezone=Asia/Manila`);
-            const weatherData = await weatherRes.json();
-            const heatIndex = weatherData.current.apparent_temperature;
-
-            // Fetch Air Quality
-            const aqiRes = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=pm10,pm2_5,carbon_monoxide,us_aqi&timezone=Asia/Manila`);
-            const aqiData = await aqiRes.json();
-            const aqi = aqiData.current.us_aqi;
-            const pm25 = aqiData.current.pm2_5;
-            const co = aqiData.current.carbon_monoxide;
-
-            // Update UI Widgets
-            document.getElementById('api-heat').innerHTML = `${heatIndex}<span class="text-sm">°C</span>`;
-            document.getElementById('api-aqi').innerText = aqi;
-            document.getElementById('api-pm').innerText = pm25 + ' µg/m³';
-            document.getElementById('api-co').innerText = co + ' μg/m³';
-
-            // Auto-Warning Logic
-            const dangerAlert = document.getElementById('danger-alert');
-            const dangerReason = document.getElementById('danger-reason');
-            
-            if (heatIndex > 41 || aqi > 150) {
-                dangerAlert.classList.remove('hidden');
-                if (heatIndex > 41 && aqi > 150) {
-                    dangerReason.innerText = `Stroke-level heat index (${heatIndex}°C) and Toxic AQI (${aqi}) detected. Immediate city-wide indoor lockdown recommended.`;
-                } else if (heatIndex > 41) {
-                    dangerReason.innerText = `Dangerously high Heat Index detected (${heatIndex}°C). Heat cramps and heat exhaustion are likely.`;
-                } else {
-                    dangerReason.innerText = `Toxic Air Quality Index detected (${aqi}). The air is unhealthy for the general public.`;
-                }
+    // 2. Mapbox Draw Initialization (Blue Polygons with fully visible dragging lines)
+    const draw = new MapboxDraw({
+        displayControlsDefault: false,
+        defaultMode: 'simple_select',
+        styles: [
+            {
+                'id': 'gl-draw-polygon-fill-active', 'type': 'fill', 'filter': ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+                'paint': { 'fill-color': '#3b82f6', 'fill-opacity': 0.3 }
+            },
+            {
+                'id': 'gl-draw-polygon-stroke-active', 'type': 'line', 'filter': ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+                'paint': { 'line-color': '#3b82f6', 'line-dasharray': [2, 2], 'line-width': 2 }
+            },
+            {
+                'id': 'gl-draw-line-active', 'type': 'line', 'filter': ['all', ['==', '$type', 'LineString'], ['!=', 'mode', 'static']],
+                'paint': { 'line-color': '#3b82f6', 'line-dasharray': [2, 2], 'line-width': 2 }
+            },
+            {
+                'id': 'gl-draw-polygon-fill-static', 'type': 'fill', 'filter': ['all', ['==', '$type', 'Polygon'], ['==', 'mode', 'static']],
+                'paint': { 'fill-color': '#3b82f6', 'fill-opacity': 0.3 }
+            },
+            {
+                'id': 'gl-draw-polygon-stroke-static', 'type': 'line', 'filter': ['all', ['==', '$type', 'Polygon'], ['==', 'mode', 'static']],
+                'paint': { 'line-color': '#3b82f6', 'line-width': 2 }
+            },
+            {
+                'id': 'gl-draw-point-active', 'type': 'circle', 'filter': ['all', ['==', '$type', 'Point'], ['!=', 'mode', 'static']],
+                'paint': { 'circle-radius': 4, 'circle-color': '#3b82f6' }
             }
+        ]
+    });
+    map.addControl(draw);
 
-        } catch (error) {
-            console.error("Open-Meteo API Error:", error);
-        }
-    }
+    let currentDrawnPolygon = null;
+    let activeDrrmoZones = JSON.parse(localStorage.getItem('beat_drrmo_zones')) || [];
+    let zoneMarkers = {};
 
     map.on('load', () => {
-        fetchEnvironmentalData();
-        // Setup Mapbox Heatmap Layer for Air Quality (Visual Mock)
-        map.addSource('earthquakes', { type: 'geojson', data: 'https://docs.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson' });
+        // Layers to display the broadcasted blue zones on the DRRMO screen
+        map.addSource('drrmo-drawn-zones', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+        map.addLayer({ 'id': 'drrmo-drawn-fill', 'type': 'fill', 'source': 'drrmo-drawn-zones', 'paint': { 'fill-color': '#3b82f6', 'fill-opacity': 0.3 } });
+        map.addLayer({ 'id': 'drrmo-drawn-stroke', 'type': 'line', 'source': 'drrmo-drawn-zones', 'paint': { 'line-color': '#3b82f6', 'line-width': 3, 'line-dasharray': [2, 2] } });
+
+        // Hidden Heat/AQI Layers
+        const bounds = [[121.05, 14.55], [121.11, 14.62]];
+        map.addSource('heat-source', { type: 'geojson', data: createMockGeoJSON(bounds, 50) });
         map.addLayer({
-            'id': 'earthquakes-heat', 'type': 'heatmap', 'source': 'earthquakes',
-            'paint': { 'heatmap-weight': 1, 'heatmap-intensity': 1, 'heatmap-color': [ 'interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(33,102,172,0)', 0.2, 'rgb(103,169,207)', 0.4, 'rgb(209,229,240)', 0.6, 'rgb(253,219,199)', 0.8, 'rgb(239,138,98)', 1, 'rgb(178,24,43)' ], 'heatmap-radius': 40, 'heatmap-opacity': 0.3 }
+            'id': 'heat-layer', 'type': 'heatmap', 'source': 'heat-source',
+            'paint': { 'heatmap-weight': 1, 'heatmap-intensity': 1, 'heatmap-radius': 60, 'heatmap-opacity': 0, 'heatmap-color': [ 'interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(255,255,255,0)', 0.5, '#f59e0b', 1, '#ef4444' ] }
         });
+        map.addSource('aqi-source', { type: 'geojson', data: createMockGeoJSON(bounds, 30) });
+        map.addLayer({
+            'id': 'aqi-layer', 'type': 'heatmap', 'source': 'aqi-source',
+            'paint': { 'heatmap-weight': 1, 'heatmap-intensity': 1, 'heatmap-radius': 80, 'heatmap-opacity': 0, 'heatmap-color': [ 'interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(255,255,255,0)', 0.5, '#94a3b8', 1, '#475569' ] }
+        });
+
+        renderDrrmoZones();
     });
+
+    function createMockGeoJSON(bounds, count) {
+        let features = [];
+        for (let i = 0; i < count; i++) {
+            const lng = bounds[0][0] + Math.random() * (bounds[1][0] - bounds[0][0]);
+            const lat = bounds[0][1] + Math.random() * (bounds[1][1] - bounds[0][1]);
+            features.push(turf.point([lng, lat]));
+        }
+        return turf.featureCollection(features);
+    }
+
+    window.toggleMapLayer = function(layerType, isChecked) {
+        const opacity = isChecked ? 0.6 : 0;
+        if (layerType === 'heat') map.setPaintProperty('heat-layer', 'heatmap-opacity', opacity);
+        else if (layerType === 'aqi') map.setPaintProperty('aqi-layer', 'heatmap-opacity', opacity);
+    };
+
+    // Drawing Interaction
+    document.getElementById('btn-draw-zone').addEventListener('click', (e) => {
+        draw.deleteAll();
+        draw.changeMode('draw_polygon');
+        e.currentTarget.innerHTML = '<i data-lucide="crosshair" class="w-4 h-4 animate-pulse"></i> Drawing...';
+        document.getElementById('btn-broadcast-zone').disabled = true;
+        lucide.createIcons();
+    });
+
+    map.on('draw.create', (e) => {
+        currentDrawnPolygon = e.features[0];
+        document.getElementById('btn-draw-zone').innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Area Drawn';
+        document.getElementById('btn-broadcast-zone').disabled = false;
+        lucide.createIcons();
+    });
+
+    // Broadcast Zone AND text inputs
+    document.getElementById('btn-broadcast-zone').addEventListener('click', () => {
+        if(!currentDrawnPolygon) return;
+        
+        const type = document.getElementById('draw-type').value;
+        const title = document.getElementById('zone-title').value || type;
+        const desc = document.getElementById('zone-desc').value || 'Active restriction zone mapped by DRRMO.';
+        
+        const newZone = {
+            id: 'zone_' + Date.now(),
+            type: type,
+            title: title,
+            desc: desc,
+            polygon: currentDrawnPolygon,
+            center: turf.center(currentDrawnPolygon).geometry.coordinates,
+            timestamp: new Date().toLocaleTimeString()
+        };
+        
+        activeDrrmoZones.push(newZone);
+        localStorage.setItem('beat_drrmo_zones', JSON.stringify(activeDrrmoZones));
+
+        // Reset UI
+        draw.deleteAll();
+        currentDrawnPolygon = null;
+        document.getElementById('zone-title').value = '';
+        document.getElementById('zone-desc').value = '';
+        document.getElementById('btn-draw-zone').innerHTML = '<i data-lucide="pen-tool" class="w-4 h-4"></i> 1. Draw Area (Polygon)';
+        document.getElementById('btn-broadcast-zone').disabled = true;
+
+        const toast = document.getElementById('sync-toast');
+        toast.classList.remove('hidden');
+        setTimeout(() => { toast.classList.add('hidden'); }, 4000);
+
+        renderDrrmoZones();
+    });
+
+    // Rendering Logic
+    function renderDrrmoZones() {
+        if(!map.getSource('drrmo-drawn-zones')) return;
+        
+        const list = document.getElementById('zones-list');
+        list.innerHTML = '';
+        
+        document.getElementById('zone-count').innerText = activeDrrmoZones.length;
+        if(activeDrrmoZones.length > 0) document.getElementById('active-zones-container').classList.remove('hidden');
+        else document.getElementById('active-zones-container').classList.add('hidden');
+
+        Object.values(zoneMarkers).forEach(m => { m.marker.remove(); m.popup.remove(); });
+        zoneMarkers = {};
+
+        let features = [];
+
+        activeDrrmoZones.forEach(zone => {
+            // UI List with Resolve Button and Bold Hazard Type
+            list.innerHTML += `
+                <div class="bg-[#0f172a] border border-blue-500/30 p-3 rounded-xl border-l-4 border-l-blue-500">
+                    <div class="flex justify-between items-start mb-1">
+                        <h4 class="text-white text-xs font-bold truncate pr-2">${zone.title}</h4>
+                        <button onclick="resolveDrrmoZone('${zone.id}')" class="bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white border border-blue-500/30 text-[10px] px-2 py-1 rounded font-bold transition-colors">Resolve</button>
+                    </div>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="text-white bg-blue-600 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">MAPPED: ${zone.type}</span>
+                    </div>
+                </div>
+            `;
+
+            // Blue Map Marker
+            const el = document.createElement('div'); el.className = 'weather-blue-marker';
+            const popupHTML = `
+                <div class="pb-1 mb-1 border-b border-gray-600 flex items-center gap-2"><i data-lucide="map-pin" class="text-blue-500 w-3 h-3"></i><span class="text-[10px] font-bold uppercase tracking-widest text-[#94a3b8]">DRRMO ZONE</span></div>
+                <h3 class="font-bold text-white text-sm mb-1">${zone.title}</h3>
+                <p class="text-[10px] text-gray-300 leading-snug mb-2">${zone.desc}</p>
+                <div class="flex flex-col gap-1 mt-2 text-[9px] font-bold tracking-wider">
+                    <span class="text-white bg-blue-600 px-2 py-1 rounded text-center border border-blue-400/20">TYPE: ${zone.type.toUpperCase()}</span>
+                </div>
+            `;
+            
+            const popup = new mapboxgl.Popup({ offset: 25, closeButton: true, closeOnClick: false }).setHTML(popupHTML);
+            const marker = new mapboxgl.Marker(el).setLngLat(zone.center).setPopup(popup).addTo(map);
+            marker.togglePopup();
+            zoneMarkers[zone.id] = { marker, popup };
+            features.push(zone.polygon);
+        });
+
+        map.getSource('drrmo-drawn-zones').setData({ type: 'FeatureCollection', features: features });
+        lucide.createIcons();
+    }
+
+    window.resolveDrrmoZone = function(id) {
+        activeDrrmoZones = activeDrrmoZones.filter(z => z.id !== id);
+        localStorage.setItem('beat_drrmo_zones', JSON.stringify(activeDrrmoZones));
+        renderDrrmoZones();
+    };
+
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'beat_drrmo_zones') {
+            activeDrrmoZones = JSON.parse(e.newValue) || [];
+            renderDrrmoZones();
+        }
+    });
+
+    const barangayData = {
+        'bagong-ilog': { center: [121.0669, 14.5670], zoom: 15 },
+        'bagong-katipunan': { center: [121.0760, 14.5610], zoom: 15.5 },
+        'bambang': { center: [121.0820, 14.5570], zoom: 15.5 },
+        'buting': { center: [121.0680, 14.5550], zoom: 15.5 },
+        'caniogan': { center: [121.0810, 14.5680], zoom: 15 },
+        'dela-paz': { center: [121.1000, 14.6180], zoom: 15 },
+        'kalawaan': { center: [121.0830, 14.5500], zoom: 15 },
+        'kapasigan': { center: [121.0770, 14.5630], zoom: 15.5 },
+        'kapitolyo': { center: [121.0590, 14.5710], zoom: 15.5 },
+        'malinao': { center: [121.0780, 14.5600], zoom: 15.5 },
+        'manggahan': { center: [121.0960, 14.6060], zoom: 14.5 },
+        'maybunga': { center: [121.0880, 14.5800], zoom: 15 },
+        'oranbo': { center: [121.0620, 14.5760], zoom: 15.5 },
+        'palatiw': { center: [121.0860, 14.5620], zoom: 15.5 },
+        'pinagbuhatan': { center: [121.0920, 14.5520], zoom: 14.5 },
+        'pineda': { center: [121.0600, 14.5640], zoom: 15.5 },
+        'rosario': { center: [121.0880, 14.5900], zoom: 14.5 },
+        'sagad': { center: [121.0780, 14.5660], zoom: 15.5 },
+        'san-antonio': { center: [121.0630, 14.5830], zoom: 15.5 },
+        'san-joaquin': { center: [121.0760, 14.5510], zoom: 15.5 },
+        'san-jose': { center: [121.0750, 14.5630], zoom: 15.5 },
+        'san-miguel': { center: [121.0930, 14.5730], zoom: 15.5 },
+        'san-nicolas': { center: [121.0780, 14.5580], zoom: 15.5 },
+        'santa-cruz': { center: [121.0790, 14.5600], zoom: 15.5 },
+        'santa-lucia': { center: [121.1010, 14.5840], zoom: 15 },
+        'santa-rosa': { center: [121.0730, 14.5600], zoom: 15.5 },
+        'santo-tomas': { center: [121.0800, 14.5580], zoom: 15.5 },
+        'santolan': { center: [121.0850, 14.6150], zoom: 15 },
+        'sumilang': { center: [121.0730, 14.5580], zoom: 15.5 },
+        'ugong': { center: [121.0750, 14.5850], zoom: 14.5 }
+    };
+
+    window.zoomToBarangay = function(val) {
+        if (!val) { map.flyTo({ center: [121.0700, 14.5700], zoom: 13.5, pitch: 45 }); return; }
+        map.flyTo({ center: barangayData[val].center, zoom: barangayData[val].zoom, pitch: 60 });
+    };
 
     function doLogout() { localStorage.removeItem('activeDepartment'); window.location.href = 'admin.html'; }
   </script>
