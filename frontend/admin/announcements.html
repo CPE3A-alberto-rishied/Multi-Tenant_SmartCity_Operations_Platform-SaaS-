@@ -217,19 +217,7 @@
                  </div>
                  <p id="ann-category-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p>
                </div>
-               <div>
-                 <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">COVER IMAGE (OPTIONAL)</label>
-                 <div class="modal-input flex flex-col p-3" style="background:var(--surface); border-color:var(--border)">
-                   <div class="flex items-center">
-                     <label class="bg-white text-black font-bold text-xs py-1.5 px-3 rounded cursor-pointer hover:bg-gray-200 transition-colors">
-                        Choose File
-                        <input type="file" class="hidden" accept="image/*" onchange="handleImageUpload(this, 'ann-cover-preview')">
-                     </label>
-                     <button type="button" class="ml-4 text-red-400 hover:text-red-500 text-xs font-bold hidden transition-colors" id="ann-cover-remove" onclick="removeImage('ann-cover-preview')"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                   </div>
-                   <img id="ann-cover-preview" src="" class="hidden w-full aspect-video max-h-[300px] object-cover object-center mt-3 rounded-lg border border-gray-700 shadow-sm">
-                 </div>
-               </div>
+               
              </div>
 
              <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-4 border-b border-gray-800 pb-2">Content Structure</p>
