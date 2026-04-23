@@ -15,8 +15,6 @@
   <title>BEAT - Public Reports</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-  <script>
-</script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
   <style>
@@ -39,8 +37,18 @@
     .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
     .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
     
-    /* Modals */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; padding: 1rem; }
+    /* Modals - FIXED Z-INDEX */
+    .modal-overlay { 
+        position: fixed; 
+        inset: 0; 
+        background: rgba(0, 0, 0, 0.85); 
+        backdrop-filter: blur(8px); 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        z-index: 10000 !important; 
+        padding: 1rem; 
+    }
     .hidden { display: none !important; }
     
     /* Input Styling */
@@ -80,10 +88,8 @@
     input:checked + .slider:before { transform: translateX(18px); }
   </style>
 </head>
-<body class="h-full auth-guarded"> <div class="flex h-full bg-[#0a0e1a]">
-        </div>
 
-    <script src="js/app.js"></script>
+<body class="h-full flex bg-[#0a0e1a] auth-guarded"> 
 
   <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
 
@@ -343,7 +349,7 @@
       }
     });
 
-    // Handle Mobile Sidebar Toggle securely without touching app.js
+    // Handle Mobile Sidebar Toggle
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
