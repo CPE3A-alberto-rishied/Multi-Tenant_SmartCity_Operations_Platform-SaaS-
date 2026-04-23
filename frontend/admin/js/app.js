@@ -187,247 +187,121 @@ function closePopup(popupId) {
 
 
 // ==========================================
-// MANAGE ADMINS LOGIC (With Memory Sync)
+// MONGODB MANAGE ADMINS LOGIC
 // ==========================================
-
-// Pulls data from memory so it persists across reloads!
-let departments = JSON.parse(localStorage.getItem('beat_departments')) || []; 
-let mockData = { 
-    admins: JSON.parse(localStorage.getItem('beat_admins')) || [] 
-}; 
-
+const departments = ["Main Admin", "Traffic", "DRRMO"]; // Hardcoded departments
+let adminsFromDB = []; 
 let currentFilter = "All Departments";
 let currentSearchQuery = "";
-let userToDelete = null;
+let userToDeleteId = null; 
 
-function checkDeptBeforeStaff() {
-    if (departments.length === 0) { openModal('no-dept-modal'); } 
-    else { openModal('add-staff-modal'); }
-}
-
-function handleSort(val) {
-    currentFilter = val;
-    const deleteBtn = document.getElementById('delete-dept-btn');
-    if (val !== "All Departments") {
-        deleteBtn.classList.remove('hidden');
-        document.getElementById('delete-dept-title').innerText = `Delete ${val}?`;
-        const count = mockData.admins.filter(a => a.dept === val).length;
-        document.getElementById('delete-dept-desc').innerText = `This will remove the department AND delete all ${count} associated staff member(s).`;
-    } else { 
-        deleteBtn.classList.add('hidden'); 
-    }
-    populateAdmins();
-}
-
-function handleSearch(val) {
-    currentSearchQuery = val.toLowerCase();
-    populateAdmins();
-}
-
+// 1. Hardcoded Dropdowns
 function updateDepartmentDropdowns() {
     const filterSelect = document.getElementById('dept-filter');
     const modalSelect = document.getElementById('staff-dept');
-    if (filterSelect) filterSelect.innerHTML = `<option>All Departments</option>` + departments.map(d => `<option value="${d}">${d}</option>`).join('');
-    if (modalSelect) modalSelect.innerHTML = `<option value="" disabled selected>Select Department</option>` + departments.map(d => `<option value="${d}">${d}</option>`).join('');
+    const optionsHTML = departments.map(d => `<option value="${d}">${d}</option>`).join('');
+    
+    if (filterSelect) filterSelect.innerHTML = `<option>All Departments</option>` + optionsHTML;
+    if (modalSelect) modalSelect.innerHTML = `<option value="" disabled selected>Select Department</option>` + optionsHTML;
 }
 
+// 2. Fetch all admins from MongoDB
+async function fetchAllAdmins() {
+    try {
+        const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/all');
+        const result = await response.json();
+        if (result.success) {
+            adminsFromDB = result.admins;
+            populateAdmins();
+        }
+    } catch (error) { console.error("Fetch Error:", error); }
+}
+
+// 3. Add Staff to MongoDB
+async function executeAddStaff() {
+    const newUser = {
+        username: document.getElementById('staff-name').value,
+        id: document.getElementById('staff-id').value,
+        email: document.getElementById('staff-email').value,
+        password: document.getElementById('staff-pass').value,
+        dept: document.getElementById('staff-dept').value,
+        status: "Active"
+    };
+
+    try {
+        const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newUser)
+        });
+        if ((await response.json()).success) {
+            clearAndCloseStaff();
+            closeModal('confirm-staff-modal');
+            fetchAllAdmins(); 
+        }
+    } catch (error) { console.error("Add Error:", error); }
+}
+
+// 4. Toggle Status (Enable/Disable)
+async function confirmStatusChange(isEnabling) {
+    try {
+        await fetch('https://beat-pasig-api.onrender.com/api/admin/status', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: currentTargetUser, status: isEnabling ? "Active" : "Disabled" })
+        });
+        closeModal(isEnabling ? 'enable-modal' : 'disable-modal');
+        fetchAllAdmins();
+    } catch (error) { console.error("Toggle Error:", error); }
+}
+
+// 5. DELETE Account
+function promptDeleteUser(id, name) {
+    userToDeleteId = id;
+    const nameSpan = document.getElementById('delete-user-name');
+    if(nameSpan) nameSpan.innerText = name;
+    openModal('confirm-delete-user-modal');
+}
+
+async function executeDeleteUser() {
+    if (!userToDeleteId) return;
+    try {
+        const response = await fetch(`https://beat-pasig-api.onrender.com/api/admin/delete/${userToDeleteId}`, {
+            method: 'DELETE'
+        });
+        if (response.ok) {
+            closeModal('confirm-delete-user-modal');
+            fetchAllAdmins();
+        }
+    } catch (error) { console.error("Delete Error:", error); }
+}
+
+// 6. Render Tables
 function populateAdmins() {
     const activeTbody = document.getElementById('active-admin-table-body');
     const disabledTbody = document.getElementById('disabled-admin-table-body');
     if(!activeTbody || !disabledTbody) return;
 
-    let adminsToDisplay = mockData.admins;
-    
-    // Apply Department Filter
-    if (currentFilter !== "All Departments") {
-        adminsToDisplay = adminsToDisplay.filter(a => a.dept === currentFilter);
-    }
+    let list = adminsFromDB;
+    if (currentFilter !== "All Departments") list = list.filter(a => a.dept === currentFilter);
+    if (currentSearchQuery) list = list.filter(a => a.username.toLowerCase().includes(currentSearchQuery) || a.id.includes(currentSearchQuery));
 
-    // Apply Search Filter (Name or ID)
-    if (currentSearchQuery) {
-        adminsToDisplay = adminsToDisplay.filter(a => 
-            a.username.toLowerCase().includes(currentSearchQuery) || 
-            a.id.toLowerCase().includes(currentSearchQuery)
-        );
-    }
-
-    const activeAdmins = adminsToDisplay.filter(a => a.status === "Active");
-    const disabledAdmins = adminsToDisplay.filter(a => a.status !== "Active");
-
-    activeTbody.innerHTML = activeAdmins.map(a => `
+    const renderRow = (a) => `
         <tr class="border-b border-[#1e293b] hover:bg-white/5 transition-colors">
-            <td class="px-5 py-4 w-10"></td> 
+            <td class="px-5 py-4 w-10">
+                ${a.status === 'Disabled' ? `<i data-lucide="trash-2" class="w-4 h-4 text-red-500/60 hover:text-red-500 cursor-pointer" onclick="promptDeleteUser('${a.id}', '${a.username}')"></i>` : ''}
+            </td> 
             <td class="font-bold py-4 px-5 text-white">${escapeHTML(a.username)}</td>
             <td class="text-[#94a3b8]">${escapeHTML(a.id)}</td>
             <td class="text-[#94a3b8]">${escapeHTML(a.email)}</td>
             <td class="text-[#94a3b8]">${escapeHTML(a.dept)}</td>
-            <td><span class="bg-green-500/20 text-green-500 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">Active</span></td>
-            <td><label class="switch"><input type="checkbox" checked onchange="handleStatusToggle(this, '${escapeHTML(a.username)}')"><span class="slider"></span></label></td>
-        </tr>`).join('');
-        
-    disabledTbody.innerHTML = disabledAdmins.map(a => `
-        <tr class="hover:bg-white/5 opacity-60">
-            <td class="px-5 py-4 w-10"><i data-lucide="trash-2" class="w-4 h-4 text-red-500/60 hover:text-red-500 cursor-pointer transition-colors" onclick="promptDeleteUser('${escapeHTML(a.username)}')"></i></td>
-            <td class="font-bold py-4 px-5 text-white">${escapeHTML(a.username)}</td>
-            <td class="text-[#94a3b8]">${escapeHTML(a.id)}</td>
-            <td class="text-[#94a3b8]">${escapeHTML(a.email)}</td>
-            <td class="text-[#94a3b8]">${escapeHTML(a.dept)}</td>
-            <td><span class="bg-yellow-500/10 text-yellow-500/70 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">Disabled</span></td>
-            <td><label class="switch"><input type="checkbox" onchange="handleStatusToggle(this, '${escapeHTML(a.username)}')"><span class="slider"></span></label></td>
-        </tr>`).join('');
-    
-    if (window.lucide) lucide.createIcons(); 
-}
+            <td><span class="${a.status === 'Active' ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'} px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">${a.status}</span></td>
+            <td><label class="switch"><input type="checkbox" ${a.status === 'Active' ? 'checked' : ''} onchange="handleStatusToggle(this, '${a.id}')"><span class="slider"></span></label></td>
+        </tr>`;
 
-function promptDeleteUser(username) {
-    userToDelete = username;
-    const nameSpan = document.getElementById('delete-user-name');
-    if(nameSpan) nameSpan.innerText = username;
-    openModal('confirm-delete-user-modal');
-}
-
-function executeDeleteUser() {
-    if(userToDelete) {
-        mockData.admins = mockData.admins.filter(a => a.username !== userToDelete);
-        
-        // SAVE USERS TO MEMORY
-        localStorage.setItem('beat_admins', JSON.stringify(mockData.admins));
-
-        userToDelete = null;
-        populateAdmins();
-    }
-    closeModal('confirm-delete-user-modal');
-}
-
-function executeDeleteDept() {
-    mockData.admins = mockData.admins.filter(a => a.dept !== currentFilter);
-    departments = departments.filter(d => d !== currentFilter);
-    
-    // SAVE BOTH DEPARTMENTS AND USERS TO MEMORY
-    localStorage.setItem('beat_departments', JSON.stringify(departments));
-    localStorage.setItem('beat_admins', JSON.stringify(mockData.admins));
-
-    currentFilter = "All Departments";
-    const filterEl = document.getElementById('dept-filter');
-    if (filterEl) filterEl.value = "All Departments";
-    document.getElementById('delete-dept-btn').classList.add('hidden');
-    updateDepartmentDropdowns();
-    populateAdmins();
-    closeModal('delete-dept-modal');
-}
-
-function validateAddStaff() {
-    const name = document.getElementById('staff-name'), 
-          id = document.getElementById('staff-id'), 
-          email = document.getElementById('staff-email'), 
-          pass = document.getElementById('staff-pass'),
-          dept = document.getElementById('staff-dept'); 
-          
-    let isValid = true;
-    if (!name.value.trim()) { name.classList.add('input-error'); document.getElementById('name-error').classList.remove('hidden'); isValid = false; }
-    if (!id.value.trim()) { id.classList.add('input-error'); document.getElementById('id-error').classList.remove('hidden'); isValid = false; }
-    if (!email.value.trim()) { email.classList.add('input-error'); document.getElementById('email-error').classList.remove('hidden'); isValid = false; }
-    if (pass.value.length < 8) { pass.classList.add('input-error'); document.getElementById('pass-error').classList.remove('hidden'); isValid = false; }
-    if (!dept.value) { dept.classList.add('input-error'); document.getElementById('dept-select-error').classList.remove('hidden'); isValid = false; }
-    
-    if (isValid) openModal('confirm-staff-modal');
-}
-
-function executeAddStaff() {
-    const newUser = {
-        username: document.getElementById('staff-name').value,
-        id: document.getElementById('staff-id').value,
-        email: document.getElementById('staff-email').value,
-        password: document.getElementById('staff-pass').value, // Saved for Login Validation
-        dept: document.getElementById('staff-dept').value,
-        status: "Active"
-    };
-    mockData.admins.push(newUser);
-    
-    // SAVE USERS TO MEMORY
-    localStorage.setItem('beat_admins', JSON.stringify(mockData.admins));
-
-    clearAndCloseStaff(); 
-    closeModal('confirm-staff-modal'); 
-    populateAdmins();
-}
-
-function validateCreateDept() {
-    const input = document.getElementById('new-dept-name');
-    if (!input.value.trim()) { input.classList.add('input-error'); document.getElementById('dept-error').classList.remove('hidden'); return; }
-    openModal('confirm-dept-modal');
-}
-
-function executeCreateDept() {
-    const name = document.getElementById('new-dept-name').value.trim();
-    if (name && !departments.includes(name)) { 
-        departments.push(name); 
-        
-        // SAVE DEPARTMENTS TO MEMORY
-        localStorage.setItem('beat_departments', JSON.stringify(departments));
-
-        updateDepartmentDropdowns(); 
-    }
-    clearAndCloseDept(); 
-    closeModal('confirm-dept-modal');
-}
-
-function clearAndCloseStaff() {
-    ['staff-name', 'staff-id', 'staff-email', 'staff-pass', 'staff-dept'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            if (el.tagName === 'SELECT') el.value = "";
-            else el.value = "";
-        }
-        let errId = id === 'staff-pass' ? 'pass-error' : id === 'staff-dept' ? 'dept-select-error' : id.split('-')[1] + '-error';
-        clearError(id, errId);
-    });
-    closeModal('add-staff-modal');
-}
-
-function clearAndCloseDept() {
-    const input = document.getElementById('new-dept-name');
-    if (input) input.value = "";
-    clearError('new-dept-name', 'dept-error');
-    closeModal('new-dept-modal');
-}
-
-let pendingToggle = null;
-let currentTargetUser = "";
-
-function handleStatusToggle(checkbox, userName) {
-    pendingToggle = checkbox;
-    currentTargetUser = userName;
-    if (!checkbox.checked) {
-        document.getElementById('disable-title').innerText = `Disable ${userName}?`;
-        openModal('disable-modal');
-        checkbox.checked = true;
-    } else {
-        document.getElementById('enable-title').innerText = `Enable ${userName}?`;
-        openModal('enable-modal');
-        checkbox.checked = false;
-    }
-}
-
-function confirmStatusChange(isEnabling) {
-    if (pendingToggle) {
-        const user = mockData.admins.find(u => u.username === currentTargetUser);
-        if (user) {
-            user.status = isEnabling ? "Active" : "Disabled";
-            
-            // SAVE STATUS CHANGE TO MEMORY
-            localStorage.setItem('beat_admins', JSON.stringify(mockData.admins));
-            
-            populateAdmins(); 
-        }
-        closeModal(isEnabling ? 'enable-modal' : 'disable-modal');
-    }
-}
-
-function cancelStatusChange() { 
-    closeModal('enable-modal'); 
-    closeModal('disable-modal'); 
-    pendingToggle = null; 
+    activeTbody.innerHTML = list.filter(a => a.status === "Active").map(renderRow).join('');
+    disabledTbody.innerHTML = list.filter(a => a.status !== "Active").map(renderRow).join('');
+    if (window.lucide) lucide.createIcons();
 }
 
 
@@ -1612,9 +1486,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if(window.lucide) lucide.createIcons(); 
     
     // Load Manage Admins Logic
-    if(document.getElementById('dept-filter') && typeof updateDepartmentDropdowns === 'function') {
-        updateDepartmentDropdowns(); 
-        populateAdmins(); 
+    if(document.getElementById('active-admin-table-body')) {
+        if(typeof updateDepartmentDropdowns === 'function') updateDepartmentDropdowns(); 
+        if(typeof fetchAllAdmins === 'function') fetchAllAdmins(); // Fetches live from DB
     }
     
     // Load Announcements Logic
