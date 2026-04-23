@@ -8,7 +8,7 @@
             window.location.replace('admin.html?error=unauthorized'); 
         }
     })();
-</script>
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BEAT – Dashboard Overview</title>
@@ -66,12 +66,12 @@
 
 <body class="h-full flex bg-[#0a0e1a]">
 
-  <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-[50] hidden lg:hidden" onclick="toggleSidebar()"></div>
 
-  <aside id="sidebar" class="sidebar flex flex-col h-full absolute lg:relative z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300" style="background:var(--surface); border-right: 1px solid var(--border)">
+  <aside id="sidebar" class="sidebar flex flex-col h-full fixed lg:relative z-[60] transform -translate-x-full lg:translate-x-0 transition-transform duration-300 top-0 left-0 bg-[#0a0e1a] lg:bg-transparent" style="border-right: 1px solid var(--border)">
     <div class="h-[76px] px-5 flex items-center shrink-0 border-b" style="border-color:var(--border)">
       <div class="flex items-center gap-3">
-        <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
+        <img src="../assets/beat_logo.png" alt="BEAT Logo" class="h-10 w-auto object-contain" onerror="this.src='assets/beat_logo.png'">
         <div class="flex flex-col justify-center">
           <div class="logo-text font-bold text-lg text-white leading-none mb-1">BEAT</div>
           <div class="text-[11px] text-[#94a3b8] leading-none">Admin Control Center</div>
@@ -147,7 +147,7 @@
               </a>
             </div>
             
-            <div id="traffic-map" class="w-full flex-1 rounded-lg border overflow-hidden relative mb-5 shadow-inner min-h-[250px]" style="border-color:var(--border)"></div>
+            <div id="traffic-map" class="w-full flex-1 rounded-lg border overflow-hidden relative mb-5 shadow-inner" style="border-color:var(--border); min-height: 400px;"></div>
             
             <div class="bg-[#0f172a]/80 border border-gray-800 rounded-lg p-4 flex items-center shrink-0 shadow-sm flex-wrap gap-4">
               <div class="w-20 h-20 sm:w-24 sm:h-24 relative flex-shrink-0 mx-auto sm:mx-0">
@@ -221,7 +221,7 @@
   <script>
     lucide.createIcons();
 
-    // FIXED: Added Mobile Hamburger logic
+    // FIXED: Mobile Hamburger logic
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
@@ -314,31 +314,35 @@
         setTimeout(() => { map.resize(); }, 500);
 
        map.on('load', () => {
-            map.addSource('pasig-boundary', {
-                type: 'geojson',
-                data: '../pasig_boundaries.geojson' 
-            });
+            try {
+                map.addSource('pasig-boundary', {
+                    type: 'geojson',
+                    data: '../pasig_boundaries.geojson' 
+                });
 
-            map.addLayer({
-                'id': 'pasig-fill',
-                'type': 'fill',
-                'source': 'pasig-boundary',
-                'paint': {
-                    'fill-color': '#3b82f6',
-                    'fill-opacity': 0.05
-                }
-            });
+                map.addLayer({
+                    'id': 'pasig-fill',
+                    'type': 'fill',
+                    'source': 'pasig-boundary',
+                    'paint': {
+                        'fill-color': '#3b82f6',
+                        'fill-opacity': 0.05
+                    }
+                });
 
-            map.addLayer({
-                'id': 'pasig-line',
-                'type': 'line',
-                'source': 'pasig-boundary',
-                'paint': {
-                    'line-color': '#3b82f6',
-                    'line-width': 2,
-                    'line-dasharray': [2, 2]
-                }
-            });
+                map.addLayer({
+                    'id': 'pasig-line',
+                    'type': 'line',
+                    'source': 'pasig-boundary',
+                    'paint': {
+                        'line-color': '#3b82f6',
+                        'line-width': 2,
+                        'line-dasharray': [2, 2]
+                    }
+                });
+            } catch (err) {
+                console.warn("Pasig Boundaries GeoJSON not found, skipping highlight overlay.");
+            }
 
             map.addSource('mapbox-traffic', {
                 type: 'vector',
