@@ -72,7 +72,7 @@
             width: 100%;
         }
 
-        /* --- THE MISSING MODAL STYLES --- */
+        /* --- THE MODAL STYLES --- */
         .news-modal-overlay {
             position: fixed; inset: 0; background: rgba(5, 10, 20, 0.9);
             backdrop-filter: blur(5px); z-index: 9999;
@@ -256,18 +256,22 @@
     <script>
         if (window.lucide) lucide.createIcons();
 
-        // --- THE MISSING MODAL JAVASCRIPT ---
+        // --- FIXED MODAL JAVASCRIPT ---
         function openNewsModal(btn) {
             const card = btn.closest('.news-card');
             
-            // Extract the data from the card that was clicked
-            const categoryHTML = card.querySelector('.news-category-highlight').outerHTML;
+            // Extract the data from the card
+            const categorySpan = card.querySelector('.news-category-highlight');
             const title = card.querySelector('.news-card-title').innerText;
             const date = card.querySelector('.news-date-tag').innerText;
             const rawBlocksStr = card.querySelector('.hidden-blocks-data').innerText;
 
-            // Inject the data into the Modal
-            document.getElementById('modal-category').outerHTML = categoryHTML;
+            // BUG FIX: Update the modal category without destroying its ID!
+            const modalCat = document.getElementById('modal-category');
+            modalCat.innerText = categorySpan.innerText;
+            modalCat.setAttribute('style', categorySpan.getAttribute('style'));
+
+            // Inject the rest of the data
             document.getElementById('modal-title').innerText = title;
             document.getElementById('modal-date').innerText = "Published on " + date;
 
@@ -294,12 +298,12 @@
 
             // Show the modal on screen
             document.getElementById('public-news-modal').classList.add('active');
-            document.body.style.overflow = 'hidden'; // Stop background scrolling
+            document.body.style.overflow = 'hidden'; 
         }
 
         function closeNewsModal() {
             document.getElementById('public-news-modal').classList.remove('active');
-            document.body.style.overflow = 'auto'; // Re-enable background scrolling
+            document.body.style.overflow = 'auto'; 
         }
         // ------------------------------------
 
@@ -369,7 +373,7 @@
                         const shortDesc = descText.length > 100 ? descText.substring(0, 100) + '...' : descText;
                         const blocksSafe = (announcement.blocks || '[]').replace(/"/g, '&quot;');
 
-                        // Generate the HTML for the card (Without the image block)
+                        // Generate the HTML for the card
                         const cardHTML = `
                             <article class="news-card p-6" data-date="${isoDate}">
                                 <div class="news-meta-top mb-4">
