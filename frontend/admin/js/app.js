@@ -208,13 +208,18 @@ function updateDepartmentDropdowns() {
 // 2. Fetch all admins from MongoDB
 async function fetchAllAdmins() {
     try {
+        // Points to your LIVE Render backend
         const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/all');
         const result = await response.json();
+        
         if (result.success) {
-            adminsFromDB = result.admins;
-            populateAdmins();
+            // result.admins should match your MongoDB response
+            adminsFromDB = result.admins || result.data || []; 
+            populateAdmins(); // Refreshes the UI tables
         }
-    } catch (error) { console.error("Fetch Error:", error); }
+    } catch (error) {
+        console.error("MongoDB Fetch Error:", error);
+    }
 }
 
 // 3. Add Staff to MongoDB
@@ -227,6 +232,30 @@ async function executeAddStaff() {
         dept: document.getElementById('staff-dept').value,
         status: "Active"
     };
+
+// ====== SAFER MODAL CANCELLATION ======
+function clearAndCloseStaff() {
+    // List of input IDs to reset
+    const fields = ['staff-name', 'staff-id', 'staff-email', 'staff-pass', 'staff-dept'];
+    
+    fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.value = ""; // Reset input value
+            el.classList.remove('input-error'); // Remove red glow
+        }
+        
+        // Construct the error element ID based on your HTML
+        let errId = id === 'staff-pass' ? 'pass-error' : 
+                   id === 'staff-dept' ? 'dept-select-error' : 
+                   id.split('-')[1] + '-error';
+        
+        const errEl = document.getElementById(errId);
+        if (errEl) errEl.classList.add('hidden'); // Hide error text
+    });
+
+    closeModal('add-staff-modal'); // Closes the creation window
+}
 
     try {
         const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/signup', {
@@ -1485,10 +1514,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if(window.lucide) lucide.createIcons(); 
     
-    // Load Manage Admins Logic
     if(document.getElementById('active-admin-table-body')) {
-        if(typeof updateDepartmentDropdowns === 'function') updateDepartmentDropdowns(); 
-        if(typeof fetchAllAdmins === 'function') fetchAllAdmins(); // Fetches live from DB
+        updateDepartmentDropdowns(); 
+        fetchAllAdmins(); // MUST call fetchAllAdmins() for MongoDB data
     }
     
     // Load Announcements Logic
