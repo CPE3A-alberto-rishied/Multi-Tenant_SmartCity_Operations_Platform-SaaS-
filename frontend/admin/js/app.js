@@ -833,10 +833,30 @@ function handleReportToggle(e, checkbox) {
     }
 }
 
-function confirmResolution() {
+// --- 1. THE UPDATED FUNCTION (Sends "Resolved" to MongoDB) ---
+async function confirmResolution() {
     if (pendingReportToggle) {
         const card = pendingReportToggle.closest('.report-card');
+        
         if (card) {
+            // Extract the Report ID from the HTML card
+            const onClickAttr = card.getAttribute('onclick');
+            const reportIdMatch = onClickAttr ? onClickAttr.match(/'([^']+)'/) : null;
+            const reportId = reportIdMatch ? reportIdMatch[1] : null;
+
+            if (reportId) {
+                try {
+                    // Send the update to your Render API
+                    await fetch(`https://beat-pasig-api.onrender.com/api/reports/resolve/${reportId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                } catch (error) {
+                    console.error("API Connection Error:", error);
+                }
+            }
+
+            // Update the UI Colors and Badges
             const badge = card.querySelector('.badge-status');
             const select = card.querySelector('select');
             const reportId = card.getAttribute('data-id');
@@ -873,6 +893,7 @@ function confirmResolution() {
     closeModal('resolve-modal');
 }
 
+// --- 2. THE ORIGINAL CANCEL FUNCTION (Untouched) ---
 function confirmCancelResolution() {
     if (pendingReportToggle) {
         const card = pendingReportToggle.closest('.report-card');

@@ -86,13 +86,28 @@ app.get('/api/reports/all', async (req, res) => {
     }
 });
 
-app.put('/api/report/:id', async (req, res) => {
+app.get('/api/news', async (req, res) => {
     try {
-        const { status } = req.body;
-        const updatedReport = await Report.findByIdAndUpdate(req.params.id, { status }, { new: true });
+        const resolvedReports = await Report.find({ status: 'Resolved' }).sort({ createdAt: -1 });
+        
+        res.status(200).json({ success: true, data: resolvedReports });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// --- Admin Resolve Route (Updates status to 'Resolved') ---
+app.put('/api/reports/resolve/:id', async (req, res) => {
+    try {
+        // Find the specific report by ID and change status to 'Resolved'
+        const updatedReport = await Report.findByIdAndUpdate(
+            req.params.id, 
+            { status: 'Resolved' }, 
+            { new: true }
+        );
         res.status(200).json({ success: true, data: updatedReport });
     } catch (error) {
-        res.status(500).json({ success: false, error: "Failed to update status" });
+        res.status(500).json({ success: false, error: "Failed to update status to Resolved" });
     }
 });
 
