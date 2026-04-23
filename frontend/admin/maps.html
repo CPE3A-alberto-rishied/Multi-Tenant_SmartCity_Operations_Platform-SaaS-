@@ -56,6 +56,10 @@
     .weather-blue-marker { width: 20px; height: 20px; background-color: #3b82f6; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); animation: pulse-blue 2s infinite; cursor: pointer; }
     @keyframes pulse-blue { 0% { box-shadow: 0 0 0 0 rgba(59,130,246, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(59,130,246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59,130,246, 0); } }
 
+    /* NEW: Yellow Evacuation Marker */
+    .weather-yellow-marker { width: 20px; height: 20px; background-color: #eab308; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px rgba(234, 179, 8, 0.8); animation: pulse-yellow 2s infinite; cursor: pointer; }
+    @keyframes pulse-yellow { 0% { box-shadow: 0 0 0 0 rgba(234,179,8, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(234,179,8, 0); } 100% { box-shadow: 0 0 0 0 rgba(234,179,8, 0); } }
+
     /* Custom Popup Colors */
     .popup-traffic .mapboxgl-popup-content { background: #1e293b !important; color: white !important; border: 1px solid #ef4444; border-radius: 8px; padding: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 240px; }
     .popup-traffic .mapboxgl-popup-tip { border-top-color: #1e293b !important; border-bottom-color: #1e293b !important; }
@@ -65,6 +69,9 @@
 
     .popup-blue .mapboxgl-popup-content { background: #1e293b !important; color: white !important; border: 1px solid #3b82f6; border-radius: 8px; padding: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 220px; }
     .popup-blue .mapboxgl-popup-tip { border-top-color: #1e293b !important; border-bottom-color: #1e293b !important; }
+
+    .popup-yellow .mapboxgl-popup-content { background: #1e293b !important; color: white !important; border: 1px solid #eab308; border-radius: 8px; padding: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 220px; }
+    .popup-yellow .mapboxgl-popup-tip { border-top-color: #1e293b !important; border-bottom-color: #1e293b !important; }
 
     .mapboxgl-popup-close-button { color: #94a3b8; font-size: 16px; top: 4px; right: 8px; }
     .mapboxgl-popup-close-button:hover { color: white; background: transparent; }
@@ -113,13 +120,13 @@
 
   <main class="flex-1 flex flex-col min-w-0">
 
-    </header>
-
     <div class="map-wrapper">
         <div id="map"></div>
 
-        <div class="map-overlay-panel">
-            <div class="section-label" style="margin-bottom: 8px;">Jump to District</div>
+        <div class="absolute top-5 right-5 z-10 w-64" style="background: rgba(10, 22, 40, 0.95); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 12px; padding: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+            <div class="section-label" style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                <i data-lucide="map" style="width: 14px; height: 14px; color: #3b82f6;"></i> Jump to District
+            </div>
             <select class="barangay-select" onchange="zoomToBarangay(this.value)">
                 <option value="">-- Pasig City --</option>
                 <option value="bagong-ilog">Bagong Ilog</option>
@@ -153,19 +160,27 @@
                 <option value="sumilang">Sumilang</option>
                 <option value="ugong">Ugong</option>
             </select>
-            
-            <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;">
+        </div>
+
+        <div class="map-overlay-panel">
+            <div>
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-[11px] text-[#94a3b8] font-bold uppercase tracking-wider">Traffic Operations</span>
                     <span id="traffic-count" class="text-red-500 font-bold font-mono text-sm">0</span>
                 </div>
-                <div id="traffic-incidents-list" class="space-y-3 pr-1 mt-2 max-h-[200px] overflow-y-auto"></div>
+                <div id="traffic-incidents-list" class="space-y-3 pr-1 mt-2 max-h-[150px] overflow-y-auto"></div>
 
                 <div class="flex justify-between items-center mb-2 mt-4 pt-4 border-t border-gray-800">
                     <span class="text-[11px] text-[#94a3b8] font-bold uppercase tracking-wider">Environmental Alerts</span>
                     <span id="weather-count" class="text-blue-500 font-bold font-mono text-sm">0</span>
                 </div>
                 <div id="weather-incidents-list" class="space-y-3 pr-1 mt-2 max-h-[150px] overflow-y-auto"></div>
+
+                <div class="flex justify-between items-center mb-2 mt-4 pt-4 border-t border-gray-800">
+                    <span class="text-[11px] text-[#94a3b8] font-bold uppercase tracking-wider">Evacuation Ops</span>
+                    <span id="rescue-count" class="text-yellow-500 font-bold font-mono text-sm">0</span>
+                </div>
+                <div id="rescue-incidents-list" class="space-y-3 pr-1 mt-2 max-h-[150px] overflow-y-auto"></div>
             </div>
         </div>
 
@@ -177,6 +192,7 @@
             <div class="section-label mt-2 mb-1 border-t border-gray-700 pt-2">Network Operations</div>
             <div class="legend-item"><span class="dot" style="background: #ef4444; border: 1px dashed white;"></span> Blocked Area / Avoid</div>
             <div class="legend-item"><span class="dot" style="background: #3b82f6; border: 1px dashed white;"></span> DRRMO Custom Zone</div>
+            <div class="legend-item"><span class="dot" style="background: #eab308; border: 1px dashed white;"></span> Evacuation Corridor</div>
         </div>
     </div>
   </main>
@@ -191,6 +207,7 @@
         });
 
         let mapObjects = {};
+        window.mapObjectsRescues = {}; // Global container for rescue markers
 
         map.on('load', () => {
             // Live Traffic Layer
@@ -214,9 +231,30 @@
             map.addLayer({ 'id': 'synced-drrmo-drawn-fill', 'type': 'fill', 'source': 'synced-drrmo-drawn', 'paint': { 'fill-color': '#3b82f6', 'fill-opacity': 0.3 } });
             map.addLayer({ 'id': 'synced-drrmo-drawn-stroke', 'type': 'line', 'source': 'synced-drrmo-drawn', 'paint': { 'line-color': '#3b82f6', 'line-width': 3, 'line-dasharray': [2, 2] } });
 
+            // 4. DRRMO Evacuation Corridors (Yellow)
+            map.addSource('synced-rescue-routes', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+            
+            // Highlight/Glow Layer
+            map.addLayer({
+                'id': 'synced-rescue-routes-highlight', 'type': 'line', 'source': 'synced-rescue-routes',
+                'layout': { 'line-join': 'round', 'line-cap': 'round' },
+                'paint': { 'line-color': '#eab308', 'line-width': 12, 'line-opacity': 0.3 }
+            });
+
+            // Main Dashed Layer
+            map.addLayer({
+                'id': 'synced-rescue-routes-line', 'type': 'line', 'source': 'synced-rescue-routes',
+                'layout': { 'line-join': 'round', 'line-cap': 'round' },
+                'paint': { 'line-color': '#eab308', 'line-width': 4, 'line-dasharray': [2, 2] }
+            });
+
             renderLiveHazards();
+            renderLiveRescues(); // Trigger initial render for Evacuation Sync
         });
 
+        // ==========================================
+        // RENDER TRAFFIC & WEATHER (Unchanged Logic)
+        // ==========================================
         function renderLiveHazards() {
             if(!map.getSource('synced-blocked-lines')) return;
 
@@ -237,10 +275,10 @@
             let trafficCount = 0, weatherCount = 0, pendingCount = 0;
             let lineFeatures = [], dangerZoneFeatures = [], blueZoneFeatures = [];
 
-            // 1. Process Traffic Alerts (from beat_live_hazards)
+            // Traffic
             const activeHazards = hazards.filter(h => h.status !== 'rejected');
             activeHazards.forEach(hazard => {
-                if (hazard.source === 'weather') return; 
+                if (hazard.source === 'weather' || hazard.source === 'evacuation') return; 
 
                 trafficCount++;
                 const isPending = hazard.status === 'pending';
@@ -292,7 +330,7 @@
                 if (hazard.dangerZone) { hazard.dangerZone.properties = { status: hazard.status }; dangerZoneFeatures.push(hazard.dangerZone); }
             });
 
-            // 2. Process DRRMO Mapped Polygons (from beat_drrmo_zones)
+            // DRRMO Blue Polygons
             drrmoZones.forEach(zone => {
                 weatherCount++;
                 if(weatherList) weatherList.innerHTML += `
@@ -300,12 +338,11 @@
                         <h4 class="text-white text-xs font-bold mb-1 truncate pr-2">${zone.title || zone.type}</h4>
                         <p class="text-[10px] text-gray-400 leading-tight mb-2">${zone.desc}</p>
                         <div class="flex items-center gap-2 mt-2">
-                            <span class="text-white bg-blue-600 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">MAPPED: ${zone.type}</span>
+                            <span class="text-blue-400 bg-blue-500/10 px-2 py-1 rounded text-center border border-blue-500/20 font-bold uppercase tracking-wider text-[9px]">TYPE: ${zone.type.toUpperCase()}</span>
                         </div>
                     </div>
                 `;
 
-// Blue Map Marker
                 const el = document.createElement('div'); el.className = `weather-blue-marker`;
                 const popupHTML = `
                     <div class="pb-1 mb-1 border-b border-gray-600 flex items-center gap-2"><i data-lucide="map-pin" class="text-blue-500 w-3 h-3"></i><span class="text-[10px] font-bold uppercase tracking-widest text-[#94a3b8]">DRRMO ZONE</span></div>
@@ -340,6 +377,62 @@
             if (window.lucide) lucide.createIcons();
         }
 
+        // ==========================================
+        // RENDER EVACUATION CORRIDORS
+        // ==========================================
+        function renderLiveRescues() {
+            if(!map.getSource('synced-rescue-routes')) return;
+            
+            let rescues = JSON.parse(localStorage.getItem('beat_live_rescues')) || [];
+            
+            const list = document.getElementById('rescue-incidents-list');
+            list.innerHTML = '';
+            document.getElementById('rescue-count').innerText = rescues.length;
+
+            Object.values(window.mapObjectsRescues || {}).forEach(obj => {
+                if(obj.marker) obj.marker.remove();
+                if(obj.popup) obj.popup.remove();
+            });
+            window.mapObjectsRescues = {};
+
+            let routeFeatures = [];
+
+            rescues.forEach(op => {
+                // UI List Item in sidebar
+                list.innerHTML += `
+                    <div class="bg-[#1e2536] border p-3 rounded-lg border-l-4 border-yellow-500/50 border-l-yellow-500 mb-3">
+                        <h4 class="text-white text-xs font-bold mb-1 truncate pr-2">${op.name}</h4>
+                        <p class="text-[10px] text-gray-400 leading-tight mb-2">To: ${op.targetName}</p>
+                        <div class="flex items-center gap-2 mt-2">
+                            <span class="text-yellow-400 bg-yellow-500/10 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">ACTIVE MOVEMENT</span>
+                        </div>
+                    </div>
+                `;
+
+                // Yellow Marker & Popup on Map
+                const el = document.createElement('div'); el.className = `weather-yellow-marker`;
+                const popupHTML = `
+                    <div class="pb-1 mb-1 border-b border-gray-600 flex items-center gap-2"><i data-lucide="life-buoy" class="text-yellow-500 w-3 h-3"></i><span class="text-[10px] font-bold uppercase tracking-widest text-[#94a3b8]">MOVEMENT</span></div>
+                    <h3 class="font-bold text-white text-sm mb-1">${op.name}</h3>
+                    <p class="text-[10px] text-gray-300 leading-snug mb-2">Evacuating ~${op.evacuees} people to ${op.targetName}.</p>
+                `;
+                
+                const popup = new mapboxgl.Popup({ offset: 25, closeButton: true, closeOnClick: false, className: 'popup-yellow' }).setHTML(popupHTML);
+                const marker = new mapboxgl.Marker(el).setLngLat(op.pickupCoords).setPopup(popup).addTo(map);
+                marker.togglePopup();
+                
+                window.mapObjectsRescues[op.id] = { marker, popup };
+                if (op.route) routeFeatures.push(op.route);
+            });
+
+            // Update Route Dashed Lines Layer
+            map.getSource('synced-rescue-routes').setData({ type: 'FeatureCollection', features: routeFeatures });
+            if (window.lucide) lucide.createIcons();
+        }
+
+        // ==========================================
+        // GLOBAL EVENT LISTENERS
+        // ==========================================
         window.approveIncident = function(id) {
             let hazards = JSON.parse(localStorage.getItem('beat_live_hazards')) || [];
             let index = hazards.findIndex(h => h.id === id);
@@ -360,8 +453,10 @@
             }
         };
 
+        // Listen for updates from other tabs (Traffic, Weather, Evac)
         window.addEventListener('storage', (e) => {
             if (e.key === 'beat_live_hazards' || e.key === 'beat_drrmo_zones') renderLiveHazards();
+            if (e.key === 'beat_live_rescues') renderLiveRescues(); // Trigger update for Evacuation Sync
         });
 
         const barangayData = {
@@ -398,7 +493,7 @@
         };
 
         window.zoomToBarangay = function(val) {
-            if (!val) { map.flyTo({ center: [121.0700, 14.5700], zoom: 12.5, pitch: 45 }); return; }
+            if (!val) { map.flyTo({ center: [121.0825, 14.5764], zoom: 12.5, pitch: 45 }); return; }
             map.flyTo({ center: barangayData[val].center, zoom: barangayData[val].zoom, pitch: 60 });
         };
     });
