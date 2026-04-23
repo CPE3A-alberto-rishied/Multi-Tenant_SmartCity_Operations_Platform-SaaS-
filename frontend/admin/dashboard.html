@@ -9,16 +9,6 @@
             window.location.replace('admin.html?error=unauthorized'); 
         }
     })();
-
-    // Sidebar Toggle Logic (Placed securely in head so it always works)
-    function toggleSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
-        if (sidebar && overlay) {
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-        }
-    }
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -80,16 +70,16 @@
   <aside id="sidebar" class="sidebar flex flex-col h-full fixed lg:relative z-[100] transform -translate-x-full lg:translate-x-0 transition-transform duration-300 top-0 left-0 theme-border-r theme-surface">
     
     <div class="h-[76px] px-5 flex items-center justify-between shrink-0 theme-border-b">
-      <div id="auth-logo" class="flex items-center gap-1.5">
-          <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain" onerror="this.src='../assets/beat_logo2.png'">
-          <div class="flex flex-col justify-center items-start">
-              <img src="/assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1" onerror="this.src='../assets/beat_text2.png'">
-              <div style="color:#94a3b8; font-size:11px" class="leading-none">Admin Control Center</div>
-          </div>
+      <div class="flex items-center gap-0.5">
+        <img src="../assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain">
+        <div class="flex flex-col justify-center items-start">
+          <img src="../assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
+          <div style="color:var(--text-dim); font-size:11px" class="leading-none">Admin Control Center</div>
+        </div>
       </div>
       
       <button type="button" class="lg:hidden text-gray-400 hover:text-white p-2" onclick="toggleSidebar()">
-        <i data-lucide="x" class="w-5 h-5 pointer-events-none"></i>
+        <i data-lucide="x" class="w-5 h-5"></i>
       </button>
     </div>
     
@@ -124,7 +114,7 @@
     <header class="px-4 sm:px-8 h-[76px] flex items-center justify-between shrink-0 relative z-[40] theme-surface theme-border-b">
       <div class="flex items-center">
         <button type="button" class="lg:hidden text-gray-400 hover:text-white mr-4 p-2 cursor-pointer z-50 relative" onclick="toggleSidebar()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+          <i data-lucide="menu" class="w-6 h-6"></i>
         </button>
         <h1 class="text-xl font-semibold text-white flex items-center gap-2">
           <i data-lucide="layout-grid" class="w-6 h-6 text-[#94a3b8] hidden sm:block"></i> Dashboard Overview
@@ -230,6 +220,27 @@
   <script src="js/app.js"></script>
 
   <script>
+    // FIXED: Sidebar logic added back correctly
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        if (sidebar.classList.contains('-translate-x-full')) {
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => { 
+        if(window.lucide) lucide.createIcons(); 
+    });
+
+    // FIXED: Completely removed duplicate 'globalTrafficChart' variables!
+    // The Mapbox and Chart initialization functions are safely living in app.js
+    
     mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag'; 
     
     try {
@@ -295,8 +306,8 @@
                 }
             });
             
-            // extractAndUpdateTrafficData is securely called from app.js!
             map.on('idle', () => {
+                // Safely call the function inside app.js
                 if (typeof extractAndUpdateTrafficData === 'function') {
                     extractAndUpdateTrafficData(map);
                 }
@@ -304,7 +315,9 @@
         });
     } catch (err) {}
 
-    // Safe DB Fetch for Dashboard feed specifically
+    // ==========================================
+    // MONGODB / BACKEND FETCH INTEGRATION
+    // ==========================================
     async function fetchReportsForFeed() {
         const feedContainer = document.getElementById('reports-feed');
         const totalReportsElement = document.getElementById('total-reports-count');
