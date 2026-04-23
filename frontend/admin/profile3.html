@@ -4,9 +4,12 @@
   <script>
     (function() {
         const session = localStorage.getItem('activeDepartment');
-        if (!session) window.location.replace('admin.html?error=unauthorized'); 
-    })();
+       if (!session || session !== 'DRRMO') {
+            window.location.replace('admin.html?error=unauthorized'); 
+        }
+   })();
   </script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BEAT - Dept Profile</title>
@@ -17,15 +20,20 @@
 </head>
 <body class="h-full flex bg-[#0a0e1a]">
   
-  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface">
+  <div id="confirm-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-yellow"><i data-lucide="alert-circle"></i></div><h2 class="text-white font-bold text-xl mb-2">Update Account?</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Confirm changes to your profile or password? Verification is required.</p><div class="flex gap-3"><button onclick="closeModal('confirm-modal')" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="proceedToVerify()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Proceed</button></div></div></div>
+  <div id="verify-modal" class="modal-overlay hidden"><div class="border theme-border w-[420px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-blue"><i data-lucide="shield-check"></i></div><h2 class="text-white font-bold text-xl mb-2">Security Verification</h2><p class="text-[#94a3b8] text-xs mb-6">Enter the 6-digit code sent to your email</p><div class="flex justify-between gap-2 mb-2"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 0)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 1)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 2)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 3)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 4)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 5)"></div><p id="otp-error" class="text-red-500 text-xs hidden mb-6">Enter all 6 digits</p><button onclick="confirmChanges()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Confirm Updates</button></div></div>
+  <div id="success-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-green"><i data-lucide="check-circle"></i></div><h2 class="text-white font-bold text-xl mb-4">Changes Successful</h2><button onclick="closeModal('success-modal')" class="w-full bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Got it</button></div></div>
+  <div id="no-changes-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-yellow"><i data-lucide="info"></i></div><h2 class="text-white font-bold text-xl mb-4">No Changes Detected</h2><button onclick="closeModal('no-changes-modal')" class="w-full bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Dismiss</button></div></div>
+
+  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-50">
     <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
-      <div class="flex items-center gap-3">
-        <div class="logo-box bg-orange-600 text-white">B</div>
-        <div class="flex flex-col justify-center">
-          <div class="logo-text font-bold text-white">BEAT</div>
-          <div class="sidebar-subtext">Department Portal</div>
+        <div id="auth-logo" class="flex items-center gap-1.5">
+            <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain">
+            <div class="flex flex-col justify-center items-start">
+                <img src="/assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
+                <div style="color:#94a3b8; font-size:11px" class="leading-none">Admin Control Center</div>
+            </div>
         </div>
-      </div>
     </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
@@ -39,14 +47,20 @@
     <div class="user-footer">
         <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
-                <div id="nav-avatar" class="nav-avatar bg-orange-600">D</div>
-                <div><div class="user-footer-name">DRRMO</div><div class="user-footer-sub">Disaster Management</div></div>
+                <div id="nav-avatar" class="nav-avatar">T</div>
+                <div>
+                  <div class="user-footer-name">DRRMO</div>
+                  <div class="user-footer-sub">Disaster Department</div>
+                </div>
             </div>
-            <a href="profile3.html" class="settings-link active"><i data-lucide="settings" class="icon-md"></i></a>
+            <a href="profile2.html" class="settings-link active"><i data-lucide="settings" class="icon-md"></i></a>
         </div>
-        <button onclick="doLogout()" class="btn-logout"><i data-lucide="log-out" class="icon-sm"></i> Logout</button>
+        <button onclick="doLogout()" class="btn-logout">
+            <i data-lucide="log-out" class="icon-sm"></i> Logout
+        </button>
     </div>
   </aside>
+
 
   <main class="flex-1 overflow-y-auto flex flex-col items-center relative">
     <header class="w-full px-8 h-[76px] flex items-center shrink-0 theme-surface theme-border-b">
@@ -55,22 +69,187 @@
 
     <div class="p-8 animate-in w-full max-w-2xl">
       <div class="profile-card rounded-2xl p-10 flex flex-col items-center shadow-lg relative">
+        
         <div class="relative group mb-6">
-          <div id="profile-display" class="profile-display-circle bg-orange-600 border border-orange-500/50">D</div>
+          <div id="profile-display" class="profile-display-circle">T</div>
+          <label for="avatar-input" class="absolute bottom-1 right-1 bg-blue-600 p-2.5 rounded-full cursor-pointer border-2 border-[#1e2536] hover:bg-blue-700 transition-colors">
+            <i data-lucide="camera" class="text-white icon-sm"></i>
+            <input type="file" id="avatar-input" class="hidden" accept="image/*" onchange="previewAvatar(this)">
+          </label>
         </div>
 
         <div class="text-center mb-10">
-          <h2 id="display-name" class="text-white text-2xl font-bold">DRRMO Control</h2>
+          <h2 id="display-name" class="text-white text-2xl font-bold">DRRMO</h2>
+          
           <div class="badge-stack">
-            <span class="text-[11px] font-bold tracking-widest bg-orange-600/20 text-orange-400 px-3 py-1.5 rounded-full uppercase w-max border border-orange-500/20">DEPT: DISASTER RISK</span>
-            <span class="text-[11px] font-bold tracking-widest bg-gray-700/50 text-[#94a3b8] px-3 py-1.5 rounded-full uppercase w-max border border-gray-600/50">ID: 202499112</span>
+            <span id="display-dept" class="text-[11px] font-bold tracking-widest bg-blue-600/20 text-blue-400 px-3 py-1.5 rounded-full uppercase w-max border border-blue-500/20">DEPT: DISASTER RISK</span>
+            <span id="display-id" class="text-[11px] font-bold tracking-widest bg-gray-700/50 text-[#94a3b8] px-3 py-1.5 rounded-full uppercase w-max border border-gray-600/50">ID: 202499112</span>
+            <span id="display-email" class="text-[11px] font-bold tracking-widest bg-gray-800/30 text-[#94a3b8] px-3 py-1.5 rounded-full lowercase w-max">admin@beat.gov.ph</span>
           </div>
         </div>
+ 
+        <form id="profile-form" onsubmit="handleInitialSave(event)" class="w-full space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">Full Name</label>
+              <input type="text" id="prof-username" class="modal-input text-sm" value="DRRMO" data-original="DRRMO">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">Email Address (Read-Only)</label>
+              <input type="email" id="prof-email" class="modal-input text-sm" value="admin@beat.gov.ph" readonly>
+            </div>
+          </div>
+
+          <hr class="theme-border my-6 border-t">
+
+          <div class="space-y-4">
+            <h3 class="text-white font-bold text-sm flex items-center gap-2"><i data-lucide="lock" class="icon-sm text-blue-500"></i> Password Updates</h3>
+            <div>
+              <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">Current Password</label>
+              <input type="password" id="curr-pass" placeholder="Verify with current password" class="modal-input text-sm">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">New Password</label>
+                <input type="password" id="new-pass" placeholder="New password" class="modal-input text-sm">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">Confirm Password</label>
+                <input type="password" id="conf-pass" placeholder="Confirm password" class="modal-input text-sm">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all mt-4">
+            Update Profile
+          </button>
+        </form>
       </div>
     </div>
   </main>
 
   <script src="js/app2.js"></script>
-  <script>lucide.createIcons(); function doLogout() { localStorage.removeItem('activeDepartment'); window.location.href = 'admin.html'; }</script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => { 
+        if(window.lucide) lucide.createIcons(); 
+        
+        // This block dynamically checks memory, but defaults to the visual standard you requested
+        const activeName = localStorage.getItem('activeUserName') || 'DRRMO';
+        const activeDept = localStorage.getItem('activeDepartment') || 'Disaster';
+        const activeId = localStorage.getItem('activeUserId') || '202499112';
+        const activeEmail = localStorage.getItem('activeUserEmail') || 'admin@beat.gov.ph';
+        
+        document.getElementById('display-name').innerText = activeName;
+        document.getElementById('display-dept').innerText = `DEPT: ${activeDept.replace(' Department', '').trim()}`;
+        document.getElementById('display-id').innerText = `ID: ${activeId}`;
+        document.getElementById('display-email').innerText = activeEmail;
+        
+        document.getElementById('prof-username').value = activeName;
+        document.getElementById('prof-username').setAttribute('data-original', activeName);
+        document.getElementById('prof-email').value = activeEmail;
+        
+        const initial = activeName.charAt(0).toUpperCase();
+        document.getElementById('profile-display').innerText = initial;
+        
+        // Update sidebar as well
+        document.querySelectorAll('.user-footer-name').forEach(el => el.innerText = activeName);
+        document.querySelectorAll('.user-footer-sub').forEach(el => el.innerText = activeDept.includes('Department') ? activeDept : activeDept + ' Department');
+        const navAv = document.getElementById('nav-avatar');
+        if(navAv) navAv.innerText = initial;
+    });
+
+    function previewAvatar(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const url = e.target.result;
+          document.getElementById('profile-display').style.backgroundImage = `url(${url})`;
+          document.getElementById('profile-display').textContent = '';
+          document.getElementById('nav-avatar').style.backgroundImage = `url(${url})`;
+          document.getElementById('nav-avatar').textContent = '';
+          document.getElementById('profile-form').dataset.changed = 'true';
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function handleInitialSave(e) {
+      e.preventDefault();
+      const username = document.getElementById('prof-username');
+      const currPass = document.getElementById('curr-pass').value;
+      const newPass = document.getElementById('new-pass').value;
+      const avatarChanged = document.getElementById('profile-form').dataset.changed === 'true';
+
+      const hasChanges = (username.value !== username.getAttribute('data-original')) || 
+                        (currPass !== "") || (newPass !== "") || avatarChanged;
+
+      if (!hasChanges) {
+        document.getElementById('no-changes-modal').classList.remove('hidden');
+      } else {
+        document.getElementById('confirm-modal').classList.remove('hidden');
+      }
+    }
+
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+    function proceedToVerify() { closeModal('confirm-modal'); document.getElementById('verify-modal').classList.remove('hidden'); }
+
+    function handleOtp(input, index) {
+      const inputs = document.querySelectorAll('.otp-input');
+      inputs.forEach(i => i.classList.remove('input-error'));
+      document.getElementById('otp-error').classList.add('hidden');
+      if (input.value.length === 1 && index < inputs.length - 1) inputs[index + 1].focus();
+    }
+
+    function confirmChanges() {
+      const inputs = document.querySelectorAll('.otp-input');
+      let code = "";
+      inputs.forEach(i => code += i.value);
+
+      if (code.length < 6) {
+        inputs.forEach(i => i.classList.add('input-error'));
+        document.getElementById('otp-error').classList.remove('hidden');
+      } else {
+        const newName = document.getElementById('prof-username').value.trim();
+        
+        if (newName) {
+            localStorage.setItem('activeUserName', newName);
+            
+            let admins = JSON.parse(localStorage.getItem('beat_admins')) || [];
+            let currentId = localStorage.getItem('activeUserId') || '2023104513';
+            let adminRecord = admins.find(a => a.id === currentId);
+            if (adminRecord) {
+                adminRecord.username = newName;
+                const newPass = document.getElementById('new-pass').value;
+                if (newPass.length > 0) adminRecord.password = newPass;
+                localStorage.setItem('beat_admins', JSON.stringify(admins));
+            }
+
+            document.querySelectorAll('.user-footer-name').forEach(el => el.innerText = newName);
+            document.getElementById('display-name').innerText = newName;
+            
+            document.querySelectorAll('#nav-avatar, #profile-display').forEach(el => {
+                if(!el.style.backgroundImage || el.style.backgroundImage === 'none') {
+                    el.innerText = newName.charAt(0).toUpperCase();
+                }
+            });
+            document.getElementById('prof-username').setAttribute('data-original', newName);
+        }
+
+        document.getElementById('verify-modal').classList.add('hidden');
+        document.getElementById('success-modal').classList.remove('hidden');
+        document.getElementById('profile-form').dataset.changed = 'false';
+        
+        document.getElementById('curr-pass').value = "";
+        document.getElementById('new-pass').value = "";
+        document.getElementById('conf-pass').value = "";
+      }
+    }
+
+    // 🚨 Added Logout Logic 🚨
+    function doLogout() {
+        localStorage.removeItem('activeDepartment'); // Wipe the session
+        window.location.href = 'admin.html'; // Kick back to login
+    }
+  </script>
 </body>
 </html>
