@@ -32,7 +32,6 @@ The system is designed to streamline emergency responses: citizens file public r
 * **Mapping & GIS:** Mapbox GL JS, Mapbox GL Draw, Turf.js
 * **Data Visualization:** Chart.js
 * **Backend API integration:** Node.js / Express / MongoDB (Hosted on Render)
-* **State Management:** Browser `localStorage` for rapid cross-page state synchronization and session handling.
 
 ## 🚀 System Workflows
 1. **The Citizen:** Visits the public portal to view live accident heatmaps or submit a hazard report.
