@@ -233,30 +233,28 @@ async function executeAddStaff() {
         status: "Active"
     };
 
-// ====== SAFER MODAL CANCELLATION ======
+    // ====== FIX: CANCEL BUTTON FUNCTION ======
 function clearAndCloseStaff() {
-    // List of input IDs to reset
     const fields = ['staff-name', 'staff-id', 'staff-email', 'staff-pass', 'staff-dept'];
     
     fields.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
-            el.value = ""; // Reset input value
+            el.value = ""; // Reset text or dropdown value
             el.classList.remove('input-error'); // Remove red glow
         }
         
-        // Construct the error element ID based on your HTML
+        // Construct error IDs to match your HTML (e.g., name-error, id-error)
         let errId = id === 'staff-pass' ? 'pass-error' : 
                    id === 'staff-dept' ? 'dept-select-error' : 
                    id.split('-')[1] + '-error';
         
         const errEl = document.getElementById(errId);
-        if (errEl) errEl.classList.add('hidden'); // Hide error text
+        if (errEl) errEl.classList.add('hidden'); // Hide error messages
     });
 
-    closeModal('add-staff-modal'); // Closes the creation window
+    closeModal('add-staff-modal'); // Hide the modal
 }
-
     try {
         const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/signup', {
             method: 'POST',
