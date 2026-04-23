@@ -187,126 +187,120 @@ function closePopup(popupId) {
 
 
 // ==========================================
-// MONGODB MANAGE ADMINS LOGIC (COMPLETE & GLOBAL)
+// MONGODB MANAGE ADMINS LOGIC (RESOLVED)
 // ==========================================
-let adminsFromDB = []; 
+const departments = ["Main Admin", "Traffic", "DRRMO"]; // Hardcoded
+let adminsFromDB = []; // Source of truth for MongoDB accounts
 let currentFilter = "All Departments";
 let currentSearchQuery = "";
 let userToDeleteId = null; 
 let currentTargetUser = ""; 
+let pendingToggle = null;
 
-// 1. UTILITY: SEARCH & SORT
-function handleSearch(val) {
-    currentSearchQuery = val.toLowerCase();
-    populateAdmins();
-}
-
-function handleSort(val) {
-    currentFilter = val;
-    populateAdmins();
-}
-
-// 2. FETCH DATA
+// 1. FETCH DATA FROM MONGODB
 async function fetchAllAdmins() {
     try {
         const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/all');
         const result = await response.json();
         if (result.success) {
-            adminsFromDB = result.admins || []; 
-            populateAdmins(); 
+            adminsFromDB = result.admins || []; // Uses 'admins' key from backend
+            populateAdmins(); // Triggers the table render
         }
-    } catch (e) { console.error("Fetch Error:", e); }
-}
-
-// 3. VALIDATION (FIXES THE REFERENCE ERROR)
-function validateAddStaff() {
-    const name = document.getElementById('staff-name');
-    const id = document.getElementById('staff-id');
-    const email = document.getElementById('staff-email');
-    const pass = document.getElementById('staff-pass');
-    const dept = document.getElementById('staff-dept');
-    
-    let isValid = true;
-    
-    // Simple validation checks
-    if (!name.value.trim()) { name.classList.add('input-error'); isValid = false; }
-    if (!id.value.trim()) { id.classList.add('input-error'); isValid = false; }
-    if (!email.value.trim() || !email.value.includes('@')) { email.classList.add('input-error'); isValid = false; }
-    if (pass.value.length < 8) { pass.classList.add('input-error'); isValid = false; }
-    if (!dept.value) { dept.classList.add('input-error'); isValid = false; }
-
-    if (isValid) {
-        openModal('confirm-staff-modal'); // Proceed to confirmation
-    } else {
-        alert("Please fill in all fields correctly (Password min 8 chars).");
+    } catch (error) {
+        console.error("MongoDB Sync Error:", error);
     }
 }
 
-// 4. CREATE ACCOUNT
-async function executeAddStaff() {
-    closeModal('confirm-staff-modal');
-    const newUser = {
-        username: document.getElementById('staff-name').value,
-        id: document.getElementById('staff-id').value,
-        email: document.getElementById('staff-email').value,
-        password: document.getElementById('staff-pass').value,
-        dept: document.getElementById('staff-dept').value,
-        status: "Active"
-    };
-
-    try {
-        const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/signup', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newUser)
-        });
-        const result = await response.json();
-        
-        if (result.success) {
-            clearAndCloseStaff(); 
-            fetchAllAdmins(); 
-            openModal('success-create-modal');
-        } else {
-            document.getElementById('error-create-message').innerText = result.error || "Duplicate ID or Email.";
-            openModal('error-create-modal');
-        }
-    } catch (e) { openModal('error-create-modal'); }
-}
-
-// 5. CANCEL & CLEAR
-function clearAndCloseStaff() {
-    ['staff-name', 'staff-id', 'staff-email', 'staff-pass', 'staff-dept'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) { el.value = ""; el.classList.remove('input-error'); }
-    });
-    closeModal('add-staff-modal');
-}
-
-// 6. RENDER TABLES
+// 2. RENDER TABLES
 function populateAdmins() {
-    const activeTbody = document.getElementById('active-admin-table-body'),
-          disabledTbody = document.getElementById('disabled-admin-table-body');
+    const activeTbody = document.getElementById('active-admin-table-body');
+    const disabledTbody = document.getElementById('disabled-admin-table-body');
     if(!activeTbody || !disabledTbody) return;
 
-    activeTbody.innerHTML = ''; disabledTbody.innerHTML = '';
+    activeTbody.innerHTML = ''; disabledTbody.innerHTML = ''; // Clear tables
 
     let list = adminsFromDB;
     if (currentFilter !== "All Departments") list = list.filter(a => a.dept === currentFilter);
     if (currentSearchQuery) list = list.filter(a => a.username.toLowerCase().includes(currentSearchQuery) || a.id.includes(currentSearchQuery));
 
     list.forEach(admin => {
-        const row = `<tr class="border-b border-[#1e293b] hover:bg-white/5 transition-colors">
-            <td class="px-5 py-4 w-10">${admin.status !== 'Active' ? `<i data-lucide="trash-2" class="text-red-500 cursor-pointer" onclick="promptDeleteUser('${admin.id}', '${admin.username}')"></i>` : ''}</td> 
-            <td class="font-bold py-4 px-5 text-white">${escapeHTML(admin.username)}</td>
-            <td class="text-[#94a3b8]">${escapeHTML(admin.id)}</td>
-            <td class="text-[#94a3b8]">${escapeHTML(admin.email)}</td>
-            <td class="text-[#94a3b8]">${escapeHTML(admin.dept)}</td>
-            <td><span class="${admin.status === 'Active' ? 'text-green-500' : 'text-red-500'} text-[10px] font-bold uppercase">${admin.status}</span></td>
-            <td><label class="switch"><input type="checkbox" ${admin.status === 'Active' ? 'checked' : ''} onchange="handleStatusToggle(this, '${admin.id}')"><span class="slider"></span></label></td>
-        </tr>`;
+        // Build the row based on MongoDB fields
+        const row = `
+            <tr class="border-b border-[#1e293b] hover:bg-white/5 transition-colors">
+                <td class="px-5 py-4 w-10">
+                    ${admin.status !== 'Active' ? `<i data-lucide="trash-2" class="w-4 h-4 text-red-500 cursor-pointer" onclick="promptDeleteUser('${admin.id}', '${admin.username}')"></i>` : ''}
+                </td> 
+                <td class="font-bold py-4 px-5 text-white">${escapeHTML(admin.username || 'No Name')}</td>
+                <td class="text-[#94a3b8]">${escapeHTML(admin.id)}</td>
+                <td class="text-[#94a3b8]">${escapeHTML(admin.email)}</td>
+                <td class="text-[#94a3b8]">${escapeHTML(admin.dept)}</td>
+                <td><span class="${admin.status === 'Active' ? 'text-green-500' : 'text-red-500'} text-[10px] font-bold uppercase tracking-widest">${admin.status}</span></td>
+                <td><label class="switch"><input type="checkbox" ${admin.status === 'Active' ? 'checked' : ''} onchange="handleStatusToggle(this, '${admin.id}')"><span class="slider"></span></label></td>
+            </tr>`;
 
         if (admin.status === 'Active') activeTbody.insertAdjacentHTML('beforeend', row);
         else disabledTbody.insertAdjacentHTML('beforeend', row);
     });
-    if (window.lucide) lucide.createIcons();
+    if (window.lucide) lucide.createIcons(); // Load icons
+}
+
+// 3. TOGGLE STATUS LOGIC (ENABLE/DISABLE)
+function handleStatusToggle(checkbox, adminId) {
+    pendingToggle = checkbox;
+    currentTargetUser = adminId;
+    if (!checkbox.checked) {
+        openModal('disable-modal');
+        checkbox.checked = true;
+    } else {
+        openModal('enable-modal');
+        checkbox.checked = false;
+    }
+}
+
+async function confirmStatusChange(isEnabling) {
+    try {
+        const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/status', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: currentTargetUser, status: isEnabling ? "Active" : "Disabled" })
+        });
+        if (response.ok) {
+            closeModal(isEnabling ? 'enable-modal' : 'disable-modal');
+            fetchAllAdmins(); // Refresh from DB
+        }
+    } catch (e) { console.error("Toggle Error:", e); }
+}
+
+function cancelStatusChange() {
+    closeModal('enable-modal'); closeModal('disable-modal');
+    fetchAllAdmins(); // Re-sync UI with DB
+}
+
+// 4. UTILITIES (SEARCH, SORT, DELETE)
+function handleSearch(val) { currentSearchQuery = val.toLowerCase(); populateAdmins(); }
+function handleSort(val) { currentFilter = val; populateAdmins(); }
+
+function promptDeleteUser(id, name) {
+    userToDeleteId = id;
+    const nameSpan = document.getElementById('delete-user-name');
+    if(nameSpan) nameSpan.innerText = name;
+    openModal('confirm-delete-user-modal');
+}
+
+async function executeDeleteUser() {
+    if (!userToDeleteId) return;
+    try {
+        const response = await fetch(`https://beat-pasig-api.onrender.com/api/admin/delete/${userToDeleteId}`, { method: 'DELETE' });
+        if (response.ok) { closeModal('confirm-delete-user-modal'); fetchAllAdmins(); }
+    } catch (e) { console.error("Delete Error:", e); }
+}
+
+function updateDepartmentDropdowns() {
+    const filterSelect = document.getElementById('dept-filter');
+    const modalSelect = document.getElementById('staff-dept');
+    const optionsHTML = departments.map(d => `<option value="${d}">${d}</option>`).join('');
+    if (filterSelect) filterSelect.innerHTML = `<option>All Departments</option>` + optionsHTML;
+    if (modalSelect) modalSelect.innerHTML = `<option value="" disabled selected>Select Department</option>` + optionsHTML;
 }
 
 
