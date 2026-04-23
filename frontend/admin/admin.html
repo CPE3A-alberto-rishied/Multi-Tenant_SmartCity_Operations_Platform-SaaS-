@@ -112,7 +112,6 @@
             .auth-panel, .popup-panel { padding: 1.5rem; }
             .otp-input { width: 40px; height: 48px; font-size: 1.1rem; }
             .logo-box { width: 48px; height: 48px; }
-            #auth-logo h1 { font-size: 32px; }
             .flex-otp { gap: 0.25rem; }
         }
     </style>
@@ -158,12 +157,15 @@
             </div>
         </div>
 
-        <div id="auth-logo" class="text-center mb-10 mt-10">
-            <div class="logo-box flex items-center justify-center font-mono font-bold text-white text-xl shadow-lg">B</div>
-            <h1 class="font-mono font-bold tracking-widest text-white text-4xl m-0">BEAT</h1>
-            <p class="text-dim-sm mt-1">Administrative Control System</p>
+        <div id="auth-logo" class="flex justify-center mb-10 mt-10">
+            <div class="flex items-center gap-1.5">
+                <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain">
+                <div class="flex flex-col justify-center items-start">
+                    <img src="/assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
+                    <div style="color:#94a3b8; font-size:11px" class="leading-none">Admin Control Center</div>
+                </div>
+            </div>
         </div>
-
         <div id="login-card" class="card card-glow auth-panel">
             <form onsubmit="handleLoginWrapper(event)" novalidate>
                 <div class="mb-5">
