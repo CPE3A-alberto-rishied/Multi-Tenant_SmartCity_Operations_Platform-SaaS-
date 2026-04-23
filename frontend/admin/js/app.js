@@ -868,7 +868,6 @@ function cancelReportToggle(modalId) {
     }
     closeModal(modalId);
 }
-
 // ==========================================
 // ANNOUNCEMENTS PAGE SPECIFIC LOGIC
 // ==========================================
@@ -1226,7 +1225,6 @@ async function executeCardAction() {
     if (currentActionType === 'approve') {
         currentActionCard.classList.remove('opacity-60');
         container.innerHTML = `
-            <button onclick="openAnnForm('edit', this.closest('.ann-card'))" class="bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2 px-8 rounded-lg text-sm transition-colors">Edit</button>
             <button onclick="triggerTakeDown(this)" class="bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center gap-2 ml-auto"><i data-lucide="trash-2" class="w-4 h-4"></i> Take Down</button>
         `;
         document.getElementById('grid-live').appendChild(currentActionCard);
@@ -1245,7 +1243,6 @@ async function executeCardAction() {
         currentActionCard.classList.remove('opacity-60');
         container.innerHTML = `
             <button onclick="triggerApprove(this)" class="flex-1 bg-transparent border border-green-500 hover:bg-green-500/10 text-green-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Approve</button>
-            <button onclick="openAnnForm('edit', this.closest('.ann-card'))" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">Edit</button>
             <button onclick="triggerReject(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"><i data-lucide="x" class="w-4 h-4"></i> Reject</button>
         `;
         document.getElementById('grid-queue').appendChild(currentActionCard);
@@ -1253,6 +1250,9 @@ async function executeCardAction() {
 
     } else if (currentActionType === 'delete') {
         currentActionCard.remove();
+        if (dbId) {
+             // Optional: If you want to add a real delete route later, it would go here.
+        }
     }
 
     openModal('action-success-modal');
@@ -1510,6 +1510,7 @@ async function executeAnnFormSubmit() {
     if (catText) {
         catText.innerText = 'Select a category...';
         catText.classList.add('text-[#94a3b8]');
+        catText.classList.remove('text-white');
     }
     
     closeAnnForm(); 
