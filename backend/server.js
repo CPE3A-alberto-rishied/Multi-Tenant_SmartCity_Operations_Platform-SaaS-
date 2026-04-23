@@ -28,11 +28,14 @@ const reportSchema = new mongoose.Schema({
 });
 const Report = mongoose.model('Report', reportSchema);
 
+// 3. SCHEMAS & MODELS
 const adminSchema = new mongoose.Schema({
     id: { type: String, required: true, unique: true },
+    username: { type: String, required: true }, // Added
     password: { type: String, required: true },
-    email: String,
-    dept: String,
+    email: { type: String, required: true },
+    dept: { type: String, required: true },
+    status: { type: String, default: 'Active' }, // Added
     otp: String,
     otpExpires: Date
 });
@@ -105,6 +108,59 @@ app.put('/api/report/:id', async (req, res) => {
         res.status(200).json({ success: true, data: updatedReport });
     } catch (error) {
         res.status(500).json({ success: false, error: "Failed to update status" });
+    }
+});
+
+// --- Admin Management Routes (FIXES THE 404 ERRORS) ---
+
+// 1. Fetch ALL Admins
+app.get('/api/admin/all', async (req, res) => {
+    try {
+        const admins = await Admin.find().sort({ username: 1 });
+        res.status(200).json({ success: true, admins }); // Returns 'admins' array
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// 2. Create/Signup New Admin
+app.post('/api/admin/signup', async (req, res) => {
+    try {
+        const { id, username, email, password, dept, status } = req.body;
+        
+        // Check if ID or Email already exists
+        const existing = await Admin.findOne({ $or: [{ id }, { email }] });
+        if (existing) {
+            return res.status(400).json({ success: false, error: "Admin ID or Email already exists." });
+        }
+
+        const newAdmin = new Admin({ id, username, email, password, dept, status });
+        await newAdmin.save();
+        res.status(201).json({ success: true, message: "Account created successfully." });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// 3. Update Admin Status (Enable/Disable)
+app.put('/api/admin/status', async (req, res) => {
+    try {
+        const { id, status } = req.body;
+        await Admin.findOneAndUpdate({ id: id }, { status: status });
+        res.status(200).json({ success: true });
+    } catch (error) {
+        res.status(500).json({ success: false, error: "Failed to update status." });
+    }
+});
+
+// 4. Delete Admin Permanently
+app.delete('/api/admin/delete/:id', async (req, res) => {
+    try {
+        const result = await Admin.findOneAndDelete({ id: req.params.id });
+        if (!result) return res.status(404).json({ success: false, error: "Admin not found." });
+        res.status(200).json({ success: true });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
     }
 });
 

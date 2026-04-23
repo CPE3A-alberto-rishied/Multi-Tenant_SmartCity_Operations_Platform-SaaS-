@@ -189,140 +189,113 @@ function closePopup(popupId) {
 // ==========================================
 // MONGODB MANAGE ADMINS LOGIC
 // ==========================================
-const departments = ["Main Admin", "Traffic", "DRRMO"]; // Removed Engineering
 let adminsFromDB = []; 
 let currentFilter = "All Departments";
 let currentSearchQuery = "";
 let userToDeleteId = null; 
 let currentTargetUser = ""; 
-let pendingToggle = null;
 
-// 1. FIXED: GLOBAL CANCEL FUNCTION
-function clearAndCloseStaff() {
-    const fields = ['staff-name', 'staff-id', 'staff-email', 'staff-pass', 'staff-dept'];
-    fields.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.value = "";
-            el.classList.remove('input-error');
-        }
-        let errId = id === 'staff-pass' ? 'pass-error' : id === 'staff-dept' ? 'dept-select-error' : id.split('-')[1] + '-error';
-        const errEl = document.getElementById(errId);
-        if (errEl) errEl.classList.add('hidden');
-    });
-    closeModal('add-staff-modal');
+// 1. MISSING FUNCTIONS: SEARCH & SORT
+function handleSearch(val) {
+    currentSearchQuery = val.toLowerCase();
+    populateAdmins();
 }
 
-// 2. FETCH ALL ADMINS
+function handleSort(val) {
+    currentFilter = val;
+    populateAdmins();
+}
+
+// 2. FETCH FROM MONGODB (With 404 Protection)
 async function fetchAllAdmins() {
     try {
         const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/all');
+        
+        // If the server returns 404, the route doesn't exist on your backend
+        if (response.status === 404) {
+            console.error("CRITICAL: Route /api/admin/all not found on backend.");
+            return;
+        }
+
         const result = await response.json();
         if (result.success) {
             adminsFromDB = result.admins || result.data || []; 
             populateAdmins(); 
         }
-    } catch (error) { console.error("MongoDB Fetch Error:", error); }
+    } catch (e) { console.error("Fetch Error:", e); }
 }
 
-// 3. ADD STAFF TO MONGODB
-function validateAddStaff() {
-    const name = document.getElementById('staff-name'), id = document.getElementById('staff-id'),
-          email = document.getElementById('staff-email'), pass = document.getElementById('staff-pass'),
-          dept = document.getElementById('staff-dept'); 
-    let isValid = true;
-    if (!name.value.trim()) { name.classList.add('input-error'); document.getElementById('name-error').classList.remove('hidden'); isValid = false; }
-    if (!id.value.trim()) { id.classList.add('input-error'); document.getElementById('id-error').classList.remove('hidden'); isValid = false; }
-    if (!email.value.trim() || !email.value.includes('@')) { email.classList.add('input-error'); document.getElementById('email-error').classList.remove('hidden'); isValid = false; }
-    if (pass.value.length < 8) { pass.classList.add('input-error'); document.getElementById('pass-error').classList.remove('hidden'); isValid = false; }
-    if (!dept.value) { dept.classList.add('input-error'); document.getElementById('dept-select-error').classList.remove('hidden'); isValid = false; }
-    if (isValid) openModal('confirm-staff-modal');
+// 3. GLOBAL CANCEL FUNCTION
+function clearAndCloseStaff() {
+    ['staff-name', 'staff-id', 'staff-email', 'staff-pass', 'staff-dept'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.value = ""; el.classList.remove('input-error'); }
+    });
+    closeModal('add-staff-modal');
 }
 
+// 4. EXECUTE CREATION
 async function executeAddStaff() {
-    closeModal('confirm-staff-modal'); // Close confirm modal first
+    closeModal('confirm-staff-modal');
     const newUser = {
-        username: document.getElementById('staff-name').value, id: document.getElementById('staff-id').value,
-        email: document.getElementById('staff-email').value, password: document.getElementById('staff-pass').value,
-        dept: document.getElementById('staff-dept').value, status: "Active"
+        username: document.getElementById('staff-name').value,
+        id: document.getElementById('staff-id').value,
+        email: document.getElementById('staff-email').value,
+        password: document.getElementById('staff-pass').value,
+        dept: document.getElementById('staff-dept').value,
+        status: "Active"
     };
 
     try {
         const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/signup', {
             method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newUser)
         });
+
+        if (response.status === 404) {
+            throw new Error("Backend route /api/admin/signup is missing.");
+        }
+
         const result = await response.json();
         if (result.success) {
-            clearAndCloseStaff(); 
-            fetchAllAdmins(); 
-            openModal('success-create-modal'); // Show Success
+            clearAndCloseStaff(); fetchAllAdmins(); 
+            openModal('success-create-modal');
         } else {
-            const errEl = document.getElementById('error-create-message');
-            if(errEl) errEl.innerText = result.error || "Failed to create account. Check for duplicate ID/Email.";
-            openModal('error-create-modal'); // Show Error
+            document.getElementById('error-create-message').innerText = result.error || "Duplicate Email or ID.";
+            openModal('error-create-modal');
         }
-    } catch (error) { 
-        console.error("Add Error:", error); 
+    } catch (e) { 
+        console.error("Signup Error:", e);
+        document.getElementById('error-create-message').innerText = "API Error: The backend route is not configured correctly.";
         openModal('error-create-modal'); 
     }
 }
 
-// 4. TOGGLE STATUS & DELETE
-function handleStatusToggle(checkbox, adminId) {
-    pendingToggle = checkbox; currentTargetUser = adminId;
-    if (!checkbox.checked) { openModal('disable-modal'); checkbox.checked = true; } 
-    else { openModal('enable-modal'); checkbox.checked = false; }
-}
-
-async function confirmStatusChange(isEnabling) {
-    try {
-        await fetch('https://beat-pasig-api.onrender.com/api/admin/status', {
-            method: 'PUT', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: currentTargetUser, status: isEnabling ? "Active" : "Disabled" })
-        });
-        closeModal(isEnabling ? 'enable-modal' : 'disable-modal');
-        fetchAllAdmins();
-    } catch (e) { console.error("Toggle Error:", e); }
-}
-
-function cancelStatusChange() { closeModal('enable-modal'); closeModal('disable-modal'); }
-
-async function executeDeleteUser() {
-    if (!userToDeleteId) return;
-    try {
-        const response = await fetch(`https://beat-pasig-api.onrender.com/api/admin/delete/${userToDeleteId}`, { method: 'DELETE' });
-        if (response.ok) { closeModal('confirm-delete-user-modal'); fetchAllAdmins(); }
-    } catch (e) { console.error("Delete Error:", e); }
-}
-
-function promptDeleteUser(id, name) {
-    userToDeleteId = id; const nameSpan = document.getElementById('delete-user-name');
-    if(nameSpan) nameSpan.innerText = name; openModal('confirm-delete-user-modal');
-}
-
-// 5. RENDER TABLES
+// 5. RENDER TABLE
 function populateAdmins() {
     const activeTbody = document.getElementById('active-admin-table-body'),
           disabledTbody = document.getElementById('disabled-admin-table-body');
     if(!activeTbody || !disabledTbody) return;
 
+    activeTbody.innerHTML = ''; disabledTbody.innerHTML = '';
+
     let list = adminsFromDB;
     if (currentFilter !== "All Departments") list = list.filter(a => a.dept === currentFilter);
     if (currentSearchQuery) list = list.filter(a => a.username.toLowerCase().includes(currentSearchQuery) || a.id.includes(currentSearchQuery));
 
-    const renderRow = (a) => `
-        <tr class="border-b border-[#1e293b] hover:bg-white/5 transition-colors">
-            <td class="px-5 py-4 w-10">${a.status !== 'Active' ? `<i data-lucide="trash-2" class="w-4 h-4 text-red-500/60 hover:text-red-500 cursor-pointer" onclick="promptDeleteUser('${a.id}', '${a.username}')"></i>` : ''}</td> 
-            <td class="font-bold py-4 px-5 text-white">${escapeHTML(a.username)}</td>
-            <td class="text-[#94a3b8]">${escapeHTML(a.id)}</td>
-            <td class="text-[#94a3b8]">${escapeHTML(a.email)}</td>
-            <td class="text-[#94a3b8]">${escapeHTML(a.dept)}</td>
-            <td><span class="${a.status === 'Active' ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'} px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-current">${a.status}</span></td>
-            <td><label class="switch"><input type="checkbox" ${a.status === 'Active' ? 'checked' : ''} onchange="handleStatusToggle(this, '${a.id}')"><span class="slider"></span></label></td>
+    list.forEach(admin => {
+        const row = `<tr class="border-b border-[#1e293b] hover:bg-white/5 transition-colors">
+            <td class="px-5 py-4 w-10">${admin.status !== 'Active' ? `<i data-lucide="trash-2" class="text-red-500 cursor-pointer" onclick="promptDeleteUser('${admin.id}', '${admin.username}')"></i>` : ''}</td> 
+            <td class="font-bold py-4 px-5 text-white">${escapeHTML(admin.username)}</td>
+            <td class="text-[#94a3b8]">${escapeHTML(admin.id)}</td>
+            <td class="text-[#94a3b8]">${escapeHTML(admin.email)}</td>
+            <td class="text-[#94a3b8]">${escapeHTML(admin.dept)}</td>
+            <td><span class="${admin.status === 'Active' ? 'text-green-500' : 'text-red-500'} text-[10px] font-bold uppercase">${admin.status}</span></td>
+            <td><label class="switch"><input type="checkbox" ${admin.status === 'Active' ? 'checked' : ''} onchange="handleStatusToggle(this, '${admin.id}')"><span class="slider"></span></label></td>
         </tr>`;
 
-    activeTbody.innerHTML = list.filter(a => a.status === "Active").map(renderRow).join('');
-    disabledTbody.innerHTML = list.filter(a => a.status !== "Active").map(renderRow).join('');
+        if (admin.status === 'Active') activeTbody.insertAdjacentHTML('beforeend', row);
+        else disabledTbody.insertAdjacentHTML('beforeend', row);
+    });
     if (window.lucide) lucide.createIcons();
 }
 
