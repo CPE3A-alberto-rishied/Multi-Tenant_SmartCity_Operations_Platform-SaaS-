@@ -5,31 +5,21 @@
     (function() {
         const session = localStorage.getItem('activeDepartment');
         if (!session || session !== 'Main Admin') {
-            // Notice the new "?error=unauthorized" at the end
             window.location.replace('admin.html?error=unauthorized'); 
         }
     })();
   </script>
   <meta charset="UTF-8">
-  <script>
-      (function() {
-          const session = localStorage.getItem('activeDepartment');
-          if (!session) {
-              // Stop the browser from loading anything else and redirect
-              window.location.replace('admin.html'); 
-          }
-      })();
-  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BEAT - Manage Admins</title>
+  
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
+  
   <style>
       body { font-family: 'DM Sans', sans-serif !important; overflow: hidden; }
-      
-      /* SIDEBAR */
       .sidebar { width: 260px !important; flex-shrink: 0 !important; }
       
       .sidebar-item { 
@@ -38,39 +28,19 @@
         font-weight: 500 !important; color: #94a3b8 !important;
         text-decoration: none !important; border-left: 3px solid transparent !important;
       }
-      .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
       .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
       .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
       
-      /* USER FOOTER FIXED */
       .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
       .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
       .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
-      .settings-link { color: #94a3b8; transition: color 0.2s; display: flex; align-items: center; }
-      .settings-link:hover { color: #3b82f6; }
-
+      
       .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
       .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; padding: 1rem; }
       .hidden { display: none !important; }
       
-      /* Input Styling */
       .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 8px 12px; transition: all 0.2s; }
-      .modal-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
-      .input-error { border-color: #ef4444 !important; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important; }
       
-      /* AUTOFILL FIX */
-      input:-webkit-autofill,
-      input:-webkit-autofill:hover, 
-      input:-webkit-autofill:focus, 
-      input:-webkit-autofill:active,
-      select:-webkit-autofill {
-          -webkit-box-shadow: 0 0 0px 1000px #1e2536 inset !important;
-          -webkit-text-fill-color: #ffffff !important;
-          caret-color: white !important;
-          transition: background-color 5000s ease-in-out 0s;
-      }
-      
-      /* Custom Select & Date Overrides */
       select { 
         appearance: none; 
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); 
@@ -79,9 +49,7 @@
         background-size: 1em; 
         padding-right: 2.5rem !important;
       }
-      input[type="date"] { color-scheme: dark; }
 
-      /* Tables & Toggles */
       .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
       .switch input { opacity: 0; width: 0; height: 0; }
       .slider { position: absolute; cursor: pointer; inset: 0; background-color: #374151; transition: .4s; border-radius: 24px; }
@@ -90,6 +58,7 @@
       input:checked + .slider:before { transform: translateX(18px); }
   </style>
 </head>
+
 <body class="h-full flex bg-[#0a0e1a]">
 
   <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
@@ -98,9 +67,9 @@
     
     <div class="h-[76px] px-5 flex items-center border-b shrink-0" style="border-color:var(--border)">
       <div class="flex items-center gap-0.5">
-        <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-13 h-14 object-contain">
+        <img src="../assets/beat_logo2.png" alt="BEAT Logo" class="w-13 h-14 object-contain">
         <div class="flex flex-col justify-center items-start">
-          <img src="/assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
+          <img src="../assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
           <div style="color:var(--text-dim); font-size:11px" class="leading-none">Admin Control Center</div>
         </div>
       </div>
@@ -108,6 +77,7 @@
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
     </div>
+
     <nav class="flex-1 py-4 overflow-y-auto">
       <a href="dashboard.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
       <a href="manage_admin.html" class="sidebar-item active"><i data-lucide="users"></i><span>Manage Admins</span></a>
@@ -119,7 +89,7 @@
     <div class="user-footer">
         <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
-                <div id="nav-avatar" style="background:#2563eb; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">M</div>
+                <div style="background:#2563eb; width:42px; height:42px; border-radius:50%;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">M</div>
                 <div>
                   <div class="user-footer-name">Main Admin</div>
                   <div class="user-footer-sub">System Administrator</div>
@@ -147,7 +117,6 @@
       
       <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full xl:w-auto">
-          
           <div class="relative w-full sm:w-auto">
             <i data-lucide="search" class="absolute left-3 top-3 text-gray-400" style="width:16px; height:16px"></i>
             <input type="text" id="admin-search" oninput="handleSearch(this.value)" placeholder="Search Name or ID..." class="modal-input !mt-0 !pl-9 w-full sm:w-[220px]">
@@ -155,17 +124,17 @@
 
           <div class="relative flex items-center w-full sm:w-auto">
             <select id="dept-filter" onchange="handleSort(this.value)" class="modal-input !mt-0 w-full sm:min-w-[160px] cursor-pointer">
+                <option>All Departments</option>
+                <option value="Main Admin">Main Admin</option>
+                <option value="Traffic">Traffic</option>
+                <option value="DRRMO">DRRMO</option>
             </select>
           </div>
-          
-          <button id="delete-dept-btn" onclick="openModal('delete-dept-modal')" class="hidden w-full sm:w-auto h-10 bg-red-500 text-white px-4 rounded-lg text-sm font-bold shadow-lg hover:bg-red-600 transition-all whitespace-nowrap leading-tight">
-            Delete Department
-          </button>
         </div>
-        <div class="flex gap-2 w-full xl:w-auto">
-          <button onclick="checkDeptBeforeStaff()" class="flex-1 xl:flex-none justify-center h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg text-sm font-bold flex items-center gap-2 shadow-lg"><i data-lucide="user-plus" style="width:16px; height:16px"></i> Add Staff</button>
-          <button onclick="openModal('new-dept-modal')" class="flex-1 xl:flex-none justify-center h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg text-sm font-bold flex items-center gap-2 shadow-lg"><i data-lucide="folder-plus" style="width:16px; height:16px"></i> New Department</button>
-        </div>
+
+        <button onclick="openModal('add-staff-modal')" class="w-full xl:w-auto justify-center h-10 bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-lg text-sm font-bold flex items-center gap-2 shadow-lg transition-all">
+          <i data-lucide="user-plus" style="width:16px; height:16px"></i> Add Staff Account
+        </button>
       </div>
 
       <div class="border rounded-2xl overflow-hidden shadow-lg" style="background:var(--surface); border-color:var(--border)">
@@ -174,7 +143,17 @@
         </h3>
         <div class="overflow-x-auto w-full">
           <table class="w-full text-left whitespace-nowrap min-w-[800px]">
-            <thead class="bg-[#1e2536]"><tr class="border-b" style="border-color:var(--border)"><th class="py-4 px-5 w-10"></th><th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">Full Name</th><th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">ID Number</th><th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">Email</th><th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">Department</th><th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">Status</th><th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">Action</th></tr></thead>
+            <thead class="bg-[#1e2536] border-b" style="border-color:var(--border)">
+              <tr>
+                <th class="py-4 px-5 w-10"></th>
+                <th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">Full Name</th>
+                <th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">ID Number</th>
+                <th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">Email</th>
+                <th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">Department</th>
+                <th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">Status</th>
+                <th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">Action</th>
+              </tr>
+            </thead>
             <tbody id="active-admin-table-body" class="divide-y divide-gray-800/50"></tbody>
           </table>
         </div>
@@ -186,7 +165,17 @@
         </h3>
         <div class="overflow-x-auto w-full">
           <table class="w-full text-left whitespace-nowrap min-w-[800px]">
-            <thead class="bg-[#1e2536]"><tr class="border-b" style="border-color:var(--border)"><th class="py-4 px-5 w-10"></th><th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">Full Name</th><th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">ID Number</th><th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">Email</th><th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">Department</th><th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">Status</th><th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">Action</th></tr></thead>
+            <thead class="bg-[#1e2536] border-b" style="border-color:var(--border)">
+              <tr>
+                <th class="py-4 px-5 w-10"></th>
+                <th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">Full Name</th>
+                <th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">ID Number</th>
+                <th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">Email</th>
+                <th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">Department</th>
+                <th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">Status</th>
+                <th class="py-4 px-5 text-[11px] text-[#94a3b8] uppercase tracking-wider">Action</th>
+              </tr>
+            </thead>
             <tbody id="disabled-admin-table-body" class="divide-y divide-gray-800/50"></tbody>
           </table>
         </div>
@@ -194,49 +183,8 @@
     </div>
   </main>
 
-  <div id="no-dept-modal" class="modal-overlay hidden">
-    <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
-      <div style="background:#f59e0b; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-yellow-500/20"><i data-lucide="alert-circle"></i></div>
-      <h2 class="text-white font-bold text-xl mb-3">No Department Found</h2>
-      <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Please create a department first before adding staff members.</p>
-      <div class="flex flex-col sm:flex-row gap-3">
-        <button onclick="closeModal('no-dept-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
-        <button onclick="closeModal('no-dept-modal'); openModal('new-dept-modal')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Create Now</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="delete-dept-modal" class="modal-overlay hidden">
-    <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
-      <div style="background:#ef4444; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-red-500/20"><i data-lucide="alert-circle"></i></div>
-      <h2 id="delete-dept-title" class="text-white font-bold text-xl mb-3">Delete Dept?</h2>
-      <p id="delete-dept-desc" class="text-[#94a3b8] text-sm mb-8 leading-relaxed"></p>
-      <div class="flex flex-col sm:flex-row gap-3">
-        <button onclick="closeModal('delete-dept-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
-        <button onclick="executeDeleteDept()" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Delete Everything</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="new-dept-modal" class="modal-overlay hidden">
-    <div class="border rounded-2xl p-6 sm:p-8 w-full sm:max-w-[400px] shadow-2xl text-left max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
-      <h2 class="text-white font-bold text-xl mb-6 flex items-center gap-2"><i data-lucide="folder-plus" class="text-blue-500"></i> Create New Department</h2>
-      <div class="space-y-4">
-        <div>
-          <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Department Name <span class="text-red-500">*</span></label>
-          <input type="text" id="new-dept-name" placeholder="e.g. Water Management" class="modal-input text-sm" oninput="clearError('new-dept-name', 'dept-error')">
-          <p id="dept-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p>
-        </div>
-      </div>
-      <div class="flex flex-col sm:flex-row justify-end gap-3 mt-8">
-        <button onclick="clearAndCloseDept()" class="px-5 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-2.5 rounded-xl text-sm transition-colors w-full sm:w-auto">Cancel</button>
-        <button onclick="validateCreateDept()" class="px-5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg w-full sm:w-auto">Create Department</button>
-      </div>
-    </div>
-  </div>
-  
   <div id="add-staff-modal" class="modal-overlay hidden">
-    <div class="border rounded-2xl p-6 sm:p-8 w-full sm:max-w-[450px] shadow-2xl text-left max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
+    <div class="border rounded-2xl p-6 sm:p-8 w-full sm:max-w-[450px] shadow-2xl text-left" style="background:var(--surface); border-color:var(--border)">
       <h2 class="text-white font-bold text-xl mb-6 flex items-center gap-2"><i data-lucide="user-plus" class="text-blue-500"></i> Add New Staff</h2>
       <div class="space-y-5">
         <div>
@@ -247,12 +195,17 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">ID Number <span class="text-red-500">*</span></label>
-            <input type="text" id="staff-id" placeholder="EMP-12345" class="modal-input text-sm" oninput="clearError('staff-id', 'id-error')">
+            <input type="text" id="staff-id" placeholder="2023XXXXXX" class="modal-input text-sm" oninput="clearError('staff-id', 'id-error')">
             <p id="id-error" class="text-[10px] text-red-500 hidden mt-1">Required</p>
           </div>
           <div>
             <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Department <span class="text-red-500">*</span></label>
-            <select id="staff-dept" class="modal-input text-sm cursor-pointer" onchange="clearError('staff-dept', 'dept-select-error')"></select>
+            <select id="staff-dept" class="modal-input text-sm cursor-pointer" onchange="clearError('staff-dept', 'dept-select-error')">
+                <option value="" disabled selected>Select Department</option>
+                <option value="Traffic">Traffic</option>
+                <option value="DRRMO">DRRMO</option>
+                <option value="Engineering">Engineering</option>
+            </select>
             <p id="dept-select-error" class="text-[10px] text-red-500 hidden mt-1">Required</p>
           </div>
         </div>
@@ -268,80 +221,66 @@
         </div>
       </div>
       <div class="flex flex-col sm:flex-row justify-end gap-3 mt-8">
-        <button onclick="clearAndCloseStaff()" class="px-5 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-2.5 rounded-xl text-sm transition-colors w-full sm:w-auto">Cancel</button>
-        <button onclick="validateAddStaff()" class="px-5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg w-full sm:w-auto">Create Account</button>
+        <button onclick="clearAndCloseStaff()" class="px-5 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">Cancel</button>
+        <button onclick="validateAddStaff()" class="px-5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg">Create Account</button>
       </div>
     </div>
   </div>
 
   <div id="confirm-staff-modal" class="modal-overlay hidden">
-    <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
-      <div style="background:#3b82f6; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-blue-500/20"><i data-lucide="user-plus"></i></div>
-      <h2 class="text-white font-bold text-xl mb-3">Confirm Staff?</h2>
-      <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Add this account to the system?</p>
+    <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
+      <div style="background:#3b82f6; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg"><i data-lucide="user-plus"></i></div>
+      <h2 class="text-white font-bold text-xl mb-3">Sync to MongoDB?</h2>
+      <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Add this account to the administrators collection?</p>
       <div class="flex flex-col sm:flex-row gap-3">
-        <button onclick="closeModal('confirm-staff-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
-        <button onclick="executeAddStaff()" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Confirm</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="confirm-dept-modal" class="modal-overlay hidden">
-    <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
-      <div style="background:#3b82f6; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-blue-500/20"><i data-lucide="folder-plus"></i></div>
-      <h2 class="text-white font-bold text-xl mb-3">Create Dept?</h2>
-      <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Confirm adding this department?</p>
-      <div class="flex flex-col sm:flex-row gap-3">
-        <button onclick="closeModal('confirm-dept-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
-        <button onclick="executeCreateDept()" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Confirm</button>
+        <button onclick="closeModal('confirm-staff-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
+        <button onclick="executeAddStaff()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm shadow-sm transition-all">Confirm Sync</button>
       </div>
     </div>
   </div>
   
   <div id="disable-modal" class="modal-overlay hidden">
-    <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
+    <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
       <div style="background:#ef4444; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-red-500/20"><i data-lucide="shield-off"></i></div>
       <h2 id="disable-title" class="text-white font-bold text-xl mb-3">Disable user?</h2>
-      <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Revoke system access?</p>
+      <p class="text-[#94a3b8] text-sm mb-8">Revoke system access for this account?</p>
       <div class="flex flex-col sm:flex-row gap-3">
-        <button onclick="cancelStatusChange()" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
-        <button onclick="confirmStatusChange(false)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Disable Access</button>
+        <button onclick="cancelStatusChange()" class="flex-1 bg-[#1e2536] border border-[#374151] text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
+        <button onclick="confirmStatusChange(false)" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Disable Access</button>
       </div>
     </div>
   </div>
 
   <div id="enable-modal" class="modal-overlay hidden">
-    <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
+    <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
       <div style="background:#22c55e; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-green-500/20"><i data-lucide="shield-check"></i></div>
       <h2 id="enable-title" class="text-white font-bold text-xl mb-3">Enable user?</h2>
-      <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Restore system access?</p>
+      <p class="text-[#94a3b8] text-sm mb-8">Restore system access for this account?</p>
       <div class="flex flex-col sm:flex-row gap-3">
-        <button onclick="cancelStatusChange()" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
-        <button onclick="confirmStatusChange(true)" class="flex-1 bg-transparent border border-green-500 hover:bg-green-500/10 text-green-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Enable Access</button>
+        <button onclick="cancelStatusChange()" class="flex-1 bg-[#1e2536] border border-[#374151] text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
+        <button onclick="confirmStatusChange(true)" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Enable Access</button>
       </div>
     </div>
   </div>
 
   <div id="confirm-delete-user-modal" class="modal-overlay hidden">
-    <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
+    <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)">
       <div style="background:#ef4444; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-red-500/20"><i data-lucide="trash-2"></i></div>
-      <h2 class="text-white font-bold text-xl mb-3">Delete Account Permanently?</h2>
+      <h2 class="text-white font-bold text-xl mb-3">Delete Permanently?</h2>
       <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to delete <span id="delete-user-name" class="font-bold text-white"></span>? This action cannot be undone.</p>
       <div class="flex flex-col sm:flex-row gap-3">
-        <button onclick="closeModal('confirm-delete-user-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
-        <button onclick="executeDeleteUser()" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm border-transparent">Delete</button>
+        <button onclick="closeModal('confirm-delete-user-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
+        <button onclick="executeDeleteUser()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Delete Forever</button>
       </div>
     </div>
   </div>
 
   <script src="js/app.js"></script>
   <script>
-    // Ensure icons load on the page
     document.addEventListener('DOMContentLoaded', () => { 
         if (window.lucide) lucide.createIcons(); 
     });
 
-    // Handle Mobile Sidebar Toggle securely without touching app.js
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
