@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en" class="h-full">
 <head>
+<<<<<<< Updated upstream
+=======
+  <script>
+    (function() {
+        const session = localStorage.getItem('activeDepartment');
+        if (!session) window.location.replace('admin.html?error=unauthorized'); 
+    })();
+  </script>
+>>>>>>> Stashed changes
   <meta charset="UTF-8">
   <script>
         (function() {
@@ -13,11 +22,16 @@
     </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BEAT - Traffic and Road Control</title>
+<<<<<<< Updated upstream
+=======
+  
+>>>>>>> Stashed changes
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
   <style>
+<<<<<<< Updated upstream
     body { font-family: 'DM Sans', sans-serif !important; overflow: hidden; }
     
     /* SIDEBAR */
@@ -84,12 +98,47 @@
     .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
     input:checked + .slider { background-color: #22c55e; }
     input:checked + .slider:before { transform: translateX(18px); }
+=======
+    /* Active Red Marker */
+    .hazard-marker-active {
+        width: 24px; height: 24px; background-color: #ef4444; border: 3px solid white; border-radius: 50%; 
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); animation: pulse-red 2s infinite; cursor: pointer;
+    }
+    @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239,68,68, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(239,68,68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68, 0); } }
+
+    /* Mapbox Popup Overrides */
+    .mapboxgl-popup-content { background: #1e293b !important; color: white !important; border: 1px solid #ef4444; border-radius: 8px; padding: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 220px; }
+    .mapboxgl-popup-tip { border-top-color: #1e293b !important; border-bottom-color: #1e293b !important; }
+    .mapboxgl-popup-close-button { color: #94a3b8; font-size: 16px; top: 4px; right: 8px; }
+    .mapboxgl-popup-close-button:hover { color: white; background: transparent; }
+>>>>>>> Stashed changes
   </style>
 </head>
 
 <body class="h-full flex bg-[#0a0e1a]">
+<<<<<<< Updated upstream
 
   <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
+=======
+  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-50">
+    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
+      <div class="flex items-center gap-3">
+        <div class="logo-box">B</div>
+        <div class="flex flex-col justify-center">
+          <div class="logo-text font-bold text-white">BEAT</div>
+          <div class="sidebar-subtext">Department Portal</div>
+        </div>
+      </div>
+    </div>
+    
+    <nav class="flex-1 py-4 overflow-y-auto">
+      <a href="dashboard2.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+      <a href="reports2.html" class="sidebar-item"><i data-lucide="file-text"></i><span>Public Reports</span></a>
+      <a href="announcements2.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+      <a href="traffic.html" class="sidebar-item active"><i data-lucide="car"></i><span>Traffic & Detour Control</span></a>
+      <a href="accident.html" class="sidebar-item"><i data-lucide="map"></i><span>Accident Heatmap</span></a>
+    </nav>
+>>>>>>> Stashed changes
 
   <aside id="sidebar" class="sidebar flex flex-col h-full absolute lg:relative z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300" style="background:var(--surface); border-right: 1px solid var(--border)">
     <div class="h-[76px] px-5 flex items-center border-b shrink-0" style="border-color:var(--border)">
@@ -114,6 +163,7 @@
     </nav>
     <div class="user-footer">
         <div class="flex items-center justify-between mb-5">
+<<<<<<< Updated upstream
             <div class="flex items-center gap-3">
                 <div id="nav-avatar" style="background:#2563eb; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">M</div>
                 <div>
@@ -126,11 +176,18 @@
         <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
             <i data-lucide="log-out" style="width:16px; height:16px"></i> Logout
         </button>
+=======
+            <div class="flex items-center gap-3"><div id="nav-avatar" class="nav-avatar">T</div><div><div class="user-footer-name">Traffic</div><div class="user-footer-sub">Traffic Department</div></div></div>
+            <a href="profile2.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
+        </div>
+        <button type="button" onclick="doLogout()" class="btn-logout"><i data-lucide="log-out" class="icon-sm"></i> Logout</button>
+>>>>>>> Stashed changes
     </div>
   </aside>
 
   <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] relative overflow-y-auto">
     
+<<<<<<< Updated upstream
     <header class="h-[76px] px-4 sm:px-8 flex items-center justify-between border-b shrink-0" style="border-color:var(--border); background:var(--surface)">
       <div class="flex items-center gap-3">
         <button class="lg:hidden text-gray-400 hover:text-white" onclick="toggleSidebar()">
@@ -201,6 +258,22 @@
                 <div class="flex justify-between text-[11px] mb-1">
                   <span class="text-blue-400 font-bold">ACCIDENT</span>
                   <span class="text-gray-500">2m ago</span>
+=======
+    <div class="absolute top-6 left-6 z-10 w-96 flex flex-col gap-4 max-h-[90vh]">
+        <div class="theme-surface border theme-border rounded-2xl p-6 shadow-2xl backdrop-blur-md bg-opacity-95 flex-shrink-0">
+            <div class="flex items-center justify-between mb-1">
+                <h2 class="text-white font-bold text-lg flex items-center gap-2"><i data-lucide="shield-alert" class="text-[#ef4444]"></i> Network Control Ops</h2>
+            </div>
+            <p class="text-[11px] text-[#94a3b8] mb-6">Draw and broadcast blockades. These will reflect instantly on the main network.</p>
+            
+            <div class="space-y-4">
+                <div class="p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative">
+                    <div class="absolute -left-3 -top-3 w-6 h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">1</div>
+                    <button type="button" id="btn-draw-hazard" class="w-full bg-[#1e293b] hover:bg-gray-700 text-[#ef4444] hover:text-white text-sm font-bold py-2.5 rounded-lg border border-[#ef4444]/50 transition-all flex justify-center items-center gap-2">
+                        <i data-lucide="pen-tool" class="w-4 h-4"></i> Draw Blocked Area (Polygon)
+                    </button>
+                    <p id="draw-status" class="text-[10px] text-[#ef4444] mt-2 text-center font-bold tracking-wider hidden">Drawing Active: Click map to draw polygon, double click to finish.</p>
+>>>>>>> Stashed changes
                 </div>
                 <p class="text-xs text-white leading-relaxed">Minor fender bender at Crossing. Expect delays.</p>
               </div>
@@ -213,6 +286,7 @@
                 <p class="text-xs text-white leading-relaxed">Road repairs near University gate, lane closed.</p>
               </div>
 
+<<<<<<< Updated upstream
               <div class="report-card p-3 rounded-lg">
                 <div class="flex justify-between text-[11px] mb-1">
                   <span class="text-green-400 font-bold">CLEAR</span>
@@ -220,11 +294,32 @@
                 </div>
                 <p class="text-xs text-white leading-relaxed">Bypass road now clear of previous debris.</p>
               </div>
+=======
+                <div class="p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative opacity-50 transition-opacity" id="step-2-box">
+                    <div class="absolute -left-3 -top-3 w-6 h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">2</div>
+                    <div class="space-y-3">
+                        <input type="text" id="hazard-title" placeholder="Incident Title (e.g., Major Collision)" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2 text-sm outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
+                        <input type="text" id="hazard-desc" placeholder="Incident Details (e.g., 2 lanes closed)" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2 text-sm outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
+                        <button type="button" id="btn-broadcast" disabled class="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2.5 rounded-lg shadow-lg transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i data-lucide="upload-cloud" class="w-4 h-4"></i> Broadcast to Main Map
+                        </button>
+                    </div>
+                </div>
+>>>>>>> Stashed changes
             </div>
           </div>
         </div>
 
+<<<<<<< Updated upstream
       </div>
+=======
+        <div class="theme-surface border theme-border rounded-2xl p-4 shadow-2xl flex-1 overflow-hidden flex flex-col hidden" id="active-incidents-container">
+            <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-3 flex items-center justify-between">
+                Active Operations <span id="op-count" class="bg-red-500 text-white px-2 py-0.5 rounded-full text-[10px]">0</span>
+            </h3>
+            <div id="incidents-list" class="space-y-3 overflow-y-auto pr-2 pb-2"></div>
+        </div>
+>>>>>>> Stashed changes
     </div>
 
     <div id="newEntryModal" class="modal-overlay hidden">
@@ -279,6 +374,7 @@
 
   <script src="js/app.js"></script>
   <script>
+<<<<<<< Updated upstream
     // Handle Mobile Sidebar Toggle
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
@@ -547,6 +643,240 @@
         closeModal();
       });
     });
+=======
+    document.addEventListener("DOMContentLoaded", function() {
+        if(window.lucide) lucide.createIcons();
+
+        mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag';
+        const map = new mapboxgl.Map({
+            container: 'map', style: 'mapbox://styles/mapbox/dark-v11', center: [121.0700, 14.5700], zoom: 13.5, pitch: 45
+        });
+
+        // FIXED: Draw tools configured to show polygon fill, polygon stroke, AND active rubberband line in Red
+        const draw = new MapboxDraw({
+            displayControlsDefault: false,
+            defaultMode: 'simple_select',
+            styles: [
+                {
+                    'id': 'gl-draw-polygon-fill-active', 'type': 'fill', 'filter': ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+                    'paint': { 'fill-color': '#ef4444', 'fill-opacity': 0.3 }
+                },
+                {
+                    'id': 'gl-draw-polygon-stroke-active', 'type': 'line', 'filter': ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+                    'paint': { 'line-color': '#ef4444', 'line-dasharray': [2, 2], 'line-width': 2 }
+                },
+                {
+                    'id': 'gl-draw-line-active', 'type': 'line', 'filter': ['all', ['==', '$type', 'LineString'], ['!=', 'mode', 'static']],
+                    'paint': { 'line-color': '#ef4444', 'line-dasharray': [2, 2], 'line-width': 2 }
+                },
+                {
+                    'id': 'gl-draw-polygon-fill-static', 'type': 'fill', 'filter': ['all', ['==', '$type', 'Polygon'], ['==', 'mode', 'static']],
+                    'paint': { 'fill-color': '#ef4444', 'fill-opacity': 0.3 }
+                },
+                {
+                    'id': 'gl-draw-polygon-stroke-static', 'type': 'line', 'filter': ['all', ['==', '$type', 'Polygon'], ['==', 'mode', 'static']],
+                    'paint': { 'line-color': '#ef4444', 'line-width': 2 }
+                },
+                {
+                    'id': 'gl-draw-point-active', 'type': 'circle', 'filter': ['all', ['==', '$type', 'Point'], ['!=', 'mode', 'static']],
+                    'paint': { 'circle-radius': 4, 'circle-color': '#ef4444' }
+                }
+            ]
+        });
+        map.addControl(draw);
+
+        let activeHazards = JSON.parse(localStorage.getItem('beat_live_hazards')) || [];
+        let mapMarkers = {}; 
+        
+        let currentDrawnLine = null;
+
+        map.on('load', () => {
+            // Live Traffic
+            map.addSource('live-traffic', { type: 'vector', url: 'mapbox://mapbox.mapbox-traffic-v1' });
+            map.addLayer({
+                'id': 'traffic-lines', 'type': 'line', 'source': 'live-traffic', 'source-layer': 'traffic',
+                'paint': { 'line-width': 3, 'line-color': [ 'match', ['get', 'congestion'], 'low', '#4ade80', 'moderate', '#facc15', 'heavy', '#f87171', 'severe', '#334155', 'transparent' ]}
+            });
+
+            // Active Zone Layer (Solid Fill and Dashed Line in Red)
+            map.addSource('active-zones', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+            map.addLayer({ 
+                'id': 'active-zones-fill', 'type': 'fill', 'source': 'active-zones', 
+                'paint': { 'fill-color': '#ef4444', 'fill-opacity': 0.25 } 
+            });
+            map.addLayer({ 
+                'id': 'active-zones-stroke', 'type': 'line', 'source': 'active-zones', 
+                'paint': { 'line-color': '#ef4444', 'line-width': 3, 'line-dasharray': [2, 2] } 
+            });
+
+            renderHazards();
+        });
+
+        document.getElementById('btn-draw-hazard').addEventListener('click', (e) => {
+            draw.deleteAll();
+            
+            draw.changeMode('draw_polygon');
+            e.currentTarget.innerHTML = '<i data-lucide="crosshair" class="w-4 h-4 animate-pulse"></i> Drawing...';
+            document.getElementById('draw-status').classList.remove('hidden');
+            
+            document.getElementById('btn-broadcast').disabled = true;
+            document.getElementById('step-2-box').classList.add('opacity-50');
+            lucide.createIcons();
+        });
+
+        map.on('draw.create', (e) => {
+            currentDrawnLine = e.features[0];
+            document.getElementById('draw-status').classList.add('hidden');
+            document.getElementById('btn-draw-hazard').innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Area Drawn';
+            
+            document.getElementById('step-2-box').classList.remove('opacity-50');
+            document.getElementById('btn-broadcast').disabled = false;
+            lucide.createIcons();
+        });
+
+        document.getElementById('btn-broadcast').addEventListener('click', () => {
+            if(!currentDrawnLine) return;
+
+            const title = document.getElementById('hazard-title').value || 'Road Hazard';
+            const desc = document.getElementById('hazard-desc').value || 'Area blocked.';
+            const center = turf.center(currentDrawnLine).geometry.coordinates;
+            
+            const newIncident = {
+                id: 'inc_' + Date.now(),
+                title: title,
+                desc: desc,
+                center: center,
+                dangerZone: currentDrawnLine, 
+                status: 'active', // Direct to ACTIVE
+                timestamp: new Date().toLocaleTimeString()
+            };
+
+            activeHazards.push(newIncident);
+            localStorage.setItem('beat_live_hazards', JSON.stringify(activeHazards));
+
+            // Reset UI completely
+            draw.deleteAll();
+            currentDrawnLine = null;
+            
+            document.getElementById('hazard-title').value = '';
+            document.getElementById('hazard-desc').value = '';
+            document.getElementById('btn-draw-hazard').innerHTML = '<i data-lucide="pen-tool" class="w-4 h-4"></i> Draw Blocked Area (Polygon)';
+            
+            document.getElementById('btn-broadcast').disabled = true;
+            document.getElementById('step-2-box').classList.add('opacity-50');
+            
+            renderHazards();
+        });
+
+        function renderHazards() {
+            if(!map.getSource('active-zones')) return; 
+
+            const listContainer = document.getElementById('incidents-list');
+            const mainContainer = document.getElementById('active-incidents-container');
+            listContainer.innerHTML = '';
+            
+            Object.values(mapMarkers).forEach(m => m.remove());
+            mapMarkers = {};
+            let zoneFeatures = [];
+
+            // Filter out weather/DRRMO alerts to only show Traffic operations
+            const trafficHazards = activeHazards.filter(h => h.source !== 'weather');
+
+            document.getElementById('op-count').innerText = trafficHazards.length;
+            if(trafficHazards.length > 0) mainContainer.classList.remove('hidden');
+            else mainContainer.classList.add('hidden');
+
+            trafficHazards.forEach(incident => {
+                // UI List Item (Direct Resolve capability)
+                listContainer.innerHTML += `
+                    <div class="bg-[#0f172a] border border-gray-700 p-3 rounded-xl border-l-4 border-l-red-500">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="text-white text-sm font-bold">${incident.title}</h4>
+                            <button onclick="resolveIncident('${incident.id}')" class="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30 text-[10px] px-2 py-1 rounded transition-colors font-bold">Resolve</button>
+                        </div>
+                        <div class="flex items-center gap-2 text-[10px] uppercase font-bold tracking-wider mt-2">
+                            <span class="text-red-400 bg-red-500/10 px-2 py-0.5 rounded text-center border border-red-500/20">ACTIVE BLOCKADE</span>
+                        </div>
+                    </div>
+                `;
+
+                const el = document.createElement('div'); el.className = 'hazard-marker-active';
+                const popupHTML = `
+                    <div class="pb-1 mb-1 border-b border-gray-600"><span class="text-[10px] font-bold uppercase tracking-widest text-[#94a3b8]">Live Ops</span></div>
+                    <h3 class="font-bold text-white text-sm mb-1">${incident.title}</h3>
+                    <p class="text-[10px] text-gray-300 leading-snug mb-2">${incident.desc}</p>
+                    <div class="flex flex-col gap-1 mt-2 text-[9px] font-bold tracking-wider">
+                        <span class="text-red-400 bg-red-500/10 px-2 py-1 rounded text-center border border-red-500/20">ACTIVE BLOCKADE</span>
+                    </div>
+                `;
+                
+                const popup = new mapboxgl.Popup({ offset: 25, closeButton: true, closeOnClick: false }).setHTML(popupHTML);
+                const marker = new mapboxgl.Marker(el).setLngLat(incident.center).setPopup(popup).addTo(map);
+                marker.togglePopup(); // Opens Automatically
+                mapMarkers[incident.id] = marker;
+
+                if (incident.dangerZone) zoneFeatures.push(incident.dangerZone);
+            });
+
+            map.getSource('active-zones').setData({ type: 'FeatureCollection', features: zoneFeatures });
+            lucide.createIcons();
+        }
+
+        // Global Resolve Function
+        window.resolveIncident = function(id) {
+            activeHazards = activeHazards.filter(h => h.id !== id);
+            localStorage.setItem('beat_live_hazards', JSON.stringify(activeHazards));
+            renderHazards();
+        };
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'beat_live_hazards') {
+                activeHazards = JSON.parse(e.newValue) || [];
+                renderHazards();
+            }
+        });
+
+        const barangayData = {
+            'bagong-ilog': { center: [121.0669, 14.5670], zoom: 15 },
+            'bagong-katipunan': { center: [121.0760, 14.5610], zoom: 15.5 },
+            'bambang': { center: [121.0820, 14.5570], zoom: 15.5 },
+            'buting': { center: [121.0680, 14.5550], zoom: 15.5 },
+            'caniogan': { center: [121.0810, 14.5680], zoom: 15 },
+            'dela-paz': { center: [121.1000, 14.6180], zoom: 15 },
+            'kalawaan': { center: [121.0830, 14.5500], zoom: 15 },
+            'kapasigan': { center: [121.0770, 14.5630], zoom: 15.5 },
+            'kapitolyo': { center: [121.0590, 14.5710], zoom: 15.5 },
+            'malinao': { center: [121.0780, 14.5600], zoom: 15.5 },
+            'manggahan': { center: [121.0960, 14.6060], zoom: 14.5 },
+            'maybunga': { center: [121.0880, 14.5800], zoom: 15 },
+            'oranbo': { center: [121.0620, 14.5760], zoom: 15.5 },
+            'palatiw': { center: [121.0860, 14.5620], zoom: 15.5 },
+            'pinagbuhatan': { center: [121.0920, 14.5520], zoom: 14.5 },
+            'pineda': { center: [121.0600, 14.5640], zoom: 15.5 },
+            'rosario': { center: [121.0880, 14.5900], zoom: 14.5 },
+            'sagad': { center: [121.0780, 14.5660], zoom: 15.5 },
+            'san-antonio': { center: [121.0630, 14.5830], zoom: 15.5 },
+            'san-joaquin': { center: [121.0760, 14.5510], zoom: 15.5 },
+            'san-jose': { center: [121.0750, 14.5630], zoom: 15.5 },
+            'san-miguel': { center: [121.0930, 14.5730], zoom: 15.5 },
+            'san-nicolas': { center: [121.0780, 14.5580], zoom: 15.5 },
+            'santa-cruz': { center: [121.0790, 14.5600], zoom: 15.5 },
+            'santa-lucia': { center: [121.1010, 14.5840], zoom: 15 },
+            'santa-rosa': { center: [121.0730, 14.5600], zoom: 15.5 },
+            'santo-tomas': { center: [121.0800, 14.5580], zoom: 15.5 },
+            'santolan': { center: [121.0850, 14.6150], zoom: 15 },
+            'sumilang': { center: [121.0730, 14.5580], zoom: 15.5 },
+            'ugong': { center: [121.0750, 14.5850], zoom: 14.5 }
+        };
+
+        window.zoomToBarangay = function(val) {
+            if (!val) { map.flyTo({ center: [121.0700, 14.5700], zoom: 13.5, pitch: 45 }); return; }
+            map.flyTo({ center: barangayData[val].center, zoom: barangayData[val].zoom, pitch: 60 });
+        };
+    });
+
+    function doLogout() { localStorage.removeItem('activeDepartment'); window.location.href = 'admin.html'; }
+>>>>>>> Stashed changes
   </script>
 </body>
 </html>

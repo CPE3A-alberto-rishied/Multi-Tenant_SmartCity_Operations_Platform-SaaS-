@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en" class="h-full">
 <head>
+<<<<<<< Updated upstream
+=======
+  <script>
+    (function() {
+        const session = localStorage.getItem('activeDepartment');
+        if (!session || session !== 'Main Admin') window.location.replace('admin.html?error=unauthorized'); 
+    })();
+  </script>
+>>>>>>> Stashed changes
   <meta charset="UTF-8">
   <script>
         (function() {
@@ -24,8 +33,12 @@
   <style>
     body { font-family: 'DM Sans', sans-serif !important; overflow: hidden; background-color: #0a0e1a; }
     
+<<<<<<< Updated upstream
     /* EXACT COPY FROM PROFILE.HTML */
     .sidebar { width: 260px !important; flex-shrink: 0 !important; background: var(--surface); }
+=======
+    .sidebar { width: 260px !important; flex-shrink: 0 !important; background: var(--surface); border-right: 1px solid var(--border); }
+>>>>>>> Stashed changes
     .sidebar-item { display: flex !important; align-items: center !important; gap: 12px !important; padding: 12px 18px !important; font-size: 14.5px !important; font-weight: 500 !important; color: #94a3b8 !important; text-decoration: none !important; border-left: 3px solid transparent !important; }
     .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
     .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
@@ -34,8 +47,8 @@
     .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
     .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
     .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
-    .settings-link { color: #3b82f6; transition: color 0.2s; display: flex; align-items: center; } 
     
+<<<<<<< Updated upstream
     .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
 
     /* Map wrapper fix: Ensuring absolute parent has flex-grow */
@@ -45,10 +58,47 @@
     /* UI Overlays */
     .map-overlay-panel { position: absolute; top: 20px; left: 20px; z-index: 10; width: 280px; background: rgba(10, 22, 40, 0.95); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
     .barangay-select { width: 100%; background: #1e2536; border: 1px solid #374151; color: white; padding: 10px; border-radius: 8px; font-family: 'Barlow Condensed'; text-transform: uppercase; outline: none; }
+=======
+    .map-wrapper { position: relative; flex-grow: 1; width: 100%; height: 100%; background: #070d19; overflow: hidden; }
+    #map { position: absolute; top: 0; bottom: 0; left: 0; right: 0; z-index: 1; }
+
+    .map-overlay-panel { position: absolute; top: 20px; left: 20px; z-index: 10; width: 340px; background: rgba(10, 22, 40, 0.95); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 12px; padding: 20px; max-h: 90vh; overflow-y: auto; }
+    .barangay-select { width: 100%; background: #1e2536; border: 1px solid #374151; color: white; padding: 10px; border-radius: 8px; font-family: 'Barlow Condensed'; text-transform: uppercase; outline: none; transition: border-color 0.2s; cursor: pointer; }
+>>>>>>> Stashed changes
     .map-legend { position: absolute; bottom: 30px; right: 20px; z-index: 10; background: rgba(10, 22, 40, 0.95); border: 1px solid var(--border); border-radius: 8px; padding: 15px; display: grid; gap: 8px; }
     .legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.75rem; color: white; font-family: 'Barlow Condensed'; text-transform: uppercase; }
     .dot { width: 10px; height: 10px; border-radius: 50%; }
     .section-label { color: #94a3b8; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+<<<<<<< Updated upstream
+=======
+
+    /* Status-Based Markers */
+    .hazard-marker-pending { width: 24px; height: 24px; background-color: #f59e0b; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 20px rgba(245, 158, 11, 0.8); animation: pulse-amber 2s infinite; cursor: pointer; }
+    @keyframes pulse-amber { 0% { box-shadow: 0 0 0 0 rgba(245,158,11, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(245,158,11, 0); } 100% { box-shadow: 0 0 0 0 rgba(245,158,11, 0); } }
+
+    .hazard-marker-active { width: 24px; height: 24px; background-color: #ef4444; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); animation: pulse-red 2s infinite; cursor: pointer; }
+    @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239,68,68, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(239,68,68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68, 0); } }
+
+    .weather-marker-active { width: 24px; height: 24px; background-color: #f97316; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 20px rgba(249, 115, 22, 0.8); animation: pulse-orange 2s infinite; cursor: pointer; }
+    @keyframes pulse-orange { 0% { box-shadow: 0 0 0 0 rgba(249,115,22, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(249,115,22, 0); } 100% { box-shadow: 0 0 0 0 rgba(249,115,22, 0); } }
+
+    /* Custom Blue Marker for DRRMO Area Drawing */
+    .weather-blue-marker { width: 20px; height: 20px; background-color: #3b82f6; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); animation: pulse-blue 2s infinite; cursor: pointer; }
+    @keyframes pulse-blue { 0% { box-shadow: 0 0 0 0 rgba(59,130,246, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(59,130,246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59,130,246, 0); } }
+
+    /* Custom Popup Colors */
+    .popup-traffic .mapboxgl-popup-content { background: #1e293b !important; color: white !important; border: 1px solid #ef4444; border-radius: 8px; padding: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 240px; }
+    .popup-traffic .mapboxgl-popup-tip { border-top-color: #1e293b !important; border-bottom-color: #1e293b !important; }
+    
+    .popup-weather .mapboxgl-popup-content { background: #1e293b !important; color: white !important; border: 1px solid #f97316; border-radius: 8px; padding: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 260px; }
+    .popup-weather .mapboxgl-popup-tip { border-top-color: #1e293b !important; border-bottom-color: #1e293b !important; }
+
+    .popup-blue .mapboxgl-popup-content { background: #1e293b !important; color: white !important; border: 1px solid #3b82f6; border-radius: 8px; padding: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 220px; }
+    .popup-blue .mapboxgl-popup-tip { border-top-color: #1e293b !important; border-bottom-color: #1e293b !important; }
+
+    .mapboxgl-popup-close-button { color: #94a3b8; font-size: 16px; top: 4px; right: 8px; }
+    .mapboxgl-popup-close-button:hover { color: white; background: transparent; }
+>>>>>>> Stashed changes
   </style>
 </head>
 <body class="h-full flex">
@@ -57,6 +107,7 @@
 
   <aside id="sidebar" class="sidebar flex flex-col h-full absolute lg:relative z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300" style="background:var(--surface); border-right: 1px solid var(--border)">
     <div class="h-[76px] px-5 flex items-center border-b shrink-0" style="border-color:var(--border)">
+<<<<<<< Updated upstream
       <div class="flex items-center gap-3">
         <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
         <div class="flex flex-col justify-center">
@@ -67,6 +118,16 @@
       <button class="lg:hidden ml-auto text-gray-400 hover:text-white" onclick="toggleSidebar()">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
+=======
+      <div class="flex items-center gap-0.5">
+        <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
+        <div class="flex flex-col justify-center ml-2">
+          <div class="logo-text font-bold text-lg text-white leading-none mb-1">BEAT</div>
+          <div style="color:var(--text-dim); font-size:11px" class="leading-none">Admin Control Center</div>
+        </div>
+      </div>
+      <button class="lg:hidden ml-auto text-gray-400 hover:text-white" onclick="toggleSidebar()"><i data-lucide="x" class="w-5 h-5"></i></button>
+>>>>>>> Stashed changes
     </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
@@ -96,12 +157,15 @@
     
   </aside>
 
+<<<<<<< Updated upstream
   <main class="flex-1 flex flex-col min-w-0">
     <header class="w-full px-4 sm:px-8 h-[76px] flex items-center border-b shrink-0" style="border-color:var(--border);background:var(--surface)">
       <button class="lg:hidden text-gray-400 hover:text-white mr-4" onclick="toggleSidebar()">
         <i data-lucide="menu" class="w-6 h-6"></i>
       </button>
       <h1 class="text-xl font-semibold text-white flex items-center gap-2"><i data-lucide="map" class="text-[#94a3b8] w-6 h-6"></i>Maps</h1>
+=======
+>>>>>>> Stashed changes
     </header>
 
     <div class="map-wrapper">
@@ -125,9 +189,22 @@
             </select>
             <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;">
                 <div class="flex justify-between items-center mb-2">
+<<<<<<< Updated upstream
                     <span class="text-[11px] text-[#94a3b8] font-bold uppercase tracking-wider">Patrols</span>
                     <span class="text-blue-500 font-bold font-mono text-sm">08</span>
                 </div>
+=======
+                    <span class="text-[11px] text-[#94a3b8] font-bold uppercase tracking-wider">Traffic Operations</span>
+                    <span id="traffic-count" class="text-red-500 font-bold font-mono text-sm">0</span>
+                </div>
+                <div id="traffic-incidents-list" class="space-y-3 pr-1 mt-2 max-h-[200px] overflow-y-auto"></div>
+
+                <div class="flex justify-between items-center mb-2 mt-4 pt-4 border-t border-gray-800">
+                    <span class="text-[11px] text-[#94a3b8] font-bold uppercase tracking-wider">Environmental Alerts</span>
+                    <span id="weather-count" class="text-blue-500 font-bold font-mono text-sm">0</span>
+                </div>
+                <div id="weather-incidents-list" class="space-y-3 pr-1 mt-2 max-h-[150px] overflow-y-auto"></div>
+>>>>>>> Stashed changes
             </div>
         </div>
 
@@ -135,6 +212,12 @@
             <div class="legend-item"><span class="dot" style="background: #4ade80;"></span> Smooth</div>
             <div class="legend-item"><span class="dot" style="background: #facc15;"></span> Moderate</div>
             <div class="legend-item"><span class="dot" style="background: #f87171;"></span> Heavy</div>
+<<<<<<< Updated upstream
+=======
+            <div class="section-label mt-2 mb-1 border-t border-gray-700 pt-2">Network Operations</div>
+            <div class="legend-item"><span class="dot" style="background: #ef4444; border: 1px dashed white;"></span> Blocked Area / Avoid</div>
+            <div class="legend-item"><span class="dot" style="background: #3b82f6; border: 1px dashed white;"></span> DRRMO Custom Zone</div>
+>>>>>>> Stashed changes
         </div>
     </div>
   </main>
@@ -158,7 +241,11 @@
         setTimeout(() => { clearInterval(resizeInterval); }, 2500);
 
         map.on('load', () => {
+<<<<<<< Updated upstream
             map.resize();
+=======
+            // Live Traffic Layer
+>>>>>>> Stashed changes
             map.addSource('live-traffic', { type: 'vector', url: 'mapbox://mapbox.mapbox-traffic-v1' });
             map.addLayer({
                 'id': 'traffic-lines', 'type': 'line', 'source': 'live-traffic', 'source-layer': 'traffic',
@@ -167,12 +254,215 @@
                     'line-color': [ 'match', ['get', 'congestion'], 'low', '#4ade80', 'moderate', '#facc15', 'heavy', '#f87171', 'severe', '#334155', 'transparent' ]
                 }
             });
+<<<<<<< Updated upstream
         });
 
         window.zoomToBarangay = function(val) {
             const barangayData = { 'bagong-ilog': [121.0689, 14.5652], 'kapasigan': [121.0741, 14.5644], 'kapitolyo': [121.0592, 14.5712] };
             if (!val) { map.flyTo({ center: [121.0825, 14.5764], zoom: 12.5 }); return; }
             map.flyTo({ center: barangayData[val] || [121.0825, 14.5764], zoom: 14.5, pitch: 60 });
+=======
+
+            // 1. Traffic Layer: Blocked Roads
+            map.addSource('synced-blocked-lines', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+            map.addLayer({ 'id': 'synced-blocked-stroke', 'type': 'line', 'source': 'synced-blocked-lines', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': ['match', ['get', 'status'], 'pending', '#f59e0b', 'active', '#ef4444', '#ef4444'], 'line-width': 6, 'line-dasharray': [2, 2] } });
+
+            // 2. Traffic Layer: Danger Zones
+            map.addSource('synced-danger-zones', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+            map.addLayer({ 'id': 'synced-danger-fill', 'type': 'fill', 'source': 'synced-danger-zones', 'paint': { 'fill-color': ['match', ['get', 'status'], 'pending', '#f59e0b', 'active', '#ef4444', '#ef4444'], 'fill-opacity': 0.25 } });
+            map.addLayer({ 'id': 'synced-danger-stroke', 'type': 'line', 'source': 'synced-danger-zones', 'paint': { 'line-color': ['match', ['get', 'status'], 'pending', '#f59e0b', 'active', '#ef4444', '#ef4444'], 'line-width': 3, 'line-dasharray': [2, 2] } });
+
+            // 3. DRRMO Custom Drawn Polygons (Blue)
+            map.addSource('synced-drrmo-drawn', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+            map.addLayer({ 'id': 'synced-drrmo-drawn-fill', 'type': 'fill', 'source': 'synced-drrmo-drawn', 'paint': { 'fill-color': '#3b82f6', 'fill-opacity': 0.3 } });
+            map.addLayer({ 'id': 'synced-drrmo-drawn-stroke', 'type': 'line', 'source': 'synced-drrmo-drawn', 'paint': { 'line-color': '#3b82f6', 'line-width': 3, 'line-dasharray': [2, 2] } });
+
+            renderLiveHazards();
+        });
+
+        function renderLiveHazards() {
+            if(!map.getSource('synced-blocked-lines')) return;
+
+            let hazards = JSON.parse(localStorage.getItem('beat_live_hazards')) || [];
+            let drrmoZones = JSON.parse(localStorage.getItem('beat_drrmo_zones')) || [];
+            
+            Object.values(mapObjects).forEach(obj => {
+                if(obj.marker) obj.marker.remove();
+                if(obj.popup) obj.popup.remove();
+            });
+            mapObjects = {};
+
+            const trafficList = document.getElementById('traffic-incidents-list');
+            const weatherList = document.getElementById('weather-incidents-list');
+            trafficList.innerHTML = '';
+            weatherList.innerHTML = '';
+
+            let trafficCount = 0, weatherCount = 0, pendingCount = 0;
+            let lineFeatures = [], dangerZoneFeatures = [], blueZoneFeatures = [];
+
+            // 1. Process Traffic Alerts (from beat_live_hazards)
+            const activeHazards = hazards.filter(h => h.status !== 'rejected');
+            activeHazards.forEach(hazard => {
+                if (hazard.source === 'weather') return; 
+
+                trafficCount++;
+                const isPending = hazard.status === 'pending';
+                const isActive = hazard.status === 'active';
+                if (isPending) pendingCount++;
+
+                let actionBtnHTML = '';
+                if (isPending) {
+                    actionBtnHTML = `
+                        <div class="flex gap-2 mt-3 pt-3 border-t border-gray-700">
+                            <button onclick="rejectIncident('${hazard.id}')" class="flex-1 border border-red-500/50 text-red-400 hover:bg-red-500/10 text-[10px] font-bold py-1.5 rounded transition-colors">REJECT</button>
+                            <button onclick="approveIncident('${hazard.id}')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold py-1.5 rounded shadow transition-colors">AUTHORIZE</button>
+                        </div>
+                    `;
+                }
+
+                const statusClass = isPending ? 'border-amber-500/50 border-l-amber-500' : 'border-red-500/30 border-l-red-500';
+                const markerClass = isPending ? 'hazard-marker-pending' : 'hazard-marker-active';
+                const badge = isPending ? '<span class="text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded text-[9px] border border-amber-500/20 font-bold uppercase tracking-wider">Requires HQ Approval</span>' : '<span class="text-white bg-red-600 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">ACTIVE BLOCKADE</span>';
+
+                if(trafficList) trafficList.innerHTML += `
+                    <div class="bg-[#1e2536] border p-3 rounded-lg border-l-4 ${statusClass} mb-3">
+                        <div class="flex justify-between items-start mb-1">
+                            <h4 class="text-white text-xs font-bold">${hazard.title}</h4>
+                        </div>
+                        <p class="text-[10px] text-gray-400 leading-tight mb-2">${hazard.desc}</p>
+                        ${badge}
+                        ${actionBtnHTML}
+                    </div>
+                `;
+
+                const el = document.createElement('div'); el.className = markerClass;
+                const popupHTML = `
+                    <div class="pb-1 mb-1 border-b border-gray-600 flex items-center gap-2"><i data-lucide="car" class="text-red-500 w-3 h-3"></i><span class="text-[10px] font-bold uppercase tracking-widest text-[#94a3b8]">TRAFFIC DEPT</span></div>
+                    <h3 class="font-bold text-white text-sm mb-1">${hazard.title}</h3>
+                    <p class="text-[10px] text-gray-300 leading-snug mb-2">${hazard.desc}</p>
+                    <div class="flex flex-col gap-1 mt-2 text-[9px] font-bold tracking-wider">
+                        <span class="text-[#ef4444] bg-[#ef4444]/10 px-2 py-1 rounded text-center border border-[#ef4444]/20">AVOID THIS AREA - OPERATION ONGOING</span>
+                    </div>
+                    ${actionBtnHTML}
+                `;
+                
+                const popup = new mapboxgl.Popup({ offset: 25, closeButton: true, closeOnClick: false, className: 'popup-traffic' }).setHTML(popupHTML);
+                const marker = new mapboxgl.Marker(el).setLngLat(hazard.center).setPopup(popup).addTo(map);
+                if(isActive || isPending) marker.togglePopup(); 
+                mapObjects[hazard.id] = { marker, popup };
+
+                if (hazard.blockedLine) { hazard.blockedLine.properties = { status: hazard.status }; lineFeatures.push(hazard.blockedLine); }
+                if (hazard.dangerZone) { hazard.dangerZone.properties = { status: hazard.status }; dangerZoneFeatures.push(hazard.dangerZone); }
+            });
+
+            // 2. Process DRRMO Mapped Polygons (from beat_drrmo_zones)
+            drrmoZones.forEach(zone => {
+                weatherCount++;
+                if(weatherList) weatherList.innerHTML += `
+                    <div class="bg-[#1e2536] border p-3 rounded-lg border-l-4 border-blue-500/50 border-l-blue-500 mb-3">
+                        <h4 class="text-white text-xs font-bold mb-1 truncate pr-2">${zone.title || zone.type}</h4>
+                        <p class="text-[10px] text-gray-400 leading-tight mb-2">${zone.desc}</p>
+                        <div class="flex items-center gap-2 mt-2">
+                            <span class="text-white bg-blue-600 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">MAPPED: ${zone.type}</span>
+                        </div>
+                    </div>
+                `;
+
+                const el = document.createElement('div'); el.className = `weather-blue-marker`;
+                const popupHTML = `
+                    <div class="pb-1 mb-1 border-b border-gray-600 flex items-center gap-2"><i data-lucide="map-pin" class="text-blue-500 w-3 h-3"></i><span class="text-[10px] font-bold uppercase tracking-widest text-[#94a3b8]">DRRMO ZONE</span></div>
+                    <h3 class="font-bold text-white text-sm mb-1">${zone.title || zone.type}</h3>
+                    <p class="text-[10px] text-gray-300 leading-snug mb-2">${zone.desc}</p>
+                    <div class="flex flex-col gap-1 mt-2 text-[9px] font-bold tracking-wider">
+                        <span class="text-white bg-blue-600 px-2 py-1 rounded text-center border border-blue-400/20">TYPE: ${zone.type.toUpperCase()}</span>
+                    </div>
+                `;
+                
+                const popup = new mapboxgl.Popup({ offset: 25, closeButton: true, closeOnClick: false, className: 'popup-blue' }).setHTML(popupHTML);
+                const marker = new mapboxgl.Marker(el).setLngLat(zone.center).setPopup(popup).addTo(map);
+                marker.togglePopup();
+                mapObjects['zone_' + zone.id] = { marker, popup };
+
+                blueZoneFeatures.push(zone.polygon);
+            });
+
+            document.getElementById('traffic-count').innerText = trafficCount;
+            document.getElementById('weather-count').innerText = weatherCount;
+            
+            const alertBanner = document.getElementById('pending-alert');
+            if (alertBanner) {
+                if (pendingCount > 0) alertBanner.classList.remove('hidden');
+                else alertBanner.classList.add('hidden');
+            }
+
+            map.getSource('synced-blocked-lines').setData({ 'type': 'FeatureCollection', 'features': lineFeatures });
+            map.getSource('synced-danger-zones').setData({ 'type': 'FeatureCollection', 'features': dangerZoneFeatures });
+            map.getSource('synced-drrmo-drawn').setData({ 'type': 'FeatureCollection', 'features': blueZoneFeatures });
+            
+            if (window.lucide) lucide.createIcons();
+        }
+
+        window.approveIncident = function(id) {
+            let hazards = JSON.parse(localStorage.getItem('beat_live_hazards')) || [];
+            let index = hazards.findIndex(h => h.id === id);
+            if (index > -1) {
+                hazards[index].status = 'active';
+                localStorage.setItem('beat_live_hazards', JSON.stringify(hazards));
+                renderLiveHazards();
+            }
+        };
+
+        window.rejectIncident = function(id) {
+            let hazards = JSON.parse(localStorage.getItem('beat_live_hazards')) || [];
+            let index = hazards.findIndex(h => h.id === id);
+            if (index > -1) {
+                hazards[index].status = 'rejected';
+                localStorage.setItem('beat_live_hazards', JSON.stringify(hazards));
+                renderLiveHazards();
+            }
+        };
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'beat_live_hazards' || e.key === 'beat_drrmo_zones') renderLiveHazards();
+        });
+
+        const barangayData = {
+            'bagong-ilog': { center: [121.0669, 14.5670], zoom: 15 },
+            'bagong-katipunan': { center: [121.0760, 14.5610], zoom: 15.5 },
+            'bambang': { center: [121.0820, 14.5570], zoom: 15.5 },
+            'buting': { center: [121.0680, 14.5550], zoom: 15.5 },
+            'caniogan': { center: [121.0810, 14.5680], zoom: 15 },
+            'dela-paz': { center: [121.1000, 14.6180], zoom: 15 },
+            'kalawaan': { center: [121.0830, 14.5500], zoom: 15 },
+            'kapasigan': { center: [121.0770, 14.5630], zoom: 15.5 },
+            'kapitolyo': { center: [121.0590, 14.5710], zoom: 15.5 },
+            'malinao': { center: [121.0780, 14.5600], zoom: 15.5 },
+            'manggahan': { center: [121.0960, 14.6060], zoom: 14.5 },
+            'maybunga': { center: [121.0880, 14.5800], zoom: 15 },
+            'oranbo': { center: [121.0620, 14.5760], zoom: 15.5 },
+            'palatiw': { center: [121.0860, 14.5620], zoom: 15.5 },
+            'pinagbuhatan': { center: [121.0920, 14.5520], zoom: 14.5 },
+            'pineda': { center: [121.0600, 14.5640], zoom: 15.5 },
+            'rosario': { center: [121.0880, 14.5900], zoom: 14.5 },
+            'sagad': { center: [121.0780, 14.5660], zoom: 15.5 },
+            'san-antonio': { center: [121.0630, 14.5830], zoom: 15.5 },
+            'san-joaquin': { center: [121.0760, 14.5510], zoom: 15.5 },
+            'san-jose': { center: [121.0750, 14.5630], zoom: 15.5 },
+            'san-miguel': { center: [121.0930, 14.5730], zoom: 15.5 },
+            'san-nicolas': { center: [121.0780, 14.5580], zoom: 15.5 },
+            'santa-cruz': { center: [121.0790, 14.5600], zoom: 15.5 },
+            'santa-lucia': { center: [121.1010, 14.5840], zoom: 15 },
+            'santa-rosa': { center: [121.0730, 14.5600], zoom: 15.5 },
+            'santo-tomas': { center: [121.0800, 14.5580], zoom: 15.5 },
+            'santolan': { center: [121.0850, 14.6150], zoom: 15 },
+            'sumilang': { center: [121.0730, 14.5580], zoom: 15.5 },
+            'ugong': { center: [121.0750, 14.5850], zoom: 14.5 }
+        };
+
+        window.zoomToBarangay = function(val) {
+            if (!val) { map.flyTo({ center: [121.0700, 14.5700], zoom: 12.5, pitch: 45 }); return; }
+            map.flyTo({ center: barangayData[val].center, zoom: barangayData[val].zoom, pitch: 60 });
+>>>>>>> Stashed changes
         };
     });
 
