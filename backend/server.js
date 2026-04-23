@@ -212,3 +212,13 @@ app.get('/api/announcements/all', async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 });
+
+// Delete Announcement Permanently (Admin Side)
+app.delete('/api/announcements/:id', async (req, res) => {
+    try {
+        await Announcement.findByIdAndDelete(req.params.id);
+        res.status(200).json({ success: true, message: 'Deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});

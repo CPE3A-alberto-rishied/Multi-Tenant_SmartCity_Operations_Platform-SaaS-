@@ -1194,7 +1194,7 @@ function triggerDelete(btn) {
     setupActionModal('alert-triangle', '#ef4444', 'shadow-red-500/20', 'Delete Permanently?', 'This action cannot be undone. The announcement will be completely erased.', 'Delete', 'bg-transparent border border-red-500 text-red-500 hover:bg-red-500/10');
 }
 
-// 3. UPDATED CARD ACTION: PUT STATUS TO MONGODB
+// 3. UPDATED CARD ACTION: PUT STATUS TO MONGODB OR DELETE
 async function executeCardAction() {
     closeModal('confirm-action-modal');
     if(!currentActionCard) return;
@@ -1205,51 +1205,60 @@ async function executeCardAction() {
     if (currentActionType === 'approve') newStatus = 'Live';
     if (currentActionType === 'reject' || currentActionType === 'takedown') newStatus = 'Denied';
 
-    if (dbId && currentActionType !== 'delete') {
+    if (dbId) {
         try {
+            // 👉 NEW: IF ACTION IS DELETE, WIPE IT FROM MONGODB PERMANENTLY
+            if (currentActionType === 'delete') {
+                await fetch(`https://beat-pasig-api.onrender.com/api/announcements/${dbId}`, {
+                    method: 'DELETE'
+                });
+                currentActionCard.remove(); // Remove visually from the screen
+                openModal('success-submit-modal'); // Show success popup
+                return; // Stop the function here so it doesn't try to change tabs
+            } 
+            
+            // OTHERWISE, JUST UPDATE THE STATUS (Live, Queue, Denied)
             await fetch(`https://beat-pasig-api.onrender.com/api/announcements/${dbId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus })
             });
-        } catch(err) { console.error("DB Update Error:", err); }
+
+            const container = currentActionCard.querySelector('.action-container');
+
+            if (currentActionType === 'approve') {
+                currentActionCard.classList.remove('opacity-60');
+                container.innerHTML = `
+                    <button onclick="openAnnForm('edit', this.closest('.ann-card'))" class="bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2 px-8 rounded-lg text-sm transition-colors">Edit</button>
+                    <button onclick="triggerTakeDown(this)" class="bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center gap-2 ml-auto"><i data-lucide="trash-2" class="w-4 h-4"></i> Take Down</button>
+                `;
+                document.getElementById('grid-live').appendChild(currentActionCard);
+                switchAnnTab('live');
+
+            } else if (currentActionType === 'reject' || currentActionType === 'takedown') {
+                currentActionCard.classList.add('opacity-60');
+                container.innerHTML = `
+                    <button onclick="triggerTakeBack(this)" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Take Back</button>
+                    <button onclick="triggerDelete(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete Permanently</button>
+                `;
+                document.getElementById('grid-denied').appendChild(currentActionCard);
+                switchAnnTab('denied');
+
+            } else if (currentActionType === 'takeback') {
+                currentActionCard.classList.remove('opacity-60');
+                container.innerHTML = `
+                    <button onclick="triggerApprove(this)" class="flex-1 bg-transparent border border-green-500 hover:bg-green-500/10 text-green-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Approve</button>
+                    <button onclick="openAnnForm('edit', this.closest('.ann-card'))" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">Edit</button>
+                    <button onclick="triggerReject(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"><i data-lucide="x" class="w-4 h-4"></i> Reject</button>
+                `;
+                document.getElementById('grid-queue').appendChild(currentActionCard);
+                switchAnnTab('queue');
+            }
+
+        } catch(err) { console.error("DB Action Error:", err); }
     }
 
-    const container = currentActionCard.querySelector('.action-container');
-
-    if (currentActionType === 'approve') {
-        currentActionCard.classList.remove('opacity-60');
-        container.innerHTML = `
-            <button onclick="openAnnForm('edit', this.closest('.ann-card'))" class="bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2 px-8 rounded-lg text-sm transition-colors">Edit</button>
-            <button onclick="triggerTakeDown(this)" class="bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center gap-2 ml-auto"><i data-lucide="trash-2" class="w-4 h-4"></i> Take Down</button>
-        `;
-        document.getElementById('grid-live').appendChild(currentActionCard);
-        switchAnnTab('live');
-
-    } else if (currentActionType === 'reject' || currentActionType === 'takedown') {
-        currentActionCard.classList.add('opacity-60');
-        container.innerHTML = `
-            <button onclick="triggerTakeBack(this)" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Take Back</button>
-            <button onclick="triggerDelete(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete Permanently</button>
-        `;
-        document.getElementById('grid-denied').appendChild(currentActionCard);
-        switchAnnTab('denied');
-
-    } else if (currentActionType === 'takeback') {
-        currentActionCard.classList.remove('opacity-60');
-        container.innerHTML = `
-            <button onclick="triggerApprove(this)" class="flex-1 bg-transparent border border-green-500 hover:bg-green-500/10 text-green-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Approve</button>
-            <button onclick="openAnnForm('edit', this.closest('.ann-card'))" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">Edit</button>
-            <button onclick="triggerReject(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"><i data-lucide="x" class="w-4 h-4"></i> Reject</button>
-        `;
-        document.getElementById('grid-queue').appendChild(currentActionCard);
-        switchAnnTab('queue');
-
-    } else if (currentActionType === 'delete') {
-        currentActionCard.remove();
-    }
-
-    openModal('action-success-modal');
+    openModal('success-submit-modal');
     if(window.lucide) lucide.createIcons();
     filterAnnouncements();
 }
