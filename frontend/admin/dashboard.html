@@ -8,7 +8,7 @@
             window.location.replace('admin.html?error=unauthorized'); 
         }
     })();
-</script>
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BEAT – Dashboard Overview</title>
@@ -68,11 +68,11 @@
 
 <aside id="sidebar" class="sidebar flex flex-col h-full" style="background:var(--surface); border-right: 1px solid var(--border)">
     <div class="h-[76px] px-5 flex items-center border-b shrink-0" style="border-color:var(--border)">
-      <div class="flex items-center gap-0.5">
-        <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-13 h-14 object-contain">
-        <div class="flex flex-col justify-center items-start">
-          <img src="/assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
-          <div style="color:var(--text-dim); font-size:11px" class="leading-none">Admin Control Center</div>
+      <div class="flex items-center gap-3">
+        <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm shadow-lg">B</div>
+        <div class="flex flex-col justify-center">
+          <div class="logo-text font-bold text-lg text-white leading-none mb-1">BEAT</div>
+          <div class="text-[11px] text-[#94a3b8] leading-none">Admin Control Center</div>
         </div>
       </div>
     </div>
@@ -136,7 +136,7 @@
               </a>
             </div>
             
-            <div id="traffic-map" class="w-full flex-1 rounded-lg border overflow-hidden relative mb-5 shadow-inner min-h-[300px]" style="border-color:var(--border)"></div>
+            <div id="traffic-map" class="w-full flex-1 rounded-lg border overflow-hidden relative mb-5 shadow-inner min-h-[400px]" style="border-color:var(--border)"></div>
             
             <div class="bg-[#0f172a]/80 border border-gray-800 rounded-lg p-4 flex items-center shrink-0 shadow-sm">
               <div class="w-24 h-24 relative flex-shrink-0">
@@ -207,217 +207,223 @@
 
   <script src="js/app.js"></script>
 
-  <script src="js/app.js"></script>
-
   <script>
-    lucide.createIcons();
+    window.addEventListener('load', function() {
+        console.log("🚀 Initializing Dashboard Elements...");
 
-    // ==========================================
-    // 1. CHART.JS & MAPBOX INTEGRATION
-    // ==========================================
-    let globalTrafficChart = null;
-
-    function initTrafficChart() {
-        const ctx = document.getElementById('trafficCongestionChart');
-        if (!ctx) return;
-
-        globalTrafficChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Light', 'Moderate', 'Heavy / Severe'],
-                datasets: [{
-                    data: [0, 0, 0], // Starting empty
-                    backgroundColor: ['#10b981', '#3b82f6', '#f43f5e'],
-                    borderWidth: 0,
-                    cutout: '75%'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } }
-            }
-        });
-    }
-
-    function extractAndUpdateTrafficData(mapInstance) {
-        if (!globalTrafficChart || !mapInstance.getLayer('traffic-lines')) return;
-
-        // Scan the features visible in the current bounding box
-        const features = mapInstance.queryRenderedFeatures({ layers: ['traffic-lines'] });
-        let counts = { low: 0, moderate: 0, heavy: 0, severe: 0 };
-
-        features.forEach(f => {
-            const congestion = f.properties.congestion;
-            if (counts[congestion] !== undefined) {
-                counts[congestion]++;
-            }
-        });
-
-        const total = counts.low + counts.moderate + counts.heavy + counts.severe;
-        const heavySevereCombined = counts.heavy + counts.severe;
-
-        // 1. Update the Chart JS instance
-        globalTrafficChart.data.datasets[0].data = [
-            counts.low,
-            counts.moderate,
-            heavySevereCombined
-        ];
-        globalTrafficChart.update();
-
-        // 2. Update the HTML Legend Percentages
-        if (total > 0) {
-            const getPct = (val) => Math.round((val / total) * 100) + '%';
-            
-            const lightEl = document.getElementById('stat-light');
-            const modEl = document.getElementById('stat-moderate');
-            const heavyEl = document.getElementById('stat-heavy');
-            
-            if(lightEl) lightEl.innerText = getPct(counts.low);
-            if(modEl) modEl.innerText = getPct(counts.moderate);
-            if(heavyEl) heavyEl.innerText = getPct(heavySevereCombined);
-        }
-    }
-
-    // Insert your actual token here!
-    mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag'; 
-    
-    try {
-        initTrafficChart(); // Initialize the donut chart first
-
-        const map = new mapboxgl.Map({
-            container: 'traffic-map', 
-            style: 'mapbox://styles/mapbox/dark-v11',
-            center: [121.0825, 14.5764], // Centered on Pasig
-            zoom: 12.5
-        });
-
-        // Add a slight delay to ensure the container is fully rendered before map resize
-        setTimeout(() => { map.resize(); }, 500);
-
-       map.on('load', () => {
-            // ==========================================
-            // 1. PASIG CITY BORDERS (Rendered Below)
-            // ==========================================
-            map.addSource('pasig-boundary', {
-                type: 'geojson',
-                // IMPORTANT: Adjust this path to exactly match your folder structure!
-                data: '../pasig_boundaries.geojson' 
-            });
-
-            // Subtle blue background fill
-            map.addLayer({
-                'id': 'pasig-fill',
-                'type': 'fill',
-                'source': 'pasig-boundary',
-                'paint': {
-                    'fill-color': '#3b82f6',
-                    'fill-opacity': 0.05
-                }
-            });
-
-            // Glowing dashed outline
-            map.addLayer({
-                'id': 'pasig-line',
-                'type': 'line',
-                'source': 'pasig-boundary',
-                'paint': {
-                    'line-color': '#3b82f6',
-                    'line-width': 2,
-                    'line-dasharray': [2, 2]
-                }
-            });
-
-            // ==========================================
-            // 2. LIVE TRAFFIC (Rendered On Top)
-            // ==========================================
-            map.addSource('mapbox-traffic', {
-                type: 'vector',
-                url: 'mapbox://mapbox.mapbox-traffic-v1'
-            });
-
-            map.addLayer({
-                id: 'traffic-lines',
-                type: 'line',
-                source: 'mapbox-traffic',
-                'source-layer': 'traffic',
-                paint: {
-                    'line-width': 3,
-                    'line-color': [
-                        'match',
-                        ['get', 'congestion'],
-                        'low', '#10b981',      // Emerald (Light)
-                        'moderate', '#3b82f6', // Blue (Moderate)
-                        'heavy', '#f43f5e',    // Rose (Heavy)
-                        'severe', '#9f1239',   // Dark Red (Severe)
-                        'transparent' 
-                    ]
-                }
-            });
-            
-            // Extract data when the map stops moving to update the Donut Chart
-            map.on('idle', () => {
-                extractAndUpdateTrafficData(map);
-            });
-        });
-    } catch (err) {
-        console.error("Mapbox failed to load. Ensure you added an access token.", err);
-    }
-
-    // ==========================================
-    // 2. MONGODB / BACKEND FETCH INTEGRATION
-    // ==========================================
-    async function fetchReportsFromDB() {
-        const feedContainer = document.getElementById('reports-feed');
-        const totalReportsElement = document.getElementById('total-reports-count');
-        
+        // 1. INIT ICONS SAFELY
         try {
-            // Simulated DB Response
-            const dummyDBResponse = {
-                total30D: 184, 
-                recent: [
-                    { type: 'Vehicular Accident', location: 'Brgy. San Antonio, C5 North', time: '2m ago', severity: 'rose' },
-                    { type: 'Illegal Parking', location: 'Emerald Ave, Ortigas', time: '15m ago', severity: 'slate' },
-                    { type: 'Traffic Light Malfunction', location: 'Shaw Blvd Intersection', time: '30m ago', severity: 'yellow' },
-                    { type: 'Minor Flooding', location: 'Ortigas Ave', time: '1h ago', severity: 'blue' },
-                    { type: 'Road Clearing', location: 'Julia Vargas', time: '1.5h ago', severity: 'emerald' },
-                    { type: 'Stalled Vehicle', location: 'EDSA Northbound', time: '2h ago', severity: 'rose' }
-                ]
-            };
-            
-            const reports = dummyDBResponse.recent; 
-            totalReportsElement.innerText = dummyDBResponse.total30D;
+            if (window.lucide) lucide.createIcons();
+        } catch (e) { console.error("Icon Error:", e); }
 
-            feedContainer.innerHTML = ''; 
-
-            if(reports.length === 0) {
-                 feedContainer.innerHTML = '<p class="text-xs text-gray-500 pl-5">No recent reports found.</p>';
-                 return;
+        // 2. INIT CHART.JS (With a Grey Placeholder State)
+        let globalTrafficChart = null;
+        try {
+            const ctx = document.getElementById('trafficCongestionChart');
+            if (ctx) {
+                globalTrafficChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['No Data (Zoom In)'],
+                        datasets: [{
+                            data: [1], 
+                            backgroundColor: ['#334155'], 
+                            borderWidth: 0,
+                            cutout: '75%'
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } } 
+                    }
+                });
             }
+        } catch (e) { console.error("❌ Chart Error:", e); }
 
-            reports.forEach(report => {
-                const ringColor = report.severity === 'rose' ? 'ring-rose-500/10' : '';
-                const feedHtml = `
-                  <div class="relative pl-5 animate-in fade-in">
-                    <div class="absolute left-0 top-1.5 w-1.5 h-1.5 rounded-full bg-${report.severity}-500 ${ringColor ? `ring-4 ${ringColor}` : ''}"></div>
-                    <div class="flex justify-between items-start">
-                      <p class="text-sm font-semibold text-white leading-tight">${report.type}</p>
-                      <span class="text-[10px] font-mono text-[#94a3b8] uppercase whitespace-nowrap ml-2">${report.time}</span>
-                    </div>
-                    <p class="text-[10px] text-[#94a3b8] mt-1 uppercase tracking-wider">${report.location}</p>
-                  </div>
-                `;
-                feedContainer.insertAdjacentHTML('beforeend', feedHtml);
+        // 3. UPGRADED TRAFFIC EXTRACTION LOGIC
+        function extractAndUpdateTrafficData(mapInstance) {
+            if (!globalTrafficChart || !mapInstance.getLayer('traffic-lines')) return;
+            
+            const features = mapInstance.queryRenderedFeatures({ layers: ['traffic-lines'] });
+            let counts = { low: 0, moderate: 0, heavy: 0, severe: 0 };
+            let total = 0;
+            
+            features.forEach(f => {
+                if (f.properties && f.properties.congestion) {
+                    counts[f.properties.congestion]++;
+                    total++;
+                }
             });
 
-        } catch (error) {
-            console.error("Error fetching reports from MongoDB:", error);
-            feedContainer.innerHTML = '<p class="text-xs text-red-400 pl-5">Failed to load reports from database.</p>';
-            totalReportsElement.innerText = 'Err';
-        }
-    }
+            const heavySevere = counts.heavy + counts.severe;
 
-    document.addEventListener('DOMContentLoaded', fetchReportsFromDB);
+            if (total > 0) {
+                globalTrafficChart.data.labels = ['Light', 'Moderate', 'Heavy / Severe'];
+                globalTrafficChart.data.datasets[0].data = [counts.low, counts.moderate, heavySevere];
+                globalTrafficChart.data.datasets[0].backgroundColor = ['#10b981', '#3b82f6', '#f43f5e']; 
+                globalTrafficChart.options.plugins.tooltip.enabled = true;
+                globalTrafficChart.update();
+
+                const getPct = (val) => Math.round((val / total) * 100) + '%';
+                document.getElementById('stat-light').innerText = getPct(counts.low);
+                document.getElementById('stat-moderate').innerText = getPct(counts.moderate);
+                document.getElementById('stat-heavy').innerText = getPct(heavySevere);
+            } else {
+                globalTrafficChart.data.labels = ['No Data (Zoom In)'];
+                globalTrafficChart.data.datasets[0].data = [1];
+                globalTrafficChart.data.datasets[0].backgroundColor = ['#334155'];
+                globalTrafficChart.options.plugins.tooltip.enabled = false;
+                globalTrafficChart.update();
+
+                document.getElementById('stat-light').innerText = '0%';
+                document.getElementById('stat-moderate').innerText = '0%';
+                document.getElementById('stat-heavy').innerText = '0%';
+            }
+        }
+
+        // 4. INIT MAPBOX SAFELY
+        try {
+            mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag'; 
+            
+            document.getElementById('traffic-map').style.minHeight = '400px';
+
+            const map = new mapboxgl.Map({
+                container: 'traffic-map', 
+                style: 'mapbox://styles/mapbox/dark-v11',
+                center: [121.0825, 14.5764], 
+                zoom: 14 // Increased zoom level so traffic lines render immediately
+            });
+
+            map.on('load', () => {
+                // 🔹 PASIG BOUNDARY LAYER (Matched to Main Website)
+                map.addSource('pasig-boundary', {
+                    type: 'geojson',
+                    data: 'pasig_boundaries.geojson' 
+                });
+
+                map.addLayer({
+                    'id': 'pasig-fill',
+                    'type': 'fill',
+                    'source': 'pasig-boundary',
+                    'paint': {
+                        'fill-color': '#3b82f6',
+                        'fill-opacity': 0.05
+                    }
+                });
+
+                // Solid Cyan Border
+                map.addLayer({
+                    'id': 'pasig-line',
+                    'type': 'line',
+                    'source': 'pasig-boundary',
+                    'paint': {
+                        'line-color': '#06b6d4', 
+                        'line-width': 4,
+                        'line-opacity': 0.9 
+                    }
+                });
+
+                // 🔹 3D BUILDINGS LAYER (Matched to Main Website)
+                map.addLayer({
+                    'id': '3d-buildings',
+                    'source': 'composite',
+                    'source-layer': 'building',
+                    'filter': ['==', 'extrude', 'true'],
+                    'type': 'fill-extrusion',
+                    'minzoom': 14, 
+                    'paint': {
+                        'fill-extrusion-color': '#1e293b', 
+                        'fill-extrusion-height': ['get', 'height'],
+                        'fill-extrusion-base': ['get', 'min_height'],
+                        'fill-extrusion-opacity': 0.8
+                    }
+                });
+
+                // 🔹 TRAFFIC LAYER
+                map.addSource('mapbox-traffic', {
+                    type: 'vector',
+                    url: 'mapbox://mapbox.mapbox-traffic-v1'
+                });
+
+                map.addLayer({
+                    id: 'traffic-lines',
+                    type: 'line',
+                    source: 'mapbox-traffic',
+                    'source-layer': 'traffic',
+                    paint: {
+                        'line-width': 3.5,
+                        'line-color': [
+                            'match', ['get', 'congestion'],
+                            'low', '#10b981',      
+                            'moderate', '#3b82f6', 
+                            'heavy', '#f43f5e',    
+                            'severe', '#9f1239',   
+                            'transparent' 
+                        ]
+                    }
+                });
+
+                map.on('moveend', () => extractAndUpdateTrafficData(map));
+                map.on('idle', () => extractAndUpdateTrafficData(map));
+            });
+        } catch (e) { console.error("❌ Mapbox Error:", e); }
+
+        // 5. FETCH DATABASE SAFELY
+        async function fetchReportsFromDB() {
+            const feedContainer = document.getElementById('reports-feed');
+            const totalReportsElement = document.getElementById('total-reports-count');
+            
+            try {
+                const response = await fetch('https://beat-pasig-api.onrender.com/api/reports/all');
+                const result = await response.json();
+                
+                const reports = Array.isArray(result) ? result : (result.data || []);
+                
+                if (totalReportsElement) totalReportsElement.innerText = reports.length;
+                if (feedContainer) feedContainer.innerHTML = ''; 
+
+                if(reports.length === 0) {
+                     if (feedContainer) feedContainer.innerHTML = '<p class="text-xs text-gray-500 pl-5">No recent reports found.</p>';
+                     return;
+                }
+
+                reports.slice(0, 6).forEach(report => {
+                    const status = report.status || 'Pending';
+                    let severityColor = 'blue';
+                    let ringColor = '';
+                    
+                    if (status === 'Pending') { severityColor = 'orange'; ringColor = 'ring-orange-500/10'; }
+                    else if (status === 'Resolved') { severityColor = 'emerald'; }
+                    else if (status === 'Returned') { severityColor = 'rose'; ringColor = 'ring-rose-500/10'; }
+                    
+                    const dateObj = new Date(report.createdAt);
+                    const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    
+                    const safeSubject = (report.report_subject || 'Incident Report').replace(/</g, "&lt;");
+                    const safeLoc = (report.report_location || 'Pasig City').replace(/</g, "&lt;");
+
+                    const feedHtml = `
+                      <div class="relative pl-6 animate-in fade-in mb-6">
+                        <div class="absolute left-0 top-1.5 w-2 h-2 rounded-full bg-${severityColor}-500 ${ringColor ? `ring-4 ${ringColor}` : ''} -ml-[3px]"></div>
+                        <div class="flex justify-between items-start">
+                          <p class="text-sm font-semibold text-white leading-tight truncate pr-2">${safeSubject}</p>
+                          <span class="text-[10px] font-mono text-[#94a3b8] uppercase whitespace-nowrap shrink-0">${timeStr}</span>
+                        </div>
+                        <p class="text-[11px] text-[#94a3b8] mt-1 tracking-wide truncate">${safeLoc}</p>
+                      </div>
+                    `;
+                    feedContainer.insertAdjacentHTML('beforeend', feedHtml);
+                });
+            } catch (error) {
+                console.error("❌ DB Fetch Error:", error);
+                if (feedContainer) feedContainer.innerHTML = '<p class="text-xs text-red-400 pl-5">Failed to load reports from database.</p>';
+                if (totalReportsElement) totalReportsElement.innerText = 'Err';
+            }
+        }
+        
+        fetchReportsFromDB();
+    });
   </script>
 </body>
 </html>
