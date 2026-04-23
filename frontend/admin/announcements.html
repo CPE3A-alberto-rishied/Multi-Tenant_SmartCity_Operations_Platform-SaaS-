@@ -6,7 +6,7 @@
         const session = localStorage.getItem('activeDepartment');
         if (!session || session !== 'Main Admin') {
             // Notice the new "?error=unauthorized" at the end
-            window.location.replace('/admin?error=unauthorized'); 
+            window.location.replace('admin.html?error=unauthorized'); 
         }
     })();
   </script>
@@ -93,11 +93,11 @@
       </button>
     </div>
     <nav class="flex-1 py-4 overflow-y-auto">
-      <a href="/dashboard" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
-      <a href="/manage_admin" class="sidebar-item"><i data-lucide="users"></i><span>Manage Admins</span></a>
-      <a href="/reports" class="sidebar-item"><i data-lucide="alert-triangle"></i><span>Public Reports</span></a>
-      <a href="/announcements" class="sidebar-item active"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
-      <a href="/maps" class="sidebar-item"><i data-lucide="map"></i><span>Maps</span></a>
+      <a href="dashboard.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+      <a href="manage_admin.html" class="sidebar-item"><i data-lucide="users"></i><span>Manage Admins</span></a>
+      <a href="reports.html" class="sidebar-item"><i data-lucide="alert-triangle"></i><span>Public Reports</span></a>
+      <a href="announcements.html" class="sidebar-item active"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+      <a href="maps.html" class="sidebar-item"><i data-lucide="map"></i><span>Maps</span></a>
     </nav>
     
     <div class="user-footer">
@@ -109,7 +109,7 @@
                   <div class="user-footer-sub">System Administrator</div>
                 </div>
             </div>
-            <a href="/profile" class="settings-link"><i data-lucide="settings" style="width:18px; height:18px"></i></a>
+            <a href="profile.html" class="settings-link"><i data-lucide="settings" style="width:18px; height:18px"></i></a>
         </div>
         <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
             <i data-lucide="log-out" style="width:16px; height:16px"></i> Logout

@@ -5,7 +5,7 @@
     (function() {
         const session = localStorage.getItem('activeDepartment');
         if (!session || session !== 'Traffic') {
-            window.location.replace('/admin?error=unauthorized'); 
+            window.location.replace('admin.html?error=unauthorized'); 
         }
     })();
   </script>
@@ -37,11 +37,11 @@
     </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
-        <a href="/dashboard_traffic" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
-        <a href="/reports2" class="sidebar-item"><i data-lucide="file-text"></i><span>Public Reports</span></a>
-        <a href="/announcements_traffic" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
-        <a href="/traffic" class="sidebar-item"><i data-lucide="car"></i><span>Traffic & Detour Control</span></a>
-        <a href="/accident" class="sidebar-item"><i data-lucide="map"></i><span>Accident Heatmap</span></a>
+        <a href="dashboard2.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+        <a href="reports2.html" class="sidebar-item"><i data-lucide="file-text"></i><span>Public Reports</span></a>
+        <a href="announcements2.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+        <a href="traffic.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic & Detour Control</span></a>
+        <a href="accident.html" class="sidebar-item"><i data-lucide="map"></i><span>Accident Heatmap</span></a>
     </nav>
     
     <div class="user-footer">
@@ -53,7 +53,7 @@
                   <div class="user-footer-sub">Traffic Department</div>
                 </div>
             </div>
-            <a href="/profile_traffic" class="settings-link active"><i data-lucide="settings" class="icon-md"></i></a>
+            <a href="profile2.html" class="settings-link active"><i data-lucide="settings" class="icon-md"></i></a>
         </div>
         <button onclick="doLogout()" class="btn-logout">
             <i data-lucide="log-out" class="icon-sm"></i> Logout
@@ -249,7 +249,7 @@
     // 🚨 Added Logout Logic 🚨
     function doLogout() {
         localStorage.removeItem('activeDepartment'); // Wipe the session
-        window.location.href = '/admin'; // Kick back to login
+        window.location.href = 'admin.html'; // Kick back to login
     }
   </script>
 </body>

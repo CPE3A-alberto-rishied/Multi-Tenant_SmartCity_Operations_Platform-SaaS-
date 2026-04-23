@@ -5,7 +5,7 @@
    (function() {
         const session = localStorage.getItem('activeDepartment');
         if (!session || session !== 'DRRMO') { // Also secured specifically for DRRMO
-            window.location.replace('/admin?error=unauthorized'); 
+            window.location.replace('admin.html?error=unauthorized'); 
         }
     })();
   </script>
@@ -35,16 +35,16 @@
     </div>
 
     <nav class="flex-1 py-4 overflow-y-auto">
-      <a href="/dashboard3" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
-      <a href="/reports3" class="sidebar-item active"><i data-lucide="file-text"></i><span>Public Reports</span></a>
-      <a href="/announcements3" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
-      <a href="/weather" class="sidebar-item"><i data-lucide="thermometer-sun"></i><span>Weather & AQI Alerts</span></a>
-      <a href="/evacuation" class="sidebar-item"><i data-lucide="tent"></i><span>Evacuation Control</span></a>
+      <a href="dashboard3.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+      <a href="reports3.html" class="sidebar-item active"><i data-lucide="file-text"></i><span>Public Reports</span></a>
+      <a href="announcements3.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+      <a href="weather.html" class="sidebar-item"><i data-lucide="thermometer-sun"></i><span>Weather & AQI Alerts</span></a>
+      <a href="evacuation.html" class="sidebar-item"><i data-lucide="tent"></i><span>Evacuation Control</span></a>
     </nav>
     <div class="user-footer">
         <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3"><div id="nav-avatar" class="nav-avatar bg-orange-600">D</div><div><div class="user-footer-name">DRRMO</div><div class="user-footer-sub">Disaster Management</div></div></div>
-            <a href="/profile3" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
+            <a href="profile3.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
         </div>
         <button type="button" onclick="doLogout()" class="btn-logout"><i data-lucide="log-out" class="icon-sm"></i> Logout</button>
     </div>
@@ -118,7 +118,7 @@
     
     function doLogout() { 
         localStorage.removeItem('activeDepartment'); 
-        window.location.href = '/admin'; 
+        window.location.href = 'admin.html'; 
     }
 
     function openModal(id) {
