@@ -79,21 +79,16 @@ async function handleLogin(event) {
 
         const data = await response.json();
 
-        if (response.ok && data.success) {
-            // Save the verified department to localStorage
-            localStorage.setItem('activeDepartment', data.department);
+       if (response.ok && data.success) {
+            // SUCCESS: Credentials matched, Email was sent!
+            currentLoggingInId = data.adminId; // Store ID temporarily for verification
             
-            // Redirect based on the verified department
-            if (data.department === 'Main Admin') {
-                window.location.href = 'dashboard.html';
-            } else if (data.department === 'Traffic') {
-                window.location.href = 'dashboard2.html';
-            } else if (data.department === 'DRRMO') {
-                window.location.href = 'dashboard3.html';
-            }
+            // UI Transition: Hide Login Card, Show 2FA Verify Card for ALL departments
+            document.getElementById('login-card').classList.add('hidden');
+            document.getElementById('verify-card').classList.remove('hidden');
         } else {
             // If the backend sends back an error (wrong pass, wrong dept), alert the user
-            alert(data.message);
+            alert(data.error || data.message || 'Invalid credentials or department mismatch.');
         }
 
     } catch (error) {
