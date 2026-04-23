@@ -1,292 +1,78 @@
 <!doctype html>
 <html lang="en" class="h-full">
 <head>
-  <meta charset="UTF-8">
-  
   <script>
-      (function() {
-          const session = localStorage.getItem('activeDepartment');
-          // Kick out if no session, or if the session isn't DRRMO
-          if (!session || session !== 'DRRMO') {
-              window.location.replace('admin.html?error=unauthorized'); 
-          }
-      })();
+    (function() {
+        const session = localStorage.getItem('activeDepartment');
+        if (!session) window.location.replace('admin.html?error=unauthorized'); 
+    })();
   </script>
-
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BEAT - DRRMO Reports</title>
+  <title>BEAT - Public Reports</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
   <style>
-    /* CRITICAL FIX: Ensure all modal overlays are fixed to the screen and stack correctly */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background-color: rgba(0, 0, 0, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      /* Higher z-index to stay on top of the main UI */
-      z-index: 10000; 
-    }
-
-    /* Extra priority for the confirmation and success popups so they appear ABOVE the forms */
-    #modal-confirm-action, #action-success-modal {
-      z-index: 20000 !important;
-    }
-    
-    .report-date-dark { color: #475569 !important; }
-    .report-time-visible { color: #94a3b8 !important; }
-
-    input[type="date"]::-webkit-calendar-picker-indicator {
-      filter: invert(1);
-      cursor: pointer;
-    }
-
-    .action-input-field {
-      background-color: #0f172a;
-      border: 1px solid #334155;
-      color: #cbd5e1;
-      width: 100%;
-      border-radius: 0.5rem;
-      padding: 0.75rem;
-      font-size: 0.75rem;
-      outline: none;
-    }
-    .action-input-field.input-error { border-color: #ef4444; }
-    
-    /* Global Base styles */
-    body { font-family: 'DM Sans', sans-serif !important; overflow: hidden; }
-    .sidebar { width: 260px !important; flex-shrink: 0 !important; }
-    .sidebar-item { 
-      display: flex !important; align-items: center !important; gap: 12px !important;
-      padding: 12px 18px !important; font-size: 14.5px !important; 
-      font-weight: 500 !important; color: #94a3b8 !important;
-      text-decoration: none !important; border-left: 3px solid transparent !important;
-    }
-    .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
-    .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
-    .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
-    .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
-    .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
-    .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 8px 12px; transition: all 0.2s; }
-    .modal-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
-    
-    select { 
-      appearance: none; 
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); 
-      background-repeat: no-repeat; 
-      background-position: right 0.75rem center; 
-      background-size: 1em; 
-    }
+    .modal-overlay { position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+    #modal-confirm-action, #action-success-modal { z-index: 20000 !important; }
   </style>
 </head>
 <body class="h-full flex bg-[#0a0e1a]">
 
-  <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
-
-  <aside id="sidebar" class="sidebar flex flex-col h-full absolute lg:relative z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 theme-surface theme-border-r">
-    
-    <div class="h-[80px] px-5 flex items-center shrink-0 theme-border-b">
-      <div id="auth-logo" class="flex items-center gap-1.5">
-        <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain">
-        <div class="flex flex-col justify-center items-start">
-          <img src="/assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
-          <div style="color:#94a3b8; font-size:11px" class="leading-none">Admin Control Center</div>
+  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface">
+    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
+      <div class="flex items-center gap-3">
+        <div class="logo-box bg-orange-600 text-white">B</div>
+        <div class="flex flex-col justify-center">
+          <div class="logo-text font-bold text-white">BEAT</div>
+          <div class="sidebar-subtext">Department Portal</div>
         </div>
       </div>
-      <button class="lg:hidden ml-auto text-gray-400 hover:text-white" onclick="toggleSidebar()">
-        <i data-lucide="x" class="w-5 h-5"></i>
-      </button>
     </div>
-    
     <nav class="flex-1 py-4 overflow-y-auto">
       <a href="dashboard3.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
       <a href="reports3.html" class="sidebar-item active"><i data-lucide="file-text"></i><span>Public Reports</span></a>
       <a href="announcements3.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
-      <a href="traffic3.html" class="sidebar-item"><i data-lucide="truck"></i><span>Fleet Response Control</span></a>
-      <a href="analytics3.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
+      <a href="weather.html" class="sidebar-item"><i data-lucide="thermometer-sun"></i><span>Weather & AQI Alerts</span></a>
+      <a href="evacuation.html" class="sidebar-item"><i data-lucide="tent"></i><span>Evacuation Control</span></a>
     </nav>
-    
     <div class="user-footer">
         <div class="flex items-center justify-between mb-5">
-            <div class="flex items-center gap-3">
-                <div style="background:#f59e0b; width:42px; height:42px; border-radius:50%;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">D</div>
-                <div>
-                  <div class="text-white font-semibold text-sm">DRRMO</div>
-                  <div class="text-[#94a3b8] text-[11px]">Emergency Response</div>
-                </div>
-            </div>
-            <a href="profile3.html" class="text-[#94a3b8] hover:text-[#3b82f6] transition-colors"><i data-lucide="settings" class="w-4 h-4"></i></a>
+            <div class="flex items-center gap-3"><div id="nav-avatar" class="nav-avatar bg-orange-600">D</div><div><div class="user-footer-name">DRRMO</div><div class="user-footer-sub">Disaster Management</div></div></div>
+            <a href="profile3.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
         </div>
-        <button type="button" onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 text-white text-sm font-semibold hover:bg-gray-800 transition-colors">
-            <i data-lucide="log-out" class="w-4 h-4"></i> Logout
-        </button>
+        <button type="button" onclick="doLogout()" class="btn-logout"><i data-lucide="log-out" class="icon-sm"></i> Logout</button>
     </div>
   </aside>
 
-  <main class="flex-1 overflow-y-auto flex flex-col relative min-w-0 bg-[#0a0e1a]">
-    <header class="px-4 sm:px-8 h-[80px] flex items-center border-b shrink-0" style="border-color:var(--border); background:var(--surface)">
-      <button class="lg:hidden text-gray-400 hover:text-white mr-4" onclick="toggleSidebar()">
-        <i data-lucide="menu" class="w-6 h-6"></i>
-      </button>
-      <h1 class="text-xl font-semibold text-white flex items-center gap-2">
-        <i data-lucide="file-text" class="text-blue-500 w-6 h-6 hidden sm:block"></i> Public Reports
-      </h1>
+  <main class="flex-1 overflow-y-auto flex flex-col">
+    <header class="px-8 h-[76px] flex items-center shrink-0 theme-surface theme-border-b">
+      <h1 class="text-xl font-semibold text-white flex items-center gap-2"><i data-lucide="file-text" class="icon-lg"></i> Public Reports</h1>
     </header>
 
-    <div class="p-4 sm:p-8 flex-1 animate-in">
-      <div class="flex flex-wrap gap-4 items-center justify-between mb-8">
-        <div class="flex flex-wrap gap-3 items-center">
-          <input type="date" id="filter-date" onchange="filterReports()" class="h-10 bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 text-sm outline-none cursor-pointer min-w-[160px]">
-          <div class="relative flex items-center">
-            <select id="filter-status" onchange="filterReports()" class="appearance-none h-10 bg-[#1e2536] text-white border border-[#374151] rounded-lg pl-4 pr-10 text-sm outline-none cursor-pointer min-w-[180px]">
-              <option selected>All Status</option>
-              <option>New</option>
-              <option>Returned</option>
-              <option>Waiting for Approval</option>
-              <option>Resolved</option>
-            </select>
-          </div>
-        </div>
-        <button type="button" onclick="openModal('new-report-modal')" class="h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg text-sm font-bold flex items-center gap-2 shadow-lg transition-all"><i data-lucide="plus" class="w-4 h-4"></i> New Report</button>
-      </div>
-
-      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch" id="reports-grid">
-        
-        <div class="report-card border theme-border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors theme-surface" onclick="openReportDetails(this)" data-email="drrmo.staff@example.com" data-contact="+63 917 123 4567" data-location="Ortigas Ave Ext">
-          <div class="flex justify-between items-start mb-4">
-            <div><p class="text-xs font-bold report-date-dark">4/19/2026</p><p class="text-xs report-time-visible">10:21 AM</p></div>
-            <span class="badge-status bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">New</span>
-          </div>
-          <h3 class="text-lg font-bold text-white mb-4">Minor Flooding</h3>
-          <div class="space-y-1 text-sm mb-6">
-            <p><span class="text-[#94a3b8]">Name:</span> <span class="text-white font-semibold">Staff</span></p>
-            <p><span class="text-[#94a3b8]">Location:</span> <span class="text-white font-semibold">Pasig City</span></p>
-          </div>
-          <div class="text-sm mb-6"><p class="text-[#94a3b8] mb-1">Description:</p><p class="text-slate-300 leading-relaxed line-clamp-3">Gutter deep flooding near the intersection. Warning signs requested.</p></div>
-          
-          <div class="mt-auto pt-4 border-t theme-border" onclick="event.stopPropagation()">
-            <div id="action-buttons-container" class="flex flex-wrap gap-2">
-              <button type="button" onclick="toggleActionField(this, 'return')" class="px-4 py-2 border border-red-500/50 text-red-400 hover:bg-red-500/10 rounded-lg text-[10px] font-bold uppercase tracking-widest">Return to Admin</button>
-              <button type="button" onclick="toggleActionField(this, 'resolve')" class="px-4 py-2 border border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10 rounded-lg text-[10px] font-bold uppercase tracking-widest">Submit for Resolution</button>
+    <div class="p-8 flex-1 animate-in">
+        <div class="flex flex-wrap gap-4 items-center justify-between mb-8">
+            <div class="flex flex-wrap gap-3 items-center">
+              <input type="date" id="filter-date" class="h-10 bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 text-sm outline-none cursor-pointer min-w-[160px]">
             </div>
-            <div class="hidden mt-4 w-full animate-in fade-in" id="dynamic-action-field">
-              <p id="action-label" class="text-[10px] font-bold uppercase tracking-wider mb-2"></p>
-              <textarea id="action-description" class="action-input-field mb-1" rows="3" oninput="this.classList.remove('input-error'); document.getElementById('action-error').classList.add('hidden')"></textarea>
-              <p id="action-error" class="text-[10px] text-red-500 hidden mb-3">Please provide a reason or explanation.</p>
-              <button type="button" id="action-confirm-btn" onclick="promptActionConfirm(this.getAttribute('data-type'), this)" class="px-6 py-2 rounded-lg text-[10px] font-bold uppercase text-white transition-all"></button>
-            </div>
-          </div>
-
+            <button type="button" onclick="openModal('new-report-modal')" class="h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg text-sm font-bold flex items-center gap-2 shadow-lg"><i data-lucide="plus" class="icon-sm"></i> File Incident</button>
         </div>
-
-      </div>
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6" id="reports-grid">
+            <p class="text-[#94a3b8] text-sm italic">No emergency reports fetched for this view currently.</p>
+        </div>
     </div>
   </main>
 
   <div id="new-report-modal" class="modal-overlay hidden">
-    <div class="border theme-border w-[550px] max-w-[90%] rounded-2xl p-8 max-h-[90vh] overflow-y-auto shadow-2xl theme-surface">
-      <h2 class="text-white font-bold text-xl mb-6 flex items-center gap-2 justify-center">
-        <i data-lucide="file-plus" class="text-blue-500 w-6 h-6"></i> Submit a Report
-      </h2>
-      <form id="new-report-form" class="space-y-4 text-left" onsubmit="validateNewReport(event)">
-        <div>
-          <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Name</label>
-          <input type="text" id="report-name" placeholder="Full name" class="modal-input text-sm" oninput="clearReqError(this)">
-          <p id="report-name-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p>
-        </div>
-        <div>
-          <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Email Address</label>
-          <input type="email" id="report-email" placeholder="your@email.com" class="modal-input text-sm" oninput="clearReqError(this)">
-          <p id="report-email-error" class="text-[10px] text-red-500 hidden mt-1">Valid email required</p>
-        </div>
-        <div>
-          <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Contact Number</label>
-          <input type="text" id="report-contact" placeholder="+63 9XX XXX XXXX" class="modal-input text-sm" oninput="clearReqError(this)">
-          <p id="report-contact-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p>
-        </div>
-        <div>
-          <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Location</label>
-          <input type="text" id="report-location" placeholder="Address of issue" class="modal-input text-sm" oninput="clearReqError(this)">
-          <p id="report-location-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p>
-        </div>
-        <div>
-          <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Subject</label>
-          <input type="text" id="report-subject" placeholder="Title of report" class="modal-input text-sm" oninput="clearReqError(this)">
-          <p id="report-subject-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p>
-        </div>
-        <div>
-          <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Description</label>
-          <textarea id="report-desc" rows="4" placeholder="Details..." class="modal-input text-sm resize-none" oninput="clearReqError(this)"></textarea>
-          <p id="report-desc-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p>
-        </div>
-        <div class="flex justify-end gap-3 mt-8 pt-4">
-          <button type="button" onclick="closeModal('new-report-modal')" class="px-6 bg-[#1e2536] border theme-border text-white font-bold py-2.5 rounded-xl text-sm hover:bg-gray-800 transition-colors">Cancel</button>
-          <button type="submit" class="px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm shadow-lg transition-all">Submit</button>
-        </div>
-      </form>
+    <div class="border theme-border w-[550px] max-w-[90%] rounded-2xl p-8 shadow-2xl theme-surface">
+      <h2 class="text-white font-bold text-xl mb-6 flex items-center gap-2 justify-center"><i data-lucide="file-plus" class="text-blue-500 icon-lg"></i> Submit Incident</h2>
+      <button type="button" onclick="closeModal('new-report-modal')" class="w-full bg-[#1e2536] border theme-border text-white font-bold py-2.5 rounded-xl text-sm">Cancel</button>
     </div>
   </div>
 
-  <div id="view-report-modal" class="modal-overlay hidden" onclick="closeModal('view-report-modal')">
-    <div class="border theme-border w-[450px] max-w-[90%] rounded-2xl p-8 shadow-2xl text-left max-h-[90vh] overflow-y-auto theme-surface" onclick="event.stopPropagation()">
-      <h2 id="modal-detail-title" class="text-white font-bold text-2xl mb-4"></h2>
-      <div id="modal-detail-datetime" class="bg-[#1e2536] p-3 rounded-lg text-sm text-[#94a3b8] mb-6 border theme-border"></div>
-      <p id="modal-detail-desc" class="text-slate-300 leading-relaxed"></p>
-      <button type="button" onclick="closeModal('view-report-modal')" class="w-full mt-8 bg-blue-600 hover:bg-blue-700 transition-all text-white font-bold py-3 rounded-xl text-sm">Close</button>
-    </div>
-  </div>
-
-  <div id="modal-confirm-action" class="modal-overlay hidden">
-    <div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface" onclick="event.stopPropagation()">
-      <div class="mb-4 mx-auto flex items-center justify-center bg-blue-500/10 text-blue-500 w-16 h-16 rounded-full">
-        <i data-lucide="help-circle" class="w-8 h-8"></i>
-      </div>
-      <h2 id="confirm-title" class="text-white font-bold text-xl mb-3">Confirm Action?</h2>
-      <p id="confirm-body" class="text-[#94a3b8] text-sm mb-8 leading-relaxed"></p>
-      <div class="flex gap-3">
-        <button type="button" onclick="closeModal('modal-confirm-action')" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
-        <button type="button" id="btn-final-confirm" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm shadow-lg">Confirm</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="action-success-modal" class="modal-overlay hidden">
-    <div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface" onclick="event.stopPropagation()">
-      <div class="mb-4 mx-auto flex items-center justify-center bg-emerald-500/10 text-emerald-500 w-16 h-16 rounded-full">
-        <i data-lucide="check-circle" class="w-8 h-8"></i>
-      </div>
-      <h2 id="success-title" class="text-white font-bold text-xl mb-3">Action Successful</h2>
-      <p id="success-body" class="text-[#94a3b8] text-sm mb-8 leading-relaxed"></p>
-      <button type="button" onclick="closeModal('action-success-modal')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Done</button>
-    </div>
-  </div>
-
-  <script src="js/app3.js"></script>
-  <script>
-    if(window.lucide) lucide.createIcons();
-    
-    // Sidebar logic
-    function toggleSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
-        if (sidebar.classList.contains('-translate-x-full')) {
-            sidebar.classList.remove('-translate-x-full');
-            if(overlay) overlay.classList.remove('hidden');
-        } else {
-            sidebar.classList.add('-translate-x-full');
-            if(overlay) overlay.classList.add('hidden');
-        }
-    }
-
-    // Logout logic
-    function doLogout() {
-        localStorage.removeItem('activeDepartment');
-        window.location.href = 'admin.html';
-    }
-  </script>
+  <script src="js/app2.js"></script>
+  <script>lucide.createIcons(); function doLogout() { localStorage.removeItem('activeDepartment'); window.location.href = 'admin.html'; }</script>
 </body>
 </html>

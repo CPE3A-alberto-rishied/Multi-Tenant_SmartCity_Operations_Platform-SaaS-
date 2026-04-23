@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <script>
+    (function() {
+        const session = localStorage.getItem('activeDepartment');
+        if (!session) window.location.replace('admin.html?error=unauthorized'); 
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BEAT - Evacuation Control</title>
+  
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles2.css">
+  
+  <style>
+    .evac-marker { width: 28px; height: 28px; background-color: #475569; border: 3px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+    .evac-marker.active { background-color: #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.8); animation: pulse-green 2s infinite; }
+    
+    @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(16,185,129, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(16,185,129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16,185,129, 0); } }
+
+    /* Mapbox Popup Overrides */
+    .mapboxgl-popup-content { background: #1e293b !important; color: white !important; border: 1px solid #334155; border-radius: 12px; padding: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 250px; }
+    .mapboxgl-popup-tip { border-top-color: #1e293b !important; border-bottom-color: #1e293b !important; }
+    .mapboxgl-popup-close-button { color: #94a3b8; font-size: 16px; top: 4px; right: 8px; }
+    .mapboxgl-popup-close-button:hover { color: white; background: transparent; }
+  </style>
+</head>
+
+<body class="h-full flex bg-[#0a0e1a]">
+  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-50">
+    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
+      <div class="flex items-center gap-3">
+        <div class="logo-box bg-orange-600 text-white">B</div>
+        <div class="flex flex-col justify-center">
+          <div class="logo-text font-bold text-white">BEAT</div>
+          <div class="sidebar-subtext">Department Portal</div>
+        </div>
+      </div>
+    </div>
+    
+    <nav class="flex-1 py-4 overflow-y-auto">
+      <a href="dashboard3.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+      <a href="reports3.html" class="sidebar-item"><i data-lucide="file-text"></i><span>Public Reports</span></a>
+      <a href="announcements3.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+      <a href="weather.html" class="sidebar-item"><i data-lucide="thermometer-sun"></i><span>Weather & AQI Alerts</span></a>
+      <a href="evacuation.html" class="sidebar-item active"><i data-lucide="tent"></i><span>Evacuation Control</span></a>
+    </nav>
+
+    <div class="user-footer">
+        <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-3"><div id="nav-avatar" class="nav-avatar bg-orange-600">D</div><div><div class="user-footer-name">DRRMO</div><div class="user-footer-sub">Disaster Management</div></div></div>
+            <a href="profile3.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
+        </div>
+        <button type="button" onclick="doLogout()" class="btn-logout"><i data-lucide="log-out" class="icon-sm"></i> Logout</button>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] relative">
+    
+    <div class="absolute top-6 left-6 z-10 w-96 flex flex-col gap-4 max-h-[90vh]">
+        <div class="theme-surface border theme-border rounded-2xl p-6 shadow-2xl backdrop-blur-md bg-opacity-95 flex-shrink-0">
+            <div class="flex items-center justify-between mb-1">
+                <h2 class="text-white font-bold text-lg flex items-center gap-2"><i data-lucide="waves" class="text-blue-400"></i> Pre-Emptive Control</h2>
+            </div>
+            <p class="text-[11px] text-[#94a3b8] mb-6">Review the <span class="text-blue-400 font-bold">Blue Flood Risk Zones</span>. Click on gray evacuation centers outside the danger zone to activate them.</p>
+            
+            <div class="flex items-center gap-3 bg-[#0f172a] p-4 rounded-xl border border-gray-800">
+                <div class="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
+                    <i data-lucide="tent" class="text-emerald-500 w-5 h-5"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Active Centers</p>
+                    <h3 id="active-count" class="text-xl font-bold text-white">0</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="logistics-modal" class="modal-overlay hidden fixed inset-0 bg-black/80 z-[100] flex items-center justify-center">
+        <div class="theme-surface border theme-border w-[400px] p-8 rounded-2xl shadow-2xl">
+            <h2 class="text-white font-bold text-xl mb-2 flex items-center gap-2"><i data-lucide="package-check" class="text-emerald-500"></i> Dispatch Logistics</h2>
+            <p class="text-xs text-[#94a3b8] mb-6">Activating <span id="modal-evac-name" class="font-bold text-white"></span></p>
+            
+            <div class="space-y-4 mb-8">
+                <div>
+                    <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Food Packs Allocation</label>
+                    <input type="number" placeholder="e.g., 500" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2 text-sm outline-none">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Water Bottles</label>
+                    <input type="number" placeholder="e.g., 1000" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2 text-sm outline-none">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Assigned Commander</label>
+                    <input type="text" placeholder="Name of DRRMO Officer" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2 text-sm outline-none">
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="document.getElementById('logistics-modal').classList.add('hidden')" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
+                <button onclick="confirmActivation()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm shadow-lg transition-all">Confirm & Activate</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="map" class="w-full h-full"></div>
+  </main>
+
+  <script src="js/app2.js"></script>
+  <script>
+    lucide.createIcons();
+    mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag';
+    const map = new mapboxgl.Map({
+        container: 'map', style: 'mapbox://styles/mapbox/dark-v11', center: [121.0700, 14.5700], zoom: 13.5, pitch: 45
+    });
+
+    let centers = [
+        { id: 1, name: 'Rizal High School Gym', coords: [121.0741, 14.5644], active: false },
+        { id: 2, name: 'Pasig City Sports Complex', coords: [121.0810, 14.5680], active: false },
+        { id: 3, name: 'Kapitolyo High School', coords: [121.0592, 14.5712], active: false },
+        { id: 4, name: 'Manggahan Elementary', coords: [121.0960, 14.6060], active: false },
+        { id: 5, name: 'San Joaquin Covered Court', coords: [121.0760, 14.5510], active: false }
+    ];
+
+    let pendingActivationId = null;
+    let markerInstances = {};
+
+    map.on('load', () => {
+        // Simulated Flood Risk Polygon (Blue Zone) - Manggahan / Rosario area
+        const floodGeoJSON = turf.polygon([[
+            [121.085, 14.590], [121.100, 14.610], [121.110, 14.600], [121.095, 14.580], [121.085, 14.590]
+        ]]);
+
+        map.addSource('flood-risk', { 'type': 'geojson', 'data': floodGeoJSON });
+        map.addLayer({
+            'id': 'flood-fill', 'type': 'fill', 'source': 'flood-risk',
+            'paint': { 'fill-color': '#3b82f6', 'fill-opacity': 0.3 } // Translucent Blue
+        });
+        map.addLayer({
+            'id': 'flood-stroke', 'type': 'line', 'source': 'flood-risk',
+            'paint': { 'line-color': '#3b82f6', 'line-width': 2, 'line-dasharray': [2, 2] }
+        });
+
+        renderCenters();
+    });
+
+    function renderCenters() {
+        // Clear old markers
+        Object.values(markerInstances).forEach(m => m.remove());
+        markerInstances = {};
+
+        let activeCount = 0;
+
+        centers.forEach(center => {
+            if(center.active) activeCount++;
+
+            const el = document.createElement('div');
+            el.className = `evac-marker ${center.active ? 'active' : ''}`;
+            el.innerHTML = '<i data-lucide="tent" style="width:14px; height:14px;"></i>';
+
+            let popupContent = `
+                <div class="pb-2 mb-2 border-b border-gray-700">
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-[#94a3b8]">Facility Target</span>
+                </div>
+                <h3 class="font-bold text-white text-base mb-1">${center.name}</h3>
+                <p class="text-xs text-gray-400 mb-4">Capacity: 1,500 individuals</p>
+            `;
+
+            if (center.active) {
+                popupContent += `<div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 p-2 rounded text-center text-[10px] font-bold uppercase tracking-wider">Center Activated & Stocked</div>`;
+            } else {
+                popupContent += `<button onclick="openLogistics(${center.id})" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-lg">Activate Center</button>`;
+            }
+
+            const popup = new mapboxgl.Popup({ offset: 20 }).setHTML(popupContent);
+            const marker = new mapboxgl.Marker(el).setLngLat(center.coords).setPopup(popup).addTo(map);
+            
+            markerInstances[center.id] = marker;
+        });
+
+        document.getElementById('active-count').innerText = activeCount;
+        lucide.createIcons();
+    }
+
+    window.openLogistics = function(id) {
+        pendingActivationId = id;
+        const center = centers.find(c => c.id === id);
+        document.getElementById('modal-evac-name').innerText = center.name;
+        document.getElementById('logistics-modal').classList.remove('hidden');
+        
+        // Close the map popup
+        markerInstances[id].togglePopup();
+    };
+
+    window.confirmActivation = function() {
+        const center = centers.find(c => c.id === pendingActivationId);
+        center.active = true;
+        document.getElementById('logistics-modal').classList.add('hidden');
+        renderCenters();
+    };
+
+    function doLogout() { localStorage.removeItem('activeDepartment'); window.location.href = 'admin.html'; }
+  </script>
+</body>
+</html>
