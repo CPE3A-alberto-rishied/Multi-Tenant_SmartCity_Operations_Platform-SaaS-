@@ -2,12 +2,12 @@
 <html lang="en" class="h-full">
 <head>
   <script>
-    (function() {
-        const session = localStorage.getItem('activeDepartment');
-        if (!session || session !== 'Traffic') {
-            window.location.replace('admin.html?error=unauthorized'); 
-        }
-    })();
+//    (function() {
+//        const session = localStorage.getItem('activeDepartment');
+//        if (!session || session !== 'Traffic') {
+//            window.location.replace('admin.html?error=unauthorized'); 
+//        }
+//    })();
   </script>
 
   <meta charset="UTF-8" />
@@ -25,13 +25,13 @@
 
   <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-50">
     <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
-        <div id="auth-logo" class="flex items-center gap-1.5">
-            <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain">
-            <div class="flex flex-col justify-center items-start">
-                <img src="/assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
-                <div style="color:#94a3b8; font-size:11px" class="leading-none">Admin Control Center</div>
-            </div>
+      <div class="flex items-center gap-3">
+        <div class="logo-box">B</div>
+        <div class="flex flex-col justify-center">
+          <div class="logo-text font-bold text-white">BEAT</div>
+          <div class="sidebar-subtext">Traffic Department</div>
         </div>
+      </div>
     </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
