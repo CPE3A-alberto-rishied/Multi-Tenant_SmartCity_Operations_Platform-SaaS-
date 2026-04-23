@@ -13,6 +13,7 @@
   
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
@@ -21,13 +22,16 @@
   <link rel="stylesheet" href="css/styles2.css">
   
   <style>
-    .evac-marker { width: 28px; height: 28px; background-color: #475569; border: 3px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-    .evac-marker.active { background-color: #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.8); animation: pulse-green 2s infinite; }
+    /* Green Evacuation Center Markers */
+    .center-marker { width: 28px; height: 28px; background-color: #10b981; border: 3px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
     
-    @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(16,185,129, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(16,185,129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16,185,129, 0); } }
+    /* Yellow Origin Markers */
+    .pickup-marker { width: 20px; height: 20px; background-color: #eab308; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px rgba(234, 179, 8, 0.8); animation: pulse-yellow 2s infinite; cursor: pointer; }
+    @keyframes pulse-yellow { 0% { box-shadow: 0 0 0 0 rgba(234,179,8, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(234,179,8, 0); } 100% { box-shadow: 0 0 0 0 rgba(234,179,8, 0); } }
 
     /* Mapbox Popup Overrides */
-    .mapboxgl-popup-content { background: #1e293b !important; color: white !important; border: 1px solid #334155; border-radius: 12px; padding: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 250px; }
+    .mapboxgl-popup-content { background: #1e293b !important; color: white !important; border: 1px solid #10b981; border-radius: 8px; padding: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 240px; }
+    .popup-yellow .mapboxgl-popup-content { border-color: #eab308 !important; }
     .mapboxgl-popup-tip { border-top-color: #1e293b !important; border-bottom-color: #1e293b !important; }
     .mapboxgl-popup-close-button { color: #94a3b8; font-size: 16px; top: 4px; right: 8px; }
     .mapboxgl-popup-close-button:hover { color: white; background: transparent; }
@@ -35,13 +39,13 @@
 </head>
 
 <body class="h-full flex bg-[#0a0e1a]">
-  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface">
+  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-50">
     <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
-        <div id="auth-logo" class="flex items-center gap-1.5">
-            <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain">
-            <div class="flex flex-col justify-center items-start">
-                <img src="/assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
-          <div class="sidebar-subtext">Admin Control Center</div>
+      <div class="flex items-center gap-3">
+        <div class="logo-box bg-orange-600 text-white">B</div>
+        <div class="flex flex-col justify-center">
+          <div class="logo-text font-bold text-white">BEAT</div>
+          <div class="sidebar-subtext">Department Portal</div>
         </div>
       </div>
     </div>
@@ -65,49 +69,70 @@
 
   <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] relative">
     
-    <div class="absolute top-6 left-6 z-10 w-96 flex flex-col gap-4 max-h-[90vh]">
+    <div class="absolute top-6 left-6 z-10 w-[420px] flex flex-col gap-4 max-h-[90vh] overflow-y-auto pr-2 pb-6">
+        
         <div class="theme-surface border theme-border rounded-2xl p-6 shadow-2xl backdrop-blur-md bg-opacity-95 flex-shrink-0">
             <div class="flex items-center justify-between mb-1">
-                <h2 class="text-white font-bold text-lg flex items-center gap-2"><i data-lucide="waves" class="text-blue-400"></i> Pre-Emptive Control</h2>
+                <h2 class="text-white font-bold text-lg flex items-center gap-2"><i data-lucide="map" class="text-yellow-500"></i> Corridor Mapping</h2>
             </div>
-            <p class="text-[11px] text-[#94a3b8] mb-6">Review the <span class="text-blue-400 font-bold">Blue Flood Risk Zones</span>. Click on gray evacuation centers outside the danger zone to activate them.</p>
+            <p class="text-[11px] text-[#94a3b8] mb-6">Designate origin points and map safe evacuation corridors to active centers.</p>
             
-            <div class="flex items-center gap-3 bg-[#0f172a] p-4 rounded-xl border border-gray-800">
-                <div class="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
-                    <i data-lucide="tent" class="text-emerald-500 w-5 h-5"></i>
+            <div class="space-y-4">
+                
+                <div class="p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative">
+                    <div class="absolute -left-3 -top-3 w-6 h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">1</div>
+                    <button type="button" id="btn-drop-checkpoint" class="w-full bg-[#1e293b] hover:bg-gray-700 text-yellow-500 text-xs font-bold py-3 rounded-lg border border-yellow-500/50 transition-all flex justify-center items-center gap-2 shadow-sm">
+                        <i data-lucide="map-pin" class="w-4 h-4"></i> Set Evacuation Origin
+                    </button>
+                    <p id="drop-status" class="text-[10px] text-yellow-400 mt-3 text-center font-bold tracking-wider hidden animate-pulse">Click anywhere on the map to set the origin point.</p>
                 </div>
-                <div>
-                    <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Active Centers</p>
-                    <h3 id="active-count" class="text-xl font-bold text-white">0</h3>
+
+                <div class="p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative opacity-50 transition-opacity" id="step-2-box">
+                    <div class="absolute -left-3 -top-3 w-6 h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">2</div>
+                    <div class="space-y-3">
+                        <input type="text" id="checkpoint-name" placeholder="Origin Landmark/Street" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-xs outline-none focus:border-yellow-500">
+                        <input type="number" id="est-evacuees" placeholder="Est. Evacuees (Optional)" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-xs outline-none focus:border-yellow-500 mt-1">
+                        
+                        <select id="target-center" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-xs outline-none focus:border-emerald-500 cursor-pointer mt-1">
+                            <option value="" disabled selected>Target Evacuation Center...</option>
+                            <option value="1">Rizal High School Gym</option>
+                            <option value="2">Pasig City Sports Complex</option>
+                            <option value="3">Kapitolyo High School</option>
+                            <option value="4">Manggahan Elementary</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative opacity-50 transition-opacity" id="step-3-box">
+                    <div class="absolute -left-3 -top-3 w-6 h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">3</div>
+                    <button type="button" id="btn-dispatch" disabled class="w-full bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-bold py-3 rounded-lg shadow-lg transition-all flex justify-center items-center gap-2 disabled:cursor-not-allowed">
+                        <i data-lucide="route" class="w-4 h-4"></i> Establish Safe Corridor
+                    </button>
                 </div>
             </div>
         </div>
+
+        <div class="theme-surface border theme-border rounded-2xl p-4 shadow-2xl flex-1 overflow-hidden flex flex-col hidden" id="active-rescues-container">
+            <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-3 flex items-center justify-between">
+                Active Evacuation Corridors <span id="rescue-count" class="bg-yellow-500 text-black px-2 py-0.5 rounded-full text-[10px]">0</span>
+            </h3>
+            <div id="rescues-list" class="space-y-3 overflow-y-auto pr-2 pb-2"></div>
+        </div>
+
     </div>
 
-    <div id="logistics-modal" class="modal-overlay hidden fixed inset-0 bg-black/80 z-[100] flex items-center justify-center">
-        <div class="theme-surface border theme-border w-[400px] p-8 rounded-2xl shadow-2xl">
-            <h2 class="text-white font-bold text-xl mb-2 flex items-center gap-2"><i data-lucide="package-check" class="text-emerald-500"></i> Dispatch Logistics</h2>
-            <p class="text-xs text-[#94a3b8] mb-6">Activating <span id="modal-evac-name" class="font-bold text-white"></span></p>
-            
-            <div class="space-y-4 mb-8">
-                <div>
-                    <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Food Packs Allocation</label>
-                    <input type="number" placeholder="e.g., 500" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2 text-sm outline-none">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Water Bottles</label>
-                    <input type="number" placeholder="e.g., 1000" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2 text-sm outline-none">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Assigned Commander</label>
-                    <input type="text" placeholder="Name of DRRMO Officer" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2 text-sm outline-none">
-                </div>
+    <div class="absolute top-6 right-6 z-10 w-64">
+        <div class="theme-surface border theme-border rounded-xl p-4 shadow-2xl backdrop-blur-md bg-opacity-95">
+            <div class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2 flex items-center gap-2">
+                <i data-lucide="map" class="w-3 h-3 text-blue-500"></i> Jump to District
             </div>
-
-            <div class="flex gap-3">
-                <button onclick="document.getElementById('logistics-modal').classList.add('hidden')" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
-                <button onclick="confirmActivation()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm shadow-lg transition-all">Confirm & Activate</button>
-            </div>
+            <select class="w-full bg-[#1e2536] border border-[#374151] text-white px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider outline-none cursor-pointer" onchange="zoomToBarangay(this.value)">
+                <option value="">-- Select Barangay --</option>
+                <option value="bagong-ilog">Bagong Ilog</option>
+                <option value="kapitolyo">Kapitolyo</option>
+                <option value="manggahan">Manggahan</option>
+                <option value="rosario">Rosario</option>
+            </select>
         </div>
     </div>
 
@@ -118,93 +143,199 @@
   <script>
     lucide.createIcons();
     mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag';
+    
     const map = new mapboxgl.Map({
         container: 'map', style: 'mapbox://styles/mapbox/dark-v11', center: [121.0700, 14.5700], zoom: 13.5, pitch: 45
     });
 
-    let centers = [
-        { id: 1, name: 'Rizal High School Gym', coords: [121.0741, 14.5644], active: false },
-        { id: 2, name: 'Pasig City Sports Complex', coords: [121.0810, 14.5680], active: false },
-        { id: 3, name: 'Kapitolyo High School', coords: [121.0592, 14.5712], active: false },
-        { id: 4, name: 'Manggahan Elementary', coords: [121.0960, 14.6060], active: false },
-        { id: 5, name: 'San Joaquin Covered Court', coords: [121.0760, 14.5510], active: false }
+    // 1. Static Evacuation Centers (Safe Zones)
+    const evacCenters = [
+        { id: '1', name: 'Rizal High School Gym', coords: [121.0741, 14.5644] },
+        { id: '2', name: 'Pasig City Sports Complex', coords: [121.0810, 14.5680] },
+        { id: '3', name: 'Kapitolyo High School', coords: [121.0592, 14.5712] },
+        { id: '4', name: 'Manggahan Elementary', coords: [121.0960, 14.6060] }
     ];
 
-    let pendingActivationId = null;
-    let markerInstances = {};
+    // State Variables
+    let tempPickupMarker = null;
+    let tempPickupCoords = null;
+    let activeRescues = [];
+    let routeLayersAndMarkers = {}; 
 
     map.on('load', () => {
-        // Simulated Flood Risk Polygon (Blue Zone) - Manggahan / Rosario area
-        const floodGeoJSON = turf.polygon([[
-            [121.085, 14.590], [121.100, 14.610], [121.110, 14.600], [121.095, 14.580], [121.085, 14.590]
-        ]]);
-
-        map.addSource('flood-risk', { 'type': 'geojson', 'data': floodGeoJSON });
-        map.addLayer({
-            'id': 'flood-fill', 'type': 'fill', 'source': 'flood-risk',
-            'paint': { 'fill-color': '#3b82f6', 'fill-opacity': 0.3 } // Translucent Blue
-        });
-        map.addLayer({
-            'id': 'flood-stroke', 'type': 'line', 'source': 'flood-risk',
-            'paint': { 'line-color': '#3b82f6', 'line-width': 2, 'line-dasharray': [2, 2] }
-        });
-
-        renderCenters();
-    });
-
-    function renderCenters() {
-        // Clear old markers
-        Object.values(markerInstances).forEach(m => m.remove());
-        markerInstances = {};
-
-        let activeCount = 0;
-
-        centers.forEach(center => {
-            if(center.active) activeCount++;
-
+        // Render Permanent Safe Zones
+        evacCenters.forEach(center => {
             const el = document.createElement('div');
-            el.className = `evac-marker ${center.active ? 'active' : ''}`;
+            el.className = 'center-marker';
             el.innerHTML = '<i data-lucide="tent" style="width:14px; height:14px;"></i>';
 
-            let popupContent = `
-                <div class="pb-2 mb-2 border-b border-gray-700">
-                    <span class="text-[10px] font-bold uppercase tracking-widest text-[#94a3b8]">Facility Target</span>
-                </div>
-                <h3 class="font-bold text-white text-base mb-1">${center.name}</h3>
-                <p class="text-xs text-gray-400 mb-4">Capacity: 1,500 individuals</p>
+            const popupHTML = `
+                <div class="pb-1 mb-1 border-b border-emerald-500/30"><span class="text-[10px] font-bold uppercase tracking-widest text-emerald-500">Safe Zone</span></div>
+                <h3 class="font-bold text-white text-sm mb-1">${center.name}</h3>
+                <span class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">Accepting Evacuees</span>
             `;
-
-            if (center.active) {
-                popupContent += `<div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 p-2 rounded text-center text-[10px] font-bold uppercase tracking-wider">Center Activated & Stocked</div>`;
-            } else {
-                popupContent += `<button onclick="openLogistics(${center.id})" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-lg">Activate Center</button>`;
-            }
-
-            const popup = new mapboxgl.Popup({ offset: 20 }).setHTML(popupContent);
-            const marker = new mapboxgl.Marker(el).setLngLat(center.coords).setPopup(popup).addTo(map);
-            
-            markerInstances[center.id] = marker;
+            const popup = new mapboxgl.Popup({ offset: 20 }).setHTML(popupHTML);
+            new mapboxgl.Marker(el).setLngLat(center.coords).setPopup(popup).addTo(map);
         });
 
-        document.getElementById('active-count').innerText = activeCount;
+        // Dynamic Source for Routing Lines
+        map.addSource('rescue-routes', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+        map.addLayer({
+            'id': 'rescue-routes-line', 'type': 'line', 'source': 'rescue-routes',
+            'layout': { 'line-join': 'round', 'line-cap': 'round' },
+            'paint': { 'line-color': '#eab308', 'line-width': 4, 'line-dasharray': [2, 2] }
+        });
+
+        lucide.createIcons();
+    });
+
+    // 2. Map Interaction: Dropping Checkpoints
+    document.getElementById('btn-drop-checkpoint').addEventListener('click', (e) => {
+        if(tempPickupMarker) { tempPickupMarker.remove(); tempPickupMarker = null; tempPickupCoords = null; }
+        
+        map.getCanvas().style.cursor = 'crosshair';
+        e.currentTarget.innerHTML = '<i data-lucide="map-pin" class="w-4 h-4 animate-pulse"></i> Select on Map...';
+        document.getElementById('drop-status').classList.remove('hidden');
+        
+        document.getElementById('btn-dispatch').disabled = true;
+        document.getElementById('step-2-box').classList.add('opacity-50');
+        document.getElementById('step-3-box').classList.add('opacity-50');
+        lucide.createIcons();
+
+        map.once('click', (ev) => {
+            tempPickupCoords = [ev.lngLat.lng, ev.lngLat.lat];
+            
+            const el = document.createElement('div');
+            el.className = 'pickup-marker opacity-50'; // Faded until dispatched
+            tempPickupMarker = new mapboxgl.Marker(el).setLngLat(tempPickupCoords).addTo(map);
+            
+            map.getCanvas().style.cursor = '';
+            document.getElementById('drop-status').classList.add('hidden');
+            document.getElementById('btn-drop-checkpoint').innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Origin Selected';
+            
+            document.getElementById('step-2-box').classList.remove('opacity-50');
+            lucide.createIcons();
+            checkFormCompletion();
+        });
+    });
+
+    // 3. Form Validation
+    function checkFormCompletion() {
+        const name = document.getElementById('checkpoint-name').value;
+        const center = document.getElementById('target-center').value;
+
+        if(name && center && tempPickupCoords) {
+            document.getElementById('step-3-box').classList.remove('opacity-50');
+            document.getElementById('btn-dispatch').disabled = false;
+        } else {
+            document.getElementById('step-3-box').classList.add('opacity-50');
+            document.getElementById('btn-dispatch').disabled = true;
+        }
+    }
+
+    document.getElementById('checkpoint-name').addEventListener('input', checkFormCompletion);
+    document.getElementById('target-center').addEventListener('change', checkFormCompletion);
+
+    // 4. Dispatching Route
+    document.getElementById('btn-dispatch').addEventListener('click', () => {
+        const name = document.getElementById('checkpoint-name').value;
+        const evacuees = document.getElementById('est-evacuees').value || 'Unknown';
+        const targetId = document.getElementById('target-center').value;
+        
+        const targetObj = evacCenters.find(c => c.id === targetId);
+        
+        // Generate LineString for Route
+        const routeLine = turf.lineString([tempPickupCoords, targetObj.coords]);
+
+        const rescueOp = {
+            id: 'res_' + Date.now(),
+            name: name,
+            evacuees: evacuees,
+            targetName: targetObj.name,
+            pickupCoords: tempPickupCoords,
+            route: routeLine,
+            timestamp: new Date().toLocaleTimeString()
+        };
+
+        activeRescues.push(rescueOp);
+
+        // Reset UI
+        if(tempPickupMarker) { tempPickupMarker.remove(); tempPickupMarker = null; }
+        document.getElementById('checkpoint-name').value = '';
+        document.getElementById('est-evacuees').value = '';
+        document.getElementById('target-center').value = '';
+        document.getElementById('btn-drop-checkpoint').innerHTML = '<i data-lucide="map-pin" class="w-4 h-4"></i> Set Evacuation Origin';
+        document.getElementById('btn-dispatch').disabled = true;
+        document.getElementById('step-2-box').classList.add('opacity-50');
+        document.getElementById('step-3-box').classList.add('opacity-50');
+        
+        renderRescues();
+    });
+
+    function renderRescues() {
+        const listContainer = document.getElementById('rescues-list');
+        const mainContainer = document.getElementById('active-rescues-container');
+        listContainer.innerHTML = '';
+        
+        document.getElementById('rescue-count').innerText = activeRescues.length;
+        if(activeRescues.length > 0) mainContainer.classList.remove('hidden');
+        else mainContainer.classList.add('hidden');
+
+        // Clear Map Elements
+        Object.values(routeLayersAndMarkers).forEach(m => m.remove());
+        routeLayersAndMarkers = {};
+        let routeFeatures = [];
+
+        activeRescues.forEach(op => {
+            // Panel List Item
+            listContainer.innerHTML += `
+                <div class="bg-[#1e2536] border border-yellow-500/30 p-3 rounded-xl border-l-4 border-l-yellow-500 relative">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="text-white text-xs font-bold w-3/4 truncate">${op.name}</h4>
+                    </div>
+                    <div class="space-y-1 mb-3">
+                        <p class="text-[10px] text-gray-400"><span class="text-[#94a3b8] font-bold">To:</span> ${op.targetName}</p>
+                    </div>
+                    <button onclick="resolveRescue('${op.id}')" class="w-full bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30 text-[10px] px-2 py-1.5 rounded transition-colors font-bold uppercase tracking-wider"><i data-lucide="check" class="w-3 h-3 inline-block mb-0.5"></i> Close Corridor</button>
+                </div>
+            `;
+
+            // Active Yellow Marker on Map
+            const el = document.createElement('div'); el.className = 'pickup-marker';
+            const popupHTML = `
+                <div class="pb-1 mb-1 border-b border-yellow-500/30"><span class="text-[10px] font-bold uppercase tracking-widest text-yellow-500">Evacuation Origin</span></div>
+                <h3 class="font-bold text-white text-sm mb-1">${op.name}</h3>
+                <p class="text-[10px] text-gray-300 leading-snug mb-1">Evacuating ~${op.evacuees} people.</p>
+                <p class="text-[10px] text-gray-300 font-bold mb-2">Heading to: ${op.targetName}</p>
+                <div class="flex flex-col gap-1 mt-2 text-[9px] font-bold tracking-wider">
+                    <span class="text-yellow-400 bg-yellow-500/10 px-2 py-1 rounded text-center border border-yellow-500/20">CORRIDOR ACTIVE</span>
+                </div>
+            `;
+            
+            const popup = new mapboxgl.Popup({ offset: 25, closeButton: true, closeOnClick: false, className: 'popup-yellow' }).setHTML(popupHTML);
+            const marker = new mapboxgl.Marker(el).setLngLat(op.pickupCoords).setPopup(popup).addTo(map);
+            marker.togglePopup();
+            routeLayersAndMarkers[op.id] = marker;
+
+            routeFeatures.push(op.route);
+        });
+
+        // Update Route Lines
+        if(map.getSource('rescue-routes')) {
+            map.getSource('rescue-routes').setData({ type: 'FeatureCollection', features: routeFeatures });
+        }
         lucide.createIcons();
     }
 
-    window.openLogistics = function(id) {
-        pendingActivationId = id;
-        const center = centers.find(c => c.id === id);
-        document.getElementById('modal-evac-name').innerText = center.name;
-        document.getElementById('logistics-modal').classList.remove('hidden');
-        
-        // Close the map popup
-        markerInstances[id].togglePopup();
+    window.resolveRescue = function(id) {
+        activeRescues = activeRescues.filter(r => r.id !== id);
+        renderRescues();
     };
 
-    window.confirmActivation = function() {
-        const center = centers.find(c => c.id === pendingActivationId);
-        center.active = true;
-        document.getElementById('logistics-modal').classList.add('hidden');
-        renderCenters();
+    window.zoomToBarangay = function(val) {
+        const bd = { 'bagong-ilog': [121.0669, 14.5670], 'kapitolyo': [121.0590, 14.5710], 'manggahan': [121.0960, 14.6060], 'rosario': [121.0880, 14.5900] };
+        if (!val) { map.flyTo({ center: [121.0700, 14.5700], zoom: 13.5, pitch: 45 }); return; }
+        map.flyTo({ center: bd[val] || [121.0700, 14.5700], zoom: 14.5, pitch: 60 });
     };
 
     function doLogout() { localStorage.removeItem('activeDepartment'); window.location.href = 'admin.html'; }
