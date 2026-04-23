@@ -1,32 +1,55 @@
 <!doctype html>
 <html lang="en" class="h-full">
 <head>
-  <script>
-    (function() {
-        const session = localStorage.getItem('activeDepartment');
-        if (!session || session !== 'Main Admin') {
-            // Notice the new "?error=unauthorized" at the end
-            window.location.replace('admin.html?error=unauthorized'); 
-        }
-    })();
-</script>
   <meta charset="UTF-8">
-  <script>
-        (function() {
-            const session = localStorage.getItem('activeDepartment');
-            if (!session) {
-                // Stop the browser from loading anything else and redirect
-                window.location.replace('admin.html'); 
-            }
-        })();
-    </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BEAT - Announcement Manager</title>
+  <title>BEAT - DRRMO Announcements</title>
+  
+  <script>
+      (function() {
+          const session = localStorage.getItem('activeDepartment');
+          if (!session || session !== 'DRRMO') {
+              window.location.replace('admin.html?error=unauthorized'); 
+          }
+      })();
+  </script>
+
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
+  
   <style>
+    /* CRITICAL FIX: Ensure all modal overlays are fixed to the screen and stack correctly */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.85);
+      display: flex; 
+      align-items: center;
+      justify-content: center;
+      /* Higher z-index to stay on top of the main UI */
+      z-index: 10000;
+      pointer-events: auto;
+    }
+
+    /* Completely removes the overlay when hidden so sidebar is clickable */
+    .modal-overlay.hidden {
+      display: none !important;
+      pointer-events: none !important;
+    }
+
+    /* Extra priority for the confirmation and success popups so they appear ABOVE the forms */
+    #confirm-submit-modal, #confirm-action-modal, #success-submit-modal, #confirm-back-modal {
+      z-index: 20000 !important;
+    }
+
+    /* Red Glow for Required Fields */
+    .input-error {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+    }
+    
     body { font-family: 'DM Sans', sans-serif !important; overflow: hidden; }
     
     /* SIDEBAR */
@@ -44,17 +67,11 @@
     
     /* USER FOOTER */
     .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
-    .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
-    .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
-    .settings-link { color: #94a3b8; transition: color 0.2s; display: flex; align-items: center; }
-    .settings-link:hover { color: #3b82f6; }
-
     .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
     
     /* INPUT STYLING */
     .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 10px 14px; transition: all 0.2s; }
     .modal-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
-    .input-error { border-color: #ef4444 !important; box-shadow: 0 0 10px rgba(239, 68, 68, 0.2) !important; }
     
     /* AUTOFILL FIX */
     input:-webkit-autofill,
@@ -69,10 +86,6 @@
     }
     
     input[type="date"] { color-scheme: dark; }
-
-    /* MODALS */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(10, 14, 26, 0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999 !important; padding: 1rem; }
-    .hidden { display: none !important; }
 
     /* CUSTOM DROPDOWN SCROLLBAR */
     .cat-dropdown-menu::-webkit-scrollbar { width: 6px; }
@@ -92,8 +105,8 @@
       <div class="flex items-center gap-3">
         <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
         <div class="flex flex-col justify-center">
-          <div class="logo-text font-bold text-lg text-white leading-none mb-1">BEAT</div>
-          <div class="text-[11px] text-[#94a3b8] leading-none">Admin Control Center</div>
+          <div class="logo-text font-bold text-white leading-none mb-1">BEAT</div>
+          <div class="text-[11px] text-[#94a3b8] leading-none">Department Portal</div>
         </div>
       </div>
       <button class="lg:hidden ml-auto text-gray-400 hover:text-white" onclick="toggleSidebar()">
@@ -102,27 +115,26 @@
     </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
-      <a href="dashboard.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
-      <a href="manage_admin.html" class="sidebar-item"><i data-lucide="users"></i><span>Manage Admins</span></a>
-      <a href="reports.html" class="sidebar-item"><i data-lucide="alert-triangle"></i><span>Public Reports</span></a>
-      <a href="announcements.html" class="sidebar-item active"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
-      <a href="traffic.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
-      <a href="maps.html" class="sidebar-item"><i data-lucide="map"></i><span>Maps</span></a>
+      <a href="dashboard3.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+      <a href="reports3.html" class="sidebar-item"><i data-lucide="file-text"></i><span>Public Reports</span></a>
+      <a href="announcements3.html" class="sidebar-item active"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+      <a href="traffic3.html" class="sidebar-item"><i data-lucide="truck"></i><span>Fleet Response Control</span></a>
+      <a href="analytics3.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
     </nav>
-    
+
     <div class="user-footer">
         <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
-                <div id="nav-avatar" style="background:#2563eb; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">M</div>
+                <div style="background:#f59e0b; width:42px; height:42px; border-radius:50%;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">D</div>
                 <div>
-                  <div class="user-footer-name">Main Admin</div>
-                  <div class="user-footer-sub">System Administrator</div>
+                  <div class="text-white font-semibold text-sm">DRRMO</div>
+                  <div class="text-[#94a3b8] text-[11px]">Emergency Response</div>
                 </div>
             </div>
-            <a href="profile.html" class="settings-link"><i data-lucide="settings" style="width:18px; height:18px"></i></a>
+            <a href="profile3.html" class="text-[#94a3b8] hover:text-[#3b82f6] transition-colors"><i data-lucide="settings" class="w-4 h-4"></i></a>
         </div>
-        <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
-            <i data-lucide="log-out" style="width:16px; height:16px"></i> Logout
+        <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 text-white text-sm font-semibold hover:bg-gray-800 transition-colors">
+            <i data-lucide="log-out" class="w-4 h-4"></i> Logout
         </button>
     </div>
   </aside>
@@ -140,42 +152,34 @@
     <div class="p-4 sm:p-8 flex-1 relative flex flex-col max-w-[1600px] mx-auto w-full">
       
       <div id="view-list" class="animate-in block w-full">
-        
         <div class="border-b border-gray-800 flex gap-2 mb-6 overflow-x-auto no-scrollbar whitespace-nowrap">
-            <button id="tab-btn-live" onclick="switchAnnTab('live')" class="px-4 py-3 text-sm font-semibold text-blue-500 border-b-2 border-blue-500 -mb-[1px] flex items-center gap-2 transition-colors">
-                <i data-lucide="radio" class="w-4 h-4"></i> Live Announcements
-            </button>
-            <button id="tab-btn-queue" onclick="switchAnnTab('queue')" class="px-4 py-3 text-sm font-semibold text-[#94a3b8] hover:text-white border-b-2 border-transparent -mb-[1px] flex items-center gap-2 transition-colors">
-                <i data-lucide="clock" class="w-4 h-4"></i> Approval Queue
-            </button>
-            <button id="tab-btn-denied" onclick="switchAnnTab('denied')" class="px-4 py-3 text-sm font-semibold text-[#94a3b8] hover:text-white border-b-2 border-transparent -mb-[1px] flex items-center gap-2 transition-colors">
-                <i data-lucide="trash-2" class="w-4 h-4"></i> Denied/Taken Down
-            </button>
+            <button id="tab-btn-live" onclick="switchAnnTab('live')" class="px-4 py-3 text-sm font-semibold text-blue-500 border-b-2 border-blue-500 -mb-[1px] flex items-center gap-2 transition-colors"><i data-lucide="radio" class="w-4 h-4"></i> Live Announcements</button>
+            <button id="tab-btn-queue" onclick="switchAnnTab('queue')" class="px-4 py-3 text-sm font-semibold text-[#94a3b8] hover:text-white border-b-2 border-transparent -mb-[1px] flex items-center gap-2 transition-colors"><i data-lucide="clock" class="w-4 h-4"></i> Waiting for Approval</button>
+            <button id="tab-btn-denied" onclick="switchAnnTab('denied')" class="px-4 py-3 text-sm font-semibold text-[#94a3b8] hover:text-white border-b-2 border-transparent -mb-[1px] flex items-center gap-2 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i> Denied/Taken Down</button>
         </div>
 
-        <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 mb-6">
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full xl:w-auto">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <div class="flex items-center gap-3">
               <span class="text-sm font-semibold text-[#94a3b8] hidden sm:block">Filter:</span>
-              <input type="date" id="filter-calendar" onchange="filterAnnouncements()" class="modal-input !mt-0 h-10 py-0 px-3 text-sm w-full sm:w-40 shadow-sm" title="Filter by Date">
+              <input type="date" id="filter-calendar" onchange="filterAnnouncements()" class="modal-input !mt-0 h-10 py-0 px-3 text-sm w-40 shadow-sm" title="Filter by Date">
               
-              <div class="custom-dropdown-container relative w-full sm:w-48 text-sm shadow-sm z-30">
+              <div class="custom-dropdown-container relative w-48 text-sm shadow-sm z-30">
                   <div id="filter-category-btn" onclick="toggleDropdown('filter-category-menu')" class="modal-input !mt-0 h-10 py-0 pl-3 pr-3 flex justify-between items-center cursor-pointer text-white">
                       <span id="filter-category-text" class="truncate text-[#94a3b8]">All Categories</span>
                       <i data-lucide="chevron-down" class="w-4 h-4 text-[#94a3b8] flex-shrink-0 ml-2"></i>
                   </div>
-                  <div id="filter-category-menu" class="cat-dropdown-menu absolute left-0 top-full mt-1 w-full bg-[#1e2536] border border-gray-700 rounded-lg shadow-xl hidden max-h-48 overflow-y-auto">
-                      </div>
+                  <div id="filter-category-menu" class="cat-dropdown-menu absolute left-0 top-full mt-1 w-full bg-[#1e2536] border border-gray-700 rounded-lg shadow-xl hidden max-h-48 overflow-y-auto"></div>
               </div>
               <button id="btn-remove-filter-cat" onclick="removeCategory('filter')" class="hidden w-full sm:w-auto p-2.5 rounded-lg border border-gray-700 bg-[#1e2536] text-red-400 hover:text-red-500 hover:border-red-500/50 transition-all shadow-sm flex items-center justify-center" title="Delete Selected Category">
                   <i data-lucide="minus" class="w-4 h-4"></i>
               </button>
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
-                <button onclick="openModal('create-category-modal')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-lg text-sm flex items-center justify-center gap-2 shadow-lg transition-colors whitespace-nowrap">
+            <div class="flex gap-3 w-full sm:w-auto">
+                <button onclick="openModal('create-category-modal')" class="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-lg text-sm flex items-center justify-center gap-2 shadow-lg transition-colors whitespace-nowrap">
                     <i data-lucide="folder-plus" class="w-4 h-4"></i> Create Category
                 </button>
-                <button onclick="checkCategoryBeforeAnn()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-lg text-sm flex items-center justify-center gap-2 shadow-lg transition-colors whitespace-nowrap">
+                <button onclick="checkCategoryBeforeAnn()" class="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-lg text-sm flex items-center justify-center gap-2 shadow-lg transition-colors whitespace-nowrap">
                     <i data-lucide="file-plus" class="w-4 h-4"></i> Create Announcement
                 </button>
             </div>
@@ -184,31 +188,24 @@
         <div id="grid-live" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch"></div>
         <div id="grid-queue" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch hidden"></div>
         <div id="grid-denied" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch hidden"></div>
-
       </div>
 
       <div id="view-form" class="hidden animate-in pb-10 w-full max-w-[800px] mx-auto mt-4">
-        
-        <button onclick="handleAnnBackClick()" id="btn-back-trigger" class="border border-[#374151] bg-transparent hover:bg-[#1e2536] text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center justify-center sm:justify-start gap-2 mb-6 transition-colors w-full sm:w-auto">
+        <button onclick="handleAnnBackClick()" id="btn-back-trigger" class="border border-gray-700 bg-transparent hover:bg-[#1e2536] text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center justify-center sm:justify-start gap-2 mb-6 transition-colors w-full sm:w-auto">
           <i data-lucide="arrow-left" class="w-4 h-4"></i> <span id="btn-back-text">Back to Announcements</span>
         </button>
-        
-        <div class="border rounded-2xl p-4 sm:p-8 shadow-lg" style="background:var(--surface); border-color:var(--border)">
-          
+        <div class="border border-gray-700 rounded-2xl p-4 sm:p-8 shadow-lg" style="background:var(--surface);">
           <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-3 mb-8">
             <i id="form-icon" data-lucide="file-plus" class="text-blue-500 w-6 h-6 hidden sm:block"></i> 
             <span id="form-title">Create Announcement</span>
           </h2>
-          
           <form onsubmit="event.preventDefault(); handleAnnFormSubmit();">
-             
              <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-4 border-b border-gray-800 pb-2">Global Details</p>
-             
              <div class="space-y-5 mb-12">
                <div>
                  <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">TITLE <span class="text-red-500">*</span></label>
                  <input type="text" id="ann-title" placeholder="Enter announcement title" class="modal-input text-sm" oninput="clearReqError(this)">
-                 <p class="text-[10px] text-red-500 hidden mt-1">Required field</p>
+                 <p id="ann-title-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p>
                </div>
                <div>
                  <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">CATEGORY <span class="text-red-500">*</span></label>
@@ -218,8 +215,7 @@
                              <span id="ann-category-text" class="truncate text-[#94a3b8]">Select a category...</span>
                              <i data-lucide="chevron-down" class="w-4 h-4 text-[#94a3b8] flex-shrink-0 ml-2"></i>
                          </div>
-                         <div id="ann-category-menu" class="cat-dropdown-menu absolute left-0 top-full mt-1 w-full bg-[#1e2536] border border-gray-700 rounded-lg shadow-xl hidden max-h-48 overflow-y-auto">
-                             </div>
+                         <div id="ann-category-menu" class="cat-dropdown-menu absolute left-0 top-full mt-1 w-full bg-[#1e2536] border border-gray-700 rounded-lg shadow-xl hidden max-h-48 overflow-y-auto"></div>
                      </div>
                      <button type="button" id="btn-remove-form-cat" onclick="removeCategory('form')" class="hidden p-2.5 mt-1.5 rounded-lg border border-gray-700 bg-[#1e2536] text-red-400 hover:text-red-500 hover:border-red-500/50 transition-all shadow-sm" title="Delete Selected Category">
                          <i data-lucide="minus" class="w-4 h-4"></i>
@@ -229,7 +225,7 @@
                </div>
                <div>
                  <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">COVER IMAGE (OPTIONAL)</label>
-                 <div class="modal-input flex flex-col p-3" style="background:var(--surface); border-color:var(--border)">
+                 <div class="modal-input flex flex-col p-3" style="background:var(--surface);">
                    <div class="flex items-center">
                      <label class="bg-white text-black font-bold text-xs py-1.5 px-3 rounded cursor-pointer hover:bg-gray-200 transition-colors">
                         Choose File
@@ -243,40 +239,27 @@
              </div>
 
              <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-4 border-b border-gray-800 pb-2">Content Structure</p>
-             
              <div id="content-blocks-container" class="space-y-4 mb-6"></div>
-
-             <button type="button" onclick="addContentBlock()" class="w-full border border-[#374151] bg-transparent hover:bg-[#1e2536] text-[#94a3b8] hover:text-white font-bold py-3 rounded-lg text-sm transition-colors flex items-center justify-center gap-2 mb-8">
-               <i data-lucide="plus" class="w-4 h-4"></i> Add New Content Block
-             </button>
-
+             <button type="button" onclick="addContentBlock()" class="w-full border border-gray-700 bg-transparent hover:bg-[#1e2536] text-[#94a3b8] hover:text-white font-bold py-3 rounded-lg text-sm transition-colors flex items-center justify-center gap-2 mb-8"><i data-lucide="plus" class="w-4 h-4"></i> Add New Content Block</button>
              <div class="flex justify-center mt-4">
                <button type="submit" id="btn-submit" class="w-full sm:w-auto px-8 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-lg text-sm transition-colors shadow-sm">Submit for Review</button>
              </div>
-
           </form>
         </div>
       </div>
 
       <div id="view-details" class="hidden animate-in pb-10 w-full max-w-[800px] mx-auto mt-4">
-        
-        <button onclick="closeAnnDetails()" class="border border-[#374151] bg-transparent hover:bg-[#1e2536] text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center justify-center sm:justify-start gap-2 mb-6 transition-colors w-full sm:w-auto">
+        <button onclick="closeAnnDetails()" class="border border-gray-700 bg-transparent hover:bg-[#1e2536] text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center justify-center sm:justify-start gap-2 mb-6 transition-colors w-full sm:w-auto">
           <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Announcements
         </button>
-        
-        <div class="border rounded-2xl p-4 sm:p-8 shadow-lg relative" style="background:var(--surface); border-color:var(--border)">
-          
+        <div class="border border-gray-700 rounded-2xl p-4 sm:p-8 shadow-lg relative" style="background:var(--surface);">
           <span id="detail-badge" class="absolute top-4 right-4 sm:top-8 sm:right-8 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase"></span>
-          
           <div class="text-center mb-8 mt-6 sm:mt-2 max-w-[90%] sm:max-w-[80%] mx-auto flex flex-col items-center">
               <h1 id="detail-title" class="text-2xl sm:text-3xl font-bold text-white mb-3 leading-tight"></h1>
               <p class="text-sm text-[#94a3b8]">Published <span id="detail-date"></span></p>
           </div>
-          
           <div id="detail-cover-container" class="hidden mb-8 flex justify-center"></div>
-
-          <hr style="border-color:var(--border)" class="mb-8">
-          
+          <hr class="border-gray-700 mb-8">
           <div id="detail-content" class="w-full"></div>
         </div>
       </div>
@@ -284,129 +267,128 @@
     </div>
   </main>
 
-  <div id="create-category-modal" class="modal-overlay hidden">
-    <div class="border rounded-2xl p-8 w-full sm:max-w-[400px] shadow-2xl text-left max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
-      <h2 class="text-white font-bold text-xl mb-6 flex items-center gap-2">
-        <i data-lucide="folder-plus" class="text-blue-500 w-6 h-6"></i> Create Category
-      </h2>
-      <div class="space-y-4">
-        <div>
-          <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Category Name <span class="text-red-500">*</span></label>
-          <input type="text" id="new-category-name" placeholder="e.g. Weather Alert" class="modal-input text-sm" oninput="clearReqError(this)">
-          <p class="text-[10px] text-red-500 hidden mt-1">Required field</p>
-        </div>
+  <div id="create-category-modal" class="modal-overlay hidden" onclick="event.stopPropagation()">
+      <div class="border border-gray-700 rounded-2xl p-8 w-[400px] max-w-[90%] shadow-2xl text-left" style="background:var(--surface);" onclick="event.stopPropagation()">
+          <h2 class="text-white font-bold text-xl mb-6 flex items-center gap-2"><i data-lucide="folder-plus" class="text-blue-500 w-6 h-6"></i> Create Category</h2>
+          <div class="space-y-4">
+              <div>
+                  <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Category Name <span class="text-red-500">*</span></label>
+                  <input type="text" id="new-category-name" placeholder="e.g. Weather Alert" class="modal-input text-sm" oninput="this.classList.remove('input-error'); document.getElementById('new-category-error').classList.add('hidden')">
+                  <p id="new-category-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p>
+              </div>
+          </div>
+          <div class="flex justify-end gap-3 mt-8">
+              <button onclick="closeModal('create-category-modal')" class="px-5 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">Cancel</button>
+              <button onclick="saveCategory()" class="px-5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg">Save Category</button>
+          </div>
       </div>
-      <div class="flex flex-col sm:flex-row justify-end gap-3 mt-8">
-        <button onclick="closeModal('create-category-modal')" class="px-5 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-2.5 rounded-xl text-sm transition-colors w-full sm:w-auto">Cancel</button>
-        <button onclick="saveCategory()" class="px-5 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg w-full sm:w-auto">Save Category</button>
-      </div>
-    </div>
   </div>
 
   <div id="no-category-modal" class="modal-overlay hidden">
-    <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
+    <div class="border border-gray-700 w-[400px] max-w-[90%] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface);">
       <div style="background:#f59e0b; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-yellow-500/20">
         <i data-lucide="alert-circle" class="w-6 h-6"></i>
       </div>
       <h2 class="text-white font-bold text-xl mb-3">No Categories Found</h2>
       <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">You need to create at least one category before you can publish an announcement.</p>
-      
-      <div class="flex flex-col sm:flex-row gap-3">
-        <button onclick="closeModal('no-category-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
+      <div class="flex gap-3">
+        <button onclick="closeModal('no-category-modal')" class="flex-1 bg-[#1e2536] border border-gray-700 hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
         <button onclick="closeModal('no-category-modal'); openModal('create-category-modal')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Create Category</button>
       </div>
     </div>
   </div>
 
   <div id="confirm-delete-cat-modal" class="modal-overlay hidden">
-    <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
+    <div class="border border-gray-700 w-[400px] max-w-[90%] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface);">
       <div style="background:#ef4444; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-red-500/20">
         <i data-lucide="trash-2" class="w-6 h-6"></i>
       </div>
       <h2 class="text-white font-bold text-xl mb-3">Delete Category?</h2>
       <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to remove this category from the dropdown? Existing announcements will keep their category labels.</p>
-      
-      <div class="flex flex-col sm:flex-row gap-3">
-        <button onclick="closeModal('confirm-delete-cat-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
+      <div class="flex gap-3">
+        <button onclick="closeModal('confirm-delete-cat-modal')" class="flex-1 bg-[#1e2536] border border-gray-700 hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
         <button onclick="executeDeleteCategory()" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Delete</button>
       </div>
     </div>
   </div>
 
   <div id="confirm-submit-modal" class="modal-overlay hidden">
-    <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
+    <div class="border border-gray-700 w-[400px] max-w-[90%] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface);">
       <div style="background:#3b82f6; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
         <i data-lucide="send" class="w-6 h-6"></i>
       </div>
       <h2 id="confirm-submit-title" class="text-white font-bold text-xl mb-3">Submit for Review?</h2>
       <p id="confirm-submit-desc" class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to submit this announcement?</p>
-      
-      <div class="flex flex-col sm:flex-row gap-3">
-        <button onclick="closeModal('confirm-submit-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
+      <div class="flex gap-3">
+        <button onclick="closeModal('confirm-submit-modal')" class="flex-1 bg-[#1e2536] border border-gray-700 hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
         <button onclick="executeAnnFormSubmit()" id="btn-confirm-submit" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Confirm</button>
       </div>
     </div>
   </div>
 
   <div id="confirm-back-modal" class="modal-overlay hidden">
-    <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
+    <div class="border border-gray-700 w-[400px] max-w-[90%] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface);">
       <div style="background:#ef4444; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-red-500/20">
         <i data-lucide="alert-triangle" class="w-6 h-6 text-white"></i>
       </div>
       <h2 id="confirm-back-title" class="text-white font-bold text-xl mb-3">Discard Changes?</h2>
       <p id="confirm-back-desc" class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to go back? Any unsaved changes will be lost.</p>
-      
-      <div class="flex flex-col sm:flex-row gap-3">
-        <button onclick="closeModal('confirm-back-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Stay</button>
+      <div class="flex gap-3">
+        <button onclick="closeModal('confirm-back-modal')" class="flex-1 bg-[#1e2536] border border-gray-700 hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Stay</button>
         <button onclick="executeAnnBack()" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Discard</button>
       </div>
     </div>
   </div>
 
   <div id="confirm-action-modal" class="modal-overlay hidden">
-    <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
+    <div class="border border-gray-700 w-[400px] max-w-[90%] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface);">
       <div id="action-icon-bg" style="background:#3b82f6; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
         <i id="action-icon" data-lucide="check" class="w-6 h-6"></i>
       </div>
       <h2 id="action-title" class="text-white font-bold text-xl mb-3">Confirm Action?</h2>
       <p id="action-desc" class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure?</p>
-      
-      <div class="flex flex-col sm:flex-row gap-3">
-        <button onclick="closeModal('confirm-action-modal')" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
+      <div class="flex gap-3">
+        <button onclick="closeModal('confirm-action-modal')" class="flex-1 bg-[#1e2536] border border-gray-700 hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
         <button onclick="executeCardAction()" id="btn-action-confirm" class="flex-1 font-bold py-3 rounded-xl text-sm transition-all shadow-sm border-transparent">Confirm</button>
       </div>
     </div>
   </div>
 
   <div id="success-submit-modal" class="modal-overlay hidden">
-    <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
+    <div class="border border-gray-700 w-[400px] max-w-[90%] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface);">
       <div style="background:#22c55e; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-green-500/20">
         <i data-lucide="check-circle" class="w-6 h-6"></i>
       </div>
       <h2 class="text-white font-bold text-xl mb-3">Success</h2>
       <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Your announcement action was completed successfully.</p>
-      
       <button onclick="closeModal('success-submit-modal')" class="w-full bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Done</button>
     </div>
   </div>
 
-<script src="js/app.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => { if (window.lucide) lucide.createIcons(); });
+  <script src="js/app3.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => { 
+      if (window.lucide) lucide.createIcons(); 
+    });
 
-  // Handle Mobile Sidebar Toggle
-  function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('sidebar-overlay');
-      
-      if (sidebar.classList.contains('-translate-x-full')) {
-          sidebar.classList.remove('-translate-x-full');
-          overlay.classList.remove('hidden');
-      } else {
-          sidebar.classList.add('-translate-x-full');
-          overlay.classList.add('hidden');
-      }
-  }
-</script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        if (sidebar.classList.contains('-translate-x-full')) {
+            sidebar.classList.remove('-translate-x-full');
+            if(overlay) overlay.classList.remove('hidden');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            if(overlay) overlay.classList.add('hidden');
+        }
+    }
+
+    function doLogout() {
+        localStorage.removeItem('activeDepartment');
+        window.location.href = 'admin.html';
+    }
+  </script>
 </body>
 </html>

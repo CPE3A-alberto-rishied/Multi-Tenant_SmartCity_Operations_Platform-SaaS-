@@ -2,113 +2,160 @@
 <html lang="en" class="h-full">
 <head>
   <meta charset="UTF-8" />
+  
+  <script>
+      (function() {
+          const session = localStorage.getItem('activeDepartment');
+          if (!session || session !== 'DRRMO') {
+              window.location.replace('admin.html?error=unauthorized'); 
+          }
+      })();
+  </script>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BEAT – Dept Dashboard</title>
+  <title>BEAT – DRRMO Dashboard</title>
 
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
 
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
+  
+  <style>
+    body { font-family: 'DM Sans', sans-serif !important; }
+    
+    /* SIDEBAR */
+    .sidebar { width: 260px !important; flex-shrink: 0 !important; }
+    
+    .sidebar-item { 
+      display: flex !important; align-items: center !important; gap: 12px !important;
+      padding: 12px 18px !important; font-size: 14.5px !important; 
+      font-weight: 500 !important; color: #94a3b8 !important;
+      text-decoration: none !important; border-left: 3px solid transparent !important;
+    }
+    .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
+    .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
+    .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
+    
+    /* USER FOOTER */
+    .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
+    .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
+
+    /* Custom Scrollbar for Feed */
+    .feed-scroll::-webkit-scrollbar { width: 4px; }
+    .feed-scroll::-webkit-scrollbar-track { background: transparent; }
+    .feed-scroll::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+    .feed-scroll::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+  </style>
 </head>
 
 <body class="h-full flex bg-[#0a0e1a]">
 
-  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface">
-    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+  <aside id="sidebar" class="sidebar flex flex-col h-full absolute lg:relative z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300" style="background:var(--surface); border-right: 1px solid var(--border)">
+    <div class="h-[76px] px-5 flex items-center shrink-0 border-b" style="border-color:var(--border)">
       <div class="flex items-center gap-3">
-        <div class="logo-box">B</div>
+        <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
         <div class="flex flex-col justify-center">
           <div class="logo-text font-bold text-white">BEAT</div>
-          <div class="sidebar-subtext">Department Portal</div>
+          <div class="text-[11px] text-[#94a3b8] leading-none">Department Portal</div>
         </div>
       </div>
+      <button class="lg:hidden ml-auto text-gray-400 hover:text-white" onclick="toggleSidebar()">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
     </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
-      <a href="dashboard2.html" class="sidebar-item active"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
-      <a href="reports2.html" class="sidebar-item"><i data-lucide="file-text"></i><span>Public Reports</span></a>
-      <a href="announcements2.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
-      <a href="traffic2.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
-      <a href="analytics2.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
+      <a href="dashboard3.html" class="sidebar-item active"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+      <a href="reports3.html" class="sidebar-item"><i data-lucide="file-text"></i><span>Public Reports</span></a>
+      <a href="announcements3.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+      <a href="traffic3.html" class="sidebar-item"><i data-lucide="truck"></i><span>Fleet Response Control</span></a>
+      <a href="analytics3.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
     </nav>
 
     <div class="user-footer">
         <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
-                <div id="nav-avatar" class="nav-avatar">T</div>
+                <div style="background:#f59e0b; width:42px; height:42px; border-radius:50%;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">D</div>
                 <div>
-                  <div class="user-footer-name">Traffic</div>
-                  <div class="user-footer-sub">Traffic Department</div>
+                  <div class="text-white font-semibold text-sm">DRRMO</div>
+                  <div class="text-[#94a3b8] text-[11px]">Emergency Response</div>
                 </div>
             </div>
-            <a href="profile2.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
+            <a href="profile3.html" class="text-[#94a3b8] hover:text-[#3b82f6] transition-colors"><i data-lucide="settings" class="w-4 h-4"></i></a>
         </div>
-        <button onclick="doLogout()" class="btn-logout">
-            <i data-lucide="log-out" class="icon-sm"></i> Logout
+        <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 text-white text-sm font-semibold hover:bg-gray-800 transition-colors">
+            <i data-lucide="log-out" class="w-4 h-4"></i> Logout
         </button>
     </div>
   </aside>
 
   <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a]">
-    <header class="h-[76px] px-8 flex items-center justify-between shrink-0 theme-surface theme-border-b">
-      <h1 class="text-xl font-semibold text-white flex items-center gap-2">
-        <i data-lucide="layout-grid" class="icon-lg"></i> Dashboard Overview
-      </h1>
+    <header class="h-[76px] px-4 sm:px-8 flex items-center justify-between shrink-0 border-b" style="background:var(--surface); border-color:var(--border)">
+      <div class="flex items-center gap-4">
+          <button class="lg:hidden text-gray-400 hover:text-white" onclick="toggleSidebar()">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+          <h1 class="text-xl font-semibold text-white flex items-center gap-2">
+            <i data-lucide="layout-grid" class="w-6 h-6 text-blue-500 hidden sm:block"></i> Dashboard Overview
+          </h1>
+      </div>
       
       <div class="flex items-center gap-4">
-        <div class="px-4 py-2 rounded-xl flex items-center gap-3 shadow-sm border theme-surface-2 theme-border">
-          <i data-lucide="sun" class="w-4 h-4 text-yellow-500"></i>
-          <span class="text-sm font-semibold text-white">28°C</span>
+        <div class="px-4 py-2 rounded-xl flex items-center gap-3 shadow-sm border" style="background:var(--surface2); border-color:var(--border)">
+          <i data-lucide="cloud-rain" class="w-4 h-4 text-blue-400"></i>
+          <span class="text-sm font-semibold text-white">26°C</span>
           <div class="w-px h-4 bg-gray-700"></div>
-          <span class="text-[11px] font-bold text-[#94a3b8] uppercase tracking-wider">Mainly Clear</span>
+          <span class="text-[11px] font-bold text-[#94a3b8] uppercase tracking-wider">Light Rain</span>
         </div>
       </div>
     </header>
 
-    <div class="flex-1 overflow-y-auto p-8 animate-in">
+    <div class="flex-1 overflow-y-auto p-4 sm:p-8 animate-in">
       <div class="max-w-[1400px] mx-auto space-y-6">
         
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           
-          <div class="border theme-border rounded-2xl p-6 shadow-lg theme-surface flex flex-col justify-between hover:border-rose-500/50 transition-colors">
+          <div class="border rounded-2xl p-6 shadow-lg flex flex-col justify-between hover:border-rose-500/50 transition-colors" style="background:var(--surface); border-color:var(--border)">
             <div class="mb-4">
               <p class="text-[11px] font-bold uppercase tracking-wider text-[#94a3b8]">Active Incidents</p>
             </div>
             <div>
-              <h2 class="text-3xl font-bold text-rose-500 mb-1">0</h2>
+              <h2 class="text-3xl font-bold text-rose-500 mb-1">2</h2>
               <p class="text-xs text-[#94a3b8]">Live system count</p>
             </div>
           </div>
 
-          <div class="border theme-border rounded-2xl p-6 shadow-lg theme-surface flex flex-col justify-between hover:border-orange-500/50 transition-colors">
+          <div class="border rounded-2xl p-6 shadow-lg flex flex-col justify-between hover:border-orange-500/50 transition-colors" style="background:var(--surface); border-color:var(--border)">
             <div class="mb-4">
               <p class="text-[11px] font-bold uppercase tracking-wider text-[#94a3b8]">Pending Approvals</p>
             </div>
             <div>
               <div class="flex items-center gap-3 mb-1">
-                <h2 class="text-3xl font-bold text-white">0</h2>
+                <h2 class="text-3xl font-bold text-white">1</h2>
               </div>
               <p class="text-xs text-[#94a3b8]">Staff announcements</p>
             </div>
           </div>
           
-          <div class="border theme-border rounded-2xl p-6 shadow-lg theme-surface flex flex-col justify-between hover:border-blue-500/50 transition-colors">
+          <div class="border rounded-2xl p-6 shadow-lg flex flex-col justify-between hover:border-blue-500/50 transition-colors" style="background:var(--surface); border-color:var(--border)">
             <div class="mb-4">
               <p class="text-[11px] font-bold uppercase tracking-wider text-[#94a3b8]">Total Reports (30D)</p>
             </div>
             <div>
-              <h2 class="text-3xl font-bold text-white mb-1">0</h2>
-              <p class="text-xs text-[#94a3b8]">Across all barangays</p>
+              <h2 id="total-reports-count" class="text-3xl font-bold text-white mb-1">...</h2>
+              <p class="text-xs text-emerald-400 mt-2 flex items-center gap-1"><i data-lucide="refresh-cw" class="w-3 h-3"></i> Live Sync</p>
             </div>
           </div>
           
-          <div class="border theme-border rounded-2xl p-6 shadow-lg theme-surface flex flex-col justify-between hover:border-emerald-500/50 transition-colors">
+          <div class="border rounded-2xl p-6 shadow-lg flex flex-col justify-between hover:border-emerald-500/50 transition-colors" style="background:var(--surface); border-color:var(--border)">
             <div class="mb-4">
-              <p class="text-[11px] font-bold uppercase tracking-wider text-[#94a3b8]">Active Staff</p>
+              <p class="text-[11px] font-bold uppercase tracking-wider text-[#94a3b8]">Active Responders</p>
             </div>
             <div>
-              <h2 class="text-3xl font-bold text-emerald-500 mb-1">1</h2>
+              <h2 class="text-3xl font-bold text-emerald-500 mb-1">3</h2>
               <p class="text-xs text-[#94a3b8]">Online right now</p>
             </div>
           </div>
@@ -116,92 +163,25 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          <div class="border theme-border rounded-2xl p-6 shadow-lg theme-surface">
-            <div class="flex items-center gap-2 mb-8">
-              <i data-lucide="bar-chart-horizontal" class="text-blue-500 icon-sm"></i>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-[#94a3b8]">Congestion Index</h3>
-            </div>
-            <div class="space-y-6">
-              <div class="space-y-2">
-                <div class="flex justify-between text-[11px] font-bold text-[#94a3b8] uppercase tracking-wider">
-                  <span>C5 North</span><span class="text-white">82%</span>
-                </div>
-                <div class="h-2 w-full rounded-full overflow-hidden theme-surface-2">
-                  <div class="h-full bg-rose-500 rounded-full" style="width: 82%"></div>
-                </div>
+          <div class="lg:col-span-2 border rounded-xl p-6 shadow-sm flex flex-col min-h-[400px] justify-center items-center text-center" style="background:var(--surface); border-color:var(--border)">
+             <div class="w-16 h-16 bg-gray-800/50 rounded-full flex items-center justify-center text-gray-600 mb-4">
+                  <i data-lucide="map" class="w-8 h-8"></i>
               </div>
-              <div class="space-y-2">
-                <div class="flex justify-between text-[11px] font-bold text-[#94a3b8] uppercase tracking-wider">
-                  <span>EDSA South</span><span class="text-white">95%</span>
-                </div>
-                <div class="h-2 w-full rounded-full overflow-hidden theme-surface-2">
-                  <div class="h-full bg-rose-500 rounded-full" style="width: 95%"></div>
-                </div>
-              </div>
-              <div class="space-y-2">
-                <div class="flex justify-between text-[11px] font-bold text-[#94a3b8] uppercase tracking-wider">
-                  <span>Ortigas Ave</span><span class="text-white">45%</span>
-                </div>
-                <div class="h-2 w-full rounded-full overflow-hidden theme-surface-2">
-                  <div class="h-full bg-blue-500 rounded-full" style="width: 45%"></div>
-                </div>
-              </div>
-            </div>
+              <h3 class="text-white font-bold text-lg mb-1">Map View Unavailable</h3>
+              <p class="text-[#94a3b8] text-sm max-w-[280px]">The map module is being configured for the DRRMO dashboard.</p>
           </div>
 
-          <div class="border theme-border rounded-2xl p-6 shadow-lg theme-surface">
-            <div class="flex items-center gap-2 mb-6">
-              <i data-lucide="radio" class="text-emerald-500 icon-sm"></i>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-[#94a3b8]">Unit Dispatch Status</h3>
-            </div>
-            <div class="space-y-3">
-              <div class="p-4 rounded-xl flex items-center justify-between theme-surface-2 border theme-border hover:border-gray-500 transition-colors cursor-default">
-                <div>
-                  <p class="text-sm font-semibold text-white">Unit-Alpha (Rico)</p>
-                  <p class="text-[10px] text-[#94a3b8] mt-1 uppercase tracking-wider">Incident #882 / C5 North</p>
-                </div>
-                <span class="text-[9px] font-bold text-blue-400 bg-blue-400/10 px-2.5 py-1 rounded border border-blue-400/20 uppercase tracking-wider">En Route</span>
-              </div>
-              <div class="p-4 rounded-xl flex items-center justify-between theme-surface-2 border theme-border hover:border-gray-500 transition-colors cursor-default">
-                <div>
-                  <p class="text-sm font-semibold text-white">Unit-Bravo (Santi)</p>
-                  <p class="text-[10px] text-[#94a3b8] mt-1 uppercase tracking-wider">Incident #880 / Ortigas</p>
-                </div>
-                <span class="text-[9px] font-bold text-rose-400 bg-rose-400/10 px-2.5 py-1 rounded border border-rose-400/20 uppercase tracking-wider">On Scene</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="border theme-border rounded-2xl p-6 shadow-lg theme-surface">
-            <div class="flex items-center justify-between mb-6">
+          <div class="border rounded-2xl p-6 shadow-lg flex flex-col flex-1 overflow-hidden" style="background:var(--surface); border-color:var(--border)">
+            <div class="flex items-center justify-between mb-6 shrink-0">
               <div class="flex items-center gap-2">
-                <i data-lucide="bell" class="text-purple-500 icon-sm"></i>
+                <i data-lucide="bell" class="w-4 h-4 text-purple-500"></i>
                 <h3 class="text-xs font-bold uppercase tracking-wider text-[#94a3b8]">Live Reports Feed</h3>
               </div>
-              <a href="reports2.html" class="text-[10px] font-bold text-blue-400 uppercase tracking-wider hover:text-blue-300 transition-colors">View All</a>
+              <a href="reports3.html" class="text-[10px] font-bold text-blue-400 uppercase tracking-wider hover:text-blue-300 transition-colors">View All</a>
             </div>
             
-            <div class="relative space-y-6 before:absolute before:left-[5px] before:top-2 before:bottom-2 before:w-px before:bg-gray-800 ml-1">
-              
-              <div class="relative pl-6">
-                <div class="absolute left-0 top-1.5 w-2 h-2 rounded-full bg-rose-500 ring-4 ring-rose-500/10 -ml-[3px]"></div>
-                <div class="flex justify-between items-start">
-                  <p class="text-sm font-semibold text-white leading-tight">Vehicular Accident</p>
-                  <span class="text-[10px] font-mono text-[#94a3b8] uppercase">2m ago</span>
-                </div>
-                <p class="text-[11px] text-[#94a3b8] mt-1 tracking-wide">Brgy. San Antonio, C5 North</p>
-              </div>
-
-              <div class="relative pl-6">
-                <div class="absolute left-0 top-1.5 w-2 h-2 rounded-full bg-slate-500 -ml-[3px]"></div>
-                <div class="flex justify-between items-start">
-                  <p class="text-sm font-semibold text-white leading-tight">Illegal Parking</p>
-                  <span class="text-[10px] font-mono text-[#94a3b8] uppercase">15m ago</span>
-                </div>
-                <p class="text-[11px] text-[#94a3b8] mt-1 tracking-wide">Emerald Ave, Ortigas</p>
-              </div>
-
+            <div id="reports-feed" class="relative space-y-5 flex-1 overflow-y-auto feed-scroll pr-2 before:absolute before:left-[3px] before:top-2 before:bottom-2 before:w-px before:bg-gray-800 ml-1">
+               <p class="text-xs text-gray-500 pl-5">Connecting to database...</p>
             </div>
           </div>
 
@@ -210,6 +190,91 @@
     </div>
   </main>
 
-  <script src="js/app2.js"></script>
+  <script src="js/app3.js"></script>
+
+  <script>
+    // 1. Initialize Icons
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.lucide) lucide.createIcons();
+        fetchReportsFromDB();
+    });
+
+    // 2. Mobile Sidebar Toggle
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        if (sidebar.classList.contains('-translate-x-full')) {
+            sidebar.classList.remove('-translate-x-full');
+            if(overlay) overlay.classList.remove('hidden');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            if(overlay) overlay.classList.add('hidden');
+        }
+    }
+
+    // 3. LOGOUT FUNCTION
+    function doLogout() {
+        localStorage.removeItem('activeDepartment'); // Wipe the session
+        window.location.href = 'admin.html'; // Kick back to login
+    }
+
+    // 4. MongoDB Fetch Logic
+    async function fetchReportsFromDB() {
+        const feedContainer = document.getElementById('reports-feed');
+        const totalReportsElement = document.getElementById('total-reports-count');
+        
+        try {
+            const response = await fetch('https://beat-pasig-api.onrender.com/api/reports');
+            const result = await response.json();
+            
+            const reports = Array.isArray(result) ? result : (result.data || []);
+            
+            if (totalReportsElement) totalReportsElement.innerText = reports.length;
+            if (feedContainer) feedContainer.innerHTML = ''; 
+
+            if(reports.length === 0) {
+                 if (feedContainer) feedContainer.innerHTML = '<p class="text-xs text-gray-500 pl-5">No recent reports found.</p>';
+                 return;
+            }
+
+            // Show top 6 recent
+            reports.slice(0, 6).forEach(report => {
+                const status = report.status || 'Pending';
+                let severityColor = 'blue';
+                let ringColor = '';
+                
+                if (status === 'Pending') { severityColor = 'orange'; ringColor = 'ring-orange-500/10'; }
+                else if (status === 'Resolved') { severityColor = 'emerald'; }
+                else if (status === 'Returned') { severityColor = 'rose'; ringColor = 'ring-rose-500/10'; }
+                
+                const dateObj = new Date(report.createdAt);
+                const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+                const feedHtml = `
+                  <div class="relative pl-6 animate-in fade-in mb-6">
+                    <div class="absolute left-0 top-1.5 w-2 h-2 rounded-full bg-${severityColor}-500 ${ringColor ? `ring-4 ${ringColor}` : ''} -ml-[3px]"></div>
+                    <div class="flex justify-between items-start">
+                      <p class="text-sm font-semibold text-white leading-tight truncate pr-2">${escapeHTML(report.report_subject || 'Incident Report')}</p>
+                      <span class="text-[10px] font-mono text-[#94a3b8] uppercase whitespace-nowrap shrink-0">${timeStr}</span>
+                    </div>
+                    <p class="text-[11px] text-[#94a3b8] mt-1 tracking-wide truncate">${escapeHTML(report.report_location || 'Pasig City')}</p>
+                  </div>
+                `;
+                feedContainer.insertAdjacentHTML('beforeend', feedHtml);
+            });
+
+        } catch (error) {
+            console.error("Error fetching reports from MongoDB:", error);
+            if (feedContainer) feedContainer.innerHTML = '<p class="text-xs text-red-400 pl-5">Failed to load reports from database.</p>';
+            if (totalReportsElement) totalReportsElement.innerText = 'Err';
+        }
+    }
+
+    function escapeHTML(str) {
+        if (!str) return '';
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+  </script>
 </body>
 </html>

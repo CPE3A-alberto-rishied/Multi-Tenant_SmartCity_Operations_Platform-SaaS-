@@ -19,7 +19,7 @@ function clearReqError(el) {
         }
     }
 }
-// ADD THIS TO THE TOP OF app.js
+
 function clearError(inputId, errorId) {
     const input = document.getElementById(inputId);
     const error = document.getElementById(errorId);
@@ -44,6 +44,7 @@ function doLogout() {
     // 2. Redirect to the login screen
     window.location.href = 'admin.html'; 
 }
+
 // Close custom dropdowns when clicking outside
 document.addEventListener('click', (e) => {
     if (!e.target.closest('.custom-dropdown-container')) {
@@ -56,6 +57,7 @@ document.addEventListener('click', (e) => {
 // AUTHENTICATION LOGIC (admin.html)
 // ==========================================
 let currentLoggingInId = "";
+
 async function handleLogin(event) {
     event.preventDefault();
 
@@ -64,8 +66,7 @@ async function handleLogin(event) {
     const selectedDept = document.getElementById('login-dept').value;
 
     try {
-        // Change this URL if your backend is hosted somewhere else
-        const response = await fetch('https://beat-pasig-api.onrender.com/api/login', {
+        const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -73,27 +74,38 @@ async function handleLogin(event) {
             body: JSON.stringify({ 
                 id: userId, 
                 password: userPass, 
-                dept: selectedDept // Matches your MongoDB field name
+                dept: selectedDept 
             })
         });
 
         const data = await response.json();
 
         if (response.ok && data.success) {
-            // Save the verified department to localStorage
-            localStorage.setItem('activeDepartment', data.department);
-            
-            // Redirect based on the verified department
-            if (data.department === 'Main Admin') {
-                window.location.href = 'dashboard.html';
-            } else if (data.department === 'Traffic') {
+
+           // --- 🚨 TEMPORARY 2FA BYPASS 🚨 ---
+           if (selectedDept === 'Main Admin') {
+               localStorage.setItem('activeDepartment', 'Main Admin');
+               window.location.href = 'dashboard.html';
+               return; // Stop the script here
+           } else if (selectedDept === 'Traffic') {
+               localStorage.setItem('activeDepartment', 'Traffic');
                 window.location.href = 'dashboard2.html';
-            } else if (data.department === 'DRRMO') {
-                window.location.href = 'dashboard3.html';
+              return; // Stop the script here
+          } else if (selectedDept === 'DRRMO') {
+             localStorage.setItem('activeDepartment', 'DRRMO');
+               window.location.href = 'dashboard3.html';
+               return; // Stop the script here
             }
+            // -------------------------------------------------
+
+            // SUCCESS: Credentials matched, Email was sent!
+            currentLoggingInId = data.adminId; // Store ID temporarily for verification
+            
+            // UI Transition: Hide Login Card, Show 2FA Verify Card for everyone else
+            document.getElementById('login-card').classList.add('hidden');
+            document.getElementById('verify-card').classList.remove('hidden');
         } else {
-            // If the backend sends back an error (wrong pass, wrong dept), alert the user
-            alert(data.message);
+            alert(data.error || data.message || 'Invalid credentials or department mismatch.');
         }
 
     } catch (error) {
@@ -106,8 +118,15 @@ async function handleVerify(e) {
     e.preventDefault();
     const inputs = document.querySelectorAll('.otp-input');
     const otpCode = Array.from(inputs).map(i => i.value).join('');
+    const errorMsg = document.getElementById('verify-error');
 
-    if (otpCode.length < 6) return;
+    if (otpCode.length < 6) {
+        if(errorMsg) {
+            errorMsg.innerText = "Please enter all 6 digits";
+            errorMsg.classList.remove('hidden');
+        }
+        return;
+    }
 
     try {
         const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/verify', {
@@ -117,15 +136,34 @@ async function handleVerify(e) {
         });
 
         const result = await response.json();
-        if (result.success) {
-            localStorage.setItem('activeDepartment', result.dept);
-            window.location.href = result.dept === 'Main Admin' ? "dashboard.html" : "dashboard2.html";
+        if (response.ok && result.success) {
+            const verifiedDept = result.department || result.dept;
+            localStorage.setItem('activeDepartment', verifiedDept);
+            
+            if (verifiedDept === 'Main Admin') {
+                window.location.href = 'dashboard.html';
+            } else if (verifiedDept === 'Traffic') {
+                window.location.href = 'dashboard2.html';
+            } else if (verifiedDept === 'DRRMO') {
+                window.location.href = 'dashboard3.html';
+            }
         } else {
-            alert("Incorrect code. Please try again.");
-            inputs.forEach(i => i.value = ''); // Clear inputs
+            if(errorMsg) {
+                errorMsg.innerText = result.error || "Incorrect code. Please try again.";
+                errorMsg.classList.remove('hidden');
+            }
+            
+            inputs.forEach(input => {
+                input.classList.add('input-error');
+                setTimeout(() => input.classList.remove('input-error'), 500); 
+                input.value = ''; 
+            });
             inputs[0].focus();
         }
-    } catch (error) { alert("Connection lost."); }
+    } catch (error) { 
+        console.error(error);
+        alert("Connection lost."); 
+    }
 }
 
 function handleReset(e) {
@@ -194,8 +232,6 @@ function closePopup(popupId) {
 // ==========================================
 // MANAGE ADMINS LOGIC (With Memory Sync)
 // ==========================================
-
-// Pulls data from memory so it persists across reloads!
 let departments = JSON.parse(localStorage.getItem('beat_departments')) || []; 
 let mockData = { 
     admins: JSON.parse(localStorage.getItem('beat_admins')) || [] 
@@ -243,12 +279,10 @@ function populateAdmins() {
 
     let adminsToDisplay = mockData.admins;
     
-    // Apply Department Filter
     if (currentFilter !== "All Departments") {
         adminsToDisplay = adminsToDisplay.filter(a => a.dept === currentFilter);
     }
 
-    // Apply Search Filter (Name or ID)
     if (currentSearchQuery) {
         adminsToDisplay = adminsToDisplay.filter(a => 
             a.username.toLowerCase().includes(currentSearchQuery) || 
@@ -294,10 +328,7 @@ function promptDeleteUser(username) {
 function executeDeleteUser() {
     if(userToDelete) {
         mockData.admins = mockData.admins.filter(a => a.username !== userToDelete);
-        
-        // SAVE USERS TO MEMORY
         localStorage.setItem('beat_admins', JSON.stringify(mockData.admins));
-
         userToDelete = null;
         populateAdmins();
     }
@@ -308,7 +339,6 @@ function executeDeleteDept() {
     mockData.admins = mockData.admins.filter(a => a.dept !== currentFilter);
     departments = departments.filter(d => d !== currentFilter);
     
-    // SAVE BOTH DEPARTMENTS AND USERS TO MEMORY
     localStorage.setItem('beat_departments', JSON.stringify(departments));
     localStorage.setItem('beat_admins', JSON.stringify(mockData.admins));
 
@@ -343,13 +373,11 @@ function executeAddStaff() {
         username: document.getElementById('staff-name').value,
         id: document.getElementById('staff-id').value,
         email: document.getElementById('staff-email').value,
-        password: document.getElementById('staff-pass').value, // Saved for Login Validation
+        password: document.getElementById('staff-pass').value,
         dept: document.getElementById('staff-dept').value,
         status: "Active"
     };
     mockData.admins.push(newUser);
-    
-    // SAVE USERS TO MEMORY
     localStorage.setItem('beat_admins', JSON.stringify(mockData.admins));
 
     clearAndCloseStaff(); 
@@ -367,10 +395,7 @@ function executeCreateDept() {
     const name = document.getElementById('new-dept-name').value.trim();
     if (name && !departments.includes(name)) { 
         departments.push(name); 
-        
-        // SAVE DEPARTMENTS TO MEMORY
         localStorage.setItem('beat_departments', JSON.stringify(departments));
-
         updateDepartmentDropdowns(); 
     }
     clearAndCloseDept(); 
@@ -419,10 +444,7 @@ function confirmStatusChange(isEnabling) {
         const user = mockData.admins.find(u => u.username === currentTargetUser);
         if (user) {
             user.status = isEnabling ? "Active" : "Disabled";
-            
-            // SAVE STATUS CHANGE TO MEMORY
             localStorage.setItem('beat_admins', JSON.stringify(mockData.admins));
-            
             populateAdmins(); 
         }
         closeModal(isEnabling ? 'enable-modal' : 'disable-modal');
@@ -439,6 +461,100 @@ function cancelStatusChange() {
 // ==========================================
 // REPORTS PAGE SPECIFIC LOGIC
 // ==========================================
+
+async function fetchAdminReports() {
+    const grid = document.getElementById('reports-grid');
+    if (!grid) return;
+
+    try {
+        const response = await fetch('https://beat-pasig-api.onrender.com/api/reports');
+        const result = await response.json();
+        
+        // Handle variations of backend API response formats
+        const reports = Array.isArray(result) ? result : (result.data || []);
+
+        if (reports.length > 0) {
+            const emptyState = document.getElementById('no-reports-empty');
+            if (emptyState) emptyState.classList.add('hidden');
+
+            Array.from(grid.children).forEach(child => {
+                if (child.id !== 'no-reports-empty') child.remove();
+            });
+
+            reports.forEach(report => {
+                const dateObj = report.createdAt ? new Date(report.createdAt) : new Date();
+                const dateStr = `${dateObj.getMonth() + 1}/${dateObj.getDate()}/${dateObj.getFullYear()}`;
+                let hours = dateObj.getHours();
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12 || 12; 
+                const minStr = dateObj.getMinutes().toString().padStart(2, '0');
+                const timeStr = `${hours}:${minStr} ${ampm}`;
+
+                const status = report.status || 'Pending';
+                const isResolved = status === 'Resolved';
+                
+                let badgeClass = "bg-yellow-500/10 text-yellow-500 border-yellow-500/20";
+                if (status === 'Pending') badgeClass = "bg-orange-500/10 text-orange-400 border border-orange-500/20";
+                else if (isResolved) badgeClass = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                else if (status === 'Returned') badgeClass = "bg-red-500/10 text-red-400 border border-red-500/20";
+
+                const newCardHTML = `
+                    <div class="report-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors animate-in ${isResolved ? 'opacity-70' : ''}" 
+                         style="background:var(--surface); border-color:var(--border)" 
+                         onclick="openReportDetails(this)" 
+                         data-id="${report._id || ''}"
+                         data-email="${escapeHTML(report.reporter_email || '')}" 
+                         data-contact="${escapeHTML(report.contact_number || '')}">
+                      
+                      <div class="flex justify-between items-start mb-4">
+                        <div>
+                          <p class="text-xs font-bold text-white report-date">${dateStr}</p>
+                          <p class="text-xs text-[#94a3b8]">${timeStr}</p>
+                        </div>
+                        <span class="badge-status ${badgeClass} px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all">${status}</span>
+                      </div>
+                      
+                      <h3 class="text-lg font-bold text-white mb-4 hover:text-blue-400 transition-colors">${escapeHTML(report.report_subject || 'Incident Report')}</h3>
+                      
+                      <div class="space-y-1 text-sm mb-4">
+                        <p><span class="text-[#94a3b8]">Name of reportee:</span> <span class="text-white font-semibold">${escapeHTML(report.reporter_name || 'Anonymous')}</span></p>
+                        <p><span class="text-[#94a3b8]">Location:</span> <span class="text-white font-semibold">${escapeHTML(report.report_location || 'Unknown')}</span></p>
+                      </div>
+                      
+                      <div class="text-sm mb-6">
+                        <p class="text-[#94a3b8] mb-1">Description:</p>
+                        <p class="text-slate-300 leading-relaxed line-clamp-3">${escapeHTML(report.report_description || '')}</p>
+                      </div>
+                      
+                      <div class="mt-auto pt-4 border-t space-y-4 text-sm" style="border-color:var(--border)" onclick="event.stopPropagation()">
+                        <div>
+                          <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2">FORWARD TO</p>
+                          <select class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500 cursor-pointer transition-all ${isResolved ? 'opacity-50 cursor-not-allowed' : ''}" onfocus="storePrevValue(this)" onchange="handleForward(this)" ${isResolved ? 'disabled' : ''}>
+                            <option value="" disabled selected hidden>Select department...</option>
+                            <option value="Traffic">Traffic</option>
+                            <option value="DRRMO">DRRMO</option>
+                            <option value="Engineering">Engineering</option>
+                          </select>
+                        </div>
+                        <div class="flex items-center justify-between mt-4">
+                          <p class="text-[11px] font-bold text-white uppercase tracking-wider">Mark as Resolved</p>
+                          <label class="switch" onclick="event.stopPropagation()">
+                            <input type="checkbox" onchange="handleReportToggle(event, this)" ${isResolved ? 'checked' : ''}>
+                            <span class="slider"></span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                `;
+                grid.insertAdjacentHTML('beforeend', newCardHTML);
+            });
+            
+            if (window.lucide) lucide.createIcons();
+        }
+    } catch (error) {
+        console.error("Error fetching reports from MongoDB:", error);
+    }
+}
 
 function openReportDetails(card) {
     if(!card) return;
@@ -503,94 +619,6 @@ function openReportDetails(card) {
     openModal('view-report-modal');
 }
 
-async function fetchAdminReports() {
-    const grid = document.getElementById('reports-grid');
-    if (!grid) return;
-
-    try {
-        const response = await fetch('https://beat-pasig-api.onrender.com/api/reports/all');
-        const result = await response.json();
-
-        if (result.success) {
-            grid.innerHTML = ''; // Clear the grid
-
-            result.data.forEach(report => {
-                const dateObj = new Date(report.createdAt);
-                const dateStr = dateObj.toLocaleDateString();
-                const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                // Match status colors to your UI
-                const statusStyles = {
-                    'Pending': 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-                    'Resolved': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-                    'Returned': 'bg-red-500/10 text-red-400 border-red-500/20'
-                };
-                const currentStyle = statusStyles[report.status] || 'bg-blue-500/10 text-blue-400 border-blue-500/20';
-
-                // Construct the full HTML card
-                const cardHTML = `
-                <div class="report-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors" 
-                     style="background:rgba(15, 23, 42, 0.5); border-color:rgba(51, 65, 85, 0.5)" 
-                     onclick="openReportDetails('${report._id}')">
-                    
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <p class="text-xs font-bold text-white report-date">${dateStr}</p>
-                            <p class="text-[10px] text-[#94a3b8]">${timeStr}</p>
-                        </div>
-                        <span class="badge-status ${currentStyle} px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border">
-                            ${report.status || 'PENDING'}
-                        </span>
-                    </div>
-
-                    <h3 class="text-lg font-bold text-white mb-4 uppercase tracking-tight">${escapeHTML(report.report_subject)}</h3>
-                    
-                    <div class="space-y-1 text-sm mb-4">
-                        <p><span class="text-[#94a3b8]">Name of reportee:</span> <span class="text-white font-semibold">${escapeHTML(report.reporter_name)}</span></p>
-                        <p><span class="text-[#94a3b8]">Location:</span> <span class="text-white font-semibold">${escapeHTML(report.report_location)}</span></p>
-                    </div>
-
-                    ${report.status === 'Returned' && report.return_reason ? `
-                        <div class="mb-4 p-4 bg-gray-900/50 border-l-4 border-red-500 rounded-r-lg">
-                            <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest mb-1">RETURN REASON:</p>
-                            <p class="text-xs text-[#94a3b8] italic">${escapeHTML(report.return_reason)}</p>
-                        </div>` : ''}
-
-                    <div class="text-sm mb-6">
-                        <p class="text-[#94a3b8] mb-1">Description:</p>
-                        <p class="text-slate-300 leading-relaxed line-clamp-3">${escapeHTML(report.report_description)}</p>
-                    </div>
-
-                    <div class="mt-auto pt-4 border-t space-y-4 text-sm" style="border-color:rgba(51, 65, 85, 0.5)" onclick="event.stopPropagation()">
-                        <div>
-                            <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2">FORWARD TO</p>
-                            <select class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500 cursor-pointer" 
-                                    onchange="handleForward(this, '${report._id}')">
-                                <option value="" disabled selected>${report.forwarded_to || 'Select department...'}</option>
-                                <option value="Traffic">Traffic</option>
-                                <option value="DRRMO">DRRMO</option>
-                                <option value="Engineering">Engineering</option>
-                            </select>
-                        </div>
-                        <div class="flex items-center justify-between mt-4">
-                            <p class="text-[11px] font-bold text-white uppercase tracking-wider">Mark as Resolved</p>
-                            <label class="switch">
-                                <input type="checkbox" ${report.status === 'Resolved' ? 'checked' : ''} onchange="handleReportToggle(event, this)">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>`;
-                grid.insertAdjacentHTML('beforeend', cardHTML);
-            });
-
-            if (window.lucide) lucide.createIcons();
-        }
-    } catch (error) {
-        console.error("Failed to load reports:", error);
-    }
-}
-
 function validateNewReport(e) {
     e.preventDefault();
     const fields = ['report-name', 'report-email', 'report-contact', 'report-location', 'report-subject', 'report-desc'];
@@ -648,7 +676,7 @@ function executeSubmitReport() {
           <p class="text-xs font-bold text-white report-date">${dateStr}</p>
           <p class="text-xs text-[#94a3b8]">${timeStr}</p>
         </div>
-        <span class="badge-status bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all">Pending</span>
+        <span class="badge-status bg-orange-500/10 text-orange-400 border border-orange-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all">Pending</span>
       </div>
       
       <h3 class="text-lg font-bold text-white mb-4 hover:text-blue-400 transition-colors">${escapeHTML(subject)}</h3>
@@ -831,6 +859,18 @@ async function confirmResolution() {
             // Update the UI Colors and Badges
             const badge = card.querySelector('.badge-status');
             const select = card.querySelector('select');
+            const reportId = card.getAttribute('data-id');
+            
+            // Optimistic Non-blocking DB Update attempt
+            if (reportId) {
+                try {
+                    fetch(`https://beat-pasig-api.onrender.com/api/report/${reportId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: 'Resolved' })
+                    }).catch(() => {});
+                } catch(e) {}
+            }
             
             if (badge && !badge.hasAttribute('data-orig-class')) {
                 badge.setAttribute('data-orig-class', badge.className);
@@ -860,6 +900,18 @@ function confirmCancelResolution() {
         if (card) {
             const badge = card.querySelector('.badge-status');
             const select = card.querySelector('select');
+            const reportId = card.getAttribute('data-id');
+            
+            // Optimistic Non-blocking DB Revert attempt
+            if (reportId) {
+                try {
+                    fetch(`https://beat-pasig-api.onrender.com/api/report/${reportId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: 'Pending' })
+                    }).catch(() => {});
+                } catch(e) {}
+            }
             
             card.classList.remove('opacity-70');
             
@@ -1579,110 +1631,23 @@ function executeAnnFormSubmit() {
 }
 
 
-// ==========================================
-// MAPBOX & CHART.JS TRAFFIC EXTRACTION HACK
-// ==========================================
-let globalTrafficChart = null;
-
-function initTrafficChart() {
-    const ctx = document.getElementById('trafficCongestionChart');
-    if (!ctx) return;
-
-    globalTrafficChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Light', 'Moderate', 'Heavy / Severe'],
-            datasets: [{
-                data: [0, 0, 0], // Starting empty
-                backgroundColor: ['#10b981', '#3b82f6', '#f43f5e'],
-                borderWidth: 0,
-                cutout: '75%'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            let total = context.chart._metasets[context.datasetIndex].total;
-                            let value = context.raw;
-                            let percentage = total > 0 ? Math.round((value / total) * 100) + '%' : '0%';
-                            return ` ${context.label}: ${percentage}`;
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
-
-function extractAndUpdateTrafficData(mapInstance) {
-    if (!globalTrafficChart || !mapInstance.getLayer('traffic')) return;
-
-    // Scan the features visible in the current bounding box
-    const features = mapInstance.queryRenderedFeatures({ layers: ['traffic'] });
-    let counts = { low: 0, moderate: 0, heavy: 0, severe: 0 };
-
-    features.forEach(f => {
-        const congestion = f.properties.congestion;
-        if (counts[congestion] !== undefined) {
-            counts[congestion]++;
-        }
-    });
-
-    const total = counts.low + counts.moderate + counts.heavy + counts.severe;
-    const heavySevereCombined = counts.heavy + counts.severe;
-
-    // 1. Update the Chart JS instance
-    globalTrafficChart.data.datasets[0].data = [
-        counts.low,
-        counts.moderate,
-        heavySevereCombined
-    ];
-    globalTrafficChart.update();
-
-    // 2. Update the HTML Legend Percentages
-    if (total > 0) {
-        const getPct = (val) => Math.round((val / total) * 100) + '%';
-        
-        const lightEl = document.getElementById('stat-light');
-        const modEl = document.getElementById('stat-moderate');
-        const heavyEl = document.getElementById('stat-heavy');
-        
-        if(lightEl) lightEl.innerText = getPct(counts.low);
-        if(modEl) modEl.innerText = getPct(counts.moderate);
-        if(heavyEl) heavyEl.innerText = getPct(heavySevereCombined);
-    }
-}
-
-
 // ====== PAGE LOAD INITIALIZER ======
 document.addEventListener('DOMContentLoaded', () => { 
-    if (localStorage.getItem('activeDepartment')) {
-        document.body.classList.remove('auth-guarded');
-    }
     if(window.lucide) lucide.createIcons(); 
     
-    // INITIALIZE CHART JS FOR DASHBOARD
-    initTrafficChart();
-
-    // 1. ADD THIS: Triggers the MongoDB fetch for Public Reports
-    if(document.getElementById('reports-grid')) {
-        fetchAdminReports();
-    }
-    
-    // 2. Existing: Load Manage Admins Logic
+    // Load Manage Admins Logic
     if(document.getElementById('dept-filter') && typeof updateDepartmentDropdowns === 'function') {
         updateDepartmentDropdowns(); 
         populateAdmins(); 
     }
     
-    // 3. Existing: Load Announcements Logic
+    // Load Announcements Logic
     if(document.getElementById('filter-calendar') && typeof renderCategoryDropdowns === 'function') {
         renderCategoryDropdowns();
         filterAnnouncements(); 
+    }
+
+    if(document.getElementById('reports-grid')) {
+        fetchAdminReports();
     }
 });

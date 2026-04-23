@@ -6,6 +6,7 @@
     <title>BEAT - Admin Control Center</title>
     
     <script>
+    // AUTO-REDIRECT: If already logged in, skip the login page
     if (localStorage.getItem('activeDepartment')) {
         const dept = localStorage.getItem('activeDepartment');
         if (dept === 'Main Admin') {
@@ -48,18 +49,15 @@
         
         button, a { cursor: pointer !important; }
 
-        /* =========================================
-           EXTRACTED INLINE STYLES (MOBILE RESPONSIVE)
-           ========================================= */
-        
         /* Backgrounds & Containers */
         .auth-bg {
             background: linear-gradient(135deg, #0a0e1a 0%, #1a1f3a 25%, #0f1428 50%, #1a254a 75%, #0a0e1a 100%);
             position: relative;
             overflow: hidden;
+            min-height: 100vh;
         }
         
-        /* Cards: Changed from fixed width to max-width for mobile support */
+        /* Cards */
         .popup-panel {
             width: 100%;
             max-width: 420px;
@@ -100,66 +98,44 @@
         .bg-blue-accent { background: #2563eb; }
         .bg-green-accent { background: #22c55e; }
         
-        .input-icon-left {
-            position: absolute; left: 14px; top: 13px; width: 18px; height: 18px; color: #94a3b8;
-        }
-        .input-icon-right {
-            position: absolute; right: 14px; top: 13px; width: 18px; height: 18px; color: #94a3b8; cursor: pointer; transition: color 0.2s;
-        }
+        .input-icon-left { position: absolute; left: 14px; top: 13px; width: 18px; height: 18px; color: #94a3b8; }
+        .input-icon-right { position: absolute; right: 14px; top: 13px; width: 18px; height: 18px; color: #94a3b8; cursor: pointer; transition: color 0.2s; }
         .input-icon-right:hover { color: #ffffff; }
 
         /* Form Inputs */
-        .auth-input-field {
-            padding: 12px 14px 12px 42px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-        .auth-input-pass {
-            padding: 12px 45px 12px 42px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-        .auth-select-field {
-            padding: 12px 14px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            cursor: pointer;
-        }
-        .auth-email-field {
-            padding: 12px 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
+        .auth-input-field { padding: 12px 14px 12px 42px; border-radius: 8px; border: 1px solid var(--border); }
+        .auth-input-pass { padding: 12px 45px 12px 42px; border-radius: 8px; border: 1px solid var(--border); }
+        .auth-select-field { padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; }
+        .auth-email-field { padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border); }
 
-        /* MOBILE RESPONSIVE MEDIA QUERY */
         @media (max-width: 480px) {
-            .auth-panel, .popup-panel {
-                padding: 1.5rem; /* Less padding on small screens to save space */
-            }
-            .otp-input {
-                width: 40px; /* Slightly narrower OTP boxes so they don't overflow */
-                height: 48px;
-                font-size: 1.1rem;
-            }
-            .logo-box {
-                width: 48px;
-                height: 48px;
-            }
-            #auth-logo h1 {
-                font-size: 32px;
-            }
+            .auth-panel, .popup-panel { padding: 1.5rem; }
+            .otp-input { width: 40px; height: 48px; font-size: 1.1rem; }
+            .logo-box { width: 48px; height: 48px; }
+            #auth-logo h1 { font-size: 32px; }
+            .flex-otp { gap: 0.25rem; }
         }
     </style>
 </head>
 <body class="h-full">
-    <div id="auth-screen" class="h-full w-full flex flex-col items-center justify-center auth-bg px-4">
+    <div id="auth-screen" class="h-full w-full flex flex-col items-center justify-center auth-bg px-4 relative">
         
+        <div id="unauthorized-toast" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[10000] hidden transition-all duration-500 opacity-0 -translate-y-4">
+            <div class="bg-[#ef4444]/10 border border-[#ef4444]/50 text-red-400 px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 backdrop-blur-md">
+                <i data-lucide="shield-alert" class="w-5 h-5 text-red-500"></i>
+                <span class="text-sm font-bold tracking-wide">Access Denied. Please log in first.</span>
+                <button onclick="closeUnauthorizedToast()" class="ml-2 text-red-500/70 hover:text-red-400 transition-colors">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+
         <div id="success-popup" class="modal-overlay hidden px-4">
             <div class="card card-glow popup-panel">
                 <div class="icon-circle bg-blue-accent flex items-center justify-center text-white"><i data-lucide="mail-check"></i></div>
                 <h2 class="text-white font-bold text-xl mb-4">Reset Link Sent</h2>
                 <p class="text-dim-sm line-height-relaxed mb-8">Check your email for password reset instructions.</p>
-                <button onclick="closePopup('success-popup')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-[10px]">Back to Login</button>
+                <button type="button" onclick="closePopup('success-popup')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-[10px]">Back to Login</button>
             </div>
         </div>
 
@@ -168,18 +144,28 @@
                 <div class="icon-circle bg-green-accent flex items-center justify-center text-white"><i data-lucide="mail"></i></div>
                 <h2 class="text-white font-bold text-xl mb-4">Code Resent</h2>
                 <p class="text-dim-sm mb-8">A new verification code has been sent to your email.</p>
-                <button onclick="closePopup('resent-popup')" class="w-32 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 mx-auto rounded-[10px]">Got it</button>
+                <button type="button" onclick="closePopup('resent-popup')" class="w-32 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 mx-auto rounded-[10px]">Got it</button>
             </div>
         </div>
 
-        <div id="auth-logo" class="text-center mb-10">
+        <div id="loading-popup" class="modal-overlay hidden px-4">
+            <div class="card card-glow popup-panel flex flex-col items-center justify-center py-10">
+                <div class="icon-circle bg-blue-accent flex items-center justify-center text-white mb-6 animate-spin">
+                    <i data-lucide="loader-2"></i>
+                </div>
+                <h2 class="text-white font-bold text-xl mb-2">Authenticating...</h2>
+                <p class="text-dim-sm line-height-relaxed">Please wait while we verify your credentials.</p>
+            </div>
+        </div>
+
+        <div id="auth-logo" class="text-center mb-10 mt-10">
             <div class="logo-box flex items-center justify-center font-mono font-bold text-white text-xl shadow-lg">B</div>
             <h1 class="font-mono font-bold tracking-widest text-white text-4xl m-0">BEAT</h1>
             <p class="text-dim-sm mt-1">Administrative Control System</p>
         </div>
 
         <div id="login-card" class="card card-glow auth-panel">
-            <form onsubmit="handleLogin(event)" novalidate>
+            <form onsubmit="handleLoginWrapper(event)" novalidate>
                 <div class="mb-5">
                     <label class="block text-[11px] font-bold mb-2 text-[#94a3b8] tracking-wider uppercase">ID Number</label>
                     <div class="relative flex flex-col">
@@ -216,8 +202,9 @@
             <div class="icon-circle bg-blue-accent flex items-center justify-center text-white"><i data-lucide="shield-check"></i></div>
             <h2 class="text-white font-bold text-xl mb-2">Verify Your Identity</h2>
             <p class="text-dim-sm mb-6">Enter the 6-digit code sent to your email</p>
+            
             <form onsubmit="handleVerify(event)" novalidate>
-                <div class="flex justify-between gap-1 sm:gap-2 mb-4">
+                <div class="flex justify-between flex-otp gap-1 sm:gap-2 mb-4">
                     <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 0)" onkeydown="handleOtpBack(event, 0)">
                     <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 1)" onkeydown="handleOtpBack(event, 1)">
                     <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 2)" onkeydown="handleOtpBack(event, 2)">
@@ -254,21 +241,85 @@
         document.addEventListener('DOMContentLoaded', () => { 
             if(window.lucide) lucide.createIcons(); 
             
-            // DYNAMIC LOGIN DROPDOWN: Loads created Departments from memory!
-            const loginDept = document.getElementById('login-dept');
-            if (loginDept) {
-                const savedDepts = JSON.parse(localStorage.getItem('beat_departments')) || [];
-                savedDepts.forEach(dept => {
-                    // Check if it already exists to prevent duplication
-                    if (!Array.from(loginDept.options).some(opt => opt.value === dept)) {
-                        const opt = document.createElement('option');
-                        opt.value = dept; // Ensure this casing matches DB exactly if dynamically added
-                        opt.text = dept + " Department";
-                        loginDept.appendChild(opt);
-                    }
-                });
+            // CHECK FOR UNAUTHORIZED URL PARAMETER
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('error') === 'unauthorized') {
+                showUnauthorizedToast();
             }
         });
+
+        // TOAST NOTIFICATION LOGIC
+        let toastTimeout;
+        function showUnauthorizedToast() {
+            const toast = document.getElementById('unauthorized-toast');
+            toast.classList.remove('hidden');
+            
+            // Clean up the URL so it doesn't show again if they refresh
+            window.history.replaceState({}, document.title, window.location.pathname);
+
+            // Animate In
+            requestAnimationFrame(() => {
+                toast.classList.remove('opacity-0', '-translate-y-4');
+                toast.classList.add('opacity-100', 'translate-y-0');
+            });
+
+            // Auto-hide after 5 seconds
+            toastTimeout = setTimeout(() => {
+                closeUnauthorizedToast();
+            }, 5000);
+        }
+
+        function closeUnauthorizedToast() {
+            clearTimeout(toastTimeout);
+            const toast = document.getElementById('unauthorized-toast');
+            toast.classList.remove('opacity-100', 'translate-y-0');
+            toast.classList.add('opacity-0', '-translate-y-4');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 500); // Wait for transition to finish
+        }
+
+        // ==========================================
+        // INSTANT LOADING WRAPPER
+        // ==========================================
+        async function handleLoginWrapper(e) {
+            e.preventDefault();
+            
+            const loginUser = document.getElementById('login-user');
+            const loginPass = document.getElementById('login-pass');
+            
+            let hasError = false;
+            if (!loginUser.value.trim()) {
+                loginUser.classList.add('input-error');
+                document.getElementById('user-error').classList.remove('hidden');
+                hasError = true;
+            }
+            if (!loginPass.value.trim()) {
+                loginPass.classList.add('input-error');
+                document.getElementById('pass-error').classList.remove('hidden');
+                hasError = true;
+            }
+            if (hasError) return;
+
+            const loginCard = document.getElementById('login-card');
+            const loadingPopup = document.getElementById('loading-popup');
+            const verifyCard = document.getElementById('verify-card');
+            
+            loginCard.classList.add('hidden');
+            loadingPopup.classList.remove('hidden');
+            
+            await handleLogin(e);
+            
+            loadingPopup.classList.add('hidden');
+            
+            if (!verifyCard.classList.contains('hidden')) {
+                const firstOtp = document.querySelector('.otp-input');
+                if(firstOtp) firstOtp.focus();
+            } else {
+                loginCard.classList.remove('hidden');
+            }
+        }
     </script>
 </body>
 </html>
