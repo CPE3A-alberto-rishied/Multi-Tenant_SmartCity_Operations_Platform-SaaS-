@@ -9,7 +9,7 @@
             window.location.replace('admin.html?error=unauthorized'); 
         }
     })();
-</script>
+  </script>
   <meta charset="UTF-8">
   <script>
         (function() {
@@ -101,11 +101,12 @@
   <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
 
   <aside id="sidebar" class="sidebar flex flex-col h-full absolute lg:relative z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300" style="background:var(--surface); border-right: 1px solid var(--border)">
+    
     <div class="h-[76px] px-5 flex items-center border-b shrink-0" style="border-color:var(--border)">
-      <div class="flex items-center gap-3">
-        <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
-        <div class="flex flex-col justify-center">
-          <div class="logo-text font-bold text-lg text-white tracking-widest leading-none mb-1">BEAT</div>
+      <div class="flex items-center gap-0.5">
+        <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-13 h-14 object-contain">
+        <div class="flex flex-col justify-center items-start">
+          <img src="/assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
           <div style="color:var(--text-dim); font-size:11px" class="leading-none">Admin Control Center</div>
         </div>
       </div>

@@ -100,6 +100,17 @@
 
   <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
 
+  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface">
+    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
+        <div id="auth-logo" class="flex items-center gap-1.5">
+            <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain">
+            <div class="flex flex-col justify-center items-start">
+                <img src="/assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
+                <div style="color:#94a3b8; font-size:11px" class="leading-none">Admin Control Center</div>
+            </div>
+        </div>
+    </div>
+
   <aside id="sidebar" class="sidebar flex flex-col h-full absolute lg:relative z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300" style="background:var(--surface); border-right: 1px solid var(--border)">
     <div class="h-[76px] px-5 flex items-center shrink-0 border-b" style="border-color:var(--border)">
       <div class="flex items-center gap-3">
