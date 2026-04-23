@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <script>
+    (function() {
+        const session = localStorage.getItem('activeDepartment');
+        if (!session) window.location.replace('admin.html?error=unauthorized'); 
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BEAT - Weather & AQI Alerts</title>
+  
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles2.css">
+</head>
+
+<body class="h-full flex bg-[#0a0e1a]">
+  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-50">
+    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
+      <div class="flex items-center gap-3">
+        <div class="logo-box bg-orange-600 text-white">B</div>
+        <div class="flex flex-col justify-center">
+          <div class="logo-text font-bold text-white">BEAT</div>
+          <div class="sidebar-subtext">Department Portal</div>
+        </div>
+      </div>
+    </div>
+    
+    <nav class="flex-1 py-4 overflow-y-auto">
+      <a href="dashboard3.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+      <a href="reports3.html" class="sidebar-item"><i data-lucide="file-text"></i><span>Public Reports</span></a>
+      <a href="announcements3.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+      <a href="weather.html" class="sidebar-item active"><i data-lucide="thermometer-sun"></i><span>Weather & AQI Alerts</span></a>
+      <a href="evacuation.html" class="sidebar-item"><i data-lucide="tent"></i><span>Evacuation Control</span></a>
+    </nav>
+
+    <div class="user-footer">
+        <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-3"><div id="nav-avatar" class="nav-avatar bg-orange-600">D</div><div><div class="user-footer-name">DRRMO</div><div class="user-footer-sub">Disaster Management</div></div></div>
+            <a href="profile3.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
+        </div>
+        <button type="button" onclick="doLogout()" class="btn-logout"><i data-lucide="log-out" class="icon-sm"></i> Logout</button>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] relative">
+    
+    <div class="absolute top-6 left-6 z-10 w-96 flex flex-col gap-4 max-h-[90vh]">
+        <div class="theme-surface border theme-border rounded-2xl p-6 shadow-2xl backdrop-blur-md bg-opacity-95 flex-shrink-0">
+            <div class="flex items-center justify-between mb-1">
+                <h2 class="text-white font-bold text-lg flex items-center gap-2"><i data-lucide="cloud-lightning" class="text-orange-500"></i> Environmental Hazards</h2>
+            </div>
+            <p class="text-[11px] text-[#94a3b8] mb-6">Live telemetry from Open-Meteo API for Pasig City.</p>
+            
+            <div class="space-y-4">
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-[#0f172a] border border-gray-800 p-4 rounded-xl text-center">
+                        <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Heat Index</p>
+                        <h3 id="api-heat" class="text-2xl font-bold text-white flex items-center justify-center gap-1">--<span class="text-sm">°C</span></h3>
+                    </div>
+                    <div class="bg-[#0f172a] border border-gray-800 p-4 rounded-xl text-center">
+                        <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">AQI (US)</p>
+                        <h3 id="api-aqi" class="text-2xl font-bold text-white">--</h3>
+                    </div>
+                    <div class="bg-[#0f172a] border border-gray-800 p-4 rounded-xl text-center">
+                        <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">PM 2.5</p>
+                        <h3 id="api-pm" class="text-xl font-bold text-gray-300">--</h3>
+                    </div>
+                    <div class="bg-[#0f172a] border border-gray-800 p-4 rounded-xl text-center">
+                        <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Carbon Monoxide</p>
+                        <h3 id="api-co" class="text-xl font-bold text-gray-300">--</h3>
+                    </div>
+                </div>
+
+                <div id="danger-alert" class="hidden bg-red-500/10 border border-red-500/30 p-4 rounded-xl mt-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="alert-triangle" class="text-red-500 w-5 h-5 animate-pulse"></i>
+                        <h4 class="text-red-500 font-bold text-sm uppercase tracking-wider">CRITICAL HAZARD LEVEL</h4>
+                    </div>
+                    <p id="danger-reason" class="text-xs text-red-400 mb-4 leading-relaxed"></p>
+                    <button class="w-full bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-2.5 rounded-lg shadow-lg transition-all flex justify-center items-center gap-2">
+                        <i data-lucide="radio" class="w-4 h-4"></i> Issue "Stay Indoors" Alert
+                    </button>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <div id="map" class="w-full h-full"></div>
+  </main>
+
+  <script src="js/app2.js"></script>
+  <script>
+    lucide.createIcons();
+    mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag';
+    const map = new mapboxgl.Map({
+        container: 'map', style: 'mapbox://styles/mapbox/dark-v11', center: [121.0700, 14.5700], zoom: 12.5, pitch: 45
+    });
+
+    // OPEN-METEO API INTEGRATION
+    async function fetchEnvironmentalData() {
+        try {
+            // Pasig City Coordinates
+            const lat = 14.57; const lon = 121.06;
+            
+            // Fetch Weather (Apparent Temp / Heat Index)
+            const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=apparent_temperature&timezone=Asia/Manila`);
+            const weatherData = await weatherRes.json();
+            const heatIndex = weatherData.current.apparent_temperature;
+
+            // Fetch Air Quality
+            const aqiRes = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=pm10,pm2_5,carbon_monoxide,us_aqi&timezone=Asia/Manila`);
+            const aqiData = await aqiRes.json();
+            const aqi = aqiData.current.us_aqi;
+            const pm25 = aqiData.current.pm2_5;
+            const co = aqiData.current.carbon_monoxide;
+
+            // Update UI Widgets
+            document.getElementById('api-heat').innerHTML = `${heatIndex}<span class="text-sm">°C</span>`;
+            document.getElementById('api-aqi').innerText = aqi;
+            document.getElementById('api-pm').innerText = pm25 + ' µg/m³';
+            document.getElementById('api-co').innerText = co + ' μg/m³';
+
+            // Auto-Warning Logic
+            const dangerAlert = document.getElementById('danger-alert');
+            const dangerReason = document.getElementById('danger-reason');
+            
+            if (heatIndex > 41 || aqi > 150) {
+                dangerAlert.classList.remove('hidden');
+                if (heatIndex > 41 && aqi > 150) {
+                    dangerReason.innerText = `Stroke-level heat index (${heatIndex}°C) and Toxic AQI (${aqi}) detected. Immediate city-wide indoor lockdown recommended.`;
+                } else if (heatIndex > 41) {
+                    dangerReason.innerText = `Dangerously high Heat Index detected (${heatIndex}°C). Heat cramps and heat exhaustion are likely.`;
+                } else {
+                    dangerReason.innerText = `Toxic Air Quality Index detected (${aqi}). The air is unhealthy for the general public.`;
+                }
+            }
+
+        } catch (error) {
+            console.error("Open-Meteo API Error:", error);
+        }
+    }
+
+    map.on('load', () => {
+        fetchEnvironmentalData();
+        // Setup Mapbox Heatmap Layer for Air Quality (Visual Mock)
+        map.addSource('earthquakes', { type: 'geojson', data: 'https://docs.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson' });
+        map.addLayer({
+            'id': 'earthquakes-heat', 'type': 'heatmap', 'source': 'earthquakes',
+            'paint': { 'heatmap-weight': 1, 'heatmap-intensity': 1, 'heatmap-color': [ 'interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(33,102,172,0)', 0.2, 'rgb(103,169,207)', 0.4, 'rgb(209,229,240)', 0.6, 'rgb(253,219,199)', 0.8, 'rgb(239,138,98)', 1, 'rgb(178,24,43)' ], 'heatmap-radius': 40, 'heatmap-opacity': 0.3 }
+        });
+    });
+
+    function doLogout() { localStorage.removeItem('activeDepartment'); window.location.href = 'admin.html'; }
+  </script>
+</body>
+</html>
