@@ -1268,3 +1268,106 @@ document.addEventListener('DOMContentLoaded', () => {
         filterAnnouncements(); 
     }
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // Initialize icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+
+    // 1. Fetch live Pasig Weather & Environment from Open-Meteo
+    async function fetchWeather() {
+        const weatherContainer = document.getElementById('weather-forecast-container');
+        const heatIndexVal = document.getElementById('heat-index-val');
+        const aqiVal = document.getElementById('aqi-val');
+
+        // Safety check: Only run this if the weather container actually exists on this specific HTML page
+        if (!weatherContainer) return;
+
+        try {
+            // Fetch Weather & Heat Index (apparent_temperature)
+            // Pasig coordinates: 14.5764 Lat, 121.0851 Lon
+            const weatherResponse = await fetch('https://api.open-meteo.com/v1/forecast?latitude=14.5764&longitude=121.0851&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code&timezone=Asia%2FSingapore');
+            const weatherData = await weatherResponse.json();
+            const current = weatherData.current;
+            
+            // Fetch Air Quality Index (AQI)
+            const aqiResponse = await fetch('https://air-quality-api.open-meteo.com/v1/air-quality?latitude=14.5764&longitude=121.0851&current=us_aqi&timezone=Asia%2FSingapore');
+            const aqiData = await aqiResponse.json();
+            const currentAqi = aqiData.current.us_aqi;
+            
+            // --- Update Environmental Feed ---
+            if (heatIndexVal) heatIndexVal.innerText = `${current.apparent_temperature} °C`;
+            if (aqiVal) aqiVal.innerText = currentAqi;
+
+            // --- Update Weather Feed ---
+            // Determine icon based on WMO weather code (simplified)
+            const isRaining = current.weather_code >= 50;
+            const weatherDesc = isRaining ? "Rainy" : "Clear / Cloudy";
+            const icon = isRaining ? "cloud-rain" : "cloud-sun";
+            const iconColor = isRaining ? "text-blue-400" : "text-yellow-400";
+
+            weatherContainer.innerHTML = `
+                <div class="flex flex-col border theme-border rounded-xl p-4 theme-surface-2">
+                    <span class="text-xs text-[#94a3b8] uppercase mb-1">Status</span>
+                    <span class="text-xl font-bold text-white flex items-center gap-2">
+                        <i data-lucide="${icon}" class="w-5 h-5 ${iconColor}"></i> ${weatherDesc}
+                    </span>
+                </div>
+                <div class="flex flex-col border theme-border rounded-xl p-4 theme-surface-2">
+                    <span class="text-xs text-[#94a3b8] uppercase mb-1">Temperature</span>
+                    <span class="text-xl font-bold text-white">${current.temperature_2m}°C</span>
+                </div>
+                <div class="flex flex-col border theme-border rounded-xl p-4 theme-surface-2">
+                    <span class="text-xs text-[#94a3b8] uppercase mb-1">Humidity</span>
+                    <span class="text-xl font-bold text-white">${current.relative_humidity_2m}%</span>
+                </div>
+                <div class="flex flex-col border theme-border rounded-xl p-4 theme-surface-2">
+                    <span class="text-xs text-[#94a3b8] uppercase mb-1">Wind Speed</span>
+                    <span class="text-xl font-bold text-white">${current.wind_speed_10m} km/h</span>
+                </div>
+            `;
+            
+            // Re-render Lucide icons for the newly injected HTML
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons(); 
+            }
+        } catch (error) {
+            console.error("Failed to fetch data:", error);
+            weatherContainer.innerHTML = '<p class="text-rose-500 text-sm">Failed to load weather data.</p>';
+            if (heatIndexVal) heatIndexVal.innerText = "Error";
+            if (aqiVal) aqiVal.innerText = "Error";
+        }
+    }
+
+    // 2. Sync Evacuation Data from other pages
+    function syncEvacuationData() {
+        const evacEl = document.getElementById('evacuation-count');
+        if (evacEl) {
+            const activeEvacs = localStorage.getItem('activeEvacuations') || '0';
+            evacEl.innerText = activeEvacs;
+        }
+    }
+
+    // 3. Sync Public Reports Data from other pages
+    function syncReportsData() {
+        const reportsEl = document.getElementById('reports-count');
+        if (reportsEl) {
+            const totalReports = localStorage.getItem('totalReports') || '0';
+            reportsEl.innerText = totalReports;
+        }
+    }
+
+    // Run functions on load
+    fetchWeather();
+    syncEvacuationData();
+    syncReportsData();
+});
+
+// Logout Function attached to the global window object
+// so that inline HTML like <button onclick="doLogout()"> can trigger it
+window.doLogout = function() { 
+    localStorage.removeItem('activeDepartment'); 
+    window.location.href = 'admin.html'; 
+};
