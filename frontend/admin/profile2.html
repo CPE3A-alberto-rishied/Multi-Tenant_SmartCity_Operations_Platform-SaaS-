@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en" class="h-full">
 <head>
+  <script>
+    (function() {
+        const session = localStorage.getItem('activeDepartment');
+        if (!session || session !== 'Traffic') {
+            window.location.replace('admin.html?error=unauthorized'); 
+        }
+    })();
+  </script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BEAT - Dept Profile</title>
@@ -16,7 +25,7 @@
   <div id="success-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-green"><i data-lucide="check-circle"></i></div><h2 class="text-white font-bold text-xl mb-4">Changes Successful</h2><button onclick="closeModal('success-modal')" class="w-full bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Got it</button></div></div>
   <div id="no-changes-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-yellow"><i data-lucide="info"></i></div><h2 class="text-white font-bold text-xl mb-4">No Changes Detected</h2><button onclick="closeModal('no-changes-modal')" class="w-full bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Dismiss</button></div></div>
 
-  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface">
+  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-50">
     <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
         <div id="auth-logo" class="flex items-center gap-1.5">
             <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain">
@@ -26,12 +35,13 @@
             </div>
         </div>
     </div>
+    
     <nav class="flex-1 py-4 overflow-y-auto">
         <a href="dashboard2.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
         <a href="reports2.html" class="sidebar-item"><i data-lucide="file-text"></i><span>Public Reports</span></a>
         <a href="announcements2.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
-        <a href="traffic2.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
-        <a href="analytics2.html" class="sidebar-item"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
+        <a href="traffic.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic & Detour Control</span></a>
+        <a href="accident.html" class="sidebar-item"><i data-lucide="map"></i><span>Accident Heatmap</span></a>
     </nav>
     
     <div class="user-footer">
@@ -234,6 +244,12 @@
         document.getElementById('new-pass').value = "";
         document.getElementById('conf-pass').value = "";
       }
+    }
+
+    // 🚨 Added Logout Logic 🚨
+    function doLogout() {
+        localStorage.removeItem('activeDepartment'); // Wipe the session
+        window.location.href = 'admin.html'; // Kick back to login
     }
   </script>
 </body>

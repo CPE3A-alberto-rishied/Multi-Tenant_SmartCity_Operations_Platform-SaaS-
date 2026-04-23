@@ -5,22 +5,14 @@
     (function() {
         const session = localStorage.getItem('activeDepartment');
         if (!session || session !== 'Main Admin') {
-            // Notice the new "?error=unauthorized" at the end
             window.location.replace('admin.html?error=unauthorized'); 
         }
     })();
-</script>
+  </script>
+  
   <meta charset="UTF-8">
-  <script>
-        (function() {
-            const session = localStorage.getItem('activeDepartment');
-            if (!session) {
-                window.location.replace('admin.html'); 
-            }
-        })();
-    </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BEAT - Maps</title>
+  <title>BEAT - City Maps</title>
   
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
@@ -34,7 +26,7 @@
     body { font-family: 'DM Sans', sans-serif !important; overflow: hidden; background-color: #0a0e1a; }
     
     /* SIDEBAR */
-    .sidebar { width: 260px !important; flex-shrink: 0 !important; background: var(--surface); }
+    .sidebar { width: 260px !important; flex-shrink: 0 !important; background: var(--surface); border-right: 1px solid var(--border); }
     .sidebar-item { display: flex !important; align-items: center !important; gap: 12px !important; padding: 12px 18px !important; font-size: 14.5px !important; font-weight: 500 !important; color: #94a3b8 !important; text-decoration: none !important; border-left: 3px solid transparent !important; }
     .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
     .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
@@ -47,18 +39,27 @@
     
     .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
 
-    /* Map wrapper fix */
     .map-wrapper { position: relative; flex-grow: 1; width: 100%; height: 100%; background: #070d19; overflow: hidden; }
     #map { position: absolute; top: 0; bottom: 0; left: 0; right: 0; z-index: 1; }
 
-    /* UI Overlays */
     .map-overlay-panel { position: absolute; top: 20px; left: 20px; z-index: 10; width: 280px; background: rgba(10, 22, 40, 0.95); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
-    .barangay-select { width: 100%; background: #1e2536; border: 1px solid #374151; color: white; padding: 10px; border-radius: 8px; font-family: 'Barlow Condensed'; text-transform: uppercase; outline: none; transition: border-color 0.2s; }
-    .barangay-select:focus { border-color: #3b82f6; }
+    .barangay-select { width: 100%; background: #1e2536; border: 1px solid #374151; color: white; padding: 10px; border-radius: 8px; font-family: 'Barlow Condensed'; text-transform: uppercase; outline: none; transition: border-color 0.2s; cursor: pointer; }
     .map-legend { position: absolute; bottom: 30px; right: 20px; z-index: 10; background: rgba(10, 22, 40, 0.95); border: 1px solid var(--border); border-radius: 8px; padding: 15px; display: grid; gap: 8px; }
     .legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.75rem; color: white; font-family: 'Barlow Condensed'; text-transform: uppercase; }
     .dot { width: 10px; height: 10px; border-radius: 50%; }
     .section-label { color: #94a3b8; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+
+    .synced-hazard-marker {
+        width: 20px; height: 20px; background-color: #d946ef; border: 3px solid white; border-radius: 50%; cursor: pointer;
+        animation: pulse-magenta 2s infinite;
+    }
+    @keyframes pulse-magenta { 0% { box-shadow: 0 0 0 0 rgba(217,70,239, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(217,70,239, 0); } 100% { box-shadow: 0 0 0 0 rgba(217,70,239, 0); } }
+
+    /* Mapbox Popup Overrides */
+    .mapboxgl-popup-content { background: #1e293b !important; color: white !important; border: 1px solid #d946ef; border-radius: 8px; padding: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 220px; }
+    .mapboxgl-popup-tip { border-top-color: #1e293b !important; border-bottom-color: #1e293b !important; }
+    .mapboxgl-popup-close-button { color: #94a3b8; font-size: 16px; top: 4px; right: 8px; }
+    .mapboxgl-popup-close-button:hover { color: white; background: transparent; }
   </style>
 </head>
 <body class="h-full flex">
@@ -75,10 +76,8 @@
           <div style="color:var(--text-dim); font-size:11px" class="leading-none">Admin Control Center</div>
         </div>
       </div>
-      <button class="lg:hidden ml-auto text-gray-400 hover:text-white" onclick="toggleSidebar()">
-        <i data-lucide="x" class="w-5 h-5"></i>
-      </button>
     </div>
+
     <nav class="flex-1 py-4 overflow-y-auto">
       <a href="dashboard.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
       <a href="manage_admin.html" class="sidebar-item"><i data-lucide="users"></i><span>Manage Admins</span></a>
@@ -87,14 +86,11 @@
       <a href="maps.html" class="sidebar-item active"><i data-lucide="map"></i><span>Maps</span></a>
     </nav>
     
-    <div class="user-footer">
+    <div class="user-footer border-t border-gray-800">
         <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
                 <div id="nav-avatar" style="background:#2563eb; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">M</div>
-                <div>
-                  <div class="user-footer-name">Main Admin</div>
-                  <div class="user-footer-sub">System Administrator</div>
-                </div>
+                <div><div class="user-footer-name">Main Admin</div><div class="user-footer-sub">System Administrator</div></div>
             </div>
             <a href="profile.html" class="settings-link"><i data-lucide="settings" style="width:18px; height:18px"></i></a>
         </div>
@@ -105,11 +101,18 @@
   </aside>
 
   <main class="flex-1 flex flex-col min-w-0">
-    <header class="w-full px-4 sm:px-8 h-[76px] flex items-center border-b shrink-0" style="border-color:var(--border);background:var(--surface)">
-      <button class="lg:hidden text-gray-400 hover:text-white mr-4" onclick="toggleSidebar()">
-        <i data-lucide="menu" class="w-6 h-6"></i>
-      </button>
-      <h1 class="text-xl font-semibold text-white flex items-center gap-2"><i data-lucide="map" class="text-blue-500 w-6 h-6"></i>Maps</h1>
+    <header class="w-full px-4 sm:px-8 h-[76px] flex items-center justify-between border-b shrink-0 border-gray-800 bg-[#0a0e1a]">
+      <div class="flex items-center gap-3">
+        <button class="lg:hidden text-gray-400 hover:text-white" onclick="toggleSidebar()">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+        <h1 class="text-xl font-semibold text-white flex items-center gap-2"><i data-lucide="map" class="text-blue-500 w-6 h-6"></i>City Maps</h1>
+      </div>
+      
+      <div id="sync-status" class="flex items-center gap-2 px-3 py-1.5 bg-[#d946ef]/10 border border-[#d946ef]/30 rounded-lg hidden transition-opacity">
+        <div class="w-2 h-2 rounded-full bg-[#d946ef] animate-pulse"></div>
+        <span class="text-[10px] font-bold text-[#d946ef] uppercase tracking-widest">Network Ops Active</span>
+      </div>
     </header>
 
     <div class="map-wrapper">
@@ -118,31 +121,56 @@
         <div class="map-overlay-panel">
             <div class="section-label" style="margin-bottom: 8px;">Jump to District</div>
             <select class="barangay-select" onchange="zoomToBarangay(this.value)">
-                <option value="">-- Select Barangay --</option>
+                <option value="">-- Pasig City --</option>
                 <option value="bagong-ilog">Bagong Ilog</option>
+                <option value="bagong-katipunan">Bagong Katipunan</option>
+                <option value="bambang">Bambang</option>
+                <option value="buting">Buting</option>
+                <option value="caniogan">Caniogan</option>
+                <option value="dela-paz">Dela Paz</option>
+                <option value="kalawaan">Kalawaan</option>
                 <option value="kapasigan">Kapasigan</option>
                 <option value="kapitolyo">Kapitolyo</option>
+                <option value="malinao">Malinao</option>
                 <option value="manggahan">Manggahan</option>
+                <option value="maybunga">Maybunga</option>
+                <option value="oranbo">Oranbo</option>
+                <option value="palatiw">Palatiw</option>
                 <option value="pinagbuhatan">Pinagbuhatan</option>
-                <option value="rosario">Rosario</option>
-                <option value="san-joaquin">San Joaquin</option>
-                <option value="ugong">Ugong</option>
                 <option value="pineda">Pineda</option>
+                <option value="rosario">Rosario</option>
+                <option value="sagad">Sagad</option>
+                <option value="san-antonio">San Antonio</option>
+                <option value="san-joaquin">San Joaquin</option>
+                <option value="san-jose">San Jose</option>
+                <option value="san-miguel">San Miguel</option>
+                <option value="san-nicolas">San Nicolas</option>
+                <option value="santa-cruz">Santa Cruz</option>
                 <option value="santa-lucia">Santa Lucia</option>
-                <option value="caniogan">Caniogan</option>
+                <option value="santa-rosa">Santa Rosa</option>
+                <option value="santo-tomas">Santo Tomas</option>
+                <option value="santolan">Santolan</option>
+                <option value="sumilang">Sumilang</option>
+                <option value="ugong">Ugong</option>
             </select>
+            
             <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;">
                 <div class="flex justify-between items-center mb-2">
-                    <span class="text-[11px] text-[#94a3b8] font-bold uppercase tracking-wider">Patrols</span>
-                    <span class="text-blue-500 font-bold font-mono text-sm">08</span>
+                    <span class="text-[11px] text-[#94a3b8] font-bold uppercase tracking-wider">Active Operations</span>
+                    <span id="hazard-count" class="text-[#d946ef] font-bold font-mono text-sm">0</span>
                 </div>
+                <div id="maps-incidents-list" class="max-h-[250px] overflow-y-auto space-y-2 pr-1 mt-3"></div>
             </div>
         </div>
 
         <div class="map-legend">
+            <div class="section-label mb-1">Traffic Density</div>
             <div class="legend-item"><span class="dot" style="background: #4ade80;"></span> Smooth</div>
             <div class="legend-item"><span class="dot" style="background: #facc15;"></span> Moderate</div>
             <div class="legend-item"><span class="dot" style="background: #f87171;"></span> Heavy</div>
+            <div class="section-label mt-2 mb-1 border-t border-gray-700 pt-2">Network Operations</div>
+            <div class="legend-item"><span class="dot" style="background: #d946ef; box-shadow: 0 0 5px #d946ef"></span> Hazard Epicenter</div>
+            <div class="legend-item"><span class="dot" style="background: #ef4444; border: 1px dashed white;"></span> Blocked Area / Avoid</div>
         </div>
     </div>
   </main>
@@ -152,110 +180,134 @@
         if(window.lucide) lucide.createIcons();
 
         mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag';
-        
         const map = new mapboxgl.Map({
-            container: 'map', 
-            style: 'mapbox://styles/mapbox/dark-v11', 
-            center: [121.0825, 14.5764], 
-            zoom: 12.5,
-            pitch: 45,
-            trackResize: true
+            container: 'map', style: 'mapbox://styles/mapbox/dark-v11', center: [121.0825, 14.5764], zoom: 12.5, pitch: 45
         });
 
-        const resizeInterval = setInterval(() => { map.resize(); }, 500);
-        setTimeout(() => { clearInterval(resizeInterval); }, 2500);
+        let mapObjects = {};
 
         map.on('load', () => {
-            map.resize();
-            
-            // 1. IMPORT PASIG GEOJSON
-            map.addSource('pasig-barangays', {
-                type: 'geojson',
-                data: '../pasig_boundaries.geojson' // Adjust this path if needed (e.g., './pasig_boundaries.geojson')
-            });
-
-            // 2. ADD HIGHLIGHT LAYER (Used for zoom function)
-            map.addLayer({
-                'id': 'barangay-highlight',
-                'type': 'fill',
-                'source': 'pasig-barangays',
-                'paint': {
-                    'fill-color': '#d946ef', 
-                    'fill-opacity': 0.45 
-                },
-                'filter': ['==', 'name', ''] 
-            });
-
-            // 3. ADD BLUE BORDER LINES
-            map.addLayer({
-                'id': 'barangay-borders',
-                'type': 'line',
-                'source': 'pasig-barangays',
-                'paint': {
-                    'line-color': '#06b6d4', 
-                    'line-width': 4,
-                    'line-opacity': 0.9 
-                }
-            });
-
-            // 4. ADD LIVE TRAFFIC ON TOP
             map.addSource('live-traffic', { type: 'vector', url: 'mapbox://mapbox.mapbox-traffic-v1' });
             map.addLayer({
                 'id': 'traffic-lines', 'type': 'line', 'source': 'live-traffic', 'source-layer': 'traffic',
-                'paint': {
-                    'line-width': 3,
-                    'line-color': [ 'match', ['get', 'congestion'], 'low', '#4ade80', 'moderate', '#facc15', 'heavy', '#f87171', 'severe', '#334155', 'transparent' ]
-                }
+                'paint': { 'line-width': 3, 'line-color': [ 'match', ['get', 'congestion'], 'low', '#4ade80', 'moderate', '#facc15', 'heavy', '#f87171', 'severe', '#334155', 'transparent' ]}
             });
-            
-            // 5. ADD 3D BUILDINGS
-            map.addLayer({
-                'id': '3d-buildings',
-                'source': 'composite',
-                'source-layer': 'building',
-                'filter': ['==', 'extrude', 'true'],
-                'type': 'fill-extrusion',
-                'minzoom': 14, 
-                'paint': {
-                    'fill-extrusion-color': '#1e293b', 
-                    'fill-extrusion-height': ['get', 'height'],
-                    'fill-extrusion-base': ['get', 'min_height'],
-                    'fill-extrusion-opacity': 0.8
-                }
-            });
+
+            // 1. Source/Layer: Blocked Roads
+            map.addSource('synced-blocked-lines', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+            map.addLayer({ 'id': 'synced-blocked-stroke', 'type': 'line', 'source': 'synced-blocked-lines', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#ef4444', 'line-width': 6, 'line-dasharray': [2, 2] } });
+
+            // 2. Source/Layer: Area to Avoid (Solid Fill and Dashed Line)
+            map.addSource('synced-danger-zones', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+            map.addLayer({ 'id': 'synced-danger-fill', 'type': 'fill', 'source': 'synced-danger-zones', 'paint': { 'fill-color': '#ef4444', 'fill-opacity': 0.25 } });
+            map.addLayer({ 'id': 'synced-danger-stroke', 'type': 'line', 'source': 'synced-danger-zones', 'paint': { 'line-color': '#ef4444', 'line-width': 3, 'line-dasharray': [2, 2] } });
+
+            renderLiveHazards();
         });
 
-        // 6. ZOOM LOGIC
+        // 🚨 Classmate's Flawless Global Sync Read-Only Logic 🚨
+        function renderLiveHazards() {
+            if(!map.getSource('synced-blocked-lines')) return;
+
+            let hazards = JSON.parse(localStorage.getItem('beat_live_hazards')) || [];
+            
+            document.getElementById('hazard-count').innerText = hazards.length;
+            if (hazards.length > 0) document.getElementById('sync-status').classList.remove('hidden');
+            else document.getElementById('sync-status').classList.add('hidden');
+
+            Object.values(mapObjects).forEach(obj => {
+                if(obj.marker) obj.marker.remove();
+                if(obj.popup) obj.popup.remove();
+            });
+            mapObjects = {};
+
+            const listContainer = document.getElementById('maps-incidents-list');
+            listContainer.innerHTML = '';
+
+            let lineFeatures = [], zoneFeatures = [];
+
+            hazards.forEach(hazard => {
+                // Sidebar List Item (No Resolve Button for Main Admin)
+                listContainer.innerHTML += `
+                    <div class="bg-[#1e2536] border border-gray-700 p-3 rounded-lg">
+                        <h4 class="text-white text-xs font-bold mb-1">${hazard.title}</h4>
+                        <p class="text-[10px] text-gray-400 leading-tight">${hazard.desc}</p>
+                    </div>
+                `;
+
+                const el = document.createElement('div'); el.className = `synced-hazard-marker`;
+                
+                // Map Popup (No Resolve Button for Main Admin)
+                const popupHTML = `
+                    <div class="pb-1 mb-1 border-b border-gray-600"><span class="text-[10px] font-bold uppercase tracking-widest text-[#94a3b8]">Traffic Dept Sync</span></div>
+                    <h3 class="font-bold text-white text-sm mb-1">${hazard.title}</h3>
+                    <p class="text-[10px] text-gray-300 leading-snug mb-2">${hazard.desc}</p>
+                    <div class="flex flex-col gap-1 mt-2 text-[9px] font-bold tracking-wider">
+                        <span class="text-[#ef4444] bg-[#ef4444]/10 px-2 py-1 rounded text-center">AVOID THIS AREA - OPERATION ONGOING</span>
+                    </div>
+                `;
+                
+                const popup = new mapboxgl.Popup({ offset: 25, closeButton: true, closeOnClick: false }).setHTML(popupHTML);
+                const marker = new mapboxgl.Marker(el).setLngLat(hazard.center).setPopup(popup).addTo(map);
+                marker.togglePopup(); // Opens Automatically
+                
+                mapObjects[hazard.id] = { marker, popup };
+
+                if (hazard.blockedLine) lineFeatures.push(hazard.blockedLine);
+                if (hazard.dangerZone) zoneFeatures.push(hazard.dangerZone);
+            });
+
+            map.getSource('synced-blocked-lines').setData({ 'type': 'FeatureCollection', 'features': lineFeatures });
+            map.getSource('synced-danger-zones').setData({ 'type': 'FeatureCollection', 'features': zoneFeatures });
+        }
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'beat_live_hazards') renderLiveHazards();
+        });
+
+        // FULL 30 BARANGAY DATA DICTIONARY
         const barangayData = {
-            'bagong-ilog': { name: 'Bagong Ilog', center: [121.0689, 14.5652], zoom: 14.5 },
-            'kapasigan': { name: 'Kapasigan', center: [121.0741, 14.5644], zoom: 15 },
-            'kapitolyo': { name: 'Kapitolyo', center: [121.0592, 14.5712], zoom: 14.5 },
-            'manggahan': { name: 'Manggahan', center: [121.0992, 14.6038], zoom: 14 },
-            'pinagbuhatan': { name: 'Pinagbuhatan', center: [121.0909, 14.5572], zoom: 13.5 },
-            'rosario': { name: 'Rosario', center: [121.0882, 14.5904], zoom: 14 },
-            'san-joaquin': { name: 'San Joaquin', center: [121.0757, 14.5522], zoom: 15 },
-            'ugong': { name: 'Ugong', center: [121.0732, 14.5841], zoom: 14 },
-            'pineda': { name: 'Pineda', center: [121.0595, 14.5665], zoom: 15 },
-            'santa-lucia': { name: 'Santa Lucia', center: [121.1013, 14.5842], zoom: 14.5 },
-            'caniogan': { name: 'Caniogan', center: [121.0805, 14.5719], zoom: 14.5 }
+            'bagong-ilog': { center: [121.0669, 14.5670], zoom: 15 },
+            'bagong-katipunan': { center: [121.0760, 14.5610], zoom: 15.5 },
+            'bambang': { center: [121.0820, 14.5570], zoom: 15.5 },
+            'buting': { center: [121.0680, 14.5550], zoom: 15.5 },
+            'caniogan': { center: [121.0810, 14.5680], zoom: 15 },
+            'dela-paz': { center: [121.1000, 14.6180], zoom: 15 },
+            'kalawaan': { center: [121.0830, 14.5500], zoom: 15 },
+            'kapasigan': { center: [121.0770, 14.5630], zoom: 15.5 },
+            'kapitolyo': { center: [121.0590, 14.5710], zoom: 15.5 },
+            'malinao': { center: [121.0780, 14.5600], zoom: 15.5 },
+            'manggahan': { center: [121.0960, 14.6060], zoom: 14.5 },
+            'maybunga': { center: [121.0880, 14.5800], zoom: 15 },
+            'oranbo': { center: [121.0620, 14.5760], zoom: 15.5 },
+            'palatiw': { center: [121.0860, 14.5620], zoom: 15.5 },
+            'pinagbuhatan': { center: [121.0920, 14.5520], zoom: 14.5 },
+            'pineda': { center: [121.0600, 14.5640], zoom: 15.5 },
+            'rosario': { center: [121.0880, 14.5900], zoom: 14.5 },
+            'sagad': { center: [121.0780, 14.5660], zoom: 15.5 },
+            'san-antonio': { center: [121.0630, 14.5830], zoom: 15.5 },
+            'san-joaquin': { center: [121.0760, 14.5510], zoom: 15.5 },
+            'san-jose': { center: [121.0750, 14.5630], zoom: 15.5 },
+            'san-miguel': { center: [121.0930, 14.5730], zoom: 15.5 },
+            'san-nicolas': { center: [121.0780, 14.5580], zoom: 15.5 },
+            'santa-cruz': { center: [121.0790, 14.5600], zoom: 15.5 },
+            'santa-lucia': { center: [121.1010, 14.5840], zoom: 15 },
+            'santa-rosa': { center: [121.0730, 14.5600], zoom: 15.5 },
+            'santo-tomas': { center: [121.0800, 14.5580], zoom: 15.5 },
+            'santolan': { center: [121.0850, 14.6150], zoom: 15 },
+            'sumilang': { center: [121.0730, 14.5580], zoom: 15.5 },
+            'ugong': { center: [121.0750, 14.5850], zoom: 14.5 }
         };
 
         window.zoomToBarangay = function(val) {
-            if (!val) { 
-                map.setFilter('barangay-highlight', ['==', 'name', '']);
-                map.flyTo({ center: [121.0825, 14.5764], zoom: 12.5, pitch: 45 }); 
-                return; 
-            }
-            const selectedData = barangayData[val];
-            map.setFilter('barangay-highlight', ['==', 'name', selectedData.name]);
-            map.flyTo({ center: selectedData.center, zoom: selectedData.zoom, pitch: 60 });
+            if (!val) { map.flyTo({ center: [121.0825, 14.5764], zoom: 12.5, pitch: 45 }); return; }
+            map.flyTo({ center: barangayData[val].center, zoom: barangayData[val].zoom, pitch: 60 });
         };
     });
 
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
-        
         if (sidebar.classList.contains('-translate-x-full')) {
             sidebar.classList.remove('-translate-x-full');
             overlay.classList.remove('hidden');
