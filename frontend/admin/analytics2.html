@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en" class="h-full">
 <head>
+  <script>
+    (function() {
+        const session = localStorage.getItem('activeDepartment');
+        if (!session || session !== 'Traffic') {
+            window.location.replace('admin.html?error=unauthorized'); 
+        }
+    })();
+  </script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BEAT - Analytics & Audit</title>
@@ -33,10 +42,10 @@
     <div class="user-footer">
         <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
-                <div id="nav-avatar" class="nav-avatar"></div>
+                <div id="nav-avatar" class="nav-avatar">T</div>
                 <div>
-                  <div class="user-footer-name">Loading...</div>
-                  <div class="user-footer-sub">Loading...</div>
+                  <div class="user-footer-name">Traffic</div>
+                  <div class="user-footer-sub">Traffic Department</div>
                 </div>
             </div>
             <a href="profile2.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
@@ -125,76 +134,82 @@
 
   <script src="js/app2.js"></script>
   <script>
-    lucide.createIcons();
-    
-    document.getElementById('auditSearch').addEventListener('keyup', function() {
-      let filter = this.value.toLowerCase();
-      let rows = document.querySelectorAll('#auditTableBody tr');
-      
-      rows.forEach(row => {
-        let text = row.textContent.toLowerCase();
-        row.style.display = text.includes(filter) ? '' : 'none';
-      });
-    });
-
-    let freqChart;
     document.addEventListener("DOMContentLoaded", function() {
-      const ctxCat = document.getElementById('categoriesChart').getContext('2d');
-      new Chart(ctxCat, {
-        type: 'doughnut',
-        data: {
-          labels: ['Accidents', 'Traffic Jams', 'Road Works', 'Hazards'],
-          datasets: [{
-            data: [0, 0, 0, 0], 
-            backgroundColor: ['#ef4444', '#eab308', '#3b82f6', '#10b981'],
-            borderWidth: 0, hoverOffset: 4
-          }]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false, cutout: '70%',
-          layout: { padding: { top: 0, bottom: 0 } },
-          plugins: {
-            legend: { position: 'right', align: 'center', labels: { color: '#94a3b8', boxWidth: 10, font: { size: 11 }, padding: 12, usePointStyle: true, pointStyle: 'circle' } }
-          }
-        }
-      });
+        if (window.lucide) lucide.createIcons();
+        
+        document.getElementById('auditSearch').addEventListener('keyup', function() {
+          let filter = this.value.toLowerCase();
+          let rows = document.querySelectorAll('#auditTableBody tr');
+          
+          rows.forEach(row => {
+            let text = row.textContent.toLowerCase();
+            row.style.display = text.includes(filter) ? '' : 'none';
+          });
+        });
 
-      const ctxFreq = document.getElementById('frequencyChart').getContext('2d');
-      freqChart = new Chart(ctxFreq, {
-        type: 'bar',
-        data: {
-          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          datasets: [{
-            label: 'Reports Received',
-            data: [0, 0, 0, 0, 0, 0, 0], 
-            backgroundColor: '#3b82f6', borderRadius: 4,
-          }]
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
-            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+        const ctxCat = document.getElementById('categoriesChart').getContext('2d');
+        new Chart(ctxCat, {
+          type: 'doughnut',
+          data: {
+            labels: ['Accidents', 'Traffic Jams', 'Road Works', 'Hazards'],
+            datasets: [{
+              data: [0, 0, 0, 0], 
+              backgroundColor: ['#ef4444', '#eab308', '#3b82f6', '#10b981'],
+              borderWidth: 0, hoverOffset: 4
+            }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false, cutout: '70%',
+            layout: { padding: { top: 0, bottom: 0 } },
+            plugins: {
+              legend: { position: 'right', align: 'center', labels: { color: '#94a3b8', boxWidth: 10, font: { size: 11 }, padding: 12, usePointStyle: true, pointStyle: 'circle' } }
+            }
           }
-        }
-      });
+        });
+
+        const ctxFreq = document.getElementById('frequencyChart').getContext('2d');
+        window.freqChart = new Chart(ctxFreq, {
+          type: 'bar',
+          data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+              label: 'Reports Received',
+              data: [0, 0, 0, 0, 0, 0, 0], 
+              backgroundColor: '#3b82f6', borderRadius: 4,
+            }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
+              x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            }
+          }
+        });
     });
 
     function updateFrequencyChart() {
+      if (!window.freqChart) return;
       const selection = document.getElementById('freqDropdown').value;
       
       if (selection === 'This Week') {
-        freqChart.data.labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        freqChart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0];
+        window.freqChart.data.labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        window.freqChart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0];
       } else if (selection === 'This Month') {
-        freqChart.data.labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-        freqChart.data.datasets[0].data = [0, 0, 0, 0];
+        window.freqChart.data.labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+        window.freqChart.data.datasets[0].data = [0, 0, 0, 0];
       } else if (selection === 'This Year') {
-        freqChart.data.labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        freqChart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        window.freqChart.data.labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        window.freqChart.data.datasets[0].data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
       }
-      freqChart.update();
+      window.freqChart.update();
+    }
+
+    // 🚨 Added Logout Logic 🚨
+    function doLogout() {
+        localStorage.removeItem('activeDepartment'); // Wipe the session
+        window.location.href = 'admin.html'; // Kick back to login
     }
   </script>
 </body>

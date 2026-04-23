@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en" class="h-full">
 <head>
+  <script>
+    (function() {
+        const session = localStorage.getItem('activeDepartment');
+        if (!session || session !== 'Traffic') {
+            window.location.replace('admin.html?error=unauthorized'); 
+        }
+    })();
+  </script>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>BEAT – Dept Dashboard</title>
@@ -211,5 +220,16 @@
   </main>
 
   <script src="js/app2.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => { 
+        if (window.lucide) lucide.createIcons(); 
+    });
+
+    function doLogout() {
+        localStorage.removeItem('activeDepartment'); // Wipe the session
+        window.location.href = 'admin.html'; // Kick back to login
+    }
+  </script>
 </body>
 </html>
