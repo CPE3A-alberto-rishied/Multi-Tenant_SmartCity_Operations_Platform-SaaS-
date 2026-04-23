@@ -61,16 +61,16 @@
   <div id="no-changes-modal" class="modal-overlay hidden"><div class="border w-[400px] text-center p-8 rounded-2xl shadow-2xl" style="background:var(--surface); border-color:var(--border)"><div style="background:#f59e0b; width:48px; height:48px; border-radius:50%; margin:0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-yellow-500/20"><i data-lucide="info"></i></div><h2 class="text-white font-bold text-xl mb-4">No Changes Detected</h2><button onclick="closeModal('no-changes-modal')" class="w-full bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Dismiss</button></div></div>
 
   <aside id="sidebar" class="sidebar flex flex-col h-full" style="background:var(--surface); border-right: 1px solid var(--border)">
+    
     <div class="h-[76px] px-5 flex items-center border-b shrink-0" style="border-color:var(--border)">
-      <div class="flex items-center gap-3">
-        <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
-        <div class="flex flex-col justify-center">
-          <div class="logo-text font-bold text-lg text-white tracking-widest leading-none mb-1">BEAT</div>
+      <div class="flex items-center gap-0.5">
+        <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-13 h-14 object-contain">
+        <div class="flex flex-col justify-center items-start">
+          <img src="/assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
           <div style="color:var(--text-dim); font-size:11px" class="leading-none">Admin Control Center</div>
         </div>
       </div>
     </div>
-    
     <nav class="flex-1 py-4 overflow-y-auto">
       <a href="dashboard.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
       <a href="manage_admin.html" class="sidebar-item"><i data-lucide="users"></i><span>Manage Admins</span></a>
