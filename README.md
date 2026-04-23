@@ -42,6 +42,7 @@ The system is designed to streamline emergency responses: citizens file public r
 4. **The Resolution:** The incident is cleared, the report is marked as "Resolved," and the system automatically generates an official update for the public City News page.
 
 ## 🧊 System Architecture
+
 graph TD
     %% Styling
     classDef public fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#fff;
