@@ -9,17 +9,8 @@
             window.location.replace('admin.html?error=unauthorized'); 
         }
     })();
-</script>
+  </script>
   <meta charset="UTF-8">
-  <script>
-        (function() {
-            const session = localStorage.getItem('activeDepartment');
-            if (!session) {
-                // Stop the browser from loading anything else and redirect
-                window.location.replace('admin.html'); 
-            }
-        })();
-    </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BEAT - Announcement Manager</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
@@ -393,6 +384,19 @@
 <script src="js/app.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => { if (window.lucide) lucide.createIcons(); });
+
+  // ==========================================
+  // FAILSAFE MODAL FUNCTIONS
+  // ==========================================
+  window.openModal = function(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.remove('hidden');
+  };
+
+  window.closeModal = function(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.add('hidden');
+  };
 
   // Handle Mobile Sidebar Toggle
   function toggleSidebar() {

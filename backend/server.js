@@ -86,28 +86,13 @@ app.get('/api/reports/all', async (req, res) => {
     }
 });
 
-app.get('/api/news', async (req, res) => {
+app.put('/api/report/:id', async (req, res) => {
     try {
-        const resolvedReports = await Report.find({ status: 'Resolved' }).sort({ createdAt: -1 });
-        
-        res.status(200).json({ success: true, data: resolvedReports });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-// --- Admin Resolve Route (Updates status to 'Resolved') ---
-app.put('/api/reports/resolve/:id', async (req, res) => {
-    try {
-        // Find the specific report by ID and change status to 'Resolved'
-        const updatedReport = await Report.findByIdAndUpdate(
-            req.params.id, 
-            { status: 'Resolved' }, 
-            { new: true }
-        );
+        const { status } = req.body;
+        const updatedReport = await Report.findByIdAndUpdate(req.params.id, { status }, { new: true });
         res.status(200).json({ success: true, data: updatedReport });
     } catch (error) {
-        res.status(500).json({ success: false, error: "Failed to update status to Resolved" });
+        res.status(500).json({ success: false, error: "Failed to update status" });
     }
 });
 
@@ -175,3 +160,95 @@ app.post('/api/login', async (req, res) => {
 // 6. START SERVER
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+// 1. ADD THE ANNOUNCEMENT SCHEMA (Put this with your other schemas)
+const announcementSchema = new mongoose.Schema({
+    title: String,
+    category: String,
+    coverImage: String,
+    content: String,
+    blocks: String,
+    status: { type: String, default: 'Queue' }, // 'Queue', 'Live', or 'Denied'
+    createdAt: { type: Date, default: Date.now }
+});
+const Announcement = mongoose.model('Announcement', announcementSchema);
+
+// 2. ADD THESE ROUTES (Put these with your other app.get / app.post routes)
+
+// Create a new Announcement
+app.post('/api/announcements', async (req, res) => {
+    try {
+        const newAnn = new Announcement(req.body);
+        await newAnn.save();
+        res.status(200).json({ success: true, data: newAnn });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Update Announcement Status (e.g., changing from 'Queue' to 'Live')
+app.put('/api/announcements/:id', async (req, res) => {
+    try {
+        const updated = await Announcement.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
+        res.status(200).json({ success: true, data: updated });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Fetch Live News for the Public Website
+app.get('/api/news', async (req, res) => {
+    try {
+        // Only grab announcements that the Admin has Approved ('Live')
+        const liveNews = await Announcement.find({ status: 'Live' }).sort({ createdAt: -1 });
+        res.status(200).json({ success: true, data: liveNews });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// 1. ADD THE ANNOUNCEMENT SCHEMA (Put this with your other schemas)
+const announcementSchema = new mongoose.Schema({
+    title: String,
+    category: String,
+    coverImage: String,
+    content: String,
+    blocks: String,
+    status: { type: String, default: 'Queue' }, // 'Queue', 'Live', or 'Denied'
+    createdAt: { type: Date, default: Date.now }
+});
+const Announcement = mongoose.model('Announcement', announcementSchema);
+
+// 2. ADD THESE ROUTES (Put these with your other app.get / app.post routes)
+
+// Create a new Announcement
+app.post('/api/announcements', async (req, res) => {
+    try {
+        const newAnn = new Announcement(req.body);
+        await newAnn.save();
+        res.status(200).json({ success: true, data: newAnn });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Update Announcement Status (e.g., changing from 'Queue' to 'Live')
+app.put('/api/announcements/:id', async (req, res) => {
+    try {
+        const updated = await Announcement.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
+        res.status(200).json({ success: true, data: updated });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Fetch Live News for the Public Website
+app.get('/api/news', async (req, res) => {
+    try {
+        // Only grab announcements that the Admin has Approved ('Live')
+        const liveNews = await Announcement.find({ status: 'Live' }).sort({ createdAt: -1 });
+        res.status(200).json({ success: true, data: liveNews });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
