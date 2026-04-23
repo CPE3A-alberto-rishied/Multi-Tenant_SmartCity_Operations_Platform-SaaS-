@@ -1,1 +1,192 @@
-huhuhu
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BEAT – Accident Heatmap</title>
+
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles2.css">
+  <style>
+    /* Toggle Switch */
+    .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background-color: #374151; transition: .4s; border-radius: 24px; }
+    .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: #3b82f6; }
+    input:checked + .slider:before { transform: translateX(18px); }
+  </style>
+</head>
+
+<body class="h-full flex bg-[#0a0e1a]">
+
+  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-50">
+    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
+      <div class="flex items-center gap-3">
+        <div class="logo-box">B</div>
+        <div class="flex flex-col justify-center">
+          <div class="logo-text font-bold text-white">BEAT</div>
+          <div class="sidebar-subtext">Traffic Department</div>
+        </div>
+      </div>
+    </div>
+    
+    <nav class="flex-1 py-4 overflow-y-auto">
+      <a href="dashboard2.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+      <a href="reports2.html" class="sidebar-item"><i data-lucide="file-text"></i><span>Public Reports</span></a>
+      <a href="announcements2.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+      <a href="traffic.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic & Detour Control</span></a>
+      <a href="accident.html" class="sidebar-item active"><i data-lucide="map"></i><span>Accident Heatmap</span></a>
+    </nav>
+
+    <div class="user-footer">
+        <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-3">
+                <div id="nav-avatar" class="nav-avatar">T</div>
+                <div>
+                  <div class="user-footer-name">Traffic</div>
+                  <div class="user-footer-sub">Traffic Department</div>
+                </div>
+            </div>
+            <a href="profile2.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
+        </div>
+        <button onclick="window.location.href='admin.html'" class="btn-logout">
+            <i data-lucide="log-out" class="icon-sm"></i> Logout
+        </button>
+    </div>
+  </aside>
+
+  <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] relative">
+    
+    <div class="absolute top-6 left-6 z-10 w-80">
+        <div class="theme-surface border theme-border rounded-2xl p-6 shadow-2xl backdrop-blur-md bg-opacity-95">
+            <h2 class="text-white font-bold text-lg mb-2 flex items-center gap-2">
+                <i data-lucide="map" class="text-blue-500"></i> Accident Heatmap
+            </h2>
+            <p class="text-xs text-[#94a3b8] mb-6 leading-relaxed">Visualizing high-risk zones and historical accident density across Pasig City to optimize enforcer deployment.</p>
+            
+            <div class="flex items-center justify-between p-3 rounded-xl bg-[#0f172a] border border-gray-800 mb-4">
+                <span class="text-xs font-bold text-white uppercase tracking-wider">Enable Heatmap</span>
+                <label class="switch">
+                    <input type="checkbox" id="heatmapToggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="space-y-4 mt-6 border-t theme-border pt-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Total Recorded</span>
+                    <span class="text-sm font-bold text-rose-500">124</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider">Highest Density</span>
+                    <span class="text-sm font-bold text-white">Ortigas Ave</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="map" class="w-full h-full"></div>
+
+  </main>
+
+  <script>
+    lucide.createIcons();
+
+    // Initialize Mapbox
+    mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag';
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/dark-v11', // Dark mode map
+        center: [121.0825, 14.5764], // Pasig City
+        zoom: 13,
+        pitch: 45
+    });
+
+    map.on('load', () => {
+        
+        // 1. Generate Fake Accident Data around Pasig
+        const generateAccidents = (count) => {
+            const features = [];
+            const centers = [
+                [121.0825, 14.5764], // Pasig Center
+                [121.0664, 14.5890], // Ortigas
+                [121.0680, 14.5630]  // C5 Area
+            ];
+            
+            for(let i=0; i<count; i++) {
+                const center = centers[Math.floor(Math.random() * centers.length)];
+                // Random scatter
+                const lng = center[0] + (Math.random() - 0.5) * 0.03;
+                const lat = center[1] + (Math.random() - 0.5) * 0.03;
+                features.push({
+                    'type': 'Feature',
+                    'properties': { 'mag': Math.random() * 2 },
+                    'geometry': { 'type': 'Point', 'coordinates': [lng, lat] }
+                });
+            }
+            return { 'type': 'FeatureCollection', 'features': features };
+        };
+
+        // 2. Add the Data Source
+        map.addSource('accidents', {
+            'type': 'geojson',
+            'data': generateAccidents(150)
+        });
+
+        // 3. Add Heatmap Layer
+        map.addLayer({
+            'id': 'accidents-heat',
+            'type': 'heatmap',
+            'source': 'accidents',
+            'maxzoom': 15,
+            'paint': {
+                // Increase weight as zoom increases
+                'heatmap-weight': ['interpolate', ['linear'], ['get', 'mag'], 0, 0, 2, 1],
+                // Color ramp: Blue (low) to Red (high)
+                'heatmap-color': [
+                    'interpolate',
+                    ['linear'],
+                    ['heatmap-density'],
+                    0, 'rgba(33,102,172,0)',
+                    0.2, 'rgb(103,169,207)',
+                    0.4, 'rgb(209,229,240)',
+                    0.6, 'rgb(253,219,199)',
+                    0.8, 'rgb(239,138,98)',
+                    1, 'rgb(220, 53, 69)' // Tailwind Rose-500
+                ],
+                'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 11, 15, 15, 30],
+                'heatmap-opacity': 0.8
+            }
+        });
+
+        // 4. Add Point Layer (for when zoomed in close)
+        map.addLayer({
+            'id': 'accidents-point',
+            'type': 'circle',
+            'source': 'accidents',
+            'minzoom': 14,
+            'paint': {
+                'circle-radius': ['interpolate', ['linear'], ['zoom'], 14, 4, 16, 8],
+                'circle-color': '#ef4444',
+                'circle-stroke-color': 'white',
+                'circle-stroke-width': 1,
+                'circle-opacity': ['interpolate', ['linear'], ['zoom'], 14, 0, 15, 1]
+            }
+        });
+
+        // 5. Toggle Logic
+        document.getElementById('heatmapToggle').addEventListener('change', (e) => {
+            const visibility = e.target.checked ? 'visible' : 'none';
+            map.setLayoutProperty('accidents-heat', 'visibility', visibility);
+        });
+    });
+  </script>
+</body>
+</html>
