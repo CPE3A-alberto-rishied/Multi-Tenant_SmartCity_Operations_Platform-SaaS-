@@ -456,7 +456,6 @@ async function fetchAdminReports() {
                                 <option value="" disabled selected>${report.forwarded_to || 'Select department...'}</option>
                                 <option value="Traffic">Traffic</option>
                                 <option value="DRRMO">DRRMO</option>
-                                <option value="Engineering">Engineering</option>
                             </select>
                         </div>
                         <div class="flex items-center justify-between mt-4">
@@ -557,7 +556,6 @@ function executeSubmitReport() {
             <option value="" disabled selected hidden>Select department...</option>
             <option value="Traffic">Traffic</option>
             <option value="DRRMO">DRRMO</option>
-            <option value="Engineering">Engineering</option>
           </select>
         </div>
         <div class="flex items-center justify-between mt-4">
