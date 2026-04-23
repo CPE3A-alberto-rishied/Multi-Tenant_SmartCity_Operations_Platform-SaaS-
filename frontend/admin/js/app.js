@@ -42,7 +42,7 @@ function doLogout() {
     localStorage.removeItem('activeDepartment');
     
     // 2. Redirect to the login screen
-    window.location.href = '/admin'; 
+    window.location.href = 'admin.html'; 
 }
 // Close custom dropdowns when clicking outside
 document.addEventListener('click', (e) => {
@@ -53,7 +53,7 @@ document.addEventListener('click', (e) => {
 
 
 // ==========================================
-// AUTHENTICATION LOGIC (/admin)
+// AUTHENTICATION LOGIC (admin.html)
 // ==========================================
 let currentLoggingInId = "";
 async function handleLogin(event) {
@@ -114,7 +114,7 @@ async function handleVerify(e) {
         const result = await response.json();
         if (result.success) {
             localStorage.setItem('activeDepartment', result.dept);
-            window.location.href = result.dept === 'Main Admin' ? "/dashboard" : "/dashboard2";
+            window.location.href = result.dept === 'Main Admin' ? "dashboard.html" : "dashboard2.html";
         } else {
             alert("Incorrect code. Please try again.");
             inputs.forEach(i => i.value = ''); // Clear inputs

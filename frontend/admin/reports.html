@@ -7,7 +7,7 @@
         (function() {
             const session = localStorage.getItem('activeDepartment');
             if (!session) {
-                window.location.replace('/admin'); 
+                window.location.replace('admin.html'); 
             }
         })();
     </script>
@@ -109,11 +109,11 @@
           </button>
         </div>
         <nav class="flex-1 py-4 overflow-y-auto">
-          <a href="/dashboard" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
-          <a href="/manage_admin" class="sidebar-item"><i data-lucide="users"></i><span>Manage Admins</span></a>
-          <a href="/reports" class="sidebar-item active"><i data-lucide="file-text"></i><span>Public Reports</span></a>
-          <a href="/announcements" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
-          <a href="/maps" class="sidebar-item"><i data-lucide="map"></i><span>Maps</span></a>
+          <a href="dashboard.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+          <a href="manage_admin.html" class="sidebar-item"><i data-lucide="users"></i><span>Manage Admins</span></a>
+          <a href="reports.html" class="sidebar-item active"><i data-lucide="file-text"></i><span>Public Reports</span></a>
+          <a href="announcements.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+          <a href="maps.html" class="sidebar-item"><i data-lucide="map"></i><span>Maps</span></a>
         </nav>
         
         <div class="user-footer">
@@ -125,7 +125,7 @@
                       <div class="text-[#94a3b8] text-[11px] user-footer-sub">System Administrator</div>
                     </div>
                 </div>
-                <a href="/profile" class="text-[#94a3b8] hover:text-[#3b82f6]"><i data-lucide="settings" class="w-4 h-4"></i></a>
+                <a href="profile.html" class="text-[#94a3b8] hover:text-[#3b82f6]"><i data-lucide="settings" class="w-4 h-4"></i></a>
             </div>
             <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 text-white text-sm font-semibold hover:bg-gray-800 transition-colors">
                 <i data-lucide="log-out" class="w-4 h-4"></i> Logout

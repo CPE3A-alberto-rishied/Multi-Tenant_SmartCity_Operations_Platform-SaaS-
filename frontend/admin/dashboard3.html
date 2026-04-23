@@ -4,7 +4,7 @@
   <script>
     (function() {
         const session = localStorage.getItem('activeDepartment');
-        if (!session) window.location.replace('/admin?error=unauthorized'); 
+        if (!session) window.location.replace('admin.html?error=unauthorized'); 
     })();
    </script>
   <meta charset="UTF-8" />
@@ -32,11 +32,11 @@
     </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
-      <a href="/dashboard3" class="sidebar-item active"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
-      <a href="/reports3" class="sidebar-item"><i data-lucide="file-text"></i><span>Public Reports</span></a>
-      <a href="/announcements3" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
-      <a href="/weather" class="sidebar-item"><i data-lucide="thermometer-sun"></i><span>Weather & AQI Alerts</span></a>
-      <a href="/evacuation" class="sidebar-item"><i data-lucide="tent"></i><span>Evacuation Control</span></a>
+      <a href="dashboard3.html" class="sidebar-item active"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+      <a href="reports3.html" class="sidebar-item"><i data-lucide="file-text"></i><span>Public Reports</span></a>
+      <a href="announcements3.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+      <a href="weather.html" class="sidebar-item"><i data-lucide="thermometer-sun"></i><span>Weather & AQI Alerts</span></a>
+      <a href="evacuation.html" class="sidebar-item"><i data-lucide="tent"></i><span>Evacuation Control</span></a>
     </nav>
 
     <div class="user-footer">
@@ -48,7 +48,7 @@
                   <div class="user-footer-sub">Disaster Management</div>
                 </div>
             </div>
-            <a href="/profile3" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
+            <a href="profile3.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
         </div>
         <button onclick="doLogout()" class="btn-logout"><i data-lucide="log-out" class="icon-sm"></i> Logout</button>
     </div>
@@ -65,17 +65,17 @@
       <div class="max-w-[1400px] mx-auto space-y-6">
         
        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-           <a href="/announcements3" class="border theme-border rounded-2xl p-6 shadow-lg theme-surface flex flex-col justify-between">
+           <a href="announcements3.html" class="border theme-border rounded-2xl p-6 shadow-lg theme-surface flex flex-col justify-between">
             <div class="mb-4"><p class="text-[11px] font-bold uppercase tracking-wider text-[#94a3b8]">Active Announcements</p></div>
             <div><h2 id="announcement-count" class="text-3xl font-bold text-blue-500 mb-1">0</h2><p class="text-xs text-[#94a3b8]">Live broadcasted alerts</p></div>
            </a>
            
-           <a href="/evacuation" class="border theme-border rounded-2xl p-6 shadow-lg theme-surface flex flex-col justify-between">
+           <a href="evacuation.html" class="border theme-border rounded-2xl p-6 shadow-lg theme-surface flex flex-col justify-between">
             <div class="mb-4"><p class="text-[11px] font-bold uppercase tracking-wider text-[#94a3b8]">Evacuation Centers</p></div>
             <div><h2 id="evacuation-count" class="text-3xl font-bold text-emerald-500 mb-1">0</h2><p class="text-xs text-[#94a3b8]">Activated</p></div>
            </a>
            
-           <a href="/reports3" class="border theme-border rounded-2xl p-6 shadow-lg theme-surface flex flex-col justify-between">
+           <a href="reports3.html" class="border theme-border rounded-2xl p-6 shadow-lg theme-surface flex flex-col justify-between">
             <div class="mb-4"><p class="text-[11px] font-bold uppercase tracking-wider text-[#94a3b8]">Total Reports (30D)</p></div>
             <div><h2 id="reports-count" class="text-3xl font-bold text-white mb-1">0</h2><p class="text-xs text-[#94a3b8]">Across all barangays</p></div>
            </a>
