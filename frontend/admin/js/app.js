@@ -189,27 +189,38 @@ function closePopup(popupId) {
 // ==========================================
 // MONGODB MANAGE ADMINS LOGIC
 // ==========================================
-const departments = ["Main Admin", "Traffic", "DRRMO"]; // Hardcoded departments
-let adminsFromDB = []; 
+const departments = ["Main Admin", "Traffic", "DRRMO"]; // Hardcoded
+let adminsFromDB = []; // Source of truth for MongoDB data
 let currentFilter = "All Departments";
 let currentSearchQuery = "";
 let userToDeleteId = null; 
 
-// 1. Hardcoded Dropdowns
-function updateDepartmentDropdowns() {
-    const filterSelect = document.getElementById('dept-filter');
-    const modalSelect = document.getElementById('staff-dept');
-    const optionsHTML = departments.map(d => `<option value="${d}">${d}</option>`).join('');
+// 1. FIXED: CANCEL BUTTON FUNCTION (Moved to top level)
+function clearAndCloseStaff() {
+    const fields = ['staff-name', 'staff-id', 'staff-email', 'staff-pass', 'staff-dept'];
     
-    if (filterSelect) filterSelect.innerHTML = `<option>All Departments</option>` + optionsHTML;
-    if (modalSelect) modalSelect.innerHTML = `<option value="" disabled selected>Select Department</option>` + optionsHTML;
+    fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.value = ""; // Reset value
+            el.classList.remove('input-error'); // Remove red glow
+        }
+        
+        let errId = id === 'staff-pass' ? 'pass-error' : 
+                   id === 'staff-dept' ? 'dept-select-error' : 
+                   id.split('-')[1] + '-error';
+        
+        const errEl = document.getElementById(errId);
+        if (errEl) errEl.classList.add('hidden'); // Hide errors
+    });
+
+    closeModal('add-staff-modal'); //
 }
 
 // 2. Fetch all admins from MongoDB
 async function fetchAllAdmins() {
     try {
-        // Points to your LIVE Render backend
-        const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/all');
+        const response = await fetch('https://beat-pasig-api.onrender.com/api/admins/all');
         const result = await response.json();
         
         if (result.success) {
@@ -233,38 +244,18 @@ async function executeAddStaff() {
         status: "Active"
     };
 
-    // ====== FIX: CANCEL BUTTON FUNCTION ======
-function clearAndCloseStaff() {
-    const fields = ['staff-name', 'staff-id', 'staff-email', 'staff-pass', 'staff-dept'];
-    
-    fields.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.value = ""; // Reset text or dropdown value
-            el.classList.remove('input-error'); // Remove red glow
-        }
-        
-        // Construct error IDs to match your HTML (e.g., name-error, id-error)
-        let errId = id === 'staff-pass' ? 'pass-error' : 
-                   id === 'staff-dept' ? 'dept-select-error' : 
-                   id.split('-')[1] + '-error';
-        
-        const errEl = document.getElementById(errId);
-        if (errEl) errEl.classList.add('hidden'); // Hide error messages
-    });
-
-    closeModal('add-staff-modal'); // Hide the modal
-}
     try {
         const response = await fetch('https://beat-pasig-api.onrender.com/api/admin/signup', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newUser)
         });
-        if ((await response.json()).success) {
+        
+        const result = await response.json();
+        if (result.success) {
             clearAndCloseStaff();
             closeModal('confirm-staff-modal');
-            fetchAllAdmins(); 
+            fetchAllAdmins(); // Refresh from DB
         }
     } catch (error) { console.error("Add Error:", error); }
 }
