@@ -202,3 +202,13 @@ app.post('/api/login', async (req, res) => {
 // 6. START SERVER (MUST BE AT THE VERY BOTTOM)
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+// Fetch ALL Announcements (For Admin Dashboard Reloads)
+app.get('/api/announcements/all', async (req, res) => {
+    try {
+        const allAnnouncements = await Announcement.find().sort({ createdAt: -1 });
+        res.status(200).json({ success: true, data: allAnnouncements });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
