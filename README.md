@@ -41,5 +41,24 @@ The system is designed to streamline emergency responses: citizens file public r
 4. **The Resolution:** The incident is cleared, the report is marked as "Resolved," and the system automatically generates an official update for the public City News page.
 
 ## 🧊 System Architecture
-![System Architecture Diagram](/System _Architecture.png)
+
+# Di ko malagay Codes or Picture ng Diagram haha
+
+### 🏗️ Architecture Breakdown
+
+The BEAT platform operates on a decoupled, client-server architecture, integrating local state-syncing techniques with cloud-based infrastructure to ensure high performance and real-time updates.
+
+#### 1. Client-Side (Frontend Architecture)
+The frontend is divided into targeted workspaces to ensure security and operational focus:
+* **Citizen Portal:** A public-facing interface where users can view live city alerts, monitor hazard maps, and submit emergency reports without requiring an account.
+* **Secure Department Portals:** Guarded by JWT/Session authentication, these role-specific dashboards (Main Admin, Traffic, and DRRMO) allow authorized personnel to process reports, generate map polygons, and manage specific city domains.
+
+#### 2. Server-Side (Backend Infrastructure)
+* **Node.js & Express API:** The core backend, hosted on Render, processes incoming emergency reports, authenticates admin logins (including OTP verifications), and handles all CRUD operations for the platform.
+* **MongoDB Cloud Database:** A secure, scalable NoSQL database used to persist user accounts, historical public reports, and the permanent archive of city announcements.
+
+#### 3. External Services & APIs
+* **Mapbox GL JS:** Powers the high-performance, dark-themed interactive maps, allowing for custom data overlays, real-time traffic rendering, and pinpoint hazard placement.
+* **Turf.js (Geospatial Engine):** Operates under the hood to perform complex mathematical geospatial calculations, such as instantly drawing dynamic buffer zones and polygonal exclusion perimeters around user-drawn hazard lines.
+* **Chart.js:** Processes live DOM data and renders responsive, animated doughnut charts to visualize traffic congestion metrics on the dashboards.
 
