@@ -2,79 +2,135 @@
 <html lang="en" class="h-full">
 <head>
   <meta charset="UTF-8">
+  
+  <script>
+      (function() {
+          const session = localStorage.getItem('activeDepartment');
+          if (!session || session !== 'DRRMO') {
+              window.location.replace('admin.html?error=unauthorized'); 
+          }
+      })();
+  </script>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BEAT - Analytics & Audit</title>
+  <title>BEAT - DRRMO Analytics & Audit</title>
+  
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
+  
+  <style>
+    body { font-family: 'DM Sans', sans-serif !important; overflow: hidden; }
+    
+    /* SIDEBAR */
+    .sidebar { width: 260px !important; flex-shrink: 0 !important; }
+    
+    .sidebar-item { 
+      display: flex !important; align-items: center !important; gap: 12px !important;
+      padding: 12px 18px !important; font-size: 14.5px !important; 
+      font-weight: 500 !important; color: #94a3b8 !important;
+      text-decoration: none !important; border-left: 3px solid transparent !important;
+    }
+    .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
+    .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
+    .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
+    
+    /* USER FOOTER */
+    .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
+    .logo-text { font-family: 'Space Mono', monospace !important; letter-spacing: 0.1em; }
+    
+    /* INPUTS */
+    .modal-input { width: 100%; background: #1e2536 !important; border: 1px solid #374151; color: white !important; border-radius: 0.5rem; outline: none; margin-top: 0.4rem; padding: 8px 12px; transition: all 0.2s; }
+    .modal-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6; }
+    
+    select { 
+      appearance: none; 
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); 
+      background-repeat: no-repeat; 
+      background-position: right 0.75rem center; 
+      background-size: 1em; 
+    }
+  </style>
 </head>
 <body class="h-full flex bg-[#0a0e1a]">
-  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface">
+
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+  <aside id="sidebar" class="sidebar flex flex-col h-full absolute lg:relative z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 theme-border-r theme-surface">
     <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
       <div class="flex items-center gap-3">
-        <div class="logo-box">B</div>
+        <div style="background:var(--accent); width:36px; height:36px; border-radius:10px" class="flex items-center justify-center font-bold text-white text-sm">B</div>
         <div class="flex flex-col justify-center">
-          <div class="logo-text font-bold text-white">BEAT</div>
-          <div class="sidebar-subtext">Department Portal</div>
+          <div class="logo-text font-bold text-white leading-none mb-1">BEAT</div>
+          <div class="text-[11px] text-[#94a3b8] leading-none">Department Portal</div>
         </div>
       </div>
+      <button class="lg:hidden ml-auto text-gray-400 hover:text-white" onclick="toggleSidebar()">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
     </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
-      <a href="dashboard2.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
-      <a href="reports2.html" class="sidebar-item"><i data-lucide="file-text"></i><span>Public Reports</span></a>
-      <a href="announcements2.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
-      <a href="traffic2.html" class="sidebar-item"><i data-lucide="car"></i><span>Traffic and Road Control</span></a>
-      <a href="analytics2.html" class="sidebar-item active"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
+      <a href="dashboard3.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+      <a href="reports3.html" class="sidebar-item"><i data-lucide="file-text"></i><span>Public Reports</span></a>
+      <a href="announcements3.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Announcement Manager</span></a>
+      <a href="traffic3.html" class="sidebar-item"><i data-lucide="truck"></i><span>Fleet Response Control</span></a>
+      <a href="analytics3.html" class="sidebar-item active"><i data-lucide="bar-chart-3"></i><span>Analytics & Audit</span></a>
     </nav>
 
     <div class="user-footer">
         <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
-                <div id="nav-avatar" class="nav-avatar"></div>
+                <div style="background:#f59e0b; width:42px; height:42px; border-radius:50%;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">D</div>
                 <div>
-                  <div class="user-footer-name">Loading...</div>
-                  <div class="user-footer-sub">Loading...</div>
+                  <div class="text-white font-semibold text-sm">DRRMO</div>
+                  <div class="text-[#94a3b8] text-[11px]">Emergency Response</div>
                 </div>
             </div>
-            <a href="profile2.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
+            <a href="profile3.html" class="text-[#94a3b8] hover:text-[#3b82f6] transition-colors"><i data-lucide="settings" class="w-4 h-4"></i></a>
         </div>
-        <button onclick="doLogout()" class="btn-logout">
-            <i data-lucide="log-out" class="icon-sm"></i> Logout
+        <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 text-white text-sm font-semibold hover:bg-gray-800 transition-colors">
+            <i data-lucide="log-out" class="w-4 h-4"></i> Logout
         </button>
     </div>
   </aside>
 
-  <main class="flex-1 overflow-y-auto">
-    <header class="px-8 h-[76px] flex items-center justify-between shrink-0 theme-surface theme-border-b">
-      <h1 class="text-xl font-semibold flex items-center gap-2 text-white">
-        <i data-lucide="bar-chart-3" class="icon-lg"></i>
-        Analytics & Audit
-      </h1>
-      <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 bg-[#1e2536] hover:bg-gray-800 text-white text-sm font-medium rounded-lg border theme-border transition-colors">
-        <i data-lucide="printer" class="icon-sm"></i> Print / Export Logs
+  <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] relative">
+    <header class="px-4 sm:px-8 h-[76px] flex items-center justify-between shrink-0 theme-surface border-b" style="border-color:var(--border)">
+      <div class="flex items-center gap-4">
+        <button class="lg:hidden text-gray-400 hover:text-white" onclick="toggleSidebar()">
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+        <h1 class="text-xl font-semibold flex items-center gap-2 text-white">
+          <i data-lucide="bar-chart-3" class="text-blue-500 w-6 h-6 hidden sm:block"></i>
+          Analytics & Audit
+        </h1>
+      </div>
+      <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 bg-[#1e2536] hover:bg-gray-800 text-white text-sm font-medium rounded-lg border transition-colors shadow-sm" style="border-color:var(--border)">
+        <i data-lucide="printer" class="w-4 h-4"></i> <span class="hidden sm:block">Print / Export Logs</span>
       </button>
     </header>
 
-    <div class="p-8 animate-in">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="flex-1 overflow-y-auto p-4 sm:p-8 animate-in">
+      <div class="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <div id="audit-section" class="audit-card lg:col-span-2 border theme-border rounded-xl p-6 shadow-sm flex flex-col h-[600px] theme-surface">
-          <div class="flex items-center justify-between mb-4">
+        <div id="audit-section" class="audit-card lg:col-span-2 border rounded-xl p-6 shadow-sm flex flex-col h-[600px]" style="background:var(--surface); border-color:var(--border)">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
             <h3 class="font-semibold flex items-center gap-2 text-white text-lg">
               <i data-lucide="scroll-text" class="text-blue-500"></i>
               System Audit Trail
             </h3>
-            <div class="search-container relative w-72">
-              <i data-lucide="search" class="absolute left-3 top-2.5 text-gray-500 icon-sm"></i>
+            <div class="search-container relative w-full sm:w-72">
+              <i data-lucide="search" class="absolute left-3 top-2.5 text-gray-500 w-4 h-4"></i>
               <input type="text" id="auditSearch" placeholder="Search logs by action..." class="modal-input !mt-0 !pl-9 text-sm" style="padding-top:8px; padding-bottom:8px;">
             </div>
           </div>
           
           <div class="audit-container overflow-y-auto flex-1 pr-2">
-            <table class="w-full text-left text-sm text-gray-400">
+            <table class="w-full text-left text-sm text-gray-400 min-w-[600px]">
               <thead class="text-xs uppercase bg-[#1e2536] text-gray-300 sticky top-0 z-10">
                 <tr>
                   <th class="px-4 py-3 rounded-l-lg">Date & Time</th>
@@ -83,14 +139,14 @@
                   <th class="px-4 py-3 rounded-r-lg">IP Address</th>
                 </tr>
               </thead>
-              <tbody id="auditTableBody">
-              </tbody>
+              <tbody id="auditTableBody" class="divide-y divide-gray-700/30">
+                </tbody>
             </table>
           </div>
         </div>
 
-        <div class="charts-container flex flex-col gap-6 h-[600px]">
-          <div class="border theme-border rounded-xl p-5 shadow-sm flex flex-col shrink-0 h-[260px] theme-surface">
+        <div class="charts-container flex flex-col gap-6 h-auto lg:h-[600px]">
+          <div class="border rounded-xl p-5 shadow-sm flex flex-col shrink-0 h-[260px]" style="background:var(--surface); border-color:var(--border)">
             <div class="flex items-center justify-between mb-3 shrink-0">
               <h3 class="font-semibold flex items-center gap-2 text-white">
                 <i data-lucide="pie-chart" class="text-blue-500"></i>
@@ -102,19 +158,19 @@
             </div>
           </div>
 
-          <div class="border theme-border rounded-xl p-6 shadow-sm flex flex-col flex-1 theme-surface">
+          <div class="border rounded-xl p-6 shadow-sm flex flex-col flex-1" style="background:var(--surface); border-color:var(--border)">
             <div class="flex items-center justify-between mb-4">
               <h3 class="font-semibold flex items-center gap-2 text-white">
                 <i data-lucide="activity" class="text-blue-500"></i>
                 Report Frequency
               </h3>
-              <select id="freqDropdown" onchange="updateFrequencyChart()" class="modal-input !mt-0 !w-auto text-xs cursor-pointer" style="padding:4px 8px;">
+              <select id="freqDropdown" onchange="updateFrequencyChart()" class="modal-input !mt-0 !w-auto text-xs cursor-pointer" style="padding:4px 8px; padding-right:32px;">
                 <option value="This Week">This Week</option>
                 <option value="This Month">This Month</option>
                 <option value="This Year">This Year</option>
               </select>
             </div>
-            <div class="flex-1 flex items-center justify-center relative w-full">
+            <div class="flex-1 flex items-center justify-center relative w-full min-h-[200px]">
               <canvas id="frequencyChart"></canvas>
             </div>
           </div>
@@ -123,10 +179,33 @@
     </div>
   </main>
 
-  <script src="js/app2.js"></script>
+  <script src="js/app3.js"></script>
   <script>
-    lucide.createIcons();
+    document.addEventListener('DOMContentLoaded', () => { 
+        if (window.lucide) lucide.createIcons(); 
+    });
     
+    // Sidebar toggle logic
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        
+        if (sidebar.classList.contains('-translate-x-full')) {
+            sidebar.classList.remove('-translate-x-full');
+            if(overlay) overlay.classList.remove('hidden');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            if(overlay) overlay.classList.add('hidden');
+        }
+    }
+
+    // Logout logic
+    function doLogout() {
+        localStorage.removeItem('activeDepartment'); // Wipe the session
+        window.location.href = 'admin.html'; // Kick back to login
+    }
+
+    // Search Audit Table
     document.getElementById('auditSearch').addEventListener('keyup', function() {
       let filter = this.value.toLowerCase();
       let rows = document.querySelectorAll('#auditTableBody tr');
@@ -143,10 +222,10 @@
       new Chart(ctxCat, {
         type: 'doughnut',
         data: {
-          labels: ['Accidents', 'Traffic Jams', 'Road Works', 'Hazards'],
+          labels: ['Medical', 'Fire', 'Rescue', 'Hazards'],
           datasets: [{
             data: [0, 0, 0, 0], 
-            backgroundColor: ['#ef4444', '#eab308', '#3b82f6', '#10b981'],
+            backgroundColor: ['#ef4444', '#f97316', '#3b82f6', '#10b981'],
             borderWidth: 0, hoverOffset: 4
           }]
         },
