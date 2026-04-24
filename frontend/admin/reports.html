@@ -245,61 +245,51 @@
       </div>
 
       <div id="view-report-modal" class="modal-overlay hidden" onclick="window.closeModal('view-report-modal')">
-        <div class="border w-full sm:max-w-[450px] rounded-2xl p-6 sm:p-8 shadow-2xl text-left max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)" onclick="event.stopPropagation()">
-          <div class="flex justify-between items-start mb-6">
-            <h2 id="modal-detail-title" class="text-white font-bold text-xl sm:text-2xl pr-4">Title</h2>
-            <span id="modal-detail-status" class="bg-gray-500/10 text-gray-500 border border-gray-500/20 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase">Status</span>
-          </div>
-          
-          <div id="modal-detail-datetime" class="bg-[#1e2536] p-3 rounded-lg text-sm text-[#94a3b8] mb-6 border" style="border-color:var(--border)">
-            Date <span class="mx-1">at</span> Time
-          </div>
+  <div class="border w-full sm:max-w-[450px] rounded-2xl p-6 sm:p-8 shadow-2xl text-left max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)" onclick="event.stopPropagation()">
+    <div class="flex justify-between items-start mb-6">
+      <h2 id="modal-detail-title" class="text-white font-bold text-xl sm:text-2xl pr-4">Title</h2>
+      <span id="modal-detail-status" class="badge-status">Status</span>
+    </div>
+    
+    <div id="modal-detail-datetime" class="bg-[#1e2536] p-3 rounded-lg text-sm text-[#94a3b8] mb-6 border" style="border-color:var(--border)">
+      Date at Time
+    </div>
 
-          <div class="space-y-5 text-sm">
-            <div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Name of Reportee:</p>
-            <p id="modal-detail-name" class="text-white font-semibold">Name</p></div>
-            
-            <div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Email</p>
-            <p id="modal-detail-email" class="text-white break-all">Email</p></div>
-            
-            <div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Contact</p>
-            <p id="modal-detail-contact" class="text-white">Contact</p></div>
-            
-            <div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Location</p>
-            <p id="modal-detail-location" class="text-white">Location</p></div>
-            
-            <div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Department Forwarded To</p>
-            <p id="modal-detail-forwarded" class="text-white">Dept</p></div>
-
-            <hr style="border-color:var(--border)">
-
-            <div id="modal-detail-return-box" class="hidden border-l-2 border-red-500 bg-[#1e2536] p-3 rounded-r-lg text-sm mb-5">
-                <p class="text-[#94a3b8] mb-1 font-bold text-[10px] uppercase tracking-wider">Return Reason:</p>
-                <p id="modal-detail-return-reason" class="text-slate-300 leading-relaxed"></p>
-            </div>
-
-            <div><p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Full Description</p>
-            <p id="modal-detail-desc" class="text-slate-300 leading-relaxed whitespace-pre-wrap">Description</p></div>
-          </div>
-
-          <button onclick="window.closeModal('view-report-modal')" class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg text-sm">Close</button>
-        </div>
+    <div class="space-y-5 text-sm">
+      <div>
+        <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Name of Reportee:</p>
+        <p id="modal-detail-name" class="text-white font-semibold">Name</p>
+      </div>
+      
+      <div>
+        <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Email / Contact</p>
+        <p id="modal-detail-email" class="text-white break-all">Email</p>
+        <p id="modal-detail-contact" class="text-white mt-0.5">Contact</p>
+      </div>
+      
+      <div>
+        <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Location</p>
+        <p id="modal-detail-location" class="text-white">Location</p>
       </div>
 
-      <div id="confirm-forward-modal" class="modal-overlay hidden">
-        <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
-          <div style="background:#3b82f6; width:56px; height:56px; border-radius:50%; margin: 0 auto 20px" class="flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
-            <i data-lucide="share" class="w-6 h-6"></i>
-          </div>
-          <h2 class="text-white font-bold text-xl mb-3">Forward Report?</h2>
-          <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to assign this report to a new department?</p>
-          
-          <div class="flex flex-col sm:flex-row gap-3">
-            <button onclick="cancelForward()" class="flex-1 bg-[#1e2536] border border-[#374151] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button>
-            <button onclick="confirmForward()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Confirm</button>
-          </div>
-        </div>
+      <hr style="border-color:var(--border)">
+
+      <div id="modal-detail-return-box" class="hidden border-l-2 border-red-500 bg-[#1e2536] p-3 rounded-r-lg text-sm mb-5">
+          <p class="text-[#94a3b8] mb-1 font-bold text-[10px] uppercase tracking-wider">Return Reason:</p>
+          <p id="modal-detail-return-reason" class="text-slate-300 leading-relaxed"></p>
       </div>
+
+      <div>
+        <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-1">Full Description</p>
+        <p id="modal-detail-desc" class="text-slate-300 leading-relaxed whitespace-pre-wrap">Description</p>
+      </div>
+    </div>
+
+    <button onclick="window.closeModal('view-report-modal')" class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg text-sm">
+      Close
+    </button>
+  </div>
+</div>
 
       <div id="resolve-modal" class="modal-overlay hidden">
         <div class="border w-full sm:max-w-[400px] text-center p-8 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style="background:var(--surface); border-color:var(--border)">
