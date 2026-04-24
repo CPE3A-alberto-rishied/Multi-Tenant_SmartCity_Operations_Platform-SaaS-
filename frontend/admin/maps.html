@@ -7,46 +7,49 @@
         if (!session || session !== 'Main Admin') window.location.replace('admin.html?error=unauthorized'); 
     })();
 
-    // Sidebar Toggle Logic
-    window.toggleSidebar = function() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
-        if (sidebar && overlay) {
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-        }
-    };
-
     // Mobile Map Stats Toggle Logic
     window.toggleStatsPanel = function() {
         const content = document.getElementById('stats-panel-content');
         const chevron = document.getElementById('stats-chevron');
-        if (content.classList.contains('mobile-hidden')) {
-            content.classList.remove('mobile-hidden');
+        if (content.classList.contains('hidden')) {
+            content.classList.remove('hidden');
             if(chevron) chevron.classList.add('rotate-180');
         } else {
-            content.classList.add('mobile-hidden');
+            content.classList.add('hidden');
             if(chevron) chevron.classList.remove('rotate-180');
         }
     };
 
-    // NEW: Mobile Map Legend Toggle Logic
+    // Mobile Jump to District Toggle Logic
+    window.toggleDistrictPanel = function() {
+        const content = document.getElementById('district-panel-content');
+        const chevron = document.getElementById('district-chevron');
+        if (content.classList.contains('hidden')) {
+            content.classList.remove('hidden');
+            if(chevron) chevron.classList.add('rotate-180');
+        } else {
+            content.classList.add('hidden');
+            if(chevron) chevron.classList.remove('rotate-180');
+        }
+    };
+
+    // Mobile Map Legend Toggle Logic
     window.toggleLegend = function() {
         const legend = document.getElementById('map-legend');
         const toggleBtn = document.getElementById('legend-toggle-btn');
         if (legend.classList.contains('hidden')) {
             legend.classList.remove('hidden');
-            legend.classList.add('grid');
+            legend.classList.add('flex'); 
             if(toggleBtn) toggleBtn.classList.add('hidden');
         } else {
             legend.classList.add('hidden');
-            legend.classList.remove('grid');
+            legend.classList.remove('flex');
             if(toggleBtn) toggleBtn.classList.remove('hidden');
         }
     };
   </script>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>BEAT - City Master Map</title>
   
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
@@ -56,35 +59,23 @@
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet">
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
 
-  <link rel="stylesheet" href="css/styles2.css">
   <style>
-    body { font-family: 'DM Sans', sans-serif !important; overflow: hidden; background-color: #0a0e1a; }
-    
-    /* SIDEBAR CSS */
-    .sidebar { width: 260px !important; flex-shrink: 0 !important; }
-    .sidebar-item { 
-      display: flex !important; align-items: center !important; gap: 12px !important;
-      padding: 12px 18px !important; font-size: 14.5px !important; 
-      font-weight: 500 !important; color: #94a3b8 !important;
-      text-decoration: none !important; border-left: 3px solid transparent !important;
+    body, html { font-family: 'DM Sans', sans-serif !important; overflow: hidden; background-color: #0a0e1a; margin: 0; padding: 0; width: 100%; height: 100%; }
+
+    /* Pure Fullscreen Map Base */
+    #map { position: absolute; inset: 0; z-index: 1; }
+
+    /* Floating Panel Shared Styles */
+    .floating-panel {
+        background: rgba(10, 22, 40, 0.95);
+        border: 1px solid #374151;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        backdrop-filter: blur(12px);
+        pointer-events: auto;
     }
-    .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
-    .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
-    .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
-    
-    .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
-    .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
-    .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
-    .settings-link { color: #94a3b8; transition: color 0.2s; display: flex; align-items: center; }
-    .settings-link:hover { color: #3b82f6; }
 
-    /* FIXED: Map Legend with pointer-events enabled for the Close button */
-    .map-legend { position: absolute; bottom: 30px; right: 20px; z-index: 20; background: rgba(10, 22, 40, 0.95); border: 1px solid #374151; border-radius: 12px; padding: 15px; gap: 8px; pointer-events: auto; backdrop-filter: blur(12px); }
-    .legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.75rem; color: white; }
-    .dot { width: 10px; height: 10px; border-radius: 50%; }
-    .section-label { color: #94a3b8; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
-
-    /* Status-Based Markers */
+    /* Status-Based HTML Markers */
     .hazard-marker-pending { width: 24px; height: 24px; background-color: #f59e0b; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 20px rgba(245, 158, 11, 0.8); animation: pulse-amber 2s infinite; cursor: pointer; }
     @keyframes pulse-amber { 0% { box-shadow: 0 0 0 0 rgba(245,158,11, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(245,158,11, 0); } 100% { box-shadow: 0 0 0 0 rgba(245,158,11, 0); } }
 
@@ -107,116 +98,88 @@
     .popup-yellow .mapboxgl-popup-content { background: #1e293b !important; color: white !important; border: 1px solid #eab308; border-radius: 8px; padding: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 220px; }
     .popup-yellow .mapboxgl-popup-tip { border-top-color: #1e293b !important; border-bottom-color: #1e293b !important; }
 
-    .mapboxgl-popup-close-button { color: #94a3b8; font-size: 16px; top: 4px; right: 8px; }
+    .mapboxgl-popup-close-button { color: #94a3b8; font-size: 16px; top: 4px; right: 8px; outline: none; }
     .mapboxgl-popup-close-button:hover { color: white; background: transparent; }
 
-    /* Responsive Accordion logic */
-    @media (max-width: 1023px) {
-        .mobile-hidden { display: none !important; }
-    }
+    /* Layer Switch CSS */
+    .layer-switch { position: relative; display: inline-block; width: 36px; height: 20px; }
+    .layer-switch input { opacity: 0; width: 0; height: 0; }
+    .layer-slider { position: absolute; cursor: pointer; inset: 0; background-color: #374151; transition: .4s; border-radius: 20px; }
+    .layer-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    .layer-switch input:checked + .layer-slider { background-color: #3b82f6; }
+    .layer-switch input:checked + .layer-slider:before { transform: translateX(16px); }
   </style>
 </head>
-<body class="h-full flex bg-[#0a0e1a]">
+<body class="h-full w-full bg-[#0a0e1a] overflow-hidden relative">
 
-  <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-[90] hidden lg:hidden" onclick="window.toggleSidebar()"></div>
+    <div id="map" class="absolute inset-0 z-0"></div>
 
-  <aside id="sidebar" class="sidebar flex flex-col h-full fixed lg:relative z-[100] transform -translate-x-full lg:translate-x-0 transition-transform duration-300 top-0 left-0 theme-border-r theme-surface">
-    <div class="h-[76px] px-5 flex items-center justify-between shrink-0 theme-border-b">
-        <div id="auth-logo" class="flex items-center gap-1.5">
-            <img src="../assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain" onerror="this.src='/assets/beat_logo2.png'">
-            <div class="flex flex-col justify-center items-start">
-                <img src="../assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1" onerror="this.src='/assets/beat_text2.png'">
-                <div style="color:#94a3b8; font-size:11px" class="leading-none">Command Center</div>
-            </div>
-        </div>
-        <button type="button" class="lg:hidden text-gray-400 hover:text-white p-2" onclick="window.toggleSidebar()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
-    </div>
-    
-    <nav class="flex-1 py-4 overflow-y-auto">
-      <a href="dashboard.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
-      <a href="reports.html" class="sidebar-item"><i data-lucide="file-text"></i><span>System Reports</span></a>
-      <a href="announcements.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Global Announcements</span></a>
-      <a href="maps.html" class="sidebar-item active"><i data-lucide="map"></i><span>City Master Map</span></a>
-      <a href="manage_admin.html" class="sidebar-item"><i data-lucide="users"></i><span>Manage Departments</span></a>
-    </nav>
+    <div class="absolute top-4 left-4 right-4 sm:right-auto sm:w-80 z-10 flex flex-col gap-3 max-h-[50vh] sm:max-h-[90vh] pointer-events-none">
+        <div class="floating-panel p-4 sm:p-5 flex-shrink-0 overflow-y-auto">
+            
+            <button onclick="window.location.href='dashboard.html'" class="w-full flex items-center justify-center gap-2 bg-[#1e293b] hover:bg-gray-700 text-white py-2.5 rounded-lg mb-4 text-sm font-bold transition-colors border border-gray-600 outline-none">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Dashboard
+            </button>
 
-    <div class="user-footer">
-        <div class="flex items-center justify-between mb-5">
-            <div class="flex items-center gap-3">
-                <div id="nav-avatar" style="background:#3b82f6; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">M</div>
+            <button type="button" onclick="toggleStatsPanel()" class="w-full flex items-center justify-between sm:cursor-default outline-none">
+                <h2 class="text-white font-bold text-base sm:text-lg flex items-center gap-2"><i data-lucide="activity" class="text-blue-500 w-4 h-4 sm:w-5 sm:h-5"></i> Live Network Status</h2>
+                <i data-lucide="chevron-down" id="stats-chevron" class="text-[#94a3b8] w-5 h-5 transition-transform duration-300 sm:hidden"></i>
+            </button>
+            
+            <div id="stats-panel-content" class="hidden sm:block mt-4 transition-all">
                 <div>
-                  <div class="user-footer-name">Main Admin</div>
-                  <div class="user-footer-sub">Command Center</div>
-                </div>
-            </div>
-            <a href="profile.html" class="settings-link"><i data-lucide="settings" style="width:18px; height:18px"></i></a>
-        </div>
-        <button type="button" onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
-            <i data-lucide="log-out" style="width:16px; height:16px"></i> Logout
-        </button>
-    </div>
-  </aside>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[11px] text-[#94a3b8] font-bold uppercase tracking-wider">Traffic Operations</span>
+                        <span id="traffic-count" class="text-red-500 font-bold font-mono text-sm">0</span>
+                    </div>
+                    <div id="traffic-incidents-list" class="space-y-3 pr-1 mt-2 max-h-[100px] sm:max-h-[150px] overflow-y-auto"></div>
 
-  <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] relative h-full">
-    
-    <header class="lg:hidden px-4 sm:px-8 h-[68px] flex items-center shrink-0 relative z-[40] theme-surface theme-border-b">
-      <button type="button" class="text-gray-400 hover:text-white mr-4 p-2 cursor-pointer z-50 relative" onclick="window.toggleSidebar()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-      </button>
-      <h1 class="text-lg font-semibold text-white flex items-center gap-2">
-        <i data-lucide="map" class="w-5 h-5 text-[#94a3b8]"></i> Master Map
-      </h1>
-    </header>
+                    <div class="flex justify-between items-center mb-2 mt-4 pt-4 border-t border-gray-800">
+                        <span class="text-[11px] text-[#94a3b8] font-bold uppercase tracking-wider">Environmental Alerts</span>
+                        <span id="weather-count" class="text-blue-500 font-bold font-mono text-sm">0</span>
+                    </div>
+                    <div id="weather-incidents-list" class="space-y-3 pr-1 mt-2 max-h-[100px] sm:max-h-[150px] overflow-y-auto"></div>
 
-    <div class="relative flex-1 w-full h-full overflow-hidden map-wrapper">
-        
-        <div id="map" class="absolute inset-0 z-0"></div>
+                    <div class="flex justify-between items-center mb-2 mt-4 pt-4 border-t border-gray-800">
+                        <span class="text-[11px] text-[#94a3b8] font-bold uppercase tracking-wider">Evacuation Ops</span>
+                        <span id="rescue-count" class="text-yellow-500 font-bold font-mono text-sm">0</span>
+                    </div>
+                    <div id="rescue-incidents-list" class="space-y-3 pr-1 mt-2 max-h-[100px] sm:max-h-[150px] overflow-y-auto"></div>
 
-        <div class="absolute top-4 lg:top-5 left-4 lg:left-5 right-4 lg:right-auto z-10 lg:w-80 flex flex-col gap-4 max-h-[60vh] lg:max-h-[90vh] pointer-events-none">
-            <div class="theme-surface border theme-border rounded-2xl p-4 lg:p-5 shadow-2xl backdrop-blur-md bg-opacity-95 flex-shrink-0 pointer-events-auto overflow-y-auto">
-                
-                <button onclick="window.location.href='dashboard.html'" class="w-full flex items-center justify-center gap-2 bg-[#1e293b] hover:bg-gray-700 text-white py-2.5 rounded-lg mb-4 text-sm font-bold transition-colors border border-gray-600">
-                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Dashboard
-                </button>
-
-                <button type="button" onclick="toggleStatsPanel()" class="w-full flex items-center justify-between lg:cursor-default lg:pointer-events-none">
-                    <h2 class="text-white font-bold text-base lg:text-lg flex items-center gap-2"><i data-lucide="activity" class="text-blue-500 w-4 h-4 lg:w-5 lg:h-5"></i> Live Network Status</h2>
-                    <i data-lucide="chevron-down" id="stats-chevron" class="text-[#94a3b8] w-5 h-5 transition-transform duration-300 lg:hidden"></i>
-                </button>
-                
-                <div id="stats-panel-content" class="mobile-hidden mt-3 lg:mt-5 transition-all">
-                    <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-[11px] text-[#94a3b8] font-bold uppercase tracking-wider">Traffic Operations</span>
-                            <span id="traffic-count" class="text-red-500 font-bold font-mono text-sm">0</span>
+                    <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(26, 86, 219, 0.2);">
+                        <div class="flex items-center justify-between mb-3">
+                            <span style="color: white; font-family: 'Barlow Condensed'; font-weight: bold; letter-spacing: 1px; font-size: 0.9rem;">TRAFFIC DENSITY</span>
+                            <label class="layer-switch">
+                                <input type="checkbox" id="toggle-density" checked onchange="toggleLayer('density', this.checked)">
+                                <span class="layer-slider"></span>
+                            </label>
                         </div>
-                        <div id="traffic-incidents-list" class="space-y-3 pr-1 mt-2 max-h-[150px] overflow-y-auto"></div>
-
-                        <div class="flex justify-between items-center mb-2 mt-4 pt-4 border-t border-gray-800">
-                            <span class="text-[11px] text-[#94a3b8] font-bold uppercase tracking-wider">Environmental Alerts</span>
-                            <span id="weather-count" class="text-blue-500 font-bold font-mono text-sm">0</span>
+                        <div class="flex items-center justify-between mb-1">
+                            <span style="color: white; font-family: 'Barlow Condensed'; font-weight: bold; letter-spacing: 1px; font-size: 0.9rem;">NETWORK OPERATIONS</span>
+                            <label class="layer-switch">
+                                <input type="checkbox" id="toggle-ops" checked onchange="toggleLayer('ops', this.checked)">
+                                <span class="layer-slider"></span>
+                            </label>
                         </div>
-                        <div id="weather-incidents-list" class="space-y-3 pr-1 mt-2 max-h-[150px] overflow-y-auto"></div>
-
-                        <div class="flex justify-between items-center mb-2 mt-4 pt-4 border-t border-gray-800">
-                            <span class="text-[11px] text-[#94a3b8] font-bold uppercase tracking-wider">Evacuation Ops</span>
-                            <span id="rescue-count" class="text-yellow-500 font-bold font-mono text-sm">0</span>
-                        </div>
-                        <div id="rescue-incidents-list" class="space-y-3 pr-1 mt-2 max-h-[150px] overflow-y-auto"></div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="absolute bottom-8 lg:bottom-auto lg:top-5 right-4 lg:right-5 left-4 lg:left-auto lg:w-64 z-10 pointer-events-none">
-            <div class="theme-surface border theme-border rounded-xl p-3 lg:p-4 shadow-2xl backdrop-blur-md bg-opacity-95 pointer-events-auto">
-                <div class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2 flex items-center gap-2">
+    <div class="absolute bottom-4 left-4 right-20 sm:right-auto sm:w-64 z-10 pointer-events-none">
+        <div class="floating-panel p-3 pointer-events-auto">
+            
+            <button type="button" onclick="toggleDistrictPanel()" class="w-full flex items-center justify-between sm:cursor-default outline-none">
+                <div class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider flex items-center gap-2">
                     <i data-lucide="map" class="w-3 h-3 text-blue-500"></i> Jump to District
                 </div>
+                <i data-lucide="chevron-up" id="district-chevron" class="text-[#94a3b8] w-4 h-4 transition-transform duration-300 sm:hidden"></i>
+            </button>
+            
+            <div id="district-panel-content" class="hidden sm:block mt-3 transition-all">
                 <select class="w-full bg-[#1e2536] border border-[#374151] text-white px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider outline-none cursor-pointer" onchange="zoomToBarangay(this.value)">
-                    <option value="">-- Select Barangay --</option>
+                    <option value="">-- Pasig City --</option>
                     <option value="bagong-ilog">Bagong Ilog</option>
                     <option value="bagong-katipunan">Bagong Katipunan</option>
                     <option value="bambang">Bambang</option>
@@ -250,30 +213,33 @@
                 </select>
             </div>
         </div>
-
-        <button id="legend-toggle-btn" onclick="toggleLegend()" class="lg:hidden absolute bottom-6 right-5 z-20 bg-[#1e293b] border border-gray-600 text-white p-3 rounded-full shadow-2xl transition-all hover:bg-gray-700">
-            <i data-lucide="layers" class="w-5 h-5"></i>
-        </button>
-
-        <div id="map-legend" class="map-legend hidden lg:grid transition-all">
-            <div class="flex justify-between items-center lg:hidden mb-2 pb-2 border-b border-gray-700">
-                <span class="text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4 text-blue-500"></i> Map Legend</span>
-                <button onclick="toggleLegend()" class="text-gray-400 hover:text-red-400 transition-colors p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
-            
-            <div class="section-label mb-1">Traffic Density</div>
-            <div class="legend-item"><span class="dot" style="background: #4ade80;"></span> Smooth</div>
-            <div class="legend-item"><span class="dot" style="background: #facc15;"></span> Moderate</div>
-            <div class="legend-item"><span class="dot" style="background: #f87171;"></span> Heavy</div>
-            
-            <div class="section-label mt-2 mb-1 border-t border-gray-700 pt-2">Network Operations</div>
-            <div class="legend-item"><span class="dot" style="background: #ef4444; border: 1px dashed white;"></span> Blocked Area / Avoid</div>
-            <div class="legend-item"><span class="dot" style="background: #3b82f6; border: 1px dashed white;"></span> DRRMO Custom Zone</div>
-            <div class="legend-item"><span class="dot" style="background: #eab308; border: 1px dashed white;"></span> Evacuation Corridor</div>
-        </div>
-
     </div>
-  </main>
+
+    <div id="map-legend" class="floating-panel absolute bottom-[80px] left-4 right-4 sm:bottom-6 sm:left-auto sm:right-6 sm:w-72 z-30 hidden sm:flex flex-col p-4">
+        <div class="flex justify-between items-center sm:hidden mb-2 pb-2 border-b border-gray-700">
+            <span class="text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4 text-blue-500"></i> Map Legend</span>
+            <button onclick="toggleLegend()" class="text-gray-400 hover:text-red-400 transition-colors p-1 outline-none"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        
+        <div class="text-[#94a3b8] text-[10px] font-bold uppercase tracking-widest mb-2">Traffic Density</div>
+        <div class="flex flex-col gap-1.5 sm:gap-2 mb-3">
+            <div class="flex items-center gap-2 text-[11px] sm:text-xs text-white"><span class="w-2.5 h-2.5 rounded-full bg-[#4ade80]"></span> Smooth</div>
+            <div class="flex items-center gap-2 text-[11px] sm:text-xs text-white"><span class="w-2.5 h-2.5 rounded-full bg-[#facc15]"></span> Moderate</div>
+            <div class="flex items-center gap-2 text-[11px] sm:text-xs text-white"><span class="w-2.5 h-2.5 rounded-full bg-[#f87171]"></span> Heavy</div>
+        </div>
+        
+        <div class="text-[#94a3b8] text-[10px] font-bold uppercase tracking-widest mt-1 mb-2 border-t border-gray-700 pt-3">Network Operations</div>
+        <div class="flex flex-col gap-1.5 sm:gap-2">
+            <div class="flex items-center gap-2 text-[11px] sm:text-xs text-white"><span class="w-2.5 h-2.5 rounded-full bg-[#ef4444] border border-white border-dashed"></span> Blocked Area / Avoid</div>
+            <div class="flex items-center gap-2 text-[11px] sm:text-xs text-white"><span class="w-2.5 h-2.5 rounded-full bg-[#3b82f6] border border-white border-dashed"></span> DRRMO Custom Zone</div>
+            <div class="flex items-center gap-2 text-[11px] sm:text-xs text-white"><span class="w-2.5 h-2.5 rounded-full bg-[#eab308] border border-white border-dashed"></span> Evacuation Corridor</div>
+        </div>
+    </div>
+
+    <button id="legend-toggle-btn" onclick="toggleLegend()" class="sm:hidden absolute bottom-4 right-4 z-20 bg-[#1e293b] border border-gray-600 text-white p-3 rounded-full shadow-2xl transition-all hover:bg-gray-700 pointer-events-auto outline-none">
+        <i data-lucide="layers" class="w-5 h-5 pointer-events-none"></i>
+    </button>
+
 
   <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -284,16 +250,44 @@
             container: 'map', style: 'mapbox://styles/mapbox/dark-v11', center: [121.0825, 14.5764], zoom: 12.5, pitch: 45
         });
 
+        // Add standard navigation controls to the right side (only on desktop)
+        if(window.innerWidth > 640) {
+            map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+        }
+
         let mapObjects = {};
         window.mapObjectsRescues = {}; 
 
+        // Layer Toggle Function
+        window.toggleLayer = function(type, isChecked) {
+            const visibility = isChecked ? 'visible' : 'none';
+            if (!map) return;
+
+            if (type === 'density') {
+                if (map.getLayer('traffic-lines')) {
+                    map.setLayoutProperty('traffic-lines', 'visibility', visibility);
+                }
+            } else if (type === 'ops') {
+                const opLayers = ['synced-blocked-stroke', 'synced-danger-fill', 'synced-danger-stroke', 'synced-drrmo-drawn-fill', 'synced-drrmo-drawn-stroke', 'synced-rescue-routes-highlight', 'synced-rescue-routes-line'];
+                opLayers.forEach(l => {
+                    if (map.getLayer(l)) map.setLayoutProperty(l, 'visibility', visibility);
+                });
+                
+                document.querySelectorAll('.hazard-marker-pending, .hazard-marker-active, .weather-blue-marker, .weather-yellow-marker').forEach(el => {
+                    el.style.display = isChecked ? 'block' : 'none';
+                });
+            }
+        };
+
         map.on('load', () => {
+            // Live Traffic Layer
             map.addSource('live-traffic', { type: 'vector', url: 'mapbox://mapbox.mapbox-traffic-v1' });
             map.addLayer({
                 'id': 'traffic-lines', 'type': 'line', 'source': 'live-traffic', 'source-layer': 'traffic',
                 'paint': { 'line-width': 3, 'line-color': [ 'match', ['get', 'congestion'], 'low', '#4ade80', 'moderate', '#facc15', 'heavy', '#f87171', 'severe', '#334155', 'transparent' ]}
             });
 
+            // Traffic Drawn Zones
             map.addSource('synced-blocked-lines', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
             map.addLayer({ 'id': 'synced-blocked-stroke', 'type': 'line', 'source': 'synced-blocked-lines', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': ['match', ['get', 'status'], 'pending', '#f59e0b', 'active', '#ef4444', '#ef4444'], 'line-width': 6, 'line-dasharray': [2, 2] } });
 
@@ -301,10 +295,12 @@
             map.addLayer({ 'id': 'synced-danger-fill', 'type': 'fill', 'source': 'synced-danger-zones', 'paint': { 'fill-color': ['match', ['get', 'status'], 'pending', '#f59e0b', 'active', '#ef4444', '#ef4444'], 'fill-opacity': 0.25 } });
             map.addLayer({ 'id': 'synced-danger-stroke', 'type': 'line', 'source': 'synced-danger-zones', 'paint': { 'line-color': ['match', ['get', 'status'], 'pending', '#f59e0b', 'active', '#ef4444', '#ef4444'], 'line-width': 3, 'line-dasharray': [2, 2] } });
 
+            // DRRMO Drawn Zones
             map.addSource('synced-drrmo-drawn', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
             map.addLayer({ 'id': 'synced-drrmo-drawn-fill', 'type': 'fill', 'source': 'synced-drrmo-drawn', 'paint': { 'fill-color': '#3b82f6', 'fill-opacity': 0.3 } });
             map.addLayer({ 'id': 'synced-drrmo-drawn-stroke', 'type': 'line', 'source': 'synced-drrmo-drawn', 'paint': { 'line-color': '#3b82f6', 'line-width': 3, 'line-dasharray': [2, 2] } });
 
+            // Evacuation Corridors
             map.addSource('synced-rescue-routes', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
             map.addLayer({
                 'id': 'synced-rescue-routes-highlight', 'type': 'line', 'source': 'synced-rescue-routes',
@@ -352,7 +348,7 @@
                 const badge = isPending ? '<span class="text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded text-[9px] border border-amber-500/20 font-bold uppercase tracking-wider">Requires HQ Approval</span>' : '<span class="text-white bg-red-600 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">AVOID THIS AREA</span>';
 
                 if(trafficList) trafficList.innerHTML += `
-                    <div class="bg-[#1e2536] border p-3 rounded-lg border-l-4 ${statusClass} mb-3">
+                    <div class="bg-[#1e2536] border p-3 rounded-lg border-l-4 ${statusClass} mb-3 pointer-events-auto">
                         <div class="flex justify-between items-start mb-1">
                             <h4 class="text-white text-xs font-bold">${hazard.title}</h4>
                         </div>
@@ -382,7 +378,7 @@
             drrmoZones.forEach(zone => {
                 weatherCount++;
                 if(weatherList) weatherList.innerHTML += `
-                    <div class="bg-[#1e2536] border p-3 rounded-lg border-l-4 border-blue-500/50 border-l-blue-500 mb-3">
+                    <div class="bg-[#1e2536] border p-3 rounded-lg border-l-4 border-blue-500/50 border-l-blue-500 mb-3 pointer-events-auto">
                         <h4 class="text-white text-xs font-bold mb-1 truncate pr-2">${zone.title || zone.type}</h4>
                         <p class="text-[10px] text-gray-400 leading-tight mb-2">${zone.desc}</p>
                         <div class="flex items-center gap-2 mt-2">
@@ -415,6 +411,12 @@
             map.getSource('synced-danger-zones').setData({ 'type': 'FeatureCollection', 'features': dangerZoneFeatures });
             map.getSource('synced-drrmo-drawn').setData({ 'type': 'FeatureCollection', 'features': blueZoneFeatures });
             
+            // Re-apply toggle state if ops was turned off
+            const opsToggle = document.getElementById('toggle-ops');
+            if (opsToggle && !opsToggle.checked) {
+                window.toggleLayer('ops', false);
+            }
+
             if (window.lucide) lucide.createIcons();
         }
 
@@ -436,7 +438,7 @@
 
             rescues.forEach(op => {
                 list.innerHTML += `
-                    <div class="bg-[#1e2536] border p-3 rounded-lg border-l-4 border-yellow-500/50 border-l-yellow-500 mb-3">
+                    <div class="bg-[#1e2536] border p-3 rounded-lg border-l-4 border-yellow-500/50 border-l-yellow-500 mb-3 pointer-events-auto">
                         <h4 class="text-white text-xs font-bold mb-1 truncate pr-2">${op.name}</h4>
                         <p class="text-[10px] text-gray-400 leading-tight mb-2">To: ${op.targetName}</p>
                         <div class="flex items-center gap-2 mt-2">
@@ -459,6 +461,13 @@
             });
 
             map.getSource('synced-rescue-routes').setData({ type: 'FeatureCollection', features: routeFeatures });
+            
+            // Re-apply toggle state if ops was turned off
+            const opsToggle = document.getElementById('toggle-ops');
+            if (opsToggle && !opsToggle.checked) {
+                window.toggleLayer('ops', false);
+            }
+
             if (window.lucide) lucide.createIcons();
         }
 
@@ -505,11 +514,6 @@
             map.flyTo({ center: barangayData[val].center, zoom: barangayData[val].zoom, pitch: 60 });
         };
     });
-
-    function doLogout() {
-        localStorage.removeItem('activeDepartment'); 
-        window.location.href = 'admin.html'; 
-    }
   </script>
 </body>
 </html>
