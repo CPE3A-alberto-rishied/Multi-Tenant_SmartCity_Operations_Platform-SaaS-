@@ -9,7 +9,7 @@
         }
     })();
 
-    // Sidebar Toggle Logic (Placed in head so it's instantly clickable)
+    // Sidebar Toggle Logic
     window.toggleSidebar = function() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
@@ -30,11 +30,29 @@
   <style>
     body { font-family: 'DM Sans', sans-serif !important; overflow-x: hidden; background-color: #0a0e1a; }
 
-    /* CRITICAL FIX: Ensure all modal overlays are fixed to the screen and stack correctly */
+    /* FIXED: Restored the missing Sidebar & Highlight CSS */
+    .sidebar { width: 260px !important; flex-shrink: 0 !important; }
+    .sidebar-item { 
+      display: flex !important; align-items: center !important; gap: 12px !important;
+      padding: 12px 18px !important; font-size: 14.5px !important; 
+      font-weight: 500 !important; color: #94a3b8 !important;
+      text-decoration: none !important; border-left: 3px solid transparent !important;
+    }
+    .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
+    .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
+    .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
+    
+    .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
+    .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
+    .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
+    .settings-link { color: #94a3b8; transition: color 0.2s; display: flex; align-items: center; }
+    .settings-link:hover { color: #3b82f6; }
+
+    /* Modals */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background-color: rgba(0, 0, 0, 0.8);
+      background-color: rgba(0, 0, 0, 0.85);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -73,7 +91,7 @@
   <aside id="sidebar" class="sidebar flex flex-col h-full fixed lg:relative z-[100] transform -translate-x-full lg:translate-x-0 transition-transform duration-300 top-0 left-0 theme-border-r theme-surface">
     
     <div class="h-[76px] px-5 flex items-center justify-between shrink-0 theme-border-b">
-        <div class="flex items-center gap-0.5">
+        <div id="auth-logo" class="flex items-center gap-1.5">
             <img src="../assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain" onerror="this.src='/assets/beat_logo2.png'">
             <div class="flex flex-col justify-center items-start">
                 <img src="../assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1" onerror="this.src='/assets/beat_text2.png'">
@@ -97,15 +115,17 @@
     <div class="user-footer">
         <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
-                <div id="nav-avatar" class="nav-avatar">T</div>
+                <div id="nav-avatar" style="background:#2563eb; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">T</div>
                 <div>
                   <div class="user-footer-name">Traffic</div>
                   <div class="user-footer-sub">Traffic Department</div>
                 </div>
             </div>
-            <a href="profile2.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
+            <a href="profile2.html" class="settings-link"><i data-lucide="settings" style="width:18px; height:18px"></i></a>
         </div>
-        <button type="button" onclick="doLogout()" class="btn-logout"><i data-lucide="log-out" class="icon-sm"></i> Logout</button>
+        <button type="button" onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
+            <i data-lucide="log-out" style="width:16px; height:16px"></i> Logout
+        </button>
     </div>
   </aside>
 
@@ -137,7 +157,7 @@
             <i data-lucide="chevron-down" class="absolute right-3 w-4 h-4 text-[#94a3b8] pointer-events-none"></i>
           </div>
         </div>
-        <button type="button" onclick="openModal('new-report-modal')" class="h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg text-sm font-bold flex items-center gap-2 shadow-lg transition-all"><i data-lucide="plus" class="icon-sm"></i> New Report</button>
+        <button type="button" onclick="openModal('new-report-modal')" class="h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg text-sm font-bold flex items-center gap-2 shadow-lg transition-all"><i data-lucide="plus" class="w-4 h-4"></i> New Report</button>
       </div>
 
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch" id="reports-grid">
@@ -172,7 +192,7 @@
   <div id="new-report-modal" class="modal-overlay hidden">
     <div class="border theme-border w-[550px] max-w-[90%] rounded-2xl p-8 max-h-[90vh] overflow-y-auto shadow-2xl theme-surface">
       <h2 class="text-white font-bold text-xl mb-6 flex items-center gap-2 justify-center">
-        <i data-lucide="file-plus" class="text-blue-500 icon-lg"></i> Submit a Report
+        <i data-lucide="file-plus" class="text-blue-500 w-6 h-6"></i> Submit a Report
       </h2>
       <form id="new-report-form" class="space-y-4 text-left" onsubmit="validateNewReport(event)">
         <div>
@@ -255,8 +275,8 @@
     });
 
     function doLogout() {
-        localStorage.removeItem('activeDepartment'); // Wipe the session
-        window.location.href = 'admin.html'; // Kick back to login
+        localStorage.removeItem('activeDepartment'); 
+        window.location.href = 'admin.html'; 
     }
   </script>
 </body>
