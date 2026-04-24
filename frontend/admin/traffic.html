@@ -4,10 +4,12 @@
   <script>
     (function() {
         const session = localStorage.getItem('activeDepartment');
-        if (!session) window.location.replace('admin.html?error=unauthorized'); 
+        if (!session || session !== 'Traffic') {
+            window.location.replace('admin.html?error=unauthorized'); 
+        }
     })();
 
-    // Sidebar Toggle Logic (Placed securely in head so it always works)
+    // Sidebar Toggle Logic
     window.toggleSidebar = function() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
@@ -17,9 +19,10 @@
         }
     }
   </script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BEAT - Traffic and Road Control</title>
+  <title>BEAT - Traffic and Detour Control</title>
   
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
@@ -34,15 +37,8 @@
   <link rel="stylesheet" href="css/styles2.css">
   
   <style>
-<<<<<<< Updated upstream
-    /* Active Red Marker */
-    .hazard-marker-active {
-        width: 24px; height: 24px; background-color: #ef4444; border: 3px solid white; border-radius: 50%; 
-        box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); animation: pulse-red 2s infinite; cursor: pointer;
-=======
     body { font-family: 'DM Sans', sans-serif !important; overflow: hidden; background-color: #0a0e1a; }
     
-    /* SIDEBAR */
     .sidebar { width: 260px !important; flex-shrink: 0 !important; }
     .sidebar-item { 
       display: flex !important; align-items: center !important; gap: 12px !important;
@@ -63,12 +59,10 @@
     .hazard-magenta-marker {
         width: 24px; height: 24px; background-color: #d946ef; border: 3px solid white; border-radius: 50%; 
         box-shadow: 0 0 20px rgba(217, 70, 239, 0.8); animation: pulse-magenta 2s infinite; cursor: pointer;
->>>>>>> Stashed changes
     }
-    @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239,68,68, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(239,68,68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68, 0); } }
+    @keyframes pulse-magenta { 0% { box-shadow: 0 0 0 0 rgba(217,70,239, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(217,70,239, 0); } 100% { box-shadow: 0 0 0 0 rgba(217,70,239, 0); } }
 
-    /* Mapbox Popup Overrides */
-    .mapboxgl-popup-content { background: #1e293b !important; color: white !important; border: 1px solid #ef4444; border-radius: 8px; padding: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 220px; }
+    .mapboxgl-popup-content { background: #1e293b !important; color: white !important; border: 1px solid #d946ef; border-radius: 8px; padding: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 220px; }
     .mapboxgl-popup-tip { border-top-color: #1e293b !important; border-bottom-color: #1e293b !important; }
     .mapboxgl-popup-close-button { color: #94a3b8; font-size: 16px; top: 4px; right: 8px; }
     .mapboxgl-popup-close-button:hover { color: white; background: transparent; }
@@ -76,17 +70,6 @@
 </head>
 
 <body class="h-full flex bg-[#0a0e1a]">
-<<<<<<< Updated upstream
-  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-50">
-    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
-      <div class="flex items-center gap-3">
-        <div class="logo-box">B</div>
-        <div class="flex flex-col justify-center">
-          <div class="logo-text font-bold text-white">BEAT</div>
-          <div class="sidebar-subtext">Department Portal</div>
-        </div>
-      </div>
-=======
 
   <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-[90] hidden lg:hidden" onclick="window.toggleSidebar()"></div>
 
@@ -99,11 +82,9 @@
                 <div style="color:#94a3b8; font-size:11px" class="leading-none">Traffic Department</div>
             </div>
         </div>
-
         <button type="button" class="lg:hidden text-gray-400 hover:text-white p-2" onclick="window.toggleSidebar()">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
->>>>>>> Stashed changes
     </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
@@ -116,12 +97,6 @@
 
     <div class="user-footer">
         <div class="flex items-center justify-between mb-5">
-<<<<<<< Updated upstream
-            <div class="flex items-center gap-3"><div id="nav-avatar" class="nav-avatar">T</div><div><div class="user-footer-name">Traffic</div><div class="user-footer-sub">Traffic Department</div></div></div>
-            <a href="profile2.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
-        </div>
-        <button type="button" onclick="doLogout()" class="btn-logout"><i data-lucide="log-out" class="icon-sm"></i> Logout</button>
-=======
             <div class="flex items-center gap-3">
                 <div id="nav-avatar" style="background:#2563eb; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">T</div>
                 <div>
@@ -134,49 +109,11 @@
         <button type="button" onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
             <i data-lucide="log-out" style="width:16px; height:16px"></i> Logout
         </button>
->>>>>>> Stashed changes
     </div>
   </aside>
 
   <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] relative h-full">
     
-<<<<<<< Updated upstream
-    <div class="absolute top-6 left-6 z-10 w-96 flex flex-col gap-4 max-h-[90vh]">
-        <div class="theme-surface border theme-border rounded-2xl p-6 shadow-2xl backdrop-blur-md bg-opacity-95 flex-shrink-0">
-            <div class="flex items-center justify-between mb-1">
-                <h2 class="text-white font-bold text-lg flex items-center gap-2"><i data-lucide="shield-alert" class="text-[#ef4444]"></i> Network Control Ops</h2>
-            </div>
-            <p class="text-[11px] text-[#94a3b8] mb-6">Draw and broadcast blockades. These will reflect instantly on the main network.</p>
-            
-            <div class="space-y-4">
-                <div class="p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative">
-                    <div class="absolute -left-3 -top-3 w-6 h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">1</div>
-                    <button type="button" id="btn-draw-hazard" class="w-full bg-[#1e293b] hover:bg-gray-700 text-[#ef4444] hover:text-white text-sm font-bold py-2.5 rounded-lg border border-[#ef4444]/50 transition-all flex justify-center items-center gap-2">
-                        <i data-lucide="pen-tool" class="w-4 h-4"></i> Draw Blocked Area (Polygon)
-                    </button>
-                    <p id="draw-status" class="text-[10px] text-[#ef4444] mt-2 text-center font-bold tracking-wider hidden">Drawing Active: Click map to draw polygon, double click to finish.</p>
-                </div>
-
-                <div class="p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative opacity-50 transition-opacity" id="step-2-box">
-                    <div class="absolute -left-3 -top-3 w-6 h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">2</div>
-                    <div class="space-y-3">
-                        <input type="text" id="hazard-title" placeholder="Incident Title (e.g., Major Collision)" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2 text-sm outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
-                        <input type="text" id="hazard-desc" placeholder="Incident Details (e.g., 2 lanes closed)" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2 text-sm outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
-                        <button type="button" id="btn-broadcast" disabled class="w-full bg-rose-600 hover:bg-rose-700 text-white text-sm font-bold py-2.5 rounded-lg shadow-lg transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                            <i data-lucide="upload-cloud" class="w-4 h-4"></i> Broadcast to Main Map
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="theme-surface border theme-border rounded-2xl p-4 shadow-2xl flex-1 overflow-hidden flex flex-col hidden" id="active-incidents-container">
-            <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-3 flex items-center justify-between">
-                Active Operations <span id="op-count" class="bg-red-500 text-white px-2 py-0.5 rounded-full text-[10px]">0</span>
-            </h3>
-            <div id="incidents-list" class="space-y-3 overflow-y-auto pr-2 pb-2"></div>
-        </div>
-=======
     <header class="lg:hidden px-4 sm:px-8 h-[68px] flex items-center shrink-0 relative z-[40] theme-surface theme-border-b">
       <button type="button" class="text-gray-400 hover:text-white mr-4 p-2 cursor-pointer z-50 relative" onclick="window.toggleSidebar()">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
@@ -274,7 +211,6 @@
         </div>
 
         <div id="map" class="absolute inset-0 w-full h-full z-0"></div>
->>>>>>> Stashed changes
     </div>
   </main>
 
@@ -288,34 +224,12 @@
             container: 'map', style: 'mapbox://styles/mapbox/dark-v11', center: [121.0700, 14.5700], zoom: 13.5, pitch: 45
         });
 
-        // FIXED: Draw tools configured to show polygon fill, polygon stroke, AND active rubberband line in Red
         const draw = new MapboxDraw({
             displayControlsDefault: false,
-            defaultMode: 'simple_select',
             styles: [
                 {
-                    'id': 'gl-draw-polygon-fill-active', 'type': 'fill', 'filter': ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
-                    'paint': { 'fill-color': '#ef4444', 'fill-opacity': 0.3 }
-                },
-                {
-                    'id': 'gl-draw-polygon-stroke-active', 'type': 'line', 'filter': ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
-                    'paint': { 'line-color': '#ef4444', 'line-dasharray': [2, 2], 'line-width': 2 }
-                },
-                {
-                    'id': 'gl-draw-line-active', 'type': 'line', 'filter': ['all', ['==', '$type', 'LineString'], ['!=', 'mode', 'static']],
-                    'paint': { 'line-color': '#ef4444', 'line-dasharray': [2, 2], 'line-width': 2 }
-                },
-                {
-                    'id': 'gl-draw-polygon-fill-static', 'type': 'fill', 'filter': ['all', ['==', '$type', 'Polygon'], ['==', 'mode', 'static']],
-                    'paint': { 'fill-color': '#ef4444', 'fill-opacity': 0.3 }
-                },
-                {
-                    'id': 'gl-draw-polygon-stroke-static', 'type': 'line', 'filter': ['all', ['==', '$type', 'Polygon'], ['==', 'mode', 'static']],
-                    'paint': { 'line-color': '#ef4444', 'line-width': 2 }
-                },
-                {
-                    'id': 'gl-draw-point-active', 'type': 'circle', 'filter': ['all', ['==', '$type', 'Point'], ['!=', 'mode', 'static']],
-                    'paint': { 'circle-radius': 4, 'circle-color': '#ef4444' }
+                    'id': 'gl-draw-line', 'type': 'line', 'filter': ['all', ['==', '$type', 'LineString'], ['!=', 'mode', 'static']],
+                    'paint': { 'line-color': '#ef4444', 'line-width': 6, 'line-dasharray': [2, 2] }
                 }
             ]
         });
@@ -325,94 +239,142 @@
         let mapMarkers = {}; 
         
         let currentDrawnLine = null;
+        let currentDangerZone = null;
+        let currentCenter = null;
 
         map.on('load', () => {
-            // Live Traffic
             map.addSource('live-traffic', { type: 'vector', url: 'mapbox://mapbox.mapbox-traffic-v1' });
             map.addLayer({
                 'id': 'traffic-lines', 'type': 'line', 'source': 'live-traffic', 'source-layer': 'traffic',
                 'paint': { 'line-width': 3, 'line-color': [ 'match', ['get', 'congestion'], 'low', '#4ade80', 'moderate', '#facc15', 'heavy', '#f87171', 'severe', '#334155', 'transparent' ]}
             });
 
-            // Active Zone Layer (Solid Fill and Dashed Line in Red)
+            map.addSource('active-blocked', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+            map.addLayer({ 'id': 'active-blocked-line', 'type': 'line', 'source': 'active-blocked', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#ef4444', 'line-width': 6, 'line-dasharray': [2, 2] } });
+
             map.addSource('active-zones', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
-            map.addLayer({ 
-                'id': 'active-zones-fill', 'type': 'fill', 'source': 'active-zones', 
-                'paint': { 'fill-color': '#ef4444', 'fill-opacity': 0.25 } 
-            });
-            map.addLayer({ 
-                'id': 'active-zones-stroke', 'type': 'line', 'source': 'active-zones', 
-                'paint': { 'line-color': '#ef4444', 'line-width': 3, 'line-dasharray': [2, 2] } 
-            });
+            map.addLayer({ 'id': 'active-zones-fill', 'type': 'fill', 'source': 'active-zones', 'paint': { 'fill-color': '#ef4444', 'fill-opacity': 0.25 } });
+            map.addLayer({ 'id': 'active-zones-stroke', 'type': 'line', 'source': 'active-zones', 'paint': { 'line-color': '#ef4444', 'line-width': 3, 'line-dasharray': [2, 2] } });
+
+            map.addSource('preview-zone', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+            map.addLayer({ 'id': 'preview-zone-fill', 'type': 'fill', 'source': 'preview-zone', 'paint': { 'fill-color': '#ef4444', 'fill-opacity': 0.25 } });
+            map.addLayer({ 'id': 'preview-zone-stroke', 'type': 'line', 'source': 'preview-zone', 'paint': { 'line-color': '#ef4444', 'line-width': 3, 'line-dasharray': [2, 2] } });
 
             renderHazards();
         });
 
         document.getElementById('btn-draw-hazard').addEventListener('click', (e) => {
             draw.deleteAll();
+            map.getSource('preview-zone').setData({ type: 'FeatureCollection', features: [] });
             
-            draw.changeMode('draw_polygon');
+            draw.changeMode('draw_line_string');
             e.currentTarget.innerHTML = '<i data-lucide="crosshair" class="w-4 h-4 animate-pulse"></i> Drawing...';
             document.getElementById('draw-status').classList.remove('hidden');
             
+            document.getElementById('btn-calc').disabled = true;
             document.getElementById('btn-broadcast').disabled = true;
             document.getElementById('step-2-box').classList.add('opacity-50');
+            document.getElementById('step-3-box').classList.add('opacity-50');
             lucide.createIcons();
         });
 
         map.on('draw.create', (e) => {
             currentDrawnLine = e.features[0];
             document.getElementById('draw-status').classList.add('hidden');
-            document.getElementById('btn-draw-hazard').innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Area Drawn';
+            document.getElementById('btn-draw-hazard').innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Line Drawn';
             
             document.getElementById('step-2-box').classList.remove('opacity-50');
-            document.getElementById('btn-broadcast').disabled = false;
+            const btnCalc = document.getElementById('btn-calc');
+            btnCalc.disabled = false;
+            btnCalc.classList.replace('bg-blue-600', 'bg-blue-500');
+            btnCalc.classList.add('hover:bg-blue-400');
             lucide.createIcons();
         });
 
-        document.getElementById('btn-broadcast').addEventListener('click', () => {
+        document.getElementById('btn-calc').addEventListener('click', (e) => {
             if(!currentDrawnLine) return;
+            const btn = e.currentTarget;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Processing...';
+            lucide.createIcons();
 
+            setTimeout(() => {
+                currentCenter = turf.center(currentDrawnLine).geometry.coordinates;
+                
+                try {
+                    let points = turf.explode(currentDrawnLine);
+                    let solidHull = turf.convex(points);
+                    
+                    if (solidHull) {
+                        currentDangerZone = turf.buffer(solidHull, 0.05, {units: 'kilometers'});
+                    } else {
+                        currentDangerZone = turf.buffer(currentDrawnLine, 0.05, {units: 'kilometers'});
+                    }
+                } catch(err) {
+                    currentDangerZone = turf.buffer(currentDrawnLine, 0.05, {units: 'kilometers'});
+                }
+
+                map.getSource('preview-zone').setData(currentDangerZone);
+
+                btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Generated';
+                btn.classList.replace('bg-blue-500', 'bg-green-600');
+                btn.classList.remove('hover:bg-blue-400');
+                btn.disabled = true;
+
+                document.getElementById('step-3-box').classList.remove('opacity-50');
+                const btnCast = document.getElementById('btn-broadcast');
+                btnCast.disabled = false;
+                btnCast.classList.add('hover:bg-[#c026d3]');
+                lucide.createIcons();
+            }, 800);
+        });
+
+        document.getElementById('btn-broadcast').addEventListener('click', () => {
             const title = document.getElementById('hazard-title').value || 'Road Hazard';
             const desc = document.getElementById('hazard-desc').value || 'Area blocked.';
-            const center = turf.center(currentDrawnLine).geometry.coordinates;
             
             const newIncident = {
                 id: 'inc_' + Date.now(),
                 title: title,
                 desc: desc,
-                center: center,
-                dangerZone: currentDrawnLine, 
-                status: 'active', // Direct to ACTIVE
+                center: currentCenter,
+                blockedLine: currentDrawnLine,
+                dangerZone: currentDangerZone, 
                 timestamp: new Date().toLocaleTimeString()
             };
 
             activeHazards.push(newIncident);
             localStorage.setItem('beat_live_hazards', JSON.stringify(activeHazards));
 
-            // Reset UI completely
             draw.deleteAll();
-            currentDrawnLine = null;
+            map.getSource('preview-zone').setData({ type: 'FeatureCollection', features: [] });
+            currentDrawnLine = null; currentDangerZone = null; currentCenter = null;
             
             document.getElementById('hazard-title').value = '';
             document.getElementById('hazard-desc').value = '';
-            document.getElementById('btn-draw-hazard').innerHTML = '<i data-lucide="pen-tool" class="w-4 h-4"></i> Draw Blocked Area (Polygon)';
             
-            document.getElementById('btn-broadcast').disabled = true;
+            document.getElementById('btn-draw-hazard').innerHTML = '<i data-lucide="pen-tool" class="w-4 h-4"></i> Draw Blocked Road Segment';
+            
+            const btnCalc = document.getElementById('btn-calc');
+            btnCalc.innerHTML = '<i data-lucide="cpu" class="w-4 h-4"></i> Generate Solid Zone';
+            btnCalc.className = "w-full bg-blue-600 text-white text-xs lg:text-sm font-bold py-2 lg:py-2.5 rounded-lg shadow-lg transition-all flex justify-center items-center gap-2 disabled:cursor-not-allowed";
+            btnCalc.disabled = true;
             document.getElementById('step-2-box').classList.add('opacity-50');
+            
+            const btnBroadcast = document.getElementById('btn-broadcast');
+            btnBroadcast.disabled = true;
+            btnBroadcast.classList.remove('hover:bg-[#c026d3]');
+            document.getElementById('step-3-box').classList.add('opacity-50');
             
             renderHazards();
         });
 
         function renderHazards() {
-            if(!map.getSource('active-zones')) return; 
+            if(!map.getSource('active-blocked')) return; 
 
             const listContainer = document.getElementById('incidents-list');
             const mainContainer = document.getElementById('active-incidents-container');
             listContainer.innerHTML = '';
             
-<<<<<<< Updated upstream
-=======
             document.getElementById('op-count').innerText = activeHazards.length;
             if(activeHazards.length > 0) {
                 mainContainer.classList.remove('hidden');
@@ -422,55 +384,51 @@
                 mainContainer.classList.remove('flex');
             }
 
->>>>>>> Stashed changes
             Object.values(mapMarkers).forEach(m => m.remove());
             mapMarkers = {};
+
+            let lineFeatures = [];
             let zoneFeatures = [];
 
-            // Filter out weather/DRRMO alerts to only show Traffic operations
-            const trafficHazards = activeHazards.filter(h => h.source !== 'weather');
-
-            document.getElementById('op-count').innerText = trafficHazards.length;
-            if(trafficHazards.length > 0) mainContainer.classList.remove('hidden');
-            else mainContainer.classList.add('hidden');
-
-            trafficHazards.forEach(incident => {
-                // UI List Item (Direct Resolve capability)
+            activeHazards.forEach(incident => {
                 listContainer.innerHTML += `
-                    <div class="bg-[#0f172a] border border-gray-700 p-3 rounded-xl border-l-4 border-l-red-500">
+                    <div class="bg-[#0f172a] border border-gray-700 p-3 rounded-xl">
                         <div class="flex justify-between items-start mb-2">
                             <h4 class="text-white text-sm font-bold">${incident.title}</h4>
                             <button onclick="resolveIncident('${incident.id}')" class="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30 text-[10px] px-2 py-1 rounded transition-colors font-bold">Resolve</button>
                         </div>
                         <div class="flex items-center gap-2 text-[10px] uppercase font-bold tracking-wider mt-2">
-                            <span class="text-red-400 bg-red-500/10 px-2 py-0.5 rounded text-center border border-red-500/20">AVOID THIS AREA</span>
+                            <span class="text-[#ef4444] bg-[#ef4444]/10 px-2 py-0.5 rounded text-center">AVOID THIS AREA - OPERATION ONGOING</span>
                         </div>
                     </div>
                 `;
 
-                const el = document.createElement('div'); el.className = 'hazard-marker-active';
+                const el = document.createElement('div'); el.className = 'hazard-magenta-marker';
+                
                 const popupHTML = `
-                    <div class="pb-1 mb-1 border-b border-gray-600"><span class="text-[10px] font-bold uppercase tracking-widest text-[#94a3b8]">Live Ops</span></div>
+                    <div class="pb-1 mb-1 border-b border-gray-600"><span class="text-[10px] font-bold uppercase tracking-widest text-[#94a3b8]">Active Ops</span></div>
                     <h3 class="font-bold text-white text-sm mb-1">${incident.title}</h3>
                     <p class="text-[10px] text-gray-300 leading-snug mb-2">${incident.desc}</p>
                     <div class="flex flex-col gap-1 mt-2 text-[9px] font-bold tracking-wider">
-                        <span class="text-red-400 bg-red-500/10 px-2 py-1 rounded text-center border border-red-500/20">AVOID THIS AREA</span>
+                        <span class="text-[#ef4444] bg-[#ef4444]/10 px-2 py-1 rounded text-center">AVOID THIS AREA - OPERATION ONGOING</span>
                     </div>
+                    <button onclick="resolveIncident('${incident.id}')" class="mt-3 w-full bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30 text-[10px] px-2 py-1.5 rounded transition-colors font-bold uppercase tracking-wider">Resolve Incident</button>
                 `;
                 
                 const popup = new mapboxgl.Popup({ offset: 25, closeButton: true, closeOnClick: false }).setHTML(popupHTML);
                 const marker = new mapboxgl.Marker(el).setLngLat(incident.center).setPopup(popup).addTo(map);
-                marker.togglePopup(); // Opens Automatically
+                marker.togglePopup();
                 mapMarkers[incident.id] = marker;
 
+                if (incident.blockedLine) lineFeatures.push(incident.blockedLine);
                 if (incident.dangerZone) zoneFeatures.push(incident.dangerZone);
             });
 
+            map.getSource('active-blocked').setData({ type: 'FeatureCollection', features: lineFeatures });
             map.getSource('active-zones').setData({ type: 'FeatureCollection', features: zoneFeatures });
             lucide.createIcons();
         }
 
-        // Global Resolve Function
         window.resolveIncident = function(id) {
             activeHazards = activeHazards.filter(h => h.id !== id);
             localStorage.setItem('beat_live_hazards', JSON.stringify(activeHazards));
@@ -523,7 +481,10 @@
         };
     });
 
-    function doLogout() { localStorage.removeItem('activeDepartment'); window.location.href = 'admin.html'; }
+    function doLogout() {
+        localStorage.removeItem('activeDepartment'); // Wipe the session
+        window.location.href = 'admin.html'; // Kick back to login
+    }
   </script>
 </body>
 </html>
