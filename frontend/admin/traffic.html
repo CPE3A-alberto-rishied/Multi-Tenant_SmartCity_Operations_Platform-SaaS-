@@ -4,9 +4,7 @@
   <script>
     (function() {
         const session = localStorage.getItem('activeDepartment');
-        if (!session || session !== 'Traffic') {
-            window.location.replace('admin.html?error=unauthorized'); 
-        }
+        if (!session) window.location.replace('admin.html?error=unauthorized'); 
     })();
 
     // Sidebar Toggle Logic
@@ -17,12 +15,24 @@
             sidebar.classList.toggle('-translate-x-full');
             overlay.classList.toggle('hidden');
         }
-    }
-  </script>
+    };
 
+    // NEW: Mobile Panel Toggle Logic
+    window.toggleOpsPanel = function() {
+        const content = document.getElementById('ops-panel-content');
+        const chevron = document.getElementById('ops-chevron');
+        if (content.classList.contains('hidden')) {
+            content.classList.remove('hidden');
+            if(chevron) chevron.classList.add('rotate-180');
+        } else {
+            content.classList.add('hidden');
+            if(chevron) chevron.classList.remove('rotate-180');
+        }
+    };
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BEAT - Traffic and Detour Control</title>
+  <title>BEAT - Traffic and Road Control</title>
   
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
@@ -127,36 +137,41 @@
         
         <div class="absolute top-4 lg:top-6 left-4 lg:left-6 right-4 lg:right-auto z-10 lg:w-96 flex flex-col gap-4 max-h-[60vh] lg:max-h-[90vh] pointer-events-none">
             <div class="theme-surface border theme-border rounded-2xl p-4 lg:p-6 shadow-2xl backdrop-blur-md bg-opacity-95 flex-shrink-0 pointer-events-auto overflow-y-auto">
-                <div class="flex items-center justify-between mb-1 hidden lg:flex">
-                    <h2 class="text-white font-bold text-lg flex items-center gap-2"><i data-lucide="shield-alert" class="text-[#d946ef]"></i> Exclusion Zone Ops</h2>
-                </div>
-                <p class="text-[11px] text-[#94a3b8] mb-4 lg:mb-6 hidden lg:block">Draw blocked roads, automatically generate solid avoidance zones, and sync them to Main HQ.</p>
                 
-                <div class="space-y-3 lg:space-y-4">
-                    <div class="p-3 lg:p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative">
-                        <div class="absolute -left-2 -top-2 lg:-left-3 lg:-top-3 w-5 h-5 lg:w-6 lg:h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">1</div>
-                        <button type="button" id="btn-draw-hazard" class="w-full bg-[#1e293b] hover:bg-gray-700 text-[#d946ef] hover:text-white text-xs lg:text-sm font-bold py-2 lg:py-2.5 rounded-lg border border-[#d946ef]/50 transition-all flex justify-center items-center gap-2">
-                            <i data-lucide="pen-tool" class="w-4 h-4"></i> Draw Blocked Road
-                        </button>
-                        <p id="draw-status" class="text-[10px] text-yellow-500 mt-2 text-center font-bold tracking-wider hidden">Click map to draw line, double click to finish.</p>
-                    </div>
+                <button type="button" onclick="toggleOpsPanel()" class="w-full flex items-center justify-between lg:cursor-default lg:pointer-events-none">
+                    <h2 class="text-white font-bold text-base lg:text-lg flex items-center gap-2"><i data-lucide="shield-alert" class="text-[#d946ef] w-4 h-4 lg:w-5 lg:h-5"></i> Exclusion Zone Ops</h2>
+                    <i data-lucide="chevron-down" id="ops-chevron" class="text-[#94a3b8] w-5 h-5 transition-transform duration-300 lg:hidden"></i>
+                </button>
+                
+                <div id="ops-panel-content" class="hidden lg:block mt-3 lg:mt-0 transition-all">
+                    <p class="text-[11px] text-[#94a3b8] mb-4 lg:mb-6 hidden lg:block">Draw and broadcast blockades. These will reflect instantly on the main network.</p>
+                    
+                    <div class="space-y-3 lg:space-y-4">
+                        <div class="p-3 lg:p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative">
+                            <div class="absolute -left-2 -top-2 lg:-left-3 lg:-top-3 w-5 h-5 lg:w-6 lg:h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">1</div>
+                            <button type="button" id="btn-draw-hazard" class="w-full bg-[#1e293b] hover:bg-gray-700 text-[#d946ef] hover:text-white text-xs lg:text-sm font-bold py-2 lg:py-2.5 rounded-lg border border-[#d946ef]/50 transition-all flex justify-center items-center gap-2">
+                                <i data-lucide="pen-tool" class="w-4 h-4"></i> Draw Blocked Road
+                            </button>
+                            <p id="draw-status" class="text-[10px] text-yellow-500 mt-2 text-center font-bold tracking-wider hidden">Click map to draw line, double click to finish.</p>
+                        </div>
 
-                    <div class="p-3 lg:p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative opacity-50 transition-opacity" id="step-2-box">
-                        <div class="absolute -left-2 -top-2 lg:-left-3 lg:-top-3 w-5 h-5 lg:w-6 lg:h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">2</div>
-                        <div class="space-y-2 lg:space-y-3">
-                            <input type="text" id="hazard-title" placeholder="Incident Title" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-1.5 lg:py-2 text-xs lg:text-sm outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
-                            <input type="text" id="hazard-desc" placeholder="Details (e.g., 2 lanes closed)" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-1.5 lg:py-2 text-xs lg:text-sm outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
-                            <button type="button" id="btn-calc" disabled class="w-full bg-blue-600 text-white text-xs lg:text-sm font-bold py-2 lg:py-2.5 rounded-lg shadow-lg transition-all flex justify-center items-center gap-2 disabled:cursor-not-allowed">
-                                <i data-lucide="cpu" class="w-4 h-4"></i> Generate Solid Zone
+                        <div class="p-3 lg:p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative opacity-50 transition-opacity" id="step-2-box">
+                            <div class="absolute -left-2 -top-2 lg:-left-3 lg:-top-3 w-5 h-5 lg:w-6 lg:h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">2</div>
+                            <div class="space-y-2 lg:space-y-3">
+                                <input type="text" id="hazard-title" placeholder="Incident Title" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-1.5 lg:py-2 text-xs lg:text-sm outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
+                                <input type="text" id="hazard-desc" placeholder="Details (e.g., 2 lanes closed)" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-1.5 lg:py-2 text-xs lg:text-sm outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
+                                <button type="button" id="btn-calc" disabled class="w-full bg-blue-600 text-white text-xs lg:text-sm font-bold py-2 lg:py-2.5 rounded-lg shadow-lg transition-all flex justify-center items-center gap-2 disabled:cursor-not-allowed">
+                                    <i data-lucide="cpu" class="w-4 h-4"></i> Generate Solid Zone
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="p-3 lg:p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative opacity-50 transition-opacity" id="step-3-box">
+                            <div class="absolute -left-2 -top-2 lg:-left-3 lg:-top-3 w-5 h-5 lg:w-6 lg:h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">3</div>
+                            <button type="button" id="btn-broadcast" disabled class="w-full bg-[#d946ef] hover:bg-[#c026d3] text-white text-xs lg:text-sm font-bold py-2 lg:py-2.5 rounded-lg shadow-lg transition-all flex justify-center items-center gap-2 disabled:cursor-not-allowed">
+                                <i data-lucide="upload-cloud" class="w-4 h-4"></i> Broadcast to HQ
                             </button>
                         </div>
-                    </div>
-
-                    <div class="p-3 lg:p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative opacity-50 transition-opacity" id="step-3-box">
-                        <div class="absolute -left-2 -top-2 lg:-left-3 lg:-top-3 w-5 h-5 lg:w-6 lg:h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">3</div>
-                        <button type="button" id="btn-broadcast" disabled class="w-full bg-[#d946ef] hover:bg-[#c026d3] text-white text-xs lg:text-sm font-bold py-2 lg:py-2.5 rounded-lg shadow-lg transition-all flex justify-center items-center gap-2 disabled:cursor-not-allowed">
-                            <i data-lucide="upload-cloud" class="w-4 h-4"></i> Broadcast to HQ
-                        </button>
                     </div>
                 </div>
             </div>
@@ -482,8 +497,8 @@
     });
 
     function doLogout() {
-        localStorage.removeItem('activeDepartment'); // Wipe the session
-        window.location.href = 'admin.html'; // Kick back to login
+        localStorage.removeItem('activeDepartment'); 
+        window.location.href = 'admin.html'; 
     }
   </script>
 </body>
