@@ -26,15 +26,16 @@ function escapeHTML(str) {
 }
 
 function doLogout() { 
+    localStorage.removeItem('activeDepartment');
     window.location.href = 'admin.html'; 
 }
+
 // Close custom dropdowns when clicking outside
 document.addEventListener('click', (e) => {
     if (!e.target.closest('.custom-dropdown-container')) {
         document.querySelectorAll('.cat-dropdown-menu').forEach(el => el.classList.add('hidden'));
     }
 });
-
 
 // ==========================================
 // AUTHENTICATION LOGIC (admin.html)
@@ -50,7 +51,6 @@ function handleLogin(e) {
 
     let valid = true;
 
-    // 1. Check for empty fields
     if (!userEl.value.trim()) {
         userEl.classList.add('input-error');
         userErr.innerText = "This field is required";
@@ -69,14 +69,11 @@ function handleLogin(e) {
     const inputId = userEl.value.trim();
     const inputPass = passEl.value;
 
-    // 2. Hardcoded Master Admin fallback
     const isMasterAdmin = (inputId === '2023104513' && inputPass === 'admin123');
 
-    // 3. Retrieve created accounts from Memory
     let savedAdmins = JSON.parse(localStorage.getItem('beat_admins')) || [];
     const foundAdmin = savedAdmins.find(a => a.id === inputId);
 
-    // 4. Validate Account Existence
     if (!isMasterAdmin && !foundAdmin) {
         userEl.classList.add('input-error');
         userErr.innerText = "No account made for that ID.";
@@ -84,7 +81,6 @@ function handleLogin(e) {
         return;
     }
 
-    // 5. Validate Password
     if (!isMasterAdmin && foundAdmin && foundAdmin.password !== inputPass) {
         passEl.classList.add('input-error');
         passErr.innerText = "Wrong credentials input.";
@@ -92,7 +88,6 @@ function handleLogin(e) {
         return;
     }
 
-    // 6. Validate Account Status
     if (!isMasterAdmin && foundAdmin && foundAdmin.status === "Disabled") {
         userEl.classList.add('input-error');
         userErr.innerText = "This account is disabled.";
@@ -100,11 +95,9 @@ function handleLogin(e) {
         return;
     }
     
-    // 7. Login Successful! Store Active Department for Routing
     let activeDept = isMasterAdmin ? "Main Admin" : foundAdmin.dept;
     localStorage.setItem('activeDepartment', activeDept);
 
-    // Proceed to Verify Screen
     document.getElementById('login-card').classList.add('hidden');
     document.getElementById('verify-card').classList.remove('hidden');
 }
@@ -125,9 +118,7 @@ function handleVerify(e) {
         const err = document.getElementById('verify-error');
         if(err) err.classList.remove('hidden');
     } else {
-        // SMART ROUTING BASED ON ACCOUNT
         const activeDept = localStorage.getItem('activeDepartment');
-        
         if (activeDept === 'Main Admin') {
             window.location.href = "dashboard.html"; 
         } else {
@@ -202,8 +193,6 @@ function closePopup(popupId) {
 // ==========================================
 // MANAGE ADMINS LOGIC (With Memory Sync)
 // ==========================================
-
-// Pulls data from memory so it persists across reloads!
 let departments = JSON.parse(localStorage.getItem('beat_departments')) || []; 
 let mockData = { 
     admins: JSON.parse(localStorage.getItem('beat_admins')) || [] 
@@ -222,12 +211,14 @@ function handleSort(val) {
     currentFilter = val;
     const deleteBtn = document.getElementById('delete-dept-btn');
     if (val !== "All Departments") {
-        deleteBtn.classList.remove('hidden');
-        document.getElementById('delete-dept-title').innerText = `Delete ${val}?`;
+        if(deleteBtn) deleteBtn.classList.remove('hidden');
         const count = mockData.admins.filter(a => a.dept === val).length;
-        document.getElementById('delete-dept-desc').innerText = `This will remove the department AND delete all ${count} associated staff member(s).`;
+        const titleEl = document.getElementById('delete-dept-title');
+        const descEl = document.getElementById('delete-dept-desc');
+        if(titleEl) titleEl.innerText = `Delete ${val}?`;
+        if(descEl) descEl.innerText = `This will remove the department AND delete all ${count} associated staff member(s).`;
     } else { 
-        deleteBtn.classList.add('hidden'); 
+        if(deleteBtn) deleteBtn.classList.add('hidden'); 
     }
     populateAdmins();
 }
@@ -251,12 +242,10 @@ function populateAdmins() {
 
     let adminsToDisplay = mockData.admins;
     
-    // Apply Department Filter
     if (currentFilter !== "All Departments") {
         adminsToDisplay = adminsToDisplay.filter(a => a.dept === currentFilter);
     }
 
-    // Apply Search Filter (Name or ID)
     if (currentSearchQuery) {
         adminsToDisplay = adminsToDisplay.filter(a => 
             a.username.toLowerCase().includes(currentSearchQuery) || 
@@ -302,10 +291,7 @@ function promptDeleteUser(username) {
 function executeDeleteUser() {
     if(userToDelete) {
         mockData.admins = mockData.admins.filter(a => a.username !== userToDelete);
-        
-        // SAVE USERS TO MEMORY
         localStorage.setItem('beat_admins', JSON.stringify(mockData.admins));
-
         userToDelete = null;
         populateAdmins();
     }
@@ -316,7 +302,6 @@ function executeDeleteDept() {
     mockData.admins = mockData.admins.filter(a => a.dept !== currentFilter);
     departments = departments.filter(d => d !== currentFilter);
     
-    // SAVE BOTH DEPARTMENTS AND USERS TO MEMORY
     localStorage.setItem('beat_departments', JSON.stringify(departments));
     localStorage.setItem('beat_admins', JSON.stringify(mockData.admins));
 
@@ -351,13 +336,12 @@ function executeAddStaff() {
         username: document.getElementById('staff-name').value,
         id: document.getElementById('staff-id').value,
         email: document.getElementById('staff-email').value,
-        password: document.getElementById('staff-pass').value, // Saved for Login Validation
+        password: document.getElementById('staff-pass').value,
         dept: document.getElementById('staff-dept').value,
         status: "Active"
     };
     mockData.admins.push(newUser);
     
-    // SAVE USERS TO MEMORY
     localStorage.setItem('beat_admins', JSON.stringify(mockData.admins));
 
     clearAndCloseStaff(); 
@@ -375,10 +359,7 @@ function executeCreateDept() {
     const name = document.getElementById('new-dept-name').value.trim();
     if (name && !departments.includes(name)) { 
         departments.push(name); 
-        
-        // SAVE DEPARTMENTS TO MEMORY
         localStorage.setItem('beat_departments', JSON.stringify(departments));
-
         updateDepartmentDropdowns(); 
     }
     clearAndCloseDept(); 
@@ -427,10 +408,7 @@ function confirmStatusChange(isEnabling) {
         const user = mockData.admins.find(u => u.username === currentTargetUser);
         if (user) {
             user.status = isEnabling ? "Active" : "Disabled";
-            
-            // SAVE STATUS CHANGE TO MEMORY
             localStorage.setItem('beat_admins', JSON.stringify(mockData.admins));
-            
             populateAdmins(); 
         }
         closeModal(isEnabling ? 'enable-modal' : 'disable-modal');
@@ -445,12 +423,11 @@ function cancelStatusChange() {
 
 
 // ==========================================
-// UPDATED REPORTS PAGE SPECIFIC LOGIC
+// REPORTS PAGE LOGIC
 // ==========================================
 
 function openReportDetails(card) {
     if(!card) return;
-    // Don't open if user is typing in the action box
     if (event.target.closest('button') || event.target.closest('textarea')) return;
     
     document.getElementById('modal-detail-title').innerText = card.querySelector('h3').innerText;
@@ -467,7 +444,6 @@ function toggleActionField(btn, type) {
     const confirmBtn = card.querySelector('#action-confirm-btn');
     const textarea = card.querySelector('#action-description');
 
-    // CLEAR TEXT FIELD WHEN SWITCHING ACTIONS
     textarea.value = "";
     textarea.classList.remove('input-error');
     card.querySelector('#action-error').classList.add('hidden');
@@ -502,9 +478,8 @@ function promptActionConfirm(type, btn) {
     const textarea = card.querySelector('#action-description');
     const errorMsg = card.querySelector('#action-error');
 
-    // RED GLOW VALIDATION
     if (!textarea.value.trim()) {
-        textarea.classList.add('input-error'); // Triggers red border glow
+        textarea.classList.add('input-error'); 
         if(errorMsg) errorMsg.classList.remove('hidden');
         return;
     }
@@ -522,7 +497,7 @@ function promptActionConfirm(type, btn) {
         document.getElementById('success-title').innerText = "Action Successful";
         document.getElementById('success-body').innerText = type === 'return' ? "Your report is returned." : "Your resolution is submitted.";
         
-        textarea.value = ""; // Clear on success
+        textarea.value = ""; 
         openModal('action-success-modal');
     };
     
@@ -533,11 +508,9 @@ function executeFinalAction(type, card) {
     closeModal('modal-confirm-action');
     card.querySelector('#dynamic-action-field').classList.add('hidden');
     
-    // Success Message
     document.getElementById('success-title').innerText = "Action Successful";
     document.getElementById('success-body').innerText = type === 'return' ? "Your report is returned." : "Your resolution is submitted.";
     
-    // CLEAR TEXTAREA AFTER SUCCESS
     card.querySelector('#action-description').value = "";
     openModal('action-success-modal');
 }
@@ -586,8 +559,9 @@ function clearAndCloseReport() {
         if(err) err.classList.add('hidden');
     });
 }
+
 // ==========================================
-// ANNOUNCEMENTS PAGE SPECIFIC LOGIC
+// 🚨 MONGODB ANNOUNCEMENTS LOGIC (announcements2.html) 🚨
 // ==========================================
 let currentAnnMode = 'create';
 let annBlockCount = 1;
@@ -601,6 +575,172 @@ let annCategories = [];
 let selectedFilterCategory = 'all';
 let selectedFormCategory = '';
 let categoryToDelete = '';
+
+// FETCH FROM MONGODB API
+async function fetchTrafficAnnouncements() {
+    try {
+        const response = await fetch('https://beat-pasig-api.onrender.com/api/announcements2/all');
+        const result = await response.json();
+
+        if (result.success && result.data) {
+            const gridLive = document.getElementById('grid-live');
+            const gridQueue = document.getElementById('grid-queue');
+            const gridDenied = document.getElementById('grid-denied');
+            
+            if (gridLive) gridLive.innerHTML = '';
+            if (gridQueue) gridQueue.innerHTML = '';
+            if (gridDenied) gridDenied.innerHTML = '';
+
+            let liveCount = 0;
+
+            result.data.forEach(ann => {
+                const dateObj = new Date(ann.createdAt);
+                const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const dateStr = `${dateObj.toLocaleDateString()} ${timeStr}`;
+                const isoDate = dateObj.toISOString();
+                const rawDateStr = isoDate.split('T')[0];
+
+                let badgeClass = "bg-green-500/10 text-green-400 border border-green-500/20";
+                let actionButtons = '';
+                let targetGrid = '';
+
+                if (ann.status === 'Queue') {
+                    targetGrid = 'grid-queue';
+                    actionButtons = `
+                        <button onclick="triggerApprove(this)" class="flex-1 bg-transparent border border-green-500 hover:bg-green-500/10 text-green-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Approve</button>
+                        <button onclick="triggerReject(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"><i data-lucide="x" class="w-4 h-4"></i> Reject</button>
+                    `;
+                } else if (ann.status === 'Live') {
+                    targetGrid = 'grid-live';
+                    liveCount++;
+                    actionButtons = `
+                        <button onclick="openAnnForm('edit', this.closest('.ann-card'))" class="bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2 px-8 rounded-lg text-sm transition-colors">Edit</button>
+                        <button onclick="triggerTakeDown(this)" class="bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center gap-2 ml-auto"><i data-lucide="trash-2" class="w-4 h-4"></i> Take Down</button>
+                    `;
+                } else if (ann.status === 'Denied') {
+                    targetGrid = 'grid-denied';
+                    badgeClass = "bg-red-500/10 text-red-400 border border-red-500/20";
+                    actionButtons = `
+                        <button onclick="triggerTakeBack(this)" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Take Back</button>
+                        <button onclick="triggerDelete(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i> Delete Permanently</button>
+                    `;
+                }
+
+                const cardHTML = `
+                <div class="ann-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors theme-surface ${ann.status === 'Denied' ? 'opacity-60' : ''}" 
+                     onclick="openAnnDetails(this)" data-id="${ann._id}" data-date="${isoDate}" data-raw-date="${rawDateStr}" data-blocks="${escapeHTML(ann.blocks || '[]')}">
+                    <div class="flex justify-between items-start mb-2">
+                      <h3 class="ann-title text-lg font-bold text-white">${escapeHTML(ann.title)}</h3>
+                      <span class="ann-badge ${badgeClass} px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase">${escapeHTML(ann.category)}</span>
+                    </div>
+                    <p class="text-xs text-[#94a3b8] mb-4">Published <span class="ann-date">${dateStr}</span></p>
+                    <div class="ann-content-hidden hidden">${escapeHTML(ann.content)}</div>
+                    <p class="ann-desc text-sm text-slate-300 leading-relaxed mb-6 line-clamp-2">${escapeHTML(ann.content)}</p>
+                    <div class="mt-auto pt-4 flex gap-3 action-container" onclick="event.stopPropagation()">
+                      ${actionButtons}
+                    </div>
+                </div>`;
+                
+                const gridEl = document.getElementById(targetGrid);
+                if (gridEl) gridEl.insertAdjacentHTML('beforeend', cardHTML);
+            });
+
+            const dashCount = document.getElementById('announcement-count');
+            if (dashCount) dashCount.innerText = liveCount;
+
+            if(window.lucide) lucide.createIcons();
+            filterAnnouncements();
+        }
+    } catch(e) { console.error("Error fetching traffic announcements:", e); }
+}
+
+async function executeAnnFormSubmit() {
+    closeModal('confirm-submit-modal');
+    
+    const titleInput = document.getElementById('ann-title');
+    const title = titleInput.value;
+    const category = selectedFormCategory;
+
+    const blocksData = [];
+    const blockEls = document.querySelectorAll('.ann-block');
+    let firstContent = "";
+    
+    blockEls.forEach((blk, idx) => {
+        const sub = blk.querySelector('.block-subtitle').value;
+        const txt = blk.querySelector('.block-content').value;
+        blocksData.push({ subtitle: sub, content: txt, image: "" }); // Enforce Text Only
+        if (idx === 0) firstContent = txt; 
+    });
+
+    const blocksJSON = escapeHTML(JSON.stringify(blocksData));
+
+    if (currentAnnMode === 'create') {
+        try {
+            await fetch('https://beat-pasig-api.onrender.com/api/announcements2', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    title: title, category: category, coverImage: "", 
+                    content: firstContent, blocks: blocksJSON, status: 'Queue' 
+                })
+            });
+        } catch(err) { console.error("DB Save Error:", err); }
+    } else if (currentAnnMode === 'edit' && currentEditingCard) {
+        const dbId = currentEditingCard.getAttribute('data-id');
+        try {
+            await fetch(`https://beat-pasig-api.onrender.com/api/announcements2/${dbId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, category, content: firstContent, blocks: blocksJSON })
+            });
+        } catch(err) { console.error("DB Update Error:", err); }
+    }
+
+    titleInput.value = '';
+    document.getElementById('content-blocks-container').innerHTML = '';
+    selectedFormCategory = '';
+    const catText = document.getElementById('ann-category-text');
+    if (catText) {
+        catText.innerText = 'Select a category...';
+        catText.classList.add('text-[#94a3b8]');
+    }
+    
+    closeAnnForm(); 
+    openModal('success-submit-modal');
+    switchAnnTab('queue');
+    fetchTrafficAnnouncements(); 
+}
+
+async function executeCardAction() {
+    closeModal('confirm-action-modal');
+    if(!currentActionCard) return;
+
+    const dbId = currentActionCard.getAttribute('data-id'); 
+    let newStatus = 'Queue';
+    
+    if (currentActionType === 'approve') newStatus = 'Live';
+    if (currentActionType === 'reject' || currentActionType === 'takedown') newStatus = 'Denied';
+
+    if (dbId) {
+        try {
+            if (currentActionType === 'delete') {
+                await fetch(`https://beat-pasig-api.onrender.com/api/announcements2/${dbId}`, { method: 'DELETE' });
+                currentActionCard.remove();
+                openModal('success-submit-modal');
+                return;
+            } 
+            
+            await fetch(`https://beat-pasig-api.onrender.com/api/announcements2/${dbId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            });
+            fetchTrafficAnnouncements(); 
+        } catch(err) { console.error("DB Action Error:", err); }
+    }
+    openModal('success-submit-modal');
+}
+
 
 function renderCategoryDropdowns() {
     const filterMenu = document.getElementById('filter-category-menu');
@@ -669,17 +809,17 @@ function checkCategoryRemovable(source) {
     if (source === 'filter') {
         const val = selectedFilterCategory;
         const btn = document.getElementById('btn-remove-filter-cat');
-        if (val !== 'all' && val !== '') {
+        if (val !== 'all' && val !== '' && btn) {
             btn.classList.remove('hidden');
-        } else {
+        } else if(btn) {
             btn.classList.add('hidden');
         }
     } else if (source === 'form') {
         const val = selectedFormCategory;
         const btn = document.getElementById('btn-remove-form-cat');
-        if (val !== '') {
+        if (val !== '' && btn) {
             btn.classList.remove('hidden');
-        } else {
+        } else if(btn) {
             btn.classList.add('hidden');
         }
     }
@@ -713,7 +853,8 @@ function executeDeleteCategory() {
         document.getElementById('ann-category-text').innerText = 'Select a category...';
         document.getElementById('ann-category-text').classList.add('text-[#94a3b8]');
         document.getElementById('ann-category-text').classList.remove('text-white');
-        document.getElementById('btn-remove-form-cat').classList.add('hidden');
+        const btn = document.getElementById('btn-remove-form-cat');
+        if(btn) btn.classList.add('hidden');
     }
     
     renderCategoryDropdowns();
@@ -726,7 +867,7 @@ function saveCategory() {
     const error = document.getElementById('new-category-error');
     
     if (!input || !input.value.trim()) {
-        if (input) input.classList.add('input-error'); // Red Glow
+        if (input) input.classList.add('input-error'); 
         if (error) error.classList.remove('hidden');
         return;
     }
@@ -739,7 +880,6 @@ function saveCategory() {
     renderCategoryDropdowns();
     selectCategory('form', newCat, newCat);
     
-    // Clear and Close
     input.value = '';
     input.classList.remove('input-error');
     if (error) error.classList.add('hidden');
@@ -811,7 +951,7 @@ function setupActionModal(icon, bg, shadow, title, desc, btnText, btnClass) {
     const iconEl = document.getElementById('action-icon');
     
     bgEl.style.background = bg;
-    bgEl.className = `flex items-center justify-center text-white shadow-lg ${shadow}`;
+    bgEl.className = `mx-auto flex items-center justify-center w-14 h-14 rounded-full mb-4 shadow-lg ${shadow}`;
     iconEl.setAttribute('data-lucide', icon);
     
     document.getElementById('action-title').innerText = title;
@@ -828,75 +968,38 @@ function setupActionModal(icon, bg, shadow, title, desc, btnText, btnClass) {
 function triggerApprove(btn) {
     currentActionCard = btn.closest('.ann-card');
     currentActionType = 'approve';
-    setupActionModal('check', '#22c55e', 'shadow-green-500/20', 'Approve Announcement?', 'This will move the announcement to the Live tab.', 'Approve', 'bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10');
+    setupActionModal('check', 'rgba(34, 197, 94, 0.1)', 'shadow-green-500/20', 'Approve Announcement?', 'This will move the announcement to the Live tab.', 'Approve', 'bg-transparent border border-green-500 text-green-500 hover:bg-green-500/10');
+    document.getElementById('action-icon').classList.add('text-green-500');
 }
 
 function triggerReject(btn) {
     currentActionCard = btn.closest('.ann-card');
     currentActionType = 'reject';
-    setupActionModal('x', '#ef4444', 'shadow-red-500/20', 'Reject Announcement?', 'This will move the announcement to the Denied/Taken Down tab.', 'Reject', 'bg-transparent border border-red-500 text-red-500 hover:bg-red-500/10');
+    setupActionModal('x', 'rgba(239, 68, 68, 0.1)', 'shadow-red-500/20', 'Reject Announcement?', 'This will move the announcement to the Denied/Taken Down tab.', 'Reject', 'bg-transparent border border-red-500 text-red-500 hover:bg-red-500/10');
+    document.getElementById('action-icon').classList.add('text-red-500');
 }
 
 function triggerTakeDown(btn) {
     currentActionCard = btn.closest('.ann-card');
     currentActionType = 'takedown';
-    setupActionModal('trash-2', '#ef4444', 'shadow-red-500/20', 'Take Down Announcement?', 'This will remove it from live view and move it to the Denied tab.', 'Take Down', 'bg-transparent border border-red-500 text-red-500 hover:bg-red-500/10');
+    setupActionModal('trash-2', 'rgba(239, 68, 68, 0.1)', 'shadow-red-500/20', 'Take Down Announcement?', 'This will remove it from live view and move it to the Denied tab.', 'Take Down', 'bg-transparent border border-red-500 text-red-500 hover:bg-red-500/10');
+    document.getElementById('action-icon').classList.add('text-red-500');
 }
 
 function triggerTakeBack(btn) {
     currentActionCard = btn.closest('.ann-card');
     currentActionType = 'takeback';
-    setupActionModal('refresh-cw', '#3b82f6', 'shadow-blue-500/20', 'Take Back Announcement?', 'This will restore the announcement to the Approval Queue for review.', 'Restore', 'bg-transparent border border-blue-500 text-blue-500 hover:bg-blue-500/10');
+    setupActionModal('refresh-cw', 'rgba(59, 130, 246, 0.1)', 'shadow-blue-500/20', 'Take Back Announcement?', 'This will restore the announcement to the Approval Queue for review.', 'Restore', 'bg-transparent border border-blue-500 text-blue-500 hover:bg-blue-500/10');
+    document.getElementById('action-icon').classList.add('text-blue-500');
 }
 
 function triggerDelete(btn) {
     currentActionCard = btn.closest('.ann-card');
     currentActionType = 'delete';
-    setupActionModal('alert-triangle', '#ef4444', 'shadow-red-500/20', 'Delete Permanently?', 'This action cannot be undone. The announcement will be completely erased.', 'Delete', 'bg-transparent border border-red-500 text-red-500 hover:bg-red-500/10');
+    setupActionModal('alert-triangle', 'rgba(239, 68, 68, 0.1)', 'shadow-red-500/20', 'Delete Permanently?', 'This action cannot be undone. The announcement will be completely erased.', 'Delete', 'bg-transparent border border-red-500 text-red-500 hover:bg-red-500/10');
+    document.getElementById('action-icon').classList.add('text-red-500');
 }
 
-function executeCardAction() {
-    closeModal('confirm-action-modal');
-    if(!currentActionCard) return;
-
-    const container = currentActionCard.querySelector('.action-container');
-
-    if (currentActionType === 'approve') {
-        currentActionCard.classList.remove('opacity-60');
-        // Approved state: Only show Edit button
-        container.innerHTML = `
-            <button onclick="openAnnForm('edit', this.closest('.ann-card'))" class="bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2 px-8 rounded-lg text-sm transition-colors">Edit</button>
-        `;
-        document.getElementById('grid-live').appendChild(currentActionCard);
-        switchAnnTab('live');
-
-    } else if (currentActionType === 'reject' || currentActionType === 'takedown') {
-        currentActionCard.classList.add('opacity-60');
-        container.innerHTML = `
-            <button onclick="triggerTakeBack(this)" class="flex-1 bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm">
-              <i data-lucide="refresh-cw" class="w-4 h-4"></i> Take Back
-            </button>
-            <button onclick="triggerDelete(this)" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-2.5 px-4 rounded-lg text-sm transition-all flex items-center justify-center gap-2 shadow-sm">
-              <i data-lucide="trash-2" class="w-4 h-4"></i> Delete Permanently
-            </button>
-        `;
-        document.getElementById('grid-denied').appendChild(currentActionCard);
-        switchAnnTab('denied');
-
-    } else if (currentActionType === 'takeback') {
-        currentActionCard.classList.remove('opacity-60');
-        // Clear buttons when returning to "Waiting for Approval"
-        container.innerHTML = ``; 
-        document.getElementById('grid-queue').appendChild(currentActionCard);
-        switchAnnTab('queue');
-
-    } else if (currentActionType === 'delete') {
-        currentActionCard.remove();
-    }
-
-    if(window.lucide) lucide.createIcons();
-    filterAnnouncements();
-}
 
 function openAnnDetails(card) {
     if(!card) return;
@@ -908,7 +1011,6 @@ function openAnnDetails(card) {
     const badge = card.querySelector('.ann-badge');
     const dateText = card.querySelector('.ann-date').innerText;
     
-    const coverImgSrc = card.getAttribute('data-cover-image');
     const blocksDataStr = card.getAttribute('data-blocks');
     let blocksData = [];
     try { blocksData = JSON.parse(blocksDataStr.replace(/&quot;/g, '"').replace(/&#039;/g, "'")); } catch(e) {}
@@ -918,15 +1020,6 @@ function openAnnDetails(card) {
     detailBadge.className = badge.className;
     detailBadge.innerText = badge.innerText;
     document.getElementById('detail-date').innerText = dateText;
-    
-    const coverContainer = document.getElementById('detail-cover-container');
-    if (coverImgSrc && coverImgSrc.trim() !== '') {
-        coverContainer.innerHTML = `<img src="${coverImgSrc}" class="w-full aspect-video max-h-[500px] object-cover object-center rounded-xl border border-gray-700 shadow-md">`;
-        coverContainer.classList.remove('hidden');
-    } else {
-        coverContainer.innerHTML = '';
-        coverContainer.classList.add('hidden');
-    }
 
     const contentContainer = document.getElementById('detail-content');
     contentContainer.innerHTML = '';
@@ -934,26 +1027,15 @@ function openAnnDetails(card) {
     if (blocksData.length === 0) {
         const fallbackContent = card.querySelector('.ann-content-hidden');
         if (fallbackContent) {
-            contentContainer.innerHTML = `<div class="mt-12 w-full flex"><div class="w-full"><p class="whitespace-pre-wrap text-slate-300 leading-relaxed">${fallbackContent.innerText}</p></div></div>`;
+            contentContainer.innerHTML = `<div class="mt-8 w-full flex"><div class="w-full"><p class="whitespace-pre-wrap text-slate-300 leading-relaxed">${fallbackContent.innerText}</p></div></div>`;
         }
     } else {
         blocksData.forEach((blk, idx) => {
-            let mtClass = idx === 0 ? "mt-12" : "mt-8";
-            
+            let mtClass = idx === 0 ? "mt-4" : "mt-8";
             let blkHTML = `<div class="${mtClass} flex flex-col md:flex-row gap-6 items-start">`;
-            
-            if (blk.image) {
-                blkHTML += `<div class="w-full md:w-1/3 flex-shrink-0">
-                              <img src="${blk.image}" class="w-full aspect-video object-cover object-center rounded-lg border border-gray-700 shadow-sm">
-                            </div>`;
-            }
-            
-            let textWidthClass = blk.image ? "md:w-2/3" : "w-full";
-            blkHTML += `<div class="w-full ${textWidthClass} flex flex-col justify-center">`;
-            
+            blkHTML += `<div class="w-full flex flex-col justify-center">`;
             if (blk.subtitle) blkHTML += `<h4 class="text-lg font-bold text-white mb-2">${escapeHTML(blk.subtitle)}</h4>`;
             blkHTML += `<p class="whitespace-pre-wrap text-slate-300 leading-relaxed">${escapeHTML(blk.content)}</p>`;
-            
             blkHTML += `</div></div>`;
             contentContainer.insertAdjacentHTML('beforeend', blkHTML);
         });
@@ -965,44 +1047,7 @@ function closeAnnDetails() {
     document.getElementById('view-list').classList.remove('hidden');
 }
 
-function handleImageUpload(input, previewId) {
-    if(input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = document.getElementById(previewId);
-            if (img) {
-                img.src = e.target.result;
-                img.classList.remove('hidden');
-            }
-            const removeBtn = document.getElementById(previewId.replace('preview', 'remove'));
-            if(removeBtn) removeBtn.classList.remove('hidden');
-            
-            if (previewId === 'ann-cover-preview') {
-                currentUploadedImage = e.target.result;
-            }
-        }
-        reader.readAsDataURL(input.files[0]);
-    }
-}
-
-function removeImage(previewId) {
-    const img = document.getElementById(previewId);
-    if (img) {
-        img.src = '';
-        img.classList.add('hidden');
-    }
-    const removeBtn = document.getElementById(previewId.replace('preview', 'remove'));
-    if(removeBtn) removeBtn.classList.add('hidden');
-    
-    if (previewId === 'ann-cover-preview') {
-        currentUploadedImage = null;
-    }
-}
-
-function getBlockHTML(id, subtitle = '', content = '', imageSrc = '') {
-    const imgClass = imageSrc ? "w-full aspect-video max-h-[250px] object-cover object-center mt-3 rounded-lg border border-gray-700 shadow-sm" : "hidden w-full aspect-video max-h-[250px] object-cover object-center mt-3 rounded-lg border border-gray-700 shadow-sm";
-    const removeClass = imageSrc ? "ml-4 text-red-400 hover:text-red-500 text-xs font-bold transition-colors" : "hidden ml-4 text-red-400 hover:text-red-500 text-xs font-bold transition-colors";
-    
+function getBlockHTML(id, subtitle = '', content = '') {
     return `
       <div class="ann-block border border-gray-700 bg-[#1e2536] rounded-lg p-5 mt-4" id="ann-block-${id}">
         <div class="flex justify-between items-center mb-4">
@@ -1010,19 +1055,6 @@ function getBlockHTML(id, subtitle = '', content = '', imageSrc = '') {
           <button type="button" onclick="document.getElementById('ann-block-${id}').remove()" class="text-red-400 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
         </div>
         <div class="space-y-4">
-           <div>
-             <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">MEDIA ATTACHMENT</label>
-             <div class="modal-input flex flex-col p-3" style="background:var(--surface); border-color:var(--border)">
-               <div class="flex items-center">
-                   <label class="bg-white text-black font-bold text-xs py-1.5 px-3 rounded cursor-pointer hover:bg-gray-200 transition-colors">
-                      Choose File
-                      <input type="file" class="hidden" accept="image/*" onchange="handleImageUpload(this, 'block-img-preview-${id}')">
-                   </label>
-                   <button type="button" class="${removeClass}" id="block-img-remove-${id}" onclick="removeImage('block-img-preview-${id}')"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-               </div>
-               <img id="block-img-preview-${id}" src="${imageSrc}" class="${imgClass}">
-             </div>
-           </div>
            <div>
              <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">SUBTITLE (OPTIONAL)</label>
              <input type="text" placeholder="Enter section subtitle" class="block-subtitle modal-input text-sm" value="${escapeHTML(subtitle)}" style="background:var(--surface); border-color:var(--border)">
@@ -1055,7 +1087,6 @@ function openAnnForm(mode, card = null) {
     clearReqError(inputTitle);
     inputTitle.value = '';
     selectCategory('form', '', 'Select a category...');
-    removeImage('ann-cover-preview');
 
     const container = document.getElementById('content-blocks-container');
     container.innerHTML = '';
@@ -1080,15 +1111,6 @@ function openAnnForm(mode, card = null) {
         selectCategory('form', category, category);
         checkCategoryRemovable('form');
 
-        const coverImg = card.getAttribute('data-cover-image');
-        if(coverImg) {
-            const preview = document.getElementById('ann-cover-preview');
-            preview.src = coverImg;
-            preview.classList.remove('hidden');
-            document.getElementById('ann-cover-remove').classList.remove('hidden');
-            currentUploadedImage = coverImg;
-        }
-
         const blocksDataStr = card.getAttribute('data-blocks');
         let blocksData = [];
         try { blocksData = JSON.parse(blocksDataStr.replace(/&quot;/g, '"').replace(/&#039;/g, "'")); } catch(e) {}
@@ -1099,7 +1121,7 @@ function openAnnForm(mode, card = null) {
         } else {
             blocksData.forEach((blk, idx) => {
                 annBlockCount = idx + 1;
-                container.insertAdjacentHTML('beforeend', getBlockHTML(annBlockCount, blk.subtitle, blk.content, blk.image));
+                container.insertAdjacentHTML('beforeend', getBlockHTML(annBlockCount, blk.subtitle, blk.content));
             });
         }
     }
@@ -1184,125 +1206,46 @@ function handleAnnFormSubmit() {
     openModal('confirm-submit-modal');
 }
 
-function executeAnnFormSubmit() {
-    closeModal('confirm-submit-modal');
+
+// ==========================================
+// ON PAGE LOAD COMBINED INTIALIZER
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
     
-    const titleInput = document.getElementById('ann-title');
-    const title = titleInput.value;
-    const category = selectedFormCategory;
-    const coverPreview = document.getElementById('ann-cover-preview');
-    const coverImage = (coverPreview && !coverPreview.classList.contains('hidden')) ? coverPreview.src : '';
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 
-    const blocksData = [];
-    const blockEls = document.querySelectorAll('.ann-block');
-    let firstContent = "";
-    
-    blockEls.forEach((blk, idx) => {
-        const sub = blk.querySelector('.block-subtitle').value;
-        const txt = blk.querySelector('.block-content').value;
-        const imgEl = blk.querySelector('img[id^="block-img-preview-"]');
-        const img = (imgEl && !imgEl.classList.contains('hidden')) ? imgEl.src : '';
-        blocksData.push({ subtitle: sub, content: txt, image: img });
-        if (idx === 0) firstContent = txt; 
-    });
-
-    const blocksJSON = escapeHTML(JSON.stringify(blocksData));
-    const now = new Date();
-    const timeStr = `${now.getHours() % 12 || 12}:${now.getMinutes().toString().padStart(2, '0')}${now.getHours() >= 12 ? 'PM' : 'AM'}`;
-    const dateStr = `Today ${timeStr}`;
-    const isoDate = now.toISOString();
-    const rawDateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-
-    if (currentAnnMode === 'create') {
-        const cardHTML = `
-        <div class="ann-card border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors theme-surface" onclick="openAnnDetails(this)" data-date="${isoDate}" data-raw-date="${rawDateStr}" data-cover-image="${coverImage}" data-blocks="${blocksJSON}">
-            <div class="flex justify-between items-start mb-2">
-              <h3 class="ann-title text-lg font-bold text-white">${escapeHTML(title)}</h3>
-              <span class="ann-badge bg-green-500/10 text-green-400 border border-green-500/20 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase">${escapeHTML(category)}</span>
-            </div>
-            <p class="text-xs text-[#94a3b8] mb-4">Published <span class="ann-date">${dateStr}</span></p>
-            <div class="ann-content-hidden hidden">${escapeHTML(firstContent)}</div>
-            <p class="ann-desc text-sm text-slate-300 leading-relaxed mb-6 line-clamp-2">${escapeHTML(firstContent)}</p>
-            <div class="mt-auto pt-4 flex gap-3 action-container" onclick="event.stopPropagation()">
-              </div>
-        </div>`;
-        document.getElementById('grid-queue').insertAdjacentHTML('afterbegin', cardHTML);
-    } else if (currentAnnMode === 'edit' && currentEditingCard) {
-        currentEditingCard.querySelector('.ann-title').innerText = title;
-        currentEditingCard.querySelector('.ann-badge').innerText = category;
-        currentEditingCard.querySelector('.ann-desc').innerText = firstContent;
-        currentEditingCard.setAttribute('data-cover-image', coverImage);
-        currentEditingCard.setAttribute('data-blocks', blocksJSON);
-    }
-
-    // RESET FORM: Clear title, images, and category selection
-    titleInput.value = '';
-    removeImage('ann-cover-preview');
-    document.getElementById('content-blocks-container').innerHTML = '';
-    selectedFormCategory = '';
-    const catText = document.getElementById('ann-category-text');
-    if (catText) {
-        catText.innerText = 'Select a category...';
-        catText.classList.add('text-[#94a3b8]');
-    }
-    
-    closeAnnForm(); 
-    openModal('success-submit-modal');
-    switchAnnTab('queue'); // Move user to "Waiting for Approval" tab
-    filterAnnouncements();
-}
-
-// ====== PAGE LOAD INITIALIZER ======
-document.addEventListener('DOMContentLoaded', () => { 
-    if(window.lucide) lucide.createIcons(); 
-    
-    // Load Manage Admins Logic
+    // 1. If on Manage Admins
     if(document.getElementById('dept-filter') && typeof updateDepartmentDropdowns === 'function') {
         updateDepartmentDropdowns(); 
         populateAdmins(); 
     }
     
-    // Load Announcements Logic
+    // 2. If on Announcements
     if(document.getElementById('filter-calendar') && typeof renderCategoryDropdowns === 'function') {
         renderCategoryDropdowns();
-        filterAnnouncements(); 
-    }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // Initialize icons
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
+        fetchTrafficAnnouncements(); // Hits MongoDB!
     }
 
-    // 1. Fetch live Pasig Weather & Environment from Open-Meteo
+    // 3. Fetch live Pasig Weather & Environment
     async function fetchWeather() {
         const weatherContainer = document.getElementById('weather-forecast-container');
         const heatIndexVal = document.getElementById('heat-index-val');
         const aqiVal = document.getElementById('aqi-val');
 
-        // Safety check: Only run this if the weather container actually exists on this specific HTML page
         if (!weatherContainer) return;
 
         try {
-            // Fetch Weather & Heat Index (apparent_temperature)
-            // Pasig coordinates: 14.5764 Lat, 121.0851 Lon
             const weatherResponse = await fetch('https://api.open-meteo.com/v1/forecast?latitude=14.5764&longitude=121.0851&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code&timezone=Asia%2FSingapore');
             const weatherData = await weatherResponse.json();
             const current = weatherData.current;
             
-            // Fetch Air Quality Index (AQI)
             const aqiResponse = await fetch('https://air-quality-api.open-meteo.com/v1/air-quality?latitude=14.5764&longitude=121.0851&current=us_aqi&timezone=Asia%2FSingapore');
             const aqiData = await aqiResponse.json();
             const currentAqi = aqiData.current.us_aqi;
             
-            // --- Update Environmental Feed ---
             if (heatIndexVal) heatIndexVal.innerText = `${current.apparent_temperature} °C`;
             if (aqiVal) aqiVal.innerText = currentAqi;
 
-            // --- Update Weather Feed ---
-            // Determine icon based on WMO weather code (simplified)
             const isRaining = current.weather_code >= 50;
             const weatherDesc = isRaining ? "Rainy" : "Clear / Cloudy";
             const icon = isRaining ? "cloud-rain" : "cloud-sun";
@@ -1329,10 +1272,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             
-            // Re-render Lucide icons for the newly injected HTML
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons(); 
-            }
+            if (typeof lucide !== 'undefined') lucide.createIcons(); 
         } catch (error) {
             console.error("Failed to fetch data:", error);
             weatherContainer.innerHTML = '<p class="text-rose-500 text-sm">Failed to load weather data.</p>';
@@ -1341,7 +1281,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 2. Sync Evacuation Data from other pages
     function syncEvacuationData() {
         const evacEl = document.getElementById('evacuation-count');
         if (evacEl) {
@@ -1350,7 +1289,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 3. Sync Public Reports Data from other pages
     function syncReportsData() {
         const reportsEl = document.getElementById('reports-count');
         if (reportsEl) {
@@ -1359,15 +1297,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Run functions on load
     fetchWeather();
     syncEvacuationData();
     syncReportsData();
 });
-
-// Logout Function attached to the global window object
-// so that inline HTML like <button onclick="doLogout()"> can trigger it
-window.doLogout = function() { 
-    localStorage.removeItem('activeDepartment'); 
-    window.location.href = 'admin.html'; 
-};

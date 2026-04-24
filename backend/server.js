@@ -41,7 +41,7 @@ const adminSchema = new mongoose.Schema({
 });
 const Admin = mongoose.model('Admin', adminSchema);
 
-// Announcement Schema
+// Announcement Schema (Existing)
 const announcementSchema = new mongoose.Schema({
     title: String,
     category: String,
@@ -52,6 +52,10 @@ const announcementSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 const Announcement = mongoose.model('Announcement', announcementSchema);
+
+// 👉 ADD THESE TWO NEW MODELS:
+const TrafficAnnouncement = mongoose.model('TrafficAnnouncement', announcementSchema);
+const DrrmoAnnouncement = mongoose.model('DrrmoAnnouncement', announcementSchema);
 
 // 4. EMAIL SETUP
 const transporter = nodemailer.createTransport({
