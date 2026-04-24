@@ -64,13 +64,13 @@
 
   <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-[60] fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 w-64 bg-[#0a0e1a]">
     <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
-      <div class="flex items-center gap-3">
-        <div class="logo-box bg-orange-600 text-white">B</div>
-        <div class="flex flex-col justify-center">
-          <div class="logo-text font-bold text-white">BEAT</div>
-          <div class="sidebar-subtext">Department Portal</div>
+        <div id="auth-logo" class="flex items-center gap-1.5">
+            <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain">
+            <div class="flex flex-col justify-center items-start">
+                <img src="/assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
+                <div style="color:#94a3b8; font-size:11px" class="leading-none">DRRMO Department</div>
+            </div>
         </div>
-      </div>
     </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
@@ -218,7 +218,6 @@
 
   <script src="js/app2.js"></script>
   <script>
-    // 🚨 Added Mobile Sidebar Toggle Function 🚨
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('mobile-overlay');
@@ -226,7 +225,6 @@
         overlay.classList.toggle('hidden');
     }
 
-    // Initialize map and core logic
     lucide.createIcons();
     mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag';
     
@@ -234,7 +232,6 @@
         container: 'map', style: 'mapbox://styles/mapbox/dark-v11', center: [121.0700, 14.5700], zoom: 13.5, pitch: 45
     });
 
-    // 1. Static Evacuation Centers (Safe Zones, Hospitals, Police)
     const evacCenters = [
         { id: '1', name: 'Rizal High School Gym', coords: [121.0741, 14.5644], type: 'evac' },
         { id: '2', name: 'Pasig City Sports Complex', coords: [121.0810, 14.5680], type: 'evac' },
@@ -251,19 +248,16 @@
         { id: '13', name: 'Dela Paz Evacuation Center', coords: [121.1000, 14.6180], type: 'evac' },
         { id: '14', name: 'Santa Lucia High School Gym', coords: [121.1010, 14.5840], type: 'evac' },
         { id: '15', name: 'Buting Elementary School', coords: [121.0680, 14.5550], type: 'evac' },
-        // Hospitals
         { id: 'h1', name: 'Rizal Medical Center', coords: [121.0660, 14.5615], type: 'hospital' },
         { id: 'h2', name: 'The Medical City', coords: [121.0605, 14.5880], type: 'hospital' },
         { id: 'h3', name: 'Pasig City General Hospital', coords: [121.0825, 14.5764], type: 'hospital' },
         { id: 'h4', name: 'Pasig Doctors Medical Center', coords: [121.0960, 14.6060], type: 'hospital' },
-        // Police Stations
         { id: 'p1', name: 'Pasig City Police Headquarters', coords: [121.0775, 14.5605], type: 'police' },
         { id: 'p2', name: 'Police Station 1 - San Antonio', coords: [121.0630, 14.5830], type: 'police' },
         { id: 'p3', name: 'Police Station 2 - Rosario', coords: [121.0880, 14.5900], type: 'police' },
         { id: 'p4', name: 'Police Station 3 - Kapitolyo', coords: [121.0592, 14.5712], type: 'police' }
     ];
 
-    // State Variables
     let tempPickupMarker = null;
     let tempPickupCoords = null;
     let activeRescues = JSON.parse(localStorage.getItem('beat_live_rescues')) || [];
@@ -271,7 +265,6 @@
     let evacMarkersDOM = {}; 
 
     map.on('load', () => {
-        // Render Permanent Safe Zones
         evacCenters.forEach(center => {
             const el = document.createElement('div');
             let popupHTML = '';
@@ -311,17 +304,14 @@
             evacMarkersDOM[center.id] = el;
         });
 
-        // Dynamic Source for Routing Lines
         map.addSource('rescue-routes', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
         
-        // Highlight/Glow Layer for Routes
         map.addLayer({
             'id': 'rescue-routes-highlight', 'type': 'line', 'source': 'rescue-routes',
             'layout': { 'line-join': 'round', 'line-cap': 'round' },
             'paint': { 'line-color': '#eab308', 'line-width': 12, 'line-opacity': 0.3 }
         });
 
-        // Main Dashed Line Layer for Routes
         map.addLayer({
             'id': 'rescue-routes-line', 'type': 'line', 'source': 'rescue-routes',
             'layout': { 'line-join': 'round', 'line-cap': 'round' },
@@ -332,7 +322,6 @@
         lucide.createIcons();
     });
 
-    // 2. Map Interaction: Dropping Checkpoints
     document.getElementById('btn-drop-checkpoint').addEventListener('click', (e) => {
         if(tempPickupMarker) { tempPickupMarker.remove(); tempPickupMarker = null; tempPickupCoords = null; }
         
@@ -349,7 +338,7 @@
             tempPickupCoords = [ev.lngLat.lng, ev.lngLat.lat];
             
             const el = document.createElement('div');
-            el.className = 'pickup-marker opacity-50'; // Faded until dispatched
+            el.className = 'pickup-marker opacity-50'; 
             tempPickupMarker = new mapboxgl.Marker(el).setLngLat(tempPickupCoords).addTo(map);
             
             map.getCanvas().style.cursor = '';
@@ -359,7 +348,6 @@
             document.getElementById('step-2-box').classList.remove('opacity-50');
             lucide.createIcons();
 
-            // NEW AUTO-DETECT NEAREST CENTER LOGIC
             let nearestCenter = null;
             let minDistance = Infinity;
             
@@ -374,14 +362,13 @@
             if (nearestCenter) {
                 const dropdown = document.getElementById('target-center');
                 dropdown.value = nearestCenter.id;
-                dropdown.dispatchEvent(new Event('change')); // Trigger pan and pulse
+                dropdown.dispatchEvent(new Event('change')); 
             }
 
             checkFormCompletion();
         });
     });
 
-    // 3. Form Validation & Target Center Pan/Pulse
     function checkFormCompletion() {
         const name = document.getElementById('checkpoint-name').value;
         const center = document.getElementById('target-center').value;
@@ -397,7 +384,6 @@
 
     document.getElementById('checkpoint-name').addEventListener('input', checkFormCompletion);
     
-    // Trigger Pan and Pulse when a Center is chosen
     document.getElementById('target-center').addEventListener('change', (e) => {
         checkFormCompletion();
         
@@ -405,20 +391,14 @@
         const targetObj = evacCenters.find(c => c.id === targetId);
         
         if (targetObj) {
-            // Pan to the selected evacuation center
             map.flyTo({ center: targetObj.coords, zoom: 14.5, pitch: 60, essential: true });
-            
-            // Remove pulsing from all markers
             Object.values(evacMarkersDOM).forEach(el => el.classList.remove('pulsing'));
-            
-            // Add pulsing to the newly selected marker
             if (evacMarkersDOM[targetId]) {
                 evacMarkersDOM[targetId].classList.add('pulsing');
             }
         }
     });
 
-    // 4. Dispatching Route & SYNC TO MAIN MAP
     document.getElementById('btn-dispatch').addEventListener('click', async (e) => {
         const name = document.getElementById('checkpoint-name').value;
         const evacuees = document.getElementById('est-evacuees').value || 'Unknown';
@@ -426,7 +406,6 @@
         
         const targetObj = evacCenters.find(c => c.id === targetId);
 
-        // UI Loading State
         const btn = e.currentTarget;
         const originalBtnHTML = btn.innerHTML;
         btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Plotting Route...';
@@ -436,7 +415,6 @@
         let routeFeature;
 
         try {
-            // Fetch actual road directions from Mapbox API
             const query = await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving/${tempPickupCoords[0]},${tempPickupCoords[1]};${targetObj.coords[0]},${targetObj.coords[1]}?geometries=geojson&access_token=${mapboxgl.accessToken}`);
             const response = await query.json();
             
@@ -447,7 +425,6 @@
             }
         } catch (err) {
             console.error("Routing failed, falling back to straight line:", err);
-            // Fallback to straight line if API fails
             routeFeature = turf.lineString([tempPickupCoords, targetObj.coords]);
         }
 
@@ -461,38 +438,34 @@
             timestamp: new Date().toLocaleTimeString()
         };
 
-        // Save locally for Evacuation Screen
         activeRescues.push(rescueOp);
         localStorage.setItem('beat_live_rescues', JSON.stringify(activeRescues));
 
-        // BROADCAST TO MAIN ADMIN MAP AND TRAFFIC MAP 
         let hazards = JSON.parse(localStorage.getItem('beat_live_hazards')) || [];
         hazards.push({
             id: rescueOp.id,
-            source: 'evacuation', // Tagged so maps.html and traffic.html can render it
+            source: 'evacuation', 
             title: `EVAC CORRIDOR: ${name}`,
             desc: `Active safe route to ${targetObj.name}. Evacuating ~${evacuees} people.`,
             center: tempPickupCoords,
-            blockedLine: routeFeature, // Main map natively reads this and draws the route!
+            blockedLine: routeFeature, 
             status: 'active',
             timestamp: rescueOp.timestamp
         });
         localStorage.setItem('beat_live_hazards', JSON.stringify(hazards));
 
-        // Reset UI
         if(tempPickupMarker) { tempPickupMarker.remove(); tempPickupMarker = null; }
         document.getElementById('checkpoint-name').value = '';
         document.getElementById('est-evacuees').value = '';
         document.getElementById('target-center').value = '';
         document.getElementById('btn-drop-checkpoint').innerHTML = '<i data-lucide="map-pin" class="w-4 h-4"></i> Set Evacuation Origin';
         
-        btn.innerHTML = originalBtnHTML; // Restore button HTML
-        btn.disabled = true; // Keep disabled until next valid selection
+        btn.innerHTML = originalBtnHTML; 
+        btn.disabled = true; 
         
         document.getElementById('step-2-box').classList.add('opacity-50');
         document.getElementById('step-3-box').classList.add('opacity-50');
         
-        // Stop the pulsing marker when route is established
         Object.values(evacMarkersDOM).forEach(el => el.classList.remove('pulsing'));
         
         renderRescues();
@@ -507,13 +480,11 @@
         if(activeRescues.length > 0) mainContainer.classList.remove('hidden');
         else mainContainer.classList.add('hidden');
 
-        // Clear Map Elements
         Object.values(routeLayersAndMarkers).forEach(m => m.remove());
         routeLayersAndMarkers = {};
         let routeFeatures = [];
 
         activeRescues.forEach(op => {
-            // Panel List Item
             listContainer.innerHTML += `
                 <div class="bg-[#1e2536] border border-yellow-500/30 p-3 rounded-xl border-l-4 border-l-yellow-500 relative">
                     <div class="flex justify-between items-start mb-2">
@@ -526,7 +497,6 @@
                 </div>
             `;
 
-            // Active Yellow Marker on Map
             const el = document.createElement('div'); el.className = 'pickup-marker';
             const popupHTML = `
                 <div class="pb-1 mb-1 border-b border-yellow-500/30"><span class="text-[10px] font-bold uppercase tracking-widest text-yellow-500">Evacuation Origin</span></div>
@@ -546,20 +516,16 @@
             routeFeatures.push(op.route);
         });
 
-        // Update Route Lines
         if(map.getSource('rescue-routes')) {
             map.getSource('rescue-routes').setData({ type: 'FeatureCollection', features: routeFeatures });
         }
         lucide.createIcons();
     }
 
-    // 5. De-Syncing / Closing the Route
     window.resolveRescue = function(id) {
-        // Remove locally
         activeRescues = activeRescues.filter(r => r.id !== id);
         localStorage.setItem('beat_live_rescues', JSON.stringify(activeRescues));
 
-        // Remove from Main Map Broadcast
         let hazards = JSON.parse(localStorage.getItem('beat_live_hazards')) || [];
         hazards = hazards.filter(h => h.id !== id);
         localStorage.setItem('beat_live_hazards', JSON.stringify(hazards));
@@ -567,7 +533,6 @@
         renderRescues();
     };
 
-    // Auto-update across tabs
     window.addEventListener('storage', (e) => {
         if (e.key === 'beat_live_rescues') {
             activeRescues = JSON.parse(e.newValue) || [];
