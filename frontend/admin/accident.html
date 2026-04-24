@@ -9,7 +9,7 @@
         }
     })();
 
-    // Sidebar Toggle Logic (Placed securely in head so it always works)
+    // Sidebar Toggle Logic
     window.toggleSidebar = function() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
@@ -35,7 +35,6 @@
   <style>
     body { font-family: 'DM Sans', sans-serif !important; overflow: hidden; background-color: #0a0e1a; }
     
-    /* SIDEBAR */
     .sidebar { width: 260px !important; flex-shrink: 0 !important; }
     .sidebar-item { 
       display: flex !important; align-items: center !important; gap: 12px !important;
@@ -53,7 +52,6 @@
     .settings-link { color: #94a3b8; transition: color 0.2s; display: flex; align-items: center; }
     .settings-link:hover { color: #3b82f6; }
 
-    /* Toggle Switch */
     .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; inset: 0; background-color: #374151; transition: .4s; border-radius: 24px; }
@@ -65,41 +63,22 @@
 
 <body class="h-full flex bg-[#0a0e1a]">
 
-<<<<<<< Updated upstream
-  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-50">
-    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
-      <div class="flex items-center gap-3">
-        <div class="logo-box">B</div>
-        <div class="flex flex-col justify-center">
-          <div class="logo-text font-bold text-white">BEAT</div>
-          <div class="sidebar-subtext">Department Portal</div>
-        </div>
-=======
   <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-[90] hidden lg:hidden" onclick="window.toggleSidebar()"></div>
 
   <aside id="sidebar" class="sidebar flex flex-col h-full fixed lg:relative z-[100] transform -translate-x-full lg:translate-x-0 transition-transform duration-300 top-0 left-0 theme-border-r theme-surface">
-    
     <div class="h-[76px] px-5 flex items-center justify-between shrink-0 theme-border-b">
-      
-      <div class="flex items-center gap-0.5">
-          <img src="../assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain" onerror="this.src='/assets/beat_logo2.png'">
-          <div class="flex flex-col justify-center items-start">
-              <img src="../assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1" onerror="this.src='/assets/beat_text2.png'">
-              <div style="color:#94a3b8; font-size:11px" class="leading-none">Traffic Department</div>
-          </div>
->>>>>>> Stashed changes
-      </div>
-      
-      <button type="button" class="lg:hidden ml-auto text-gray-400 hover:text-white p-2" onclick="window.toggleSidebar()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      </button>
+        <div id="auth-logo" class="flex items-center gap-1.5">
+            <img src="../assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain" onerror="this.src='/assets/beat_logo2.png'">
+            <div class="flex flex-col justify-center items-start">
+                <img src="../assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1" onerror="this.src='/assets/beat_text2.png'">
+                <div style="color:var(--text-dim); font-size:11px" class="leading-none">Traffic Department</div>
+            </div>
+        </div>
+        <button type="button" class="lg:hidden text-gray-400 hover:text-white p-2" onclick="window.toggleSidebar()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
     </div>
-      
-      <button type="button" class="lg:hidden text-gray-400 hover:text-white p-2" onclick="toggleSidebar()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      </button>
-    </div>
-
+    
     <nav class="flex-1 py-4 overflow-y-auto">
       <a href="dashboard2.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
       <a href="reports2.html" class="sidebar-item"><i data-lucide="file-text"></i><span>Public Reports</span></a>
@@ -165,9 +144,8 @@
             </div>
         </div>
 
-        <div id="map" class="absolute inset-0 w-full h-full"></div>
+        <div id="map" class="absolute inset-0 w-full h-full z-0"></div>
     </div>
-
   </main>
 
   <script>
@@ -175,30 +153,26 @@
         if(window.lucide) lucide.createIcons(); 
     });
 
-    // Initialize Mapbox
     mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag';
     const map = new mapboxgl.Map({
         container: 'map',
-        style: 'mapbox://styles/mapbox/dark-v11', // Dark mode map
-        center: [121.0825, 14.5764], // Pasig City
+        style: 'mapbox://styles/mapbox/dark-v11', 
+        center: [121.0825, 14.5764], 
         zoom: 13,
         pitch: 45
     });
 
     map.on('load', () => {
-        
-        // 1. Generate Fake Accident Data around Pasig
         const generateAccidents = (count) => {
             const features = [];
             const centers = [
-                [121.0825, 14.5764], // Pasig Center
-                [121.0664, 14.5890], // Ortigas
-                [121.0680, 14.5630]  // C5 Area
+                [121.0825, 14.5764], 
+                [121.0664, 14.5890], 
+                [121.0680, 14.5630]  
             ];
             
             for(let i=0; i<count; i++) {
                 const center = centers[Math.floor(Math.random() * centers.length)];
-                // Random scatter
                 const lng = center[0] + (Math.random() - 0.5) * 0.03;
                 const lat = center[1] + (Math.random() - 0.5) * 0.03;
                 features.push({
@@ -210,22 +184,18 @@
             return { 'type': 'FeatureCollection', 'features': features };
         };
 
-        // 2. Add the Data Source
         map.addSource('accidents', {
             'type': 'geojson',
             'data': generateAccidents(150)
         });
 
-        // 3. Add Heatmap Layer
         map.addLayer({
             'id': 'accidents-heat',
             'type': 'heatmap',
             'source': 'accidents',
             'maxzoom': 15,
             'paint': {
-                // Increase weight as zoom increases
                 'heatmap-weight': ['interpolate', ['linear'], ['get', 'mag'], 0, 0, 2, 1],
-                // Color ramp: Blue (low) to Red (high)
                 'heatmap-color': [
                     'interpolate',
                     ['linear'],
@@ -235,14 +205,13 @@
                     0.4, 'rgb(209,229,240)',
                     0.6, 'rgb(253,219,199)',
                     0.8, 'rgb(239,138,98)',
-                    1, 'rgb(220, 53, 69)' // Tailwind Rose-500
+                    1, 'rgb(220, 53, 69)' 
                 ],
                 'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 11, 15, 15, 30],
                 'heatmap-opacity': 0.8
             }
         });
 
-        // 4. Add Point Layer (for when zoomed in close)
         map.addLayer({
             'id': 'accidents-point',
             'type': 'circle',
@@ -257,17 +226,15 @@
             }
         });
 
-        // 5. Toggle Logic
         document.getElementById('heatmapToggle').addEventListener('change', (e) => {
             const visibility = e.target.checked ? 'visible' : 'none';
             map.setLayoutProperty('accidents-heat', 'visibility', visibility);
         });
     });
 
-    // Logout Logic 
     function doLogout() {
-        localStorage.removeItem('activeDepartment'); // Wipe the session
-        window.location.href = 'admin.html'; // Kick back to login
+        localStorage.removeItem('activeDepartment'); 
+        window.location.href = 'admin.html'; 
     }
   </script>
 </body>

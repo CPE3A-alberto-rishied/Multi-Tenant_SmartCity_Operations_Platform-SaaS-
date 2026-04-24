@@ -8,7 +8,7 @@
         if (!session || session !== 'Traffic') {
             window.location.replace('admin.html?error=unauthorized'); 
         }
-    })();
+   })();
 
     // Sidebar Toggle Logic (Placed in head so it's instantly clickable)
     window.toggleSidebar = function() {
@@ -30,13 +30,11 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
-
   <style>
     body { font-family: 'DM Sans', sans-serif !important; overflow-x: hidden; background-color: #0a0e1a; }
     
     /* SIDEBAR */
     .sidebar { width: 260px !important; flex-shrink: 0 !important; }
-    
     .sidebar-item { 
       display: flex !important; align-items: center !important; gap: 12px !important;
       padding: 12px 18px !important; font-size: 14.5px !important; 
@@ -47,7 +45,6 @@
     .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
     .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
     
-    /* USER FOOTER FIXED */
     .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
     .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
     .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
@@ -58,36 +55,22 @@
 
 <body class="h-full flex bg-[#0a0e1a]">
 
-<<<<<<< Updated upstream
-  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-50">
-    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
-        <div id="auth-logo" class="flex items-center gap-1.5">
-            <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain">
-            <div class="flex flex-col justify-center items-start">
-                <img src="/assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
-                <div style="color:#94a3b8; font-size:11px" class="leading-none">Admin Control Center</div>
-            </div>
-        </div>
-      </div>
-=======
-  <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-[90] hidden lg:hidden" onclick="toggleSidebar()"></div>
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-[90] hidden lg:hidden" onclick="window.toggleSidebar()"></div>
 
   <aside id="sidebar" class="sidebar flex flex-col h-full fixed lg:relative z-[100] transform -translate-x-full lg:translate-x-0 transition-transform duration-300 top-0 left-0 theme-border-r theme-surface">
-    
     <div class="h-[76px] px-5 flex items-center justify-between shrink-0 theme-border-b">
-      <div class="flex items-center gap-0.5">
-          <img src="../assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain" onerror="this.src='/assets/beat_logo2.png'">
-          <div class="flex flex-col justify-center items-start">
-              <img src="../assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1" onerror="this.src='/assets/beat_text2.png'">
-              <div style="color:var(--text-dim); font-size:11px" class="leading-none">Traffic Department</div>
-          </div>
-      </div>
-      
-      <button type="button" class="lg:hidden text-gray-400 hover:text-white p-2" onclick="toggleSidebar()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      </button>
+        <div id="auth-logo" class="flex items-center gap-1.5">
+            <img src="../assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain" onerror="this.src='/assets/beat_logo2.png'">
+            <div class="flex flex-col justify-center items-start">
+                <img src="../assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1" onerror="this.src='/assets/beat_text2.png'">
+                <div style="color:#94a3b8; font-size:11px" class="leading-none">Traffic Department</div>
+            </div>
+        </div>
+        
+        <button type="button" class="lg:hidden text-gray-400 hover:text-white p-2" onclick="window.toggleSidebar()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
     </div>
->>>>>>> Stashed changes
     
     <nav class="flex-1 py-4 overflow-y-auto">
       <a href="dashboard2.html" class="sidebar-item active"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
@@ -100,7 +83,7 @@
     <div class="user-footer">
         <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
-                <div id="nav-avatar" class="nav-avatar">T</div>
+                <div id="nav-avatar" style="background:#2563eb; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">T</div>
                 <div>
                   <div class="user-footer-name">Traffic</div>
                   <div class="user-footer-sub">Traffic Department</div>
@@ -114,11 +97,10 @@
     </div>
   </aside>
 
-  <main class="flex-1 overflow-y-auto flex flex-col relative min-w-0">
-    
+  <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] relative h-full">
     <header class="px-4 sm:px-8 h-[76px] flex items-center justify-between shrink-0 relative z-[40] theme-surface theme-border-b">
       <div class="flex items-center">
-        <button type="button" class="lg:hidden text-gray-400 hover:text-white mr-4 p-2 cursor-pointer z-50 relative" onclick="toggleSidebar()">
+        <button type="button" class="lg:hidden text-gray-400 hover:text-white mr-4 p-2 cursor-pointer z-50 relative" onclick="window.toggleSidebar()">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
         </button>
         <h1 class="text-xl font-semibold text-white flex items-center gap-2">
@@ -136,8 +118,8 @@
       </div>
     </header>
 
-    <div class="flex-1 p-4 sm:p-8 animate-in h-auto lg:h-full">
-      <div class="max-w-[1400px] mx-auto h-auto lg:h-full space-y-6 flex flex-col">
+    <div class="flex-1 overflow-y-auto p-4 sm:p-8 animate-in">
+      <div class="max-w-[1400px] mx-auto space-y-6">
         
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 shrink-0">
           
@@ -177,8 +159,8 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 h-auto lg:h-full pb-10">
-          <div class="border theme-border rounded-2xl p-6 shadow-lg theme-surface flex flex-col">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-10">
+          <div class="border theme-border rounded-2xl p-6 shadow-lg theme-surface">
             <div class="flex items-center gap-2 mb-8">
               <i data-lucide="bar-chart-horizontal" class="text-blue-500 w-5 h-5"></i>
               <h3 class="text-xs font-bold uppercase tracking-wider text-[#94a3b8]">Congestion Index</h3>
@@ -234,7 +216,7 @@
             </div>
           </div>
 
-          <div class="border theme-border rounded-2xl p-6 shadow-lg theme-surface flex flex-col h-full min-h-[350px]">
+          <div class="border theme-border rounded-2xl p-6 shadow-lg theme-surface flex flex-col min-h-[350px]">
             <div class="flex items-center justify-between mb-6 shrink-0">
               <div class="flex items-center gap-2">
                 <i data-lucide="bell" class="text-purple-500 w-5 h-5"></i>
