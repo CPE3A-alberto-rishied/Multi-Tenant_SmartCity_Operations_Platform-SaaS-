@@ -194,9 +194,21 @@ app.delete('/api/announcements/:id', async (req, res) => {
 
 app.get('/api/news', async (req, res) => {
     try {
-        const liveNews = await Announcement.find({ status: 'Live' }).sort({ createdAt: -1 });
-        res.status(200).json({ success: true, data: liveNews });
-    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+        // Fetch ONLY 'Live' announcements from ALL THREE collections
+        const mainNews = await Announcement.find({ status: 'Live' }).lean();
+        const trafficNews = await TrafficAnnouncement.find({ status: 'Live' }).lean();
+        const drrmoNews = await DrrmoAnnouncement.find({ status: 'Live' }).lean();
+
+        // Combine them all into one single array
+        const allNews = [...mainNews, ...trafficNews, ...drrmoNews];
+
+        // Sort them by Date (Newest first)
+        allNews.sort((a, b) => b.createdAt - a.createdAt);
+
+        res.status(200).json({ success: true, data: allNews });
+    } catch (error) { 
+        res.status(500).json({ success: false, error: error.message }); 
+    }
 });
 
 
