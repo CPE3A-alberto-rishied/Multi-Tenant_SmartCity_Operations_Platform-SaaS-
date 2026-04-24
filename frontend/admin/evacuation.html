@@ -8,7 +8,7 @@
     })();
   </script>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>BEAT - Evacuation Control</title>
   
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
@@ -50,11 +50,19 @@
     .mapboxgl-popup-tip { border-top-color: #1e293b !important; border-bottom-color: #1e293b !important; }
     .mapboxgl-popup-close-button { color: #94a3b8; font-size: 16px; top: 4px; right: 8px; }
     .mapboxgl-popup-close-button:hover { color: white; background: transparent; }
+
+    /* Custom Scrollbar for Mobile Panels */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
   </style>
 </head>
 
-<body class="h-full flex bg-[#0a0e1a]">
-  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-50">
+<body class="h-full flex bg-[#0a0e1a] overflow-hidden">
+  
+  <div id="mobile-overlay" class="fixed inset-0 bg-black/60 z-[55] hidden md:hidden backdrop-blur-sm transition-opacity" onclick="toggleSidebar()"></div>
+
+  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-[60] fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 w-64 bg-[#0a0e1a]">
     <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
       <div class="flex items-center gap-3">
         <div class="logo-box bg-orange-600 text-white">B</div>
@@ -82,86 +90,15 @@
     </div>
   </aside>
 
-  <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] relative">
+  <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] relative h-full">
     
-    <div class="absolute top-6 left-6 z-10 w-[420px] flex flex-col gap-4 max-h-[90vh] overflow-y-auto pr-2 pb-6">
-        
-        <div class="theme-surface border theme-border rounded-2xl p-6 shadow-2xl backdrop-blur-md bg-opacity-95 flex-shrink-0">
-            <div class="flex items-center justify-between mb-1">
-                <h2 class="text-white font-bold text-lg flex items-center gap-2"><i data-lucide="map" class="text-yellow-500"></i> Corridor Mapping</h2>
-            </div>
-            <p class="text-[11px] text-[#94a3b8] mb-6">Designate origin points and map safe movement corridors to active centers.</p>
-            
-            <div class="space-y-4">
-                
-                <div class="p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative">
-                    <div class="absolute -left-3 -top-3 w-6 h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">1</div>
-                    <button type="button" id="btn-drop-checkpoint" class="w-full bg-[#1e293b] hover:bg-gray-700 text-yellow-500 text-xs font-bold py-3 rounded-lg border border-yellow-500/50 transition-all flex justify-center items-center gap-2 shadow-sm">
-                        <i data-lucide="map-pin" class="w-4 h-4"></i> Set Movement Origin
-                    </button>
-                    <p id="drop-status" class="text-[10px] text-yellow-400 mt-3 text-center font-bold tracking-wider hidden animate-pulse">Click anywhere on the map to set the origin point.</p>
-                </div>
+    <button onclick="toggleSidebar()" class="md:hidden absolute top-4 left-4 z-40 bg-[#0f172a] border border-gray-700 text-white p-2.5 rounded-xl shadow-xl backdrop-blur-md bg-opacity-95">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+    </button>
 
-                <div class="p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative opacity-50 transition-opacity" id="step-2-box">
-                    <div class="absolute -left-3 -top-3 w-6 h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">2</div>
-                    <div class="space-y-3">
-                        <input type="text" id="checkpoint-name" placeholder="Origin Landmark/Street" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-xs outline-none focus:border-yellow-500">
-                        <input type="number" id="est-evacuees" placeholder="Est. Evacuees (Optional)" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-xs outline-none focus:border-yellow-500 mt-1">
-                        
-                        <select id="target-center" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-xs outline-none focus:border-emerald-500 cursor-pointer mt-1">
-                            <option value="" disabled selected>Target Evacuation Center...</option>
-                            <optgroup label="General Evacuation Centers">
-                                <option value="1">Rizal High School Gym</option>
-                                <option value="2">Pasig City Sports Complex</option>
-                                <option value="3">Kapitolyo High School</option>
-                                <option value="4">Manggahan Elementary</option>
-                                <option value="5">Santolan Elementary School</option>
-                                <option value="6">Rosario Sports Complex</option>
-                                <option value="7">San Joaquin Brgy Hall</option>
-                                <option value="8">Pinagbuhatan High School</option>
-                                <option value="9">Ugong Barangay Hall</option>
-                                <option value="10">Maybunga Covered Court</option>
-                                <option value="11">San Antonio Village Park</option>
-                                <option value="12">Kalawaan Elementary School</option>
-                                <option value="13">Dela Paz Evacuation Center</option>
-                                <option value="14">Santa Lucia High School Gym</option>
-                                <option value="15">Buting Elementary School</option>
-                            </optgroup>
-                            <optgroup label="Hospitals & Medical">
-                                <option value="h1">Rizal Medical Center</option>
-                                <option value="h2">The Medical City</option>
-                                <option value="h3">Pasig City General Hospital</option>
-                                <option value="h4">Pasig Doctors Medical Center</option>
-                            </optgroup>
-                            <optgroup label="Police Stations & HQ">
-                                <option value="p1">Pasig City Police Headquarters</option>
-                                <option value="p2">Police Station 1 - San Antonio</option>
-                                <option value="p3">Police Station 2 - Rosario</option>
-                                <option value="p4">Police Station 3 - Kapitolyo</option>
-                            </optgroup>
-                        </select>
-                    </div>
-                </div>
+    <div id="map" class="w-full h-full"></div>
 
-                <div class="p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative opacity-50 transition-opacity" id="step-3-box">
-                    <div class="absolute -left-3 -top-3 w-6 h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">3</div>
-                    <button type="button" id="btn-dispatch" disabled class="w-full bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-bold py-3 rounded-lg shadow-lg transition-all flex justify-center items-center gap-2 disabled:cursor-not-allowed">
-                        <i data-lucide="route" class="w-4 h-4"></i> Establish Safe Corridor
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="theme-surface border theme-border rounded-2xl p-4 shadow-2xl flex-1 overflow-hidden flex flex-col hidden" id="active-rescues-container">
-            <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-3 flex items-center justify-between">
-                Active Evacuation Corridors <span id="rescue-count" class="bg-yellow-500 text-black px-2 py-0.5 rounded-full text-[10px]">0</span>
-            </h3>
-            <div id="rescues-list" class="space-y-3 overflow-y-auto pr-2 pb-2"></div>
-        </div>
-
-    </div>
-
-    <div class="absolute top-6 right-6 z-10 w-64">
+    <div class="absolute top-4 right-4 z-10 w-[calc(100%-5rem)] sm:w-64 md:top-6 md:right-6">
         <div class="theme-surface border theme-border rounded-xl p-4 shadow-2xl backdrop-blur-md bg-opacity-95">
             <div class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2 flex items-center gap-2">
                 <i data-lucide="map" class="w-3 h-3 text-blue-500"></i> Jump to District
@@ -202,11 +139,94 @@
         </div>
     </div>
 
-    <div id="map" class="w-full h-full"></div>
+    <div class="absolute bottom-4 left-4 right-4 z-10 md:w-[420px] md:bottom-auto md:top-6 md:left-6 flex flex-col gap-4 max-h-[55vh] md:max-h-[90vh] overflow-y-auto pr-2 pb-2 md:pb-6">
+        
+        <div class="theme-surface border theme-border rounded-2xl p-5 md:p-6 shadow-2xl backdrop-blur-md bg-opacity-95 flex-shrink-0">
+            <div class="flex items-center justify-between mb-1">
+                <h2 class="text-white font-bold text-base md:text-lg flex items-center gap-2"><i data-lucide="map" class="text-yellow-500"></i> Corridor Mapping</h2>
+            </div>
+            <p class="text-[10px] md:text-[11px] text-[#94a3b8] mb-4 md:mb-6">Designate origin points and map safe movement corridors to active centers.</p>
+            
+            <div class="space-y-3 md:space-y-4">
+                <div class="p-3 md:p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative">
+                    <div class="absolute -left-3 -top-3 w-6 h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">1</div>
+                    <button type="button" id="btn-drop-checkpoint" class="w-full bg-[#1e293b] hover:bg-gray-700 text-yellow-500 text-xs font-bold py-2.5 md:py-3 rounded-lg border border-yellow-500/50 transition-all flex justify-center items-center gap-2 shadow-sm">
+                        <i data-lucide="map-pin" class="w-4 h-4"></i> Set Movement Origin
+                    </button>
+                    <p id="drop-status" class="text-[10px] text-yellow-400 mt-2 md:mt-3 text-center font-bold tracking-wider hidden animate-pulse">Click anywhere on the map to set the origin point.</p>
+                </div>
+
+                <div class="p-3 md:p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative opacity-50 transition-opacity" id="step-2-box">
+                    <div class="absolute -left-3 -top-3 w-6 h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">2</div>
+                    <div class="space-y-2.5 md:space-y-3">
+                        <input type="text" id="checkpoint-name" placeholder="Origin Landmark/Street" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2 md:py-2.5 text-xs outline-none focus:border-yellow-500">
+                        <input type="number" id="est-evacuees" placeholder="Est. Evacuees (Optional)" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2 md:py-2.5 text-xs outline-none focus:border-yellow-500 mt-1">
+                        
+                        <select id="target-center" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2 md:py-2.5 text-xs outline-none focus:border-emerald-500 cursor-pointer mt-1">
+                            <option value="" disabled selected>Target Evacuation Center...</option>
+                            <optgroup label="General Evacuation Centers">
+                                <option value="1">Rizal High School Gym</option>
+                                <option value="2">Pasig City Sports Complex</option>
+                                <option value="3">Kapitolyo High School</option>
+                                <option value="4">Manggahan Elementary</option>
+                                <option value="5">Santolan Elementary School</option>
+                                <option value="6">Rosario Sports Complex</option>
+                                <option value="7">San Joaquin Brgy Hall</option>
+                                <option value="8">Pinagbuhatan High School</option>
+                                <option value="9">Ugong Barangay Hall</option>
+                                <option value="10">Maybunga Covered Court</option>
+                                <option value="11">San Antonio Village Park</option>
+                                <option value="12">Kalawaan Elementary School</option>
+                                <option value="13">Dela Paz Evacuation Center</option>
+                                <option value="14">Santa Lucia High School Gym</option>
+                                <option value="15">Buting Elementary School</option>
+                            </optgroup>
+                            <optgroup label="Hospitals & Medical">
+                                <option value="h1">Rizal Medical Center</option>
+                                <option value="h2">The Medical City</option>
+                                <option value="h3">Pasig City General Hospital</option>
+                                <option value="h4">Pasig Doctors Medical Center</option>
+                            </optgroup>
+                            <optgroup label="Police Stations & HQ">
+                                <option value="p1">Pasig City Police Headquarters</option>
+                                <option value="p2">Police Station 1 - San Antonio</option>
+                                <option value="p3">Police Station 2 - Rosario</option>
+                                <option value="p4">Police Station 3 - Kapitolyo</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="p-3 md:p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative opacity-50 transition-opacity" id="step-3-box">
+                    <div class="absolute -left-3 -top-3 w-6 h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">3</div>
+                    <button type="button" id="btn-dispatch" disabled class="w-full bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-bold py-2.5 md:py-3 rounded-lg shadow-lg transition-all flex justify-center items-center gap-2 disabled:cursor-not-allowed">
+                        <i data-lucide="route" class="w-4 h-4"></i> Establish Safe Corridor
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="theme-surface border theme-border rounded-2xl p-4 shadow-2xl flex-1 overflow-hidden flex flex-col hidden" id="active-rescues-container">
+            <h3 class="text-[10px] md:text-xs font-bold text-white uppercase tracking-wider mb-3 flex items-center justify-between">
+                Active Corridors <span id="rescue-count" class="bg-yellow-500 text-black px-2 py-0.5 rounded-full text-[10px]">0</span>
+            </h3>
+            <div id="rescues-list" class="space-y-3 overflow-y-auto pr-2 pb-2"></div>
+        </div>
+
+    </div>
   </main>
 
   <script src="js/app2.js"></script>
   <script>
+    // 🚨 Added Mobile Sidebar Toggle Function 🚨
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobile-overlay');
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('hidden');
+    }
+
+    // Initialize map and core logic
     lucide.createIcons();
     mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag';
     
@@ -386,7 +406,7 @@
         
         if (targetObj) {
             // Pan to the selected evacuation center
-            map.flyTo({ center: targetObj.coords, zoom: 15.5, pitch: 60, essential: true });
+            map.flyTo({ center: targetObj.coords, zoom: 14.5, pitch: 60, essential: true });
             
             // Remove pulsing from all markers
             Object.values(evacMarkersDOM).forEach(el => el.classList.remove('pulsing'));
