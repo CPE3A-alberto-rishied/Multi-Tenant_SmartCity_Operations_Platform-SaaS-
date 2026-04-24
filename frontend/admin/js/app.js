@@ -461,16 +461,6 @@ async function fetchAdminReports() {
                         <p class="text-slate-300 leading-relaxed line-clamp-3">${escapeHTML(report.report_description)}</p>
                     </div>
 
-                    <div class="mt-auto pt-4 border-t space-y-4 text-sm" style="border-color:rgba(51, 65, 85, 0.5)" onclick="event.stopPropagation()">
-                        <div>
-                            <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2">FORWARD TO</p>
-                            <select class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500 cursor-pointer" 
-                                    onchange="handleForward(this, '${report._id}')">
-                                <option value="" disabled selected>${report.forwarded_to || 'Select department...'}</option>
-                                <option value="Traffic">Traffic</option>
-                                <option value="DRRMO">DRRMO</option>
-                            </select>
-                        </div>
                         <div class="flex items-center justify-between mt-4">
                             <p class="text-[11px] font-bold text-white uppercase tracking-wider">Mark as Resolved</p>
                             <label class="switch">
@@ -563,14 +553,6 @@ function executeSubmitReport() {
       </div>
       
       <div class="mt-auto pt-4 border-t space-y-4 text-sm" style="border-color:var(--border)" onclick="event.stopPropagation()">
-        <div>
-          <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2">FORWARD TO</p>
-          <select class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500 cursor-pointer transition-all" onfocus="storePrevValue(this)" onchange="handleForward(this)">
-            <option value="" disabled selected hidden>Select department...</option>
-            <option value="Traffic">Traffic</option>
-            <option value="DRRMO">DRRMO</option>
-          </select>
-        </div>
         <div class="flex items-center justify-between mt-4">
           <p class="text-[11px] font-bold text-white uppercase tracking-wider">Mark as Resolved</p>
           <label class="switch" onclick="event.stopPropagation()">
@@ -645,51 +627,6 @@ function filterReports() {
             card.style.display = 'none';
         }
     });
-}
-
-let pendingForwardSelect = null;
-
-function storePrevValue(select) {
-    if(!select.hasAttribute('data-prev')) {
-        select.setAttribute('data-prev', select.value);
-    }
-}
-
-function handleForward(select) {
-    const card = select.closest('.report-card');
-    if (!card) return;
-    const checkbox = card.querySelector('input[type="checkbox"]');
-    if (checkbox && checkbox.checked) {
-        select.value = select.getAttribute('data-prev') || "";
-        return;
-    }
-    pendingForwardSelect = select;
-    openModal('confirm-forward-modal');
-}
-
-function confirmForward() {
-    if (pendingForwardSelect) {
-        const card = pendingForwardSelect.closest('.report-card');
-        const badge = card.querySelector('.badge-status');
-        if (badge) {
-            badge.className = 'badge-status bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all';
-            badge.innerText = 'Forwarded';
-            badge.setAttribute('data-orig-class', badge.className);
-            badge.setAttribute('data-orig-text', badge.innerText);
-        }
-        pendingForwardSelect.setAttribute('data-prev', pendingForwardSelect.value);
-        filterReports();
-        pendingForwardSelect = null;
-    }
-    closeModal('confirm-forward-modal');
-}
-
-function cancelForward() {
-    if (pendingForwardSelect) {
-        pendingForwardSelect.value = pendingForwardSelect.getAttribute('data-prev') || "";
-        pendingForwardSelect = null;
-    }
-    closeModal('confirm-forward-modal');
 }
 
 let pendingReportToggle = null;

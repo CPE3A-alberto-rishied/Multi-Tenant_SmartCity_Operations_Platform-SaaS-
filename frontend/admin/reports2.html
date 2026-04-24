@@ -129,65 +129,39 @@
     </div>
   </aside>
 
-  <main class="flex-1 overflow-y-auto flex flex-col relative min-w-0">
+  <main class="flex-1 overflow-y-auto flex flex-col min-w-0 relative bg-[#0a0e1a]">
+  <header class="px-4 sm:px-8 h-[76px] flex items-center border-b shrink-0" style="border-color:var(--border); background:var(--surface)">
+    <button class="lg:hidden text-gray-400 hover:text-white mr-4" onclick="toggleSidebar()">
+      <i data-lucide="menu" class="w-6 h-6"></i>
+    </button>
+    <h1 class="text-xl font-semibold text-white flex items-center gap-2">
+      <i data-lucide="alert-triangle" class="text-blue-500 w-6 h-6 hidden sm:block"></i> Public Reports
+    </h1>
+  </header>
+
+  <div class="p-4 sm:p-8 space-y-6 sm:space-y-8 animate-in max-w-[1600px] mx-auto w-full flex-1">
     
-    <header class="px-4 sm:px-8 h-[76px] flex items-center shrink-0 relative z-[40] theme-surface theme-border-b">
-      <div class="flex items-center">
-        <button type="button" class="lg:hidden text-gray-400 hover:text-white mr-4 p-2 cursor-pointer z-50 relative" onclick="window.toggleSidebar()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-        </button>
-        <h1 class="text-xl font-semibold text-white flex items-center gap-2">
-            <i data-lucide="alert-triangle" class="w-6 h-6 text-[#94a3b8] hidden sm:block"></i> Public Reports
-        </h1>
+    <div class="flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between mb-4">
+      <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center w-full xl:w-auto">
+        <input type="date" id="filter-date" onchange="filterReports()" class="modal-input !mt-0 h-10 px-3 w-full sm:min-w-[160px] cursor-pointer">
+        <select id="filter-status" onchange="filterReports()" class="modal-input !mt-0 h-10 pl-4 pr-10 w-full sm:min-w-[140px] cursor-pointer">
+          <option>All Status</option>
+          <option>New</option>
+          <option>Resolved</option>
+        </select>
+        <select id="filter-dept" onchange="filterReports()" class="modal-input !mt-0 h-10 pl-4 pr-10 w-full sm:min-w-[160px] cursor-pointer">
+          <option>All Departments</option>
+        </select>
       </div>
-    </header>
-
-    <div class="p-4 sm:p-8 flex-1 animate-in">
-      <div class="flex flex-wrap gap-4 items-center justify-between mb-8">
-        <div class="flex flex-wrap gap-3 items-center">
-          <input type="date" id="filter-date" onchange="filterReports()" class="h-10 bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 text-sm outline-none cursor-pointer min-w-[160px]">
-          <div class="relative flex items-center">
-            <select id="filter-status" onchange="filterReports()" class="appearance-none h-10 bg-[#1e2536] text-white border border-[#374151] rounded-lg pl-4 pr-10 text-sm outline-none cursor-pointer min-w-[180px]">
-              <option selected>All Status</option>
-              <option>New</option>
-              <option>Returned</option>
-              <option>Waiting for Approval</option>
-              <option>Resolved</option>
-            </select>
-            <i data-lucide="chevron-down" class="absolute right-3 w-4 h-4 text-[#94a3b8] pointer-events-none"></i>
-          </div>
-        </div>
-        <button type="button" onclick="openModal('new-report-modal')" class="h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg text-sm font-bold flex items-center gap-2 shadow-lg transition-all"><i data-lucide="plus" class="w-4 h-4"></i> New Report</button>
-      </div>
-
-      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch" id="reports-grid">
-        <div class="report-card border theme-border rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors theme-surface" onclick="openReportDetails(this)" data-email="staff.dept@example.com" data-contact="+63 917 123 4567" data-location="Ortigas Ave cor. C. Raymundo">
-          <div class="flex justify-between items-start mb-4">
-            <div><p class="text-xs font-bold report-date-dark">4/19/2026</p><p class="text-xs report-time-visible">10:21 AM</p></div>
-            <span class="badge-status bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">New</span>
-          </div>
-          <h3 class="text-lg font-bold text-white mb-4">Accident</h3>
-          <div class="space-y-1 text-sm mb-6">
-            <p><span class="text-[#94a3b8]">Name:</span> <span class="text-white font-semibold">Staff</span></p>
-            <p><span class="text-[#94a3b8]">Location:</span> <span class="text-white font-semibold">Pasig City</span></p>
-          </div>
-          <div class="text-sm mb-6"><p class="text-[#94a3b8] mb-1">Description:</p><p class="text-slate-300 leading-relaxed line-clamp-3">Multi-vehicle accident reported blocking two lanes. Emergency responders have been notified.</p></div>
-          <div class="mt-auto pt-4 border-t theme-border" onclick="event.stopPropagation()">
-            <div id="action-buttons-container" class="flex flex-wrap gap-2">
-              <button type="button" onclick="toggleActionField(this, 'return')" class="px-4 py-2 border border-red-500/50 text-red-400 hover:bg-red-500/10 rounded-lg text-[10px] font-bold uppercase tracking-widest">Return to Admin</button>
-              <button type="button" onclick="toggleActionField(this, 'resolve')" class="px-4 py-2 border border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10 rounded-lg text-[10px] font-bold uppercase tracking-widest">Submit for Resolution</button>
-            </div>
-            <div class="hidden mt-4 w-full animate-in fade-in" id="dynamic-action-field">
-              <p id="action-label" class="text-[10px] font-bold uppercase tracking-wider mb-2"></p>
-              <textarea id="action-description" class="action-input-field mb-1" rows="3" oninput="this.classList.remove('input-error'); document.getElementById('action-error').classList.add('hidden')"></textarea>
-              <p id="action-error" class="text-[10px] text-red-500 hidden mb-3">Please provide a reason or explanation.</p>
-              <button type="button" id="action-confirm-btn" onclick="promptActionConfirm(this.getAttribute('data-type'), this)" class="px-6 py-2 rounded-lg text-[10px] font-bold uppercase text-white transition-all"></button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <button onclick="window.openModal('new-report-modal')" class="w-full xl:w-auto h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg text-sm font-bold flex items-center justify-center gap-2 shadow-lg transition-all">
+        <i data-lucide="plus" class="w-4 h-4"></i> New Report
+      </button>
     </div>
-  </main>
+
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 items-stretch" id="reports-grid">
+        </div>
+  </div>
+</main>
 
   <div id="new-report-modal" class="modal-overlay hidden">
     <div class="border theme-border w-[550px] max-w-[90%] rounded-2xl p-8 max-h-[90vh] overflow-y-auto shadow-2xl theme-surface">
