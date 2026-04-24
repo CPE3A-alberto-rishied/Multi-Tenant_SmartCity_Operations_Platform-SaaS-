@@ -10,7 +10,7 @@
     })();
   </script>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>BEAT - Public Reports</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
@@ -21,9 +21,11 @@
     #modal-confirm-action, #action-success-modal { z-index: 20000 !important; }
   </style>
 </head>
-<body class="h-full flex bg-[#0a0e1a]">
+<body class="h-full flex bg-[#0a0e1a] overflow-hidden">
 
-  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-50">
+  <div id="mobile-overlay" class="fixed inset-0 bg-black/60 z-[55] hidden md:hidden backdrop-blur-sm transition-opacity" onclick="toggleSidebar()"></div>
+
+  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-[60] fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 w-64 bg-[#0a0e1a]">
     <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
         <div id="auth-logo" class="flex items-center gap-1.5">
             <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain">
@@ -50,17 +52,25 @@
     </div>
   </aside>
 
-  <main class="flex-1 overflow-y-auto flex flex-col">
-    <header class="px-8 h-[76px] flex items-center shrink-0 theme-surface theme-border-b">
-      <h1 class="text-xl font-semibold text-white flex items-center gap-2"><i data-lucide="file-text" class="icon-lg"></i> Public Reports</h1>
+  <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] h-full overflow-hidden">
+    
+    <header class="px-5 md:px-8 h-[76px] flex items-center shrink-0 theme-surface theme-border-b">
+      <div class="flex items-center gap-3">
+        <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white transition-colors p-1">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+        <h1 class="text-lg md:text-xl font-semibold text-white flex items-center gap-2">
+            <i data-lucide="file-text" class="icon-lg hidden md:inline-block"></i> Public Reports
+        </h1>
+      </div>
     </header>
 
-    <div class="p-8 flex-1 animate-in">
-        <div class="flex flex-wrap gap-4 items-center justify-between mb-8">
-            <div class="flex flex-wrap gap-3 items-center">
-              <input type="date" id="filter-date" class="h-10 bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 text-sm outline-none cursor-pointer min-w-[160px]">
+    <div class="flex-1 overflow-y-auto p-5 md:p-8 animate-in">
+        <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-6 md:mb-8">
+            <div class="w-full sm:w-auto">
+              <input type="date" id="filter-date" class="w-full sm:w-auto h-10 bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 text-sm outline-none cursor-pointer min-w-[160px]">
             </div>
-            <button type="button" onclick="openModal('new-report-modal')" class="h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg text-sm font-bold flex items-center gap-2 shadow-lg transition-colors"><i data-lucide="plus" class="icon-sm"></i> File Incident</button>
+            <button type="button" onclick="openModal('new-report-modal')" class="w-full sm:w-auto h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg text-sm font-bold flex items-center justify-center gap-2 shadow-lg transition-colors"><i data-lucide="plus" class="icon-sm"></i> File Incident</button>
         </div>
         
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-6" id="reports-grid">
@@ -70,7 +80,7 @@
   </main>
 
   <div id="new-report-modal" class="modal-overlay hidden">
-    <div class="border theme-border w-[550px] max-w-[90%] rounded-2xl p-8 max-h-[90vh] overflow-y-auto shadow-2xl theme-surface bg-[#0a0e1a]">
+    <div class="border theme-border w-[550px] max-w-[90%] rounded-2xl p-6 md:p-8 max-h-[90vh] overflow-y-auto shadow-2xl theme-surface bg-[#0a0e1a]">
       <h2 class="text-white font-bold text-xl mb-6 flex items-center gap-2 justify-center"><i data-lucide="file-plus" class="text-blue-500 icon-lg"></i> Submit Incident</h2>
       
       <form id="new-report-form" class="space-y-4 text-left" onsubmit="handleNewReportSubmit(event)">
@@ -104,8 +114,8 @@
   </div>
 
   <div id="view-report-modal" class="modal-overlay hidden" onclick="closeModal('view-report-modal')">
-    <div class="border theme-border w-[450px] max-w-[90%] rounded-2xl p-8 shadow-2xl text-left max-h-[90vh] overflow-y-auto theme-surface bg-[#0a0e1a]" onclick="event.stopPropagation()">
-      <h2 id="modal-detail-title" class="text-white font-bold text-2xl mb-4"></h2>
+    <div class="border theme-border w-[450px] max-w-[90%] rounded-2xl p-6 md:p-8 shadow-2xl text-left max-h-[90vh] overflow-y-auto theme-surface bg-[#0a0e1a]" onclick="event.stopPropagation()">
+      <h2 id="modal-detail-title" class="text-white font-bold text-xl md:text-2xl mb-4"></h2>
       <div id="modal-detail-info" class="bg-[#1e2536] p-4 rounded-xl text-sm text-[#94a3b8] mb-6 border theme-border space-y-2"></div>
       <p id="modal-detail-desc" class="text-slate-300 leading-relaxed"></p>
       <button type="button" onclick="closeModal('view-report-modal')" class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-colors shadow-lg">Close</button>
@@ -115,6 +125,14 @@
   <script src="js/app2.js"></script>
   <script>
     lucide.createIcons(); 
+    
+    // 🚨 Mobile Sidebar Toggle Function 🚨
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobile-overlay');
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('hidden');
+    }
     
     function doLogout() { 
         localStorage.removeItem('activeDepartment'); 
@@ -153,10 +171,8 @@
         const safeName = escapeHTML(name);
         const safeContact = escapeHTML(contact);
 
-        // 🚨 Generate a unique ID for this specific card 🚨
         const cardId = 'report_' + Date.now();
 
-        // 🚨 Updated Card HTML to include the specific 'Resolve' button 🚨
         const cardHTML = `
             <div id="${cardId}" class="report-card border border-gray-700 rounded-xl p-6 shadow-sm flex flex-col h-full relative cursor-pointer hover:border-blue-500/50 transition-colors bg-[#0f172a]" 
                  onclick="openReportDetails('${safeSubj}', '${dateString} ${timeString}', '${safeDesc}', '${safeLoc}', '${safeName}', '${safeContact}')">
@@ -191,19 +207,16 @@
         closeModal('new-report-modal');
     }
 
-    // 🚨 Logic to resolve the specific card 🚨
     function markAsResolved(cardId) {
         const card = document.getElementById(cardId);
         if (!card) return;
 
-        // 1. Change the badge to Green "Resolved"
         const badge = card.querySelector('.status-badge');
         if (badge) {
             badge.innerText = 'Resolved';
             badge.className = 'status-badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest';
         }
 
-        // 2. Remove the button and show a completed checkmark instead
         const actionContainer = card.querySelector('.action-container');
         if (actionContainer) {
             actionContainer.innerHTML = `
@@ -211,7 +224,7 @@
                     <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Resolved
                 </div>
             `;
-            lucide.createIcons(); // Re-draw the checkmark icon
+            lucide.createIcons();
         }
     }
 

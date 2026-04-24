@@ -4,11 +4,13 @@
   <script>
     (function() {
         const session = localStorage.getItem('activeDepartment');
-        if (!session) window.location.replace('admin.html?error=unauthorized'); 
+        if (!session || session !== 'DRRMO') { // Also secured specifically for DRRMO
+            window.location.replace('admin.html?error=unauthorized'); 
+        }
     })();
   </script>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>BEAT - Weather & AQI Alerts</title>
   
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
@@ -41,12 +43,19 @@
     .mapboxgl-popup-tip { border-top-color: #1e293b !important; border-bottom-color: #1e293b !important; }
     .mapboxgl-popup-close-button { color: #94a3b8; font-size: 16px; top: 4px; right: 8px; }
     .mapboxgl-popup-close-button:hover { color: white; background: transparent; }
+
+    /* Custom Scrollbar for Mobile Panels */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
   </style>
 </head>
 
-<body class="h-full flex bg-[#0a0e1a]">
+<body class="h-full flex bg-[#0a0e1a] overflow-hidden">
   
-  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-50">
+  <div id="mobile-overlay" class="fixed inset-0 bg-black/60 z-[55] hidden md:hidden backdrop-blur-sm transition-opacity" onclick="toggleSidebar()"></div>
+
+  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-[60] fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 w-64 bg-[#0a0e1a]">
     <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
         <div id="auth-logo" class="flex items-center gap-1.5">
             <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain">
@@ -80,68 +89,33 @@
     </div>
   </aside>
 
-  <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] relative">
+  <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] relative h-full">
     
-    <div class="absolute top-6 left-6 z-10 w-[400px] flex flex-col gap-4 max-h-[90vh] overflow-y-auto pr-2 pb-6">
+    <button onclick="toggleSidebar()" class="md:hidden absolute top-4 left-4 z-40 bg-[#0f172a] border border-gray-700 text-white p-2.5 rounded-xl shadow-xl backdrop-blur-md bg-opacity-95">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+    </button>
 
-        <div class="theme-surface border theme-border rounded-2xl p-6 shadow-2xl backdrop-blur-md bg-opacity-95 flex-shrink-0">
-            <h2 class="text-white font-bold text-sm flex items-center gap-2 mb-4"><i data-lucide="map-pin" class="text-blue-500"></i> Custom Zone Mapping</h2>
-            <p class="text-[10px] text-[#94a3b8] mb-4">Draw an exclusion area and attach an advisory. This will ONLY reflect on the Main Admin's map.</p>
-            
-            <div class="space-y-3">
-                <select id="draw-type" class="w-full bg-[#0f172a] text-white border border-gray-700 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 transition-colors cursor-pointer">
-                    <option value="Flood Risk Area">Flood Risk Area</option>
-                    <option value="Fire Hazard Zone">Fire Hazard Zone</option>
-                    <option value="Chemical Spill">Chemical Spill</option>
-                    <option value="Landslide Warning">Landslide Warning</option>
-                    <option value="Evacuation Perimeter">Evacuation Perimeter</option>
-                </select>
-                
-                <input type="text" id="zone-title" placeholder="Advisory Title (Optional)" class="w-full bg-[#0f172a] text-white border border-gray-700 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 transition-colors" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
-                <textarea id="zone-desc" rows="2" placeholder="Instructions for the public..." class="w-full bg-[#0f172a] text-white border border-gray-700 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 transition-colors resize-none"></textarea>
-                
-                <button id="btn-draw-zone" class="w-full bg-[#1e293b] hover:bg-gray-700 text-blue-400 text-xs font-bold py-2.5 rounded-lg border border-blue-500/50 transition-all flex justify-center items-center gap-2 shadow-sm">
-                    <i data-lucide="pen-tool" class="w-4 h-4"></i> 1. Draw Area (Polygon)
-                </button>
-                
-                <button id="btn-broadcast-zone" disabled class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-lg shadow-lg transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                    <i data-lucide="upload-cloud" class="w-4 h-4"></i> 2. Broadcast to Main Map
-                </button>
-            </div>
-        </div>
+    <div id="map" class="w-full h-full"></div>
 
-        <div id="active-zones-container" class="hidden theme-surface border theme-border rounded-2xl p-4 shadow-2xl flex-shrink-0">
-            <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-3 flex items-center justify-between">
-                Active Map Zones <span id="zone-count" class="bg-blue-500 text-white px-2 py-0.5 rounded-full text-[10px]">0</span>
-            </h3>
-            <div id="zones-list" class="space-y-3 max-h-[250px] overflow-y-auto pr-2"></div>
-        </div>
-
-        <div id="sync-toast" class="bg-blue-500/10 border border-blue-500/30 text-blue-400 p-4 rounded-xl text-sm font-semibold flex items-center gap-3 hidden shadow-lg backdrop-blur-md transition-opacity mt-4">
-            <i data-lucide="check-circle" class="w-5 h-5"></i> Map Zone Synced!
-        </div>
-
-    </div>
-
-    <div class="absolute top-6 right-6 z-10 w-72 flex flex-col gap-4">
+    <div class="absolute top-4 right-4 z-10 w-[calc(100%-5rem)] sm:w-72 md:top-6 md:right-6 flex flex-col gap-3 md:gap-4 max-h-[40vh] md:max-h-none overflow-y-auto pr-1">
         
-        <div class="theme-surface border theme-border rounded-xl p-5 shadow-2xl backdrop-blur-md bg-opacity-95 flex-shrink-0">
-            <h2 class="text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 mb-4"><i data-lucide="layers" class="text-blue-400 w-4 h-4"></i> Map Layer Controls</h2>
-            <div class="space-y-3">
-                <div class="flex items-center justify-between bg-[#0f172a] border border-gray-800 p-3 rounded-lg hover:border-gray-600 transition-colors">
+        <div class="theme-surface border theme-border rounded-xl p-4 md:p-5 shadow-2xl backdrop-blur-md bg-opacity-95 flex-shrink-0">
+            <h2 class="text-white font-bold text-[11px] md:text-xs uppercase tracking-wider flex items-center gap-2 mb-3 md:mb-4"><i data-lucide="layers" class="text-blue-400 w-4 h-4"></i> Map Layer Controls</h2>
+            <div class="space-y-2 md:space-y-3">
+                <div class="flex items-center justify-between bg-[#0f172a] border border-gray-800 p-2.5 md:p-3 rounded-lg hover:border-gray-600 transition-colors">
                     <div class="flex items-center gap-2">
                         <i data-lucide="thermometer-sun" class="text-rose-500 w-4 h-4"></i>
-                        <span class="text-[11px] font-bold text-white uppercase tracking-wider">Heat Map</span>
+                        <span class="text-[10px] md:text-[11px] font-bold text-white uppercase tracking-wider">Heat Map</span>
                     </div>
                     <label class="layer-switch" style="transform: scale(0.85); transform-origin: right;">
                         <input type="checkbox" id="toggle-heat" onchange="toggleMapLayer('heat', this.checked)">
                         <span class="layer-slider"></span>
                     </label>
                 </div>
-                <div class="flex items-center justify-between bg-[#0f172a] border border-gray-800 p-3 rounded-lg hover:border-gray-600 transition-colors">
+                <div class="flex items-center justify-between bg-[#0f172a] border border-gray-800 p-2.5 md:p-3 rounded-lg hover:border-gray-600 transition-colors">
                     <div class="flex items-center gap-2">
                         <i data-lucide="wind" class="text-gray-400 w-4 h-4"></i>
-                        <span class="text-[11px] font-bold text-white uppercase tracking-wider">AQI Density</span>
+                        <span class="text-[10px] md:text-[11px] font-bold text-white uppercase tracking-wider">AQI Density</span>
                     </div>
                     <label class="layer-switch" style="transform: scale(0.85); transform-origin: right;">
                         <input type="checkbox" id="toggle-aqi" onchange="toggleMapLayer('aqi', this.checked)">
@@ -151,9 +125,9 @@
             </div>
         </div>
 
-        <div class="theme-surface border theme-border rounded-xl p-5 shadow-2xl backdrop-blur-md bg-opacity-95">
-            <div class="text-[11px] font-bold text-[#94a3b8] uppercase tracking-wider mb-3 flex items-center gap-2">
-                <i data-lucide="map" class="w-4 h-4 text-blue-500"></i> Jump to District
+        <div class="theme-surface border theme-border rounded-xl p-4 md:p-5 shadow-2xl backdrop-blur-md bg-opacity-95">
+            <div class="text-[10px] md:text-[11px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2 md:mb-3 flex items-center gap-2">
+                <i data-lucide="map" class="w-3 h-3 md:w-4 md:h-4 text-blue-500"></i> Jump to District
             </div>
             <select class="w-full bg-[#1e2536] border border-[#374151] text-white px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider outline-none cursor-pointer" onchange="zoomToBarangay(this.value)">
                 <option value="">-- Select Barangay --</option>
@@ -192,11 +166,59 @@
         
     </div>
 
-    <div id="map" class="w-full h-full"></div>
+    <div class="absolute bottom-4 left-4 right-4 z-10 md:w-[400px] md:bottom-auto md:top-6 md:left-6 flex flex-col gap-4 max-h-[50vh] md:max-h-[90vh] overflow-y-auto pr-1 md:pr-2 pb-2 md:pb-6">
+
+        <div class="theme-surface border theme-border rounded-2xl p-5 md:p-6 shadow-2xl backdrop-blur-md bg-opacity-95 flex-shrink-0">
+            <h2 class="text-white font-bold text-sm md:text-base flex items-center gap-2 mb-2 md:mb-4"><i data-lucide="map-pin" class="text-blue-500"></i> Custom Zone Mapping</h2>
+            <p class="text-[10px] md:text-[11px] text-[#94a3b8] mb-4">Draw an exclusion area and attach an advisory. This will ONLY reflect on the Main Admin's map.</p>
+            
+            <div class="space-y-2.5 md:space-y-3">
+                <select id="draw-type" class="w-full bg-[#0f172a] text-white border border-gray-700 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 transition-colors cursor-pointer">
+                    <option value="Flood Risk Area">Flood Risk Area</option>
+                    <option value="Fire Hazard Zone">Fire Hazard Zone</option>
+                    <option value="Chemical Spill">Chemical Spill</option>
+                    <option value="Landslide Warning">Landslide Warning</option>
+                    <option value="Evacuation Perimeter">Evacuation Perimeter</option>
+                </select>
+                
+                <input type="text" id="zone-title" placeholder="Advisory Title (Optional)" class="w-full bg-[#0f172a] text-white border border-gray-700 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 transition-colors" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
+                <textarea id="zone-desc" rows="2" placeholder="Instructions for the public..." class="w-full bg-[#0f172a] text-white border border-gray-700 rounded-lg px-3 py-2 text-xs outline-none focus:border-blue-500 transition-colors resize-none"></textarea>
+                
+                <button id="btn-draw-zone" class="w-full bg-[#1e293b] hover:bg-gray-700 text-blue-400 text-xs font-bold py-2.5 rounded-lg border border-blue-500/50 transition-all flex justify-center items-center gap-2 shadow-sm">
+                    <i data-lucide="pen-tool" class="w-4 h-4"></i> 1. Draw Area (Polygon)
+                </button>
+                
+                <button id="btn-broadcast-zone" disabled class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 rounded-lg shadow-lg transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i data-lucide="upload-cloud" class="w-4 h-4"></i> 2. Broadcast to Main Map
+                </button>
+            </div>
+        </div>
+
+        <div id="active-zones-container" class="hidden theme-surface border theme-border rounded-2xl p-4 shadow-2xl flex-shrink-0">
+            <h3 class="text-[10px] md:text-xs font-bold text-white uppercase tracking-wider mb-3 flex items-center justify-between">
+                Active Map Zones <span id="zone-count" class="bg-blue-500 text-white px-2 py-0.5 rounded-full text-[10px]">0</span>
+            </h3>
+            <div id="zones-list" class="space-y-3 max-h-[180px] md:max-h-[250px] overflow-y-auto pr-2"></div>
+        </div>
+
+        <div id="sync-toast" class="bg-blue-500/10 border border-blue-500/30 text-blue-400 p-3 md:p-4 rounded-xl text-xs md:text-sm font-semibold flex items-center justify-center gap-3 hidden shadow-lg backdrop-blur-md transition-opacity">
+            <i data-lucide="check-circle" class="w-4 h-4 md:w-5 md:h-5"></i> Map Zone Synced!
+        </div>
+
+    </div>
+
   </main>
 
   <script src="js/app2.js"></script>
   <script>
+    // 🚨 Mobile Sidebar Toggle Function 🚨
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobile-overlay');
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('hidden');
+    }
+
     lucide.createIcons();
     mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag';
     
