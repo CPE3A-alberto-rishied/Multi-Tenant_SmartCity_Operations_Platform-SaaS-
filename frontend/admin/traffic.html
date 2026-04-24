@@ -4,7 +4,9 @@
   <script>
     (function() {
         const session = localStorage.getItem('activeDepartment');
-        if (!session) window.location.replace('admin.html?error=unauthorized'); 
+        if (!session || session !== 'Traffic') {
+            window.location.replace('admin.html?error=unauthorized'); 
+        }
     })();
 
     // Sidebar Toggle Logic
@@ -17,15 +19,15 @@
         }
     };
 
-    // NEW: Mobile Panel Toggle Logic
+    // FIXED: Foolproof Mobile Panel Toggle Logic
     window.toggleOpsPanel = function() {
         const content = document.getElementById('ops-panel-content');
         const chevron = document.getElementById('ops-chevron');
-        if (content.classList.contains('hidden')) {
-            content.classList.remove('hidden');
+        if (content.classList.contains('mobile-hidden')) {
+            content.classList.remove('mobile-hidden');
             if(chevron) chevron.classList.add('rotate-180');
         } else {
-            content.classList.add('hidden');
+            content.classList.add('mobile-hidden');
             if(chevron) chevron.classList.remove('rotate-180');
         }
     };
@@ -76,6 +78,11 @@
     .mapboxgl-popup-tip { border-top-color: #1e293b !important; border-bottom-color: #1e293b !important; }
     .mapboxgl-popup-close-button { color: #94a3b8; font-size: 16px; top: 4px; right: 8px; }
     .mapboxgl-popup-close-button:hover { color: white; background: transparent; }
+
+    /* FIXED: Hardcoded Media Query to guarantee PC visibility */
+    @media (max-width: 1023px) {
+        .mobile-hidden { display: none !important; }
+    }
   </style>
 </head>
 
@@ -143,7 +150,7 @@
                     <i data-lucide="chevron-down" id="ops-chevron" class="text-[#94a3b8] w-5 h-5 transition-transform duration-300 lg:hidden"></i>
                 </button>
                 
-                <div id="ops-panel-content" class="hidden lg:block mt-3 lg:mt-0 transition-all">
+                <div id="ops-panel-content" class="mobile-hidden mt-3 lg:mt-0 transition-all">
                     <p class="text-[11px] text-[#94a3b8] mb-4 lg:mb-6 hidden lg:block">Draw and broadcast blockades. These will reflect instantly on the main network.</p>
                     
                     <div class="space-y-3 lg:space-y-4">

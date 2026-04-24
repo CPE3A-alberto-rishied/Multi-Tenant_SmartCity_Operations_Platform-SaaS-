@@ -28,20 +28,19 @@ const reportSchema = new mongoose.Schema({
 });
 const Report = mongoose.model('Report', reportSchema);
 
-// 3. SCHEMAS & MODELS
 const adminSchema = new mongoose.Schema({
     id: { type: String, required: true, unique: true },
-    username: { type: String, required: true }, // Added for Manage Admin
+    username: { type: String, required: true }, 
     password: { type: String, required: true },
     email: { type: String, required: true },
     dept: { type: String, required: true },
-    status: { type: String, default: 'Active' }, // Added for Manage Admin
+    status: { type: String, default: 'Active' }, 
     otp: String,
     otpExpires: Date
 });
 const Admin = mongoose.model('Admin', adminSchema);
 
-// Announcement Schema (Existing)
+// Announcement Schema 
 const announcementSchema = new mongoose.Schema({
     title: String,
     category: String,
@@ -51,9 +50,9 @@ const announcementSchema = new mongoose.Schema({
     status: { type: String, default: 'Queue' }, // 'Queue', 'Live', or 'Denied'
     createdAt: { type: Date, default: Date.now }
 });
-const Announcement = mongoose.model('Announcement', announcementSchema);
 
-// 👉 ADD THESE TWO NEW MODELS:
+// The 3 Separate Announcement Models
+const Announcement = mongoose.model('Announcement', announcementSchema);
 const TrafficAnnouncement = mongoose.model('TrafficAnnouncement', announcementSchema);
 const DrrmoAnnouncement = mongoose.model('DrrmoAnnouncement', announcementSchema);
 
@@ -82,7 +81,6 @@ app.post('/api/report', async (req, res) => {
 
         res.status(200).json({ success: true });
 
-        // Background Emails
         transporter.sendMail({
             from: `"BEAT Pasig Support" <${process.env.EMAIL_USER}>`,
             to: reporter_email,
@@ -115,9 +113,7 @@ app.put('/api/report/:id', async (req, res) => {
     }
 });
 
-// --- Admin Management Routes (FIXES THE 404 ERRORS) ---
-
-// 1. Fetch ALL Admins
+// --- Admin Management Routes ---
 app.get('/api/admin/all', async (req, res) => {
     try {
         const admins = await Admin.find().sort({ username: 1 });
@@ -127,12 +123,10 @@ app.get('/api/admin/all', async (req, res) => {
     }
 });
 
-// 2. Create New Admin
 app.post('/api/admin/signup', async (req, res) => {
     try {
         const { id, username, email, password, dept, status } = req.body;
         
-        // Check for duplicates before saving
         const existing = await Admin.findOne({ $or: [{ id }, { email }] });
         if (existing) {
             return res.status(400).json({ success: false, error: "Admin ID or Email already exists." });
@@ -146,7 +140,6 @@ app.post('/api/admin/signup', async (req, res) => {
     }
 });
 
-// 3. Update Status (Enable/Disable)
 app.put('/api/admin/status', async (req, res) => {
     try {
         const { id, status } = req.body;
@@ -157,7 +150,6 @@ app.put('/api/admin/status', async (req, res) => {
     }
 });
 
-// 4. Delete Admin Permanently
 app.delete('/api/admin/delete/:id', async (req, res) => {
     try {
         await Admin.findOneAndDelete({ id: req.params.id });
@@ -167,35 +159,124 @@ app.delete('/api/admin/delete/:id', async (req, res) => {
     }
 });
 
-// --- Announcement Routes ---
+
+// ==========================================
+// ANNOUNCEMENT ROUTES (MAIN ADMIN)
+// ==========================================
 app.post('/api/announcements', async (req, res) => {
     try {
         const newAnn = new Announcement(req.body);
         await newAnn.save();
         res.status(200).json({ success: true, data: newAnn });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.put('/api/announcements/:id', async (req, res) => {
     try {
         const updated = await Announcement.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
         res.status(200).json({ success: true, data: updated });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.get('/api/announcements/all', async (req, res) => {
+    try {
+        const allAnnouncements = await Announcement.find().sort({ createdAt: -1 });
+        res.status(200).json({ success: true, data: allAnnouncements });
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.delete('/api/announcements/:id', async (req, res) => {
+    try {
+        await Announcement.findByIdAndDelete(req.params.id);
+        res.status(200).json({ success: true, message: 'Deleted successfully' });
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.get('/api/news', async (req, res) => {
     try {
-        // Only grab announcements that the Admin has Approved ('Live')
-        const liveNews = await Announcement.find({ status: 'Live' }).sort({ createdAt: -1 });
-        res.status(200).json({ success: true, data: liveNews });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        // Fetch ONLY 'Live' announcements from ALL THREE collections
+        const mainNews = await Announcement.find({ status: 'Live' }).lean();
+        const trafficNews = await TrafficAnnouncement.find({ status: 'Live' }).lean();
+        const drrmoNews = await DrrmoAnnouncement.find({ status: 'Live' }).lean();
+
+        // Combine them all into one single array
+        const allNews = [...mainNews, ...trafficNews, ...drrmoNews];
+
+        // Sort them by Date (Newest first)
+        allNews.sort((a, b) => b.createdAt - a.createdAt);
+
+        res.status(200).json({ success: true, data: allNews });
+    } catch (error) { 
+        res.status(500).json({ success: false, error: error.message }); 
     }
 });
+
+
+// ==========================================
+// FIXED: MISSING ROUTES FOR TRAFFIC (app2.js)
+// ==========================================
+app.get('/api/announcements2/all', async (req, res) => {
+    try {
+        const data = await TrafficAnnouncement.find().sort({ createdAt: -1 });
+        res.status(200).json({ success: true, data });
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.post('/api/announcements2', async (req, res) => {
+    try {
+        const newAnn = new TrafficAnnouncement(req.body);
+        await newAnn.save();
+        res.status(200).json({ success: true, data: newAnn });
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.put('/api/announcements2/:id', async (req, res) => {
+    try {
+        const updated = await TrafficAnnouncement.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.status(200).json({ success: true, data: updated });
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.delete('/api/announcements2/:id', async (req, res) => {
+    try {
+        await TrafficAnnouncement.findByIdAndDelete(req.params.id);
+        res.status(200).json({ success: true, message: 'Deleted successfully' });
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+
+// ==========================================
+// FIXED: MISSING ROUTES FOR DRRMO (app3.js)
+// ==========================================
+app.get('/api/announcements3/all', async (req, res) => {
+    try {
+        const data = await DrrmoAnnouncement.find().sort({ createdAt: -1 });
+        res.status(200).json({ success: true, data });
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.post('/api/announcements3', async (req, res) => {
+    try {
+        const newAnn = new DrrmoAnnouncement(req.body);
+        await newAnn.save();
+        res.status(200).json({ success: true, data: newAnn });
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.put('/api/announcements3/:id', async (req, res) => {
+    try {
+        const updated = await DrrmoAnnouncement.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        res.status(200).json({ success: true, data: updated });
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.delete('/api/announcements3/:id', async (req, res) => {
+    try {
+        await DrrmoAnnouncement.findByIdAndDelete(req.params.id);
+        res.status(200).json({ success: true, message: 'Deleted successfully' });
+    } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
 
 // --- Admin Login & 2FA Routes ---
 app.post('/api/admin/login', async (req, res) => {
@@ -249,23 +330,3 @@ app.post('/api/admin/verify', async (req, res) => {
 // 6. START SERVER (MUST BE AT THE VERY BOTTOM)
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-
-// Fetch ALL Announcements (For Admin Dashboard Reloads)
-app.get('/api/announcements/all', async (req, res) => {
-    try {
-        const allAnnouncements = await Announcement.find().sort({ createdAt: -1 });
-        res.status(200).json({ success: true, data: allAnnouncements });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-// Delete Announcement Permanently (Admin Side)
-app.delete('/api/announcements/:id', async (req, res) => {
-    try {
-        await Announcement.findByIdAndDelete(req.params.id);
-        res.status(200).json({ success: true, message: 'Deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});

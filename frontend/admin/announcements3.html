@@ -2,38 +2,84 @@
 <html lang="en" class="h-full">
 <head>
   <script>
+    // Authentication Check
     (function() {
         const session = localStorage.getItem('activeDepartment');
         if (!session || session !== 'DRRMO') {
             window.location.replace('admin.html?error=unauthorized'); 
         }
     })();
+
+    // Sidebar Toggle Logic
+    window.toggleSidebar = function() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        if (sidebar && overlay) {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+    };
   </script>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>BEAT - Dept Announcements</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BEAT - DRRMO Announcements</title>
+  
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
+  
   <style>
-    .modal-overlay { position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.85); display: flex; align-items: center; justify-content: center; z-index: 10000; }
-    #publish-success-modal { z-index: 20000 !important; }
+    body { font-family: 'DM Sans', sans-serif !important; overflow-x: hidden; background-color: #0a0e1a; }
+    
+    /* SIDEBAR */
+    .sidebar { width: 260px !important; flex-shrink: 0 !important; }
+    .sidebar-item { 
+      display: flex !important; align-items: center !important; gap: 12px !important;
+      padding: 12px 18px !important; font-size: 14.5px !important; 
+      font-weight: 500 !important; color: #94a3b8 !important;
+      text-decoration: none !important; border-left: 3px solid transparent !important;
+    }
+    .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
+    .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
+    .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
+    
+    .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
+    .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
+    .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
+    .settings-link { color: #94a3b8; transition: color 0.2s; display: flex; align-items: center; }
+    .settings-link:hover { color: #3b82f6; }
+
+    /* Modals & Overlays */
+    .modal-overlay {
+      position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.85); display: flex; align-items: center; justify-content: center; z-index: 10000; pointer-events: auto;
+    }
+    .modal-overlay.hidden { display: none !important; pointer-events: none !important; }
+    #confirm-submit-modal, #confirm-action-modal, #success-submit-modal, #confirm-back-modal { z-index: 20000 !important; }
+    
+    /* Errors */
+    .input-error { border-color: #ef4444 !important; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important; }
   </style>
 </head>
-<body class="h-full flex bg-[#0a0e1a] overflow-hidden">
 
-  <div id="mobile-overlay" class="fixed inset-0 bg-black/60 z-[55] hidden md:hidden backdrop-blur-sm transition-opacity" onclick="toggleSidebar()"></div>
+<body class="h-full flex bg-[#0a0e1a]">
 
-  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-[60] fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 w-64 bg-[#0a0e1a]">
-    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-[90] hidden lg:hidden" onclick="window.toggleSidebar()"></div>
+
+  <aside id="sidebar" class="sidebar flex flex-col h-full fixed lg:relative z-[100] transform -translate-x-full lg:translate-x-0 transition-transform duration-300 top-0 left-0 theme-border-r theme-surface">
+    <div class="h-[76px] px-5 flex items-center justify-between shrink-0 theme-border-b">
         <div id="auth-logo" class="flex items-center gap-1.5">
-            <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain">
+            <img src="../assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain" onerror="this.src='/assets/beat_logo2.png'">
             <div class="flex flex-col justify-center items-start">
-                <img src="/assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
+                <img src="../assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1" onerror="this.src='/assets/beat_text2.png'">
                 <div style="color:#94a3b8; font-size:11px" class="leading-none">DRRMO Department</div>
             </div>
         </div>
+        <button type="button" class="lg:hidden text-gray-400 hover:text-white p-2" onclick="window.toggleSidebar()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
     </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
@@ -43,170 +89,155 @@
       <a href="weather.html" class="sidebar-item"><i data-lucide="thermometer-sun"></i><span>Weather & AQI Alerts</span></a>
       <a href="evacuation.html" class="sidebar-item"><i data-lucide="tent"></i><span>Evacuation Control</span></a>
     </nav>
+
     <div class="user-footer">
         <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
-              <div id="nav-avatar" class="nav-avatar bg-orange-600">D</div>
-              <div>
-                <div class="user-footer-name">DRRMO</div>
-                <div class="user-footer-sub">Disaster Management</div>
-              </div>
+                <div id="nav-avatar" style="background:#ea580c; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">D</div>
+                <div>
+                  <div class="user-footer-name">DRRMO</div>
+                  <div class="user-footer-sub">Disaster Management</div>
+                </div>
             </div>
-            <a href="profile3.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
+            <a href="profile3.html" class="settings-link"><i data-lucide="settings" style="width:18px; height:18px"></i></a>
         </div>
-        <button onclick="doLogout()" class="btn-logout"><i data-lucide="log-out" class="icon-sm"></i> Logout</button>
+        <button onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
+            <i data-lucide="log-out" style="width:16px; height:16px"></i> Logout
+        </button>
     </div>
   </aside>
 
-  <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] h-full overflow-hidden relative">
-    
-    <header class="px-5 md:px-8 h-[76px] flex items-center shrink-0 theme-surface theme-border-b">
-      <div class="flex items-center gap-3">
-        <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white transition-colors p-1">
-            <i data-lucide="menu" class="w-6 h-6"></i>
+  <main class="flex-1 overflow-y-auto flex flex-col relative min-w-0">
+    <header class="px-4 sm:px-8 h-[76px] flex items-center shrink-0 relative z-[40] theme-surface theme-border-b">
+      <div class="flex items-center">
+        <button type="button" class="lg:hidden text-gray-400 hover:text-white mr-4 p-2 cursor-pointer z-50 relative" onclick="window.toggleSidebar()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
         </button>
-        <h1 class="text-lg md:text-xl font-semibold text-white flex items-center gap-2">
-            <i data-lucide="megaphone" class="icon-lg hidden md:inline-block"></i> Announcement Manager
+        <h1 class="text-xl font-semibold text-white flex items-center gap-2">
+          <i data-lucide="megaphone" class="w-6 h-6 text-[#94a3b8] hidden sm:block"></i> Announcement Manager
         </h1>
       </div>
     </header>
 
-    <div class="p-5 md:p-8 flex-1 overflow-y-auto animate-in flex flex-col">
-        <div id="grid-live" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch w-full">
-            <div id="empty-state" class="col-span-full flex flex-col items-center justify-center py-20 mt-10">
-                <i data-lucide="megaphone" class="w-16 h-16 text-gray-600 mb-4 animate-pulse"></i>
-                <h2 class="text-xl font-bold text-white mb-2">No Active Announcements</h2>
-                <p class="text-[#94a3b8] text-sm text-center">Resolved incidents will automatically appear here.</p>
+    <div class="p-4 sm:p-8 flex-1 relative flex flex-col">
+      <div id="view-list" class="animate-in block w-full">
+        <div class="border-b border-gray-800 flex gap-2 mb-6 overflow-x-auto whitespace-nowrap">
+            <button id="tab-btn-live" onclick="switchAnnTab('live')" class="px-4 py-3 text-sm font-semibold text-orange-500 border-b-2 border-orange-500 -mb-[1px] flex items-center gap-2 transition-colors"><i data-lucide="radio" class="w-4 h-4"></i> Live Announcements</button>
+            <button id="tab-btn-queue" onclick="switchAnnTab('queue')" class="px-4 py-3 text-sm font-semibold text-[#94a3b8] hover:text-white border-b-2 border-transparent -mb-[1px] flex items-center gap-2 transition-colors"><i data-lucide="clock" class="w-4 h-4"></i> Waiting for Approval</button>
+            <button id="tab-btn-denied" onclick="switchAnnTab('denied')" class="px-4 py-3 text-sm font-semibold text-[#94a3b8] hover:text-white border-b-2 border-transparent -mb-[1px] flex items-center gap-2 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i> Denied/Taken Down</button>
+        </div>
+
+        <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 mb-6">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full xl:w-auto">
+              <span class="text-sm font-semibold text-[#94a3b8] hidden sm:block">Filter:</span>
+              <input type="date" id="filter-calendar" onchange="filterAnnouncements()" class="modal-input !mt-0 h-10 py-0 px-3 text-sm w-full sm:w-40 shadow-sm" title="Filter by Date">
+              
+              <div class="custom-dropdown-container relative w-full sm:w-48 text-sm shadow-sm z-30">
+                  <div id="filter-category-btn" onclick="toggleDropdown('filter-category-menu')" class="modal-input !mt-0 h-10 py-0 pl-3 pr-3 flex justify-between items-center cursor-pointer text-white">
+                      <span id="filter-category-text" class="truncate text-[#94a3b8]">All Categories</span>
+                      <i data-lucide="chevron-down" class="w-4 h-4 text-[#94a3b8] flex-shrink-0 ml-2"></i>
+                  </div>
+                  <div id="filter-category-menu" class="cat-dropdown-menu absolute left-0 top-full mt-1 w-full bg-[#1e2536] border border-gray-700 rounded-lg shadow-xl hidden max-h-48 overflow-y-auto"></div>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
+                <button onclick="openModal('create-category-modal')" class="w-full sm:w-auto justify-center bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 px-5 rounded-lg text-sm flex items-center gap-2 shadow-lg transition-colors whitespace-nowrap"><i data-lucide="folder-plus" class="w-4 h-4"></i> Create Category</button>
+                <button onclick="checkCategoryBeforeAnn()" class="w-full sm:w-auto justify-center bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 px-5 rounded-lg text-sm flex items-center gap-2 shadow-lg transition-colors whitespace-nowrap"><i data-lucide="file-plus" class="w-4 h-4"></i> Create Announcement</button>
             </div>
         </div>
+        
+        <div id="grid-live" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch"></div>
+        <div id="grid-queue" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch hidden"></div>
+        <div id="grid-denied" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch hidden"></div>
+      </div>
+
+      <div id="view-form" class="hidden animate-in pb-10 w-full max-w-[800px] mx-auto mt-4">
+        <button onclick="handleAnnBackClick()" id="btn-back-trigger" class="border theme-border bg-transparent hover:bg-[#1e2536] text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center gap-2 mb-6 transition-colors w-full sm:w-auto justify-center"><i data-lucide="arrow-left" class="w-4 h-4"></i> <span id="btn-back-text">Back to Announcements</span></button>
+        
+        <div class="border rounded-2xl p-6 sm:p-8 shadow-lg theme-surface">
+          <h2 class="text-2xl font-bold text-white flex items-center gap-3 mb-8"><i id="form-icon" data-lucide="file-plus" class="text-orange-500 w-6 h-6"></i> <span id="form-title">Create Announcement</span></h2>
+          <form onsubmit="event.preventDefault(); handleAnnFormSubmit();">
+             <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-4 border-b border-gray-800 pb-2">Global Details</p>
+             <div class="space-y-5 mb-12">
+               <div>
+                 <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">TITLE <span class="text-red-500">*</span></label>
+                 <input type="text" id="ann-title" placeholder="Enter announcement title" class="modal-input text-sm" oninput="clearReqError(this)">
+                 <p id="ann-title-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p>
+               </div>
+               <div>
+                 <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">CATEGORY <span class="text-red-500">*</span></label>
+                 <div class="flex items-center gap-2">
+                     <div class="custom-dropdown-container relative flex-1 z-20">
+                         <div id="ann-category-container" onclick="toggleDropdown('ann-category-menu')" class="modal-input text-sm flex justify-between items-center cursor-pointer bg-[#1e2536] text-white">
+                             <span id="ann-category-text" class="truncate text-[#94a3b8]">Select a category...</span>
+                             <i data-lucide="chevron-down" class="w-4 h-4 text-[#94a3b8] flex-shrink-0 ml-2"></i>
+                         </div>
+                         <div id="ann-category-menu" class="cat-dropdown-menu absolute left-0 top-full mt-1 w-full bg-[#1e2536] border border-gray-700 rounded-lg shadow-xl hidden max-h-48 overflow-y-auto"></div>
+                     </div>
+                 </div>
+                 <p id="ann-category-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p>
+               </div>
+               
+             </div>
+
+             <p class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-4 border-b border-gray-800 pb-2">Content Structure</p>
+             <div id="content-blocks-container" class="space-y-4 mb-6"></div>
+             
+             <button type="button" onclick="addContentBlock()" class="w-full border theme-border bg-transparent hover:bg-[#1e2536] text-[#94a3b8] hover:text-white font-bold py-3 rounded-lg text-sm transition-colors flex items-center justify-center gap-2 mb-8"><i data-lucide="plus" class="w-4 h-4"></i> Add New Content Block</button>
+             
+             <div class="flex justify-center mt-4">
+               <button type="submit" id="btn-submit" class="w-full sm:w-auto px-12 bg-transparent border border-orange-500 hover:bg-orange-500/10 text-orange-500 font-bold py-3 rounded-lg text-sm transition-colors shadow-sm">Submit for Review</button>
+             </div>
+          </form>
+        </div>
+      </div>
+
+      <div id="view-details" class="hidden animate-in pb-10 w-full max-w-[800px] mx-auto mt-4">
+        <button onclick="closeAnnDetails()" class="border theme-border bg-transparent hover:bg-[#1e2536] text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center gap-2 mb-6 transition-colors w-full sm:w-auto justify-center"><i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Announcements</button>
+        <div class="border rounded-2xl p-6 sm:p-8 shadow-lg relative theme-surface">
+          <span id="detail-badge" class="absolute top-4 sm:top-8 right-4 sm:right-8 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase hidden sm:block"></span>
+          <div class="text-center mb-8 mt-2 sm:max-w-[80%] mx-auto flex flex-col items-center">
+              <h1 id="detail-title" class="text-2xl sm:text-3xl font-bold text-white mb-3 leading-tight"></h1>
+              <p class="text-xs sm:text-sm text-[#94a3b8]">Published <span id="detail-date"></span></p>
+          </div>
+          <hr class="theme-border border-t mb-8">
+          <div id="detail-content" class="w-full text-sm sm:text-base"></div>
+        </div>
+      </div>
     </div>
   </main>
 
-  <div id="view-announcement-modal" class="modal-overlay hidden" onclick="closeModal('view-announcement-modal')">
-      <div class="border theme-border w-[500px] max-w-[95%] rounded-2xl p-6 md:p-8 shadow-2xl text-left max-h-[90vh] overflow-y-auto theme-surface bg-[#0a0e1a]" onclick="event.stopPropagation()">
-          <div class="flex justify-between items-start mb-4">
-              <span id="modal-ann-category" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest"></span>
-              <span id="modal-ann-date" class="text-xs text-gray-500"></span>
+  <div id="create-category-modal" class="modal-overlay hidden" onclick="event.stopPropagation()">
+      <div class="border rounded-2xl p-8 w-[400px] max-w-[90%] shadow-2xl text-left theme-surface" onclick="event.stopPropagation()">
+          <h2 class="text-white font-bold text-xl mb-6 flex items-center gap-2"><i data-lucide="folder-plus" class="text-orange-500 w-6 h-6"></i> Create Category</h2>
+          <div class="space-y-4">
+              <div>
+                  <label class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider block mb-1">Category Name <span class="text-red-500">*</span></label>
+                  <input type="text" id="new-category-name" placeholder="e.g. Weather Alert" class="modal-input text-sm" oninput="this.classList.remove('input-error'); document.getElementById('new-category-error').classList.add('hidden')">
+                  <p id="new-category-error" class="text-[10px] text-red-500 hidden mt-1">Required field</p>
+              </div>
           </div>
-          <h2 id="modal-ann-title" class="text-white font-bold text-xl md:text-2xl mb-4 leading-tight"></h2>
-          <div class="bg-[#1e2536] p-4 md:p-5 rounded-xl text-sm text-slate-300 mb-6 border theme-border">
-              <p id="modal-ann-content" class="leading-relaxed"></p>
-          </div>
-          <div class="flex flex-col sm:flex-row gap-3 mt-8">
-              <button type="button" onclick="closeModal('view-announcement-modal')" class="w-full sm:w-1/2 bg-[#1e2536] hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors border theme-border">Close</button>
-              <button type="button" id="btn-publish-news" class="w-full sm:w-1/2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-colors shadow-lg flex items-center justify-center gap-2">
-                  <i data-lucide="globe" class="w-4 h-4"></i> Publish to City News
-              </button>
+          <div class="flex flex-col sm:flex-row justify-end gap-3 mt-8">
+              <button onclick="closeModal('create-category-modal')" class="w-full sm:w-auto px-5 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-2.5 rounded-xl text-sm transition-colors">Cancel</button>
+              <button onclick="saveCategory()" class="w-full sm:w-auto px-5 bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 rounded-xl text-sm transition-all shadow-lg">Save Category</button>
           </div>
       </div>
   </div>
 
-  <div id="publish-success-modal" class="modal-overlay hidden">
-    <div class="border theme-border w-[400px] max-w-[90%] text-center p-6 md:p-8 rounded-2xl shadow-2xl theme-surface bg-[#0a0e1a]">
-      <div class="mb-4 mx-auto flex items-center justify-center bg-emerald-500/10 text-emerald-500 w-16 h-16 rounded-full">
-        <i data-lucide="check-circle" class="w-8 h-8"></i>
-      </div>
-      <h2 class="text-white font-bold text-xl mb-3">Successfully Published!</h2>
-      <p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">The announcement is now live on the public City News website.</p>
-      <button type="button" onclick="closeModal('publish-success-modal')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Done</button>
-    </div>
-  </div>
+  <div id="no-category-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] max-w-[90%] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="mx-auto flex items-center justify-center bg-yellow-500/10 text-yellow-500 w-14 h-14 rounded-full mb-4"><i data-lucide="alert-circle" class="w-7 h-7"></i></div><h2 class="text-white font-bold text-xl mb-3">No Categories Found</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">You need to create at least one category before you can publish an announcement.</p><div class="flex flex-col sm:flex-row gap-3"><button onclick="closeModal('no-category-modal')" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="closeModal('no-category-modal'); openModal('create-category-modal')" class="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Create Category</button></div></div></div>
+  <div id="confirm-delete-cat-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] max-w-[90%] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="mx-auto flex items-center justify-center bg-red-500/10 text-red-500 w-14 h-14 rounded-full mb-4"><i data-lucide="trash-2" class="w-7 h-7"></i></div><h2 class="text-white font-bold text-xl mb-3">Delete Category?</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to remove this category from the dropdown? Existing announcements will keep their category labels.</p><div class="flex flex-col sm:flex-row gap-3"><button onclick="closeModal('confirm-delete-cat-modal')" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="executeDeleteCategory()" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Delete</button></div></div></div>
+  <div id="confirm-submit-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] max-w-[90%] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="mx-auto flex items-center justify-center bg-orange-500/10 text-orange-500 w-14 h-14 rounded-full mb-4"><i data-lucide="send" class="w-7 h-7"></i></div><h2 id="confirm-submit-title" class="text-white font-bold text-xl mb-3">Submit for Review?</h2><p id="confirm-submit-desc" class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to submit this announcement?</p><div class="flex flex-col sm:flex-row gap-3"><button onclick="closeModal('confirm-submit-modal')" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="executeAnnFormSubmit()" id="btn-confirm-submit" class="flex-1 bg-transparent border border-orange-500 hover:bg-orange-500/10 text-orange-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Confirm</button></div></div></div>
+  <div id="confirm-back-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] max-w-[90%] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="mx-auto flex items-center justify-center bg-red-500/10 text-red-500 w-14 h-14 rounded-full mb-4"><i data-lucide="alert-triangle" class="w-7 h-7"></i></div><h2 id="confirm-back-title" class="text-white font-bold text-xl mb-3">Discard Changes?</h2><p id="confirm-back-desc" class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure you want to go back? Any unsaved changes will be lost.</p><div class="flex flex-col sm:flex-row gap-3"><button onclick="closeModal('confirm-back-modal')" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Stay</button><button onclick="executeAnnBack()" class="flex-1 bg-transparent border border-red-500 hover:bg-red-500/10 text-red-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Discard</button></div></div></div>
+  <div id="confirm-action-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] max-w-[90%] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div id="action-icon-bg" class="mx-auto flex items-center justify-center w-14 h-14 rounded-full mb-4"><i id="action-icon" class="w-7 h-7 text-white"></i></div><h2 id="action-title" class="text-white font-bold text-xl mb-3">Confirm Action?</h2><p id="action-desc" class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Are you sure?</p><div class="flex flex-col sm:flex-row gap-3"><button onclick="closeModal('confirm-action-modal')" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="executeCardAction()" id="btn-action-confirm" class="flex-1 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Confirm</button></div></div></div>
+  <div id="success-submit-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] max-w-[90%] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="mx-auto flex items-center justify-center bg-green-500/10 text-green-500 w-14 h-14 rounded-full mb-4"><i data-lucide="check-circle" class="w-7 h-7"></i></div><h2 class="text-white font-bold text-xl mb-3">Success</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Your announcement action was completed successfully.</p><button onclick="closeModal('success-submit-modal')" class="w-full bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Done</button></div></div>
+
+  <script src="js/app3.js"></script>
 
   <script>
-    let currentAnnouncementId = null;
-
-    document.addEventListener("DOMContentLoaded", function() {
-        if (window.lucide) lucide.createIcons();
-        renderAnnouncements();
+    document.addEventListener('DOMContentLoaded', () => { 
+        if (window.lucide) lucide.createIcons(); 
     });
-
-    // 🚨 Mobile Sidebar Toggle Function 🚨
-    function toggleSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('mobile-overlay');
-        sidebar.classList.toggle('-translate-x-full');
-        overlay.classList.toggle('hidden');
-    }
-
-    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-
-    // 🚨 Render Logic with onClick triggers 🚨
-    function renderAnnouncements() {
-        const grid = document.getElementById('grid-live');
-        const emptyState = document.getElementById('empty-state');
-        if(!grid) return;
-        
-        let announcements = JSON.parse(localStorage.getItem('beat_announcements')) || [];
-        
-        if (announcements.length > 0) {
-            if (emptyState) emptyState.style.display = 'none';
-            grid.innerHTML = '';
-            
-            announcements.forEach(ann => {
-                grid.innerHTML += `
-                    <div onclick="openAnnouncementDetails('${ann.id}')" class="border theme-border rounded-xl p-5 md:p-6 shadow-sm theme-surface flex flex-col bg-[#0f172a] cursor-pointer hover:border-blue-500/50 transition-colors relative overflow-hidden group">
-                        <div class="flex justify-between items-start mb-4 relative z-10">
-                            <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">${ann.category}</span>
-                            <span class="text-xs text-gray-500">${ann.date}</span>
-                        </div>
-                        <h3 class="text-lg md:text-xl font-bold text-white mb-2 relative z-10">${ann.title}</h3>
-                        <p class="text-sm text-slate-300 flex-1 relative z-10 line-clamp-2">${ann.content}</p>
-                        
-                        <div class="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity z-0 pointer-events-none"></div>
-                    </div>
-                `;
-            });
-        }
-    }
-
-    // 🚨 Logic to populate and open the details modal 🚨
-    function openAnnouncementDetails(id) {
-        let announcements = JSON.parse(localStorage.getItem('beat_announcements')) || [];
-        const ann = announcements.find(a => a.id === id);
-        
-        if(!ann) return;
-
-        currentAnnouncementId = id;
-        document.getElementById('modal-ann-title').innerText = ann.title;
-        document.getElementById('modal-ann-category').innerText = ann.category;
-        document.getElementById('modal-ann-date').innerText = ann.date;
-        document.getElementById('modal-ann-content').innerText = ann.content;
-        
-        openModal('view-announcement-modal');
-    }
-
-    // 🚨 Logic to forward the data to news.html 🚨
-    document.getElementById('btn-publish-news').addEventListener('click', function() {
-        if(!currentAnnouncementId) return;
-
-        let announcements = JSON.parse(localStorage.getItem('beat_announcements')) || [];
-        const targetAnn = announcements.find(a => a.id === currentAnnouncementId);
-        
-        if(targetAnn) {
-            let publicNews = JSON.parse(localStorage.getItem('beat_public_news')) || [];
-            
-            // Prevent duplicate publishing
-            if(!publicNews.some(n => n.id === targetAnn.id)) {
-                publicNews.unshift({
-                    id: targetAnn.id,
-                    title: targetAnn.title,
-                    date: targetAnn.date,
-                    content: targetAnn.content,
-                    category: targetAnn.category
-                });
-                localStorage.setItem('beat_public_news', JSON.stringify(publicNews));
-            }
-
-            closeModal('view-announcement-modal');
-            openModal('publish-success-modal');
-        }
-    });
-
-    function doLogout() { 
-        localStorage.removeItem('activeDepartment'); 
-        window.location.href = 'admin.html'; 
-    }
   </script>
 </body>
 </html>
