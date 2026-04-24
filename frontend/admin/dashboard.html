@@ -323,7 +323,7 @@
         const totalReportsElement = document.getElementById('total-reports-count');
         
         try {
-            const response = await fetch('https://beat-pasig-api.onrender.com/api/report/all').catch(() => null);
+            const response = await fetch('https://beat-pasig-api.onrender.com/api/reports/all').catch(() => null);
             
             let reports = [];
             let totalCount = 184;
