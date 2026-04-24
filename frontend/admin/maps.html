@@ -7,6 +7,16 @@
         if (!session || session !== 'Main Admin') window.location.replace('admin.html?error=unauthorized'); 
     })();
 
+    // Sidebar Toggle Logic
+    window.toggleSidebar = function() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        if (sidebar && overlay) {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+    };
+
     // Mobile Map Stats Toggle Logic
     window.toggleStatsPanel = function() {
         const content = document.getElementById('stats-panel-content');
@@ -19,6 +29,21 @@
             if(chevron) chevron.classList.remove('rotate-180');
         }
     };
+
+    // NEW: Mobile Map Legend Toggle Logic
+    window.toggleLegend = function() {
+        const legend = document.getElementById('map-legend');
+        const toggleBtn = document.getElementById('legend-toggle-btn');
+        if (legend.classList.contains('hidden')) {
+            legend.classList.remove('hidden');
+            legend.classList.add('grid');
+            if(toggleBtn) toggleBtn.classList.add('hidden');
+        } else {
+            legend.classList.add('hidden');
+            legend.classList.remove('grid');
+            if(toggleBtn) toggleBtn.classList.remove('hidden');
+        }
+    };
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,7 +51,7 @@
   
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
   
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet">
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
@@ -34,13 +59,27 @@
   <link rel="stylesheet" href="css/styles2.css">
   <style>
     body { font-family: 'DM Sans', sans-serif !important; overflow: hidden; background-color: #0a0e1a; }
+    
+    /* SIDEBAR CSS */
+    .sidebar { width: 260px !important; flex-shrink: 0 !important; }
+    .sidebar-item { 
+      display: flex !important; align-items: center !important; gap: 12px !important;
+      padding: 12px 18px !important; font-size: 14.5px !important; 
+      font-weight: 500 !important; color: #94a3b8 !important;
+      text-decoration: none !important; border-left: 3px solid transparent !important;
+    }
+    .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
+    .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
+    .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
+    
+    .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
+    .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
+    .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
+    .settings-link { color: #94a3b8; transition: color 0.2s; display: flex; align-items: center; }
+    .settings-link:hover { color: #3b82f6; }
 
-    /* Map Base Styles */
-    .map-wrapper { position: relative; flex-grow: 1; width: 100%; height: 100%; background: #070d19; overflow: hidden; }
-    #map { position: absolute; top: 0; bottom: 0; left: 0; right: 0; z-index: 1; }
-
-    /* Map Legend */
-    .map-legend { position: absolute; bottom: 30px; right: 20px; z-index: 10; background: rgba(10, 22, 40, 0.95); border: 1px solid #374151; border-radius: 12px; padding: 15px; display: grid; gap: 8px; pointer-events: none; backdrop-filter: blur(12px); }
+    /* FIXED: Map Legend with pointer-events enabled for the Close button */
+    .map-legend { position: absolute; bottom: 30px; right: 20px; z-index: 20; background: rgba(10, 22, 40, 0.95); border: 1px solid #374151; border-radius: 12px; padding: 15px; gap: 8px; pointer-events: auto; backdrop-filter: blur(12px); }
     .legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.75rem; color: white; }
     .dot { width: 10px; height: 10px; border-radius: 50%; }
     .section-label { color: #94a3b8; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
@@ -79,8 +118,58 @@
 </head>
 <body class="h-full flex bg-[#0a0e1a]">
 
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-[90] hidden lg:hidden" onclick="window.toggleSidebar()"></div>
+
+  <aside id="sidebar" class="sidebar flex flex-col h-full fixed lg:relative z-[100] transform -translate-x-full lg:translate-x-0 transition-transform duration-300 top-0 left-0 theme-border-r theme-surface">
+    <div class="h-[76px] px-5 flex items-center justify-between shrink-0 theme-border-b">
+        <div id="auth-logo" class="flex items-center gap-1.5">
+            <img src="../assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain" onerror="this.src='/assets/beat_logo2.png'">
+            <div class="flex flex-col justify-center items-start">
+                <img src="../assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1" onerror="this.src='/assets/beat_text2.png'">
+                <div style="color:#94a3b8; font-size:11px" class="leading-none">Command Center</div>
+            </div>
+        </div>
+        <button type="button" class="lg:hidden text-gray-400 hover:text-white p-2" onclick="window.toggleSidebar()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+    
+    <nav class="flex-1 py-4 overflow-y-auto">
+      <a href="dashboard.html" class="sidebar-item"><i data-lucide="layout-grid"></i><span>Dashboard Overview</span></a>
+      <a href="reports.html" class="sidebar-item"><i data-lucide="file-text"></i><span>System Reports</span></a>
+      <a href="announcements.html" class="sidebar-item"><i data-lucide="megaphone"></i><span>Global Announcements</span></a>
+      <a href="maps.html" class="sidebar-item active"><i data-lucide="map"></i><span>City Master Map</span></a>
+      <a href="manage_admin.html" class="sidebar-item"><i data-lucide="users"></i><span>Manage Departments</span></a>
+    </nav>
+
+    <div class="user-footer">
+        <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-3">
+                <div id="nav-avatar" style="background:#3b82f6; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">M</div>
+                <div>
+                  <div class="user-footer-name">Main Admin</div>
+                  <div class="user-footer-sub">Command Center</div>
+                </div>
+            </div>
+            <a href="profile.html" class="settings-link"><i data-lucide="settings" style="width:18px; height:18px"></i></a>
+        </div>
+        <button type="button" onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
+            <i data-lucide="log-out" style="width:16px; height:16px"></i> Logout
+        </button>
+    </div>
+  </aside>
+
   <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] relative h-full">
     
+    <header class="lg:hidden px-4 sm:px-8 h-[68px] flex items-center shrink-0 relative z-[40] theme-surface theme-border-b">
+      <button type="button" class="text-gray-400 hover:text-white mr-4 p-2 cursor-pointer z-50 relative" onclick="window.toggleSidebar()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+      </button>
+      <h1 class="text-lg font-semibold text-white flex items-center gap-2">
+        <i data-lucide="map" class="w-5 h-5 text-[#94a3b8]"></i> Master Map
+      </h1>
+    </header>
+
     <div class="relative flex-1 w-full h-full overflow-hidden map-wrapper">
         
         <div id="map" class="absolute inset-0 z-0"></div>
@@ -162,16 +251,27 @@
             </div>
         </div>
 
-        <div class="map-legend hidden lg:grid">
+        <button id="legend-toggle-btn" onclick="toggleLegend()" class="lg:hidden absolute bottom-6 right-5 z-20 bg-[#1e293b] border border-gray-600 text-white p-3 rounded-full shadow-2xl transition-all hover:bg-gray-700">
+            <i data-lucide="layers" class="w-5 h-5"></i>
+        </button>
+
+        <div id="map-legend" class="map-legend hidden lg:grid transition-all">
+            <div class="flex justify-between items-center lg:hidden mb-2 pb-2 border-b border-gray-700">
+                <span class="text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4 text-blue-500"></i> Map Legend</span>
+                <button onclick="toggleLegend()" class="text-gray-400 hover:text-red-400 transition-colors p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            
             <div class="section-label mb-1">Traffic Density</div>
             <div class="legend-item"><span class="dot" style="background: #4ade80;"></span> Smooth</div>
             <div class="legend-item"><span class="dot" style="background: #facc15;"></span> Moderate</div>
             <div class="legend-item"><span class="dot" style="background: #f87171;"></span> Heavy</div>
+            
             <div class="section-label mt-2 mb-1 border-t border-gray-700 pt-2">Network Operations</div>
             <div class="legend-item"><span class="dot" style="background: #ef4444; border: 1px dashed white;"></span> Blocked Area / Avoid</div>
             <div class="legend-item"><span class="dot" style="background: #3b82f6; border: 1px dashed white;"></span> DRRMO Custom Zone</div>
             <div class="legend-item"><span class="dot" style="background: #eab308; border: 1px dashed white;"></span> Evacuation Corridor</div>
         </div>
+
     </div>
   </main>
 
@@ -405,6 +505,11 @@
             map.flyTo({ center: barangayData[val].center, zoom: barangayData[val].zoom, pitch: 60 });
         };
     });
+
+    function doLogout() {
+        localStorage.removeItem('activeDepartment'); 
+        window.location.href = 'admin.html'; 
+    }
   </script>
 </body>
 </html>
