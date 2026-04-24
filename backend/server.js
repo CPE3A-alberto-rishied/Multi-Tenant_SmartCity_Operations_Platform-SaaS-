@@ -219,22 +219,6 @@ app.post('/api/admin/login', async (req, res) => {
             html: `<h3>Verification Code: <b>${otpCode}</b></h3><p>This code expires in 10 minutes.</p>`
         });
 
-        transporter.sendMail({
-            from: `"BEAT System Alert" <${process.env.EMAIL_USER}>`,
-            to: process.env.EMAIL_USER, // This sends the report details to your admin inbox
-            subject: `🚨 NEW INCIDENT REPORT: ${report_subject}`,
-            html: `
-                <h3>New Public Report Details:</h3>
-                <p><b>Subject:</b> ${report_subject}</p>
-                <p><b>From:</b> ${reporter_name} (${reporter_email})</p>
-                <p><b>Contact:</b> ${contact_number}</p>
-                <p><b>Location:</b> ${report_location}</p>
-                <p><b>Description:</b> ${report_description}</p>
-                <hr>
-                <p>Review this in the Admin Center at beatpasig.com/admin</p>
-            `
-        }).catch(e => console.error("Admin Mail Error:", e));
-
         res.status(200).json({ success: true, adminId: foundAdmin.id });
     } catch (error) {
         res.status(500).json({ success: false, error: "Server Error during 2FA." });
@@ -261,18 +245,6 @@ app.post('/api/admin/verify', async (req, res) => {
 });
 
 // Simple Login Route (using the same Admin model)
-app.post('/api/login', async (req, res) => {
-    const { id, password, dept } = req.body;
-    try {
-        const user = await Admin.findOne({ id });
-        if (!user || user.password !== password || user.dept !== dept) {
-            return res.status(401).json({ success: false, message: "Invalid ID, Password, or Department." });
-        }
-        res.json({ success: true, department: user.dept });
-    } catch (error) {
-        res.status(500).json({ success: false, message: "Server error." });
-    }
-});
 
 // 6. START SERVER (MUST BE AT THE VERY BOTTOM)
 const PORT = process.env.PORT || 3000;
