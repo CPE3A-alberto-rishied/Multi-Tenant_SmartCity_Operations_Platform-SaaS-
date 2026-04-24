@@ -326,18 +326,6 @@ app.post('/api/admin/verify', async (req, res) => {
 });
 
 // Simple Login Route (using the same Admin model)
-app.post('/api/login', async (req, res) => {
-    const { id, password, dept } = req.body;
-    try {
-        const user = await Admin.findOne({ id });
-        if (!user || user.password !== password || user.dept !== dept) {
-            return res.status(401).json({ success: false, message: "Invalid ID, Password, or Department." });
-        }
-        res.json({ success: true, department: user.dept });
-    } catch (error) {
-        res.status(500).json({ success: false, message: "Server error." });
-    }
-});
 
 // 6. START SERVER (MUST BE AT THE VERY BOTTOM)
 const PORT = process.env.PORT || 3000;

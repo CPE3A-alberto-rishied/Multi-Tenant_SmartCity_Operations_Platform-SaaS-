@@ -10,11 +10,11 @@
     if (localStorage.getItem('activeDepartment')) {
         const dept = localStorage.getItem('activeDepartment');
         if (dept === 'Main Admin') {
-            window.location.href = 'dashboard.html';
+            window.location.href = 'dashboard'; // Clean URL applied
         } else if (dept === 'Traffic') {
-            window.location.href = 'dashboard2.html';
+            window.location.href = 'dashboard2'; // Clean URL applied
         } else if (dept === 'DRRMO') {
-            window.location.href = 'dashboard3.html';
+            window.location.href = 'dashboard3.html'; // Clean URL applied
         }
     }
     </script>
@@ -138,15 +138,6 @@
             </div>
         </div>
 
-        <div id="resent-popup" class="modal-overlay hidden px-4">
-            <div class="card card-glow popup-panel">
-                <div class="icon-circle bg-green-accent flex items-center justify-center text-white"><i data-lucide="mail"></i></div>
-                <h2 class="text-white font-bold text-xl mb-4">Code Resent</h2>
-                <p class="text-dim-sm mb-8">A new verification code has been sent to your email.</p>
-                <button type="button" onclick="closePopup('resent-popup')" class="w-32 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 mx-auto rounded-[10px]">Got it</button>
-            </div>
-        </div>
-
         <div id="loading-popup" class="modal-overlay hidden px-4">
             <div class="card card-glow popup-panel flex flex-col items-center justify-center py-10">
                 <div class="icon-circle bg-blue-accent flex items-center justify-center text-white mb-6 animate-spin">
@@ -215,9 +206,7 @@
                     <input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 5)" onkeydown="handleOtpBack(event, 5)">
                 </div>
                 <p id="verify-error" class="error-text hidden mb-4">Please enter all 6 digits</p>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-[10px] mb-6 transition-colors">Verify Code</button>
-                
-                <p class="text-[12px] mb-8 text-[#94a3b8]">Didn't receive it? <button type="button" onclick="showResentPopup(event)" class="text-blue-500 font-semibold hover:text-blue-400">Resend</button></p>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-[10px] mb-8 transition-colors">Verify Code</button>
                 
                 <button type="button" onclick="showLoginScreen()" class="flex items-center justify-center gap-2 text-blue-500 text-[13px] font-semibold mx-auto hover:text-blue-400"><i data-lucide="arrow-left" style="width:14px"></i> Back</button>
             </form>
