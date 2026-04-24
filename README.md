@@ -40,64 +40,7 @@ The system is designed to streamline emergency responses: citizens file public r
 4. **The Resolution:** The incident is cleared, the report is marked as "Resolved," and the system automatically generates an official update for the public City News page.
 
 ## 🧊 System Architecture
-
-# Di ko malagay Codes or Picture ng Diagram haha
-flowchart TD
-    %% Styling
-    classDef public fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#fff;
-    classDef portal fill:#0f172a,stroke:#d946ef,stroke-width:2px,color:#fff;
-    classDef backend fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#fff;
-    classDef storage fill:#7c2d12,stroke:#f59e0b,stroke-width:2px,color:#fff;
-    classDef external fill:#4c1d95,stroke:#f97316,stroke-width:2px,color:#fff;
-
-    subgraph Client-Side [Frontend Architecture]
-        direction TB
-        
-        subgraph Public [Public Facing]
-            PUB[&quot;Citizen Portal (Home, Maps, Reports, News)&quot;]:::public
-        end
-
-        subgraph Portals [Secure Department Portals]
-            ADMIN[&quot;Main Admin Center (Global)&quot;]:::portal
-            TRAFFIC[&quot;Traffic Dept (Congestion &amp; Heatmaps)&quot;]:::portal
-            DRRMO[&quot;DRRMO Dept (Evacuation &amp; Alerts)&quot;]:::portal
-        end
-
-        LS[(&quot;Browser LocalStorage (Live State Sync)&quot;)]:::storage
-    end
-
-    subgraph Server-Side [Backend Infrastructure]
-        API[&quot;Node.js &amp; Express API (Render)&quot;]:::backend
-        DB[(&quot;MongoDB (Cloud Database)&quot;)]:::backend
-    end
-
-    subgraph Third-Party [External Services]
-        MAP[&quot;Mapbox GL &amp; Turf.js (Geospatial)&quot;]:::external
-        CHART[&quot;Chart.js (Data Analytics)&quot;]:::external
-    end
-
-    %% User Interactions
-    PUB --&gt;|Submits Emergency Reports| API
-    PUB -.-&gt;|Reads Live News| LS
-
-    %% Secure API Calls
-    ADMIN &lt;--&gt;|Manage Users &amp; Triage Reports| API
-    TRAFFIC &lt;--&gt;|Update Hazard Status| API
-    DRRMO &lt;--&gt;|Update Evacuation Status| API
-    API &lt;--&gt;|CRUD Operations| DB
-
-    %% Cross-Tab State Syncing (The Bridge)
-    TRAFFIC -.-&gt;|Broadcasts Blocked Roads| LS
-    DRRMO -.-&gt;|Broadcasts Hazards &amp; Resolved Incidents| LS
-    ADMIN -.-&gt;|Reads Live Hazards| LS
-
-    %% External API Routing
-    TRAFFIC --&gt;|Renders Maps &amp; Calculates Buffers| MAP
-    DRRMO --&gt;|Draws Polygons &amp; Heatmaps| MAP
-    ADMIN --&gt;|Displays Global City Map| MAP
-    PUB --&gt;|Views Public Layers| MAP
-    
-    TRAFFIC --&gt;|Renders Congestion Stats| CHART
+<img width="4032" height="779" alt="image" src="https://github.com/user-attachments/assets/37836a30-88dd-44ff-b06e-944de8042652" />
 
 ### 🏗️ Architecture Breakdown
 
