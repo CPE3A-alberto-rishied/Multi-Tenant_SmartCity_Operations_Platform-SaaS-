@@ -40,7 +40,8 @@ The system is designed to streamline emergency responses: citizens file public r
 4. **The Resolution:** The incident is cleared, the report is marked as "Resolved," and the system automatically generates an official update for the public City News page.
 
 ## 🧊 System Architecture
-<img width="4032" height="779" alt="image" src="https://github.com/user-attachments/assets/37836a30-88dd-44ff-b06e-944de8042652" />
+<img width="8192" height="5271" alt="System_Architecture" src="https://github.com/user-attachments/assets/95d7a245-650b-4970-bd21-c4c0c8f40596" />
+
 
 ### 🏗️ Architecture Breakdown
 
