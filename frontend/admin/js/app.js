@@ -408,7 +408,7 @@ async function fetchAdminReports() {
     if (!grid) return;
 
     try {
-        const response = await fetch('https://beat-pasig-api.onrender.com/api/report/all');
+        const response = await fetch('https://beat-pasig-api.onrender.com/api/reports/all');
         const result = await response.json();
 
         if (result.success) {
