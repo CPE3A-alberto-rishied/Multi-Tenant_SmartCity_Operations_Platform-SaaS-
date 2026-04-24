@@ -8,6 +8,16 @@
             window.location.replace('admin.html?error=unauthorized'); 
         }
     })();
+
+    // Sidebar Toggle Logic (Placed in head so it's instantly clickable)
+    window.toggleSidebar = function() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        if (sidebar && overlay) {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+    };
   </script>
 
   <meta charset="UTF-8">
@@ -18,6 +28,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
   <style>
+    body { font-family: 'DM Sans', sans-serif !important; overflow-x: hidden; background-color: #0a0e1a; }
+
     /* CRITICAL FIX: Ensure all modal overlays are fixed to the screen and stack correctly */
     .modal-overlay {
       position: fixed;
@@ -56,15 +68,22 @@
 </head>
 <body class="h-full flex bg-[#0a0e1a]">
 
-  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-50">
-    <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
-        <div id="auth-logo" class="flex items-center gap-1.5">
-            <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain">
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-[90] hidden lg:hidden" onclick="window.toggleSidebar()"></div>
+
+  <aside id="sidebar" class="sidebar flex flex-col h-full fixed lg:relative z-[100] transform -translate-x-full lg:translate-x-0 transition-transform duration-300 top-0 left-0 theme-border-r theme-surface">
+    
+    <div class="h-[76px] px-5 flex items-center justify-between shrink-0 theme-border-b">
+        <div class="flex items-center gap-0.5">
+            <img src="../assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain" onerror="this.src='/assets/beat_logo2.png'">
             <div class="flex flex-col justify-center items-start">
-                <img src="/assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1">
-                <div style="color:#94a3b8; font-size:11px" class="leading-none">Admin Control Center</div>
+                <img src="../assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1" onerror="this.src='/assets/beat_text2.png'">
+                <div style="color:#94a3b8; font-size:11px" class="leading-none">Traffic Department</div>
             </div>
         </div>
+        
+        <button type="button" class="lg:hidden text-gray-400 hover:text-white p-2" onclick="window.toggleSidebar()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
     </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
@@ -90,12 +109,20 @@
     </div>
   </aside>
 
-  <main class="flex-1 overflow-y-auto flex flex-col">
-    <header class="px-8 h-[76px] flex items-center shrink-0 theme-surface theme-border-b">
-      <h1 class="text-xl font-semibold text-white flex items-center gap-2"><i data-lucide="file-text" class="icon-lg"></i> Public Reports</h1>
+  <main class="flex-1 overflow-y-auto flex flex-col relative min-w-0">
+    
+    <header class="px-4 sm:px-8 h-[76px] flex items-center shrink-0 relative z-[40] theme-surface theme-border-b">
+      <div class="flex items-center">
+        <button type="button" class="lg:hidden text-gray-400 hover:text-white mr-4 p-2 cursor-pointer z-50 relative" onclick="window.toggleSidebar()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+        </button>
+        <h1 class="text-xl font-semibold text-white flex items-center gap-2">
+            <i data-lucide="file-text" class="w-6 h-6 text-[#94a3b8] hidden sm:block"></i> Public Reports
+        </h1>
+      </div>
     </header>
 
-    <div class="p-8 flex-1 animate-in">
+    <div class="p-4 sm:p-8 flex-1 animate-in">
       <div class="flex flex-wrap gap-4 items-center justify-between mb-8">
         <div class="flex flex-wrap gap-3 items-center">
           <input type="date" id="filter-date" onchange="filterReports()" class="h-10 bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 text-sm outline-none cursor-pointer min-w-[160px]">

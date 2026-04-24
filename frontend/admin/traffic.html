@@ -6,6 +6,16 @@
         const session = localStorage.getItem('activeDepartment');
         if (!session) window.location.replace('admin.html?error=unauthorized'); 
     })();
+
+    // Sidebar Toggle Logic (Placed securely in head so it always works)
+    window.toggleSidebar = function() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        if (sidebar && overlay) {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+    }
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,10 +34,36 @@
   <link rel="stylesheet" href="css/styles2.css">
   
   <style>
+<<<<<<< Updated upstream
     /* Active Red Marker */
     .hazard-marker-active {
         width: 24px; height: 24px; background-color: #ef4444; border: 3px solid white; border-radius: 50%; 
         box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); animation: pulse-red 2s infinite; cursor: pointer;
+=======
+    body { font-family: 'DM Sans', sans-serif !important; overflow: hidden; background-color: #0a0e1a; }
+    
+    /* SIDEBAR */
+    .sidebar { width: 260px !important; flex-shrink: 0 !important; }
+    .sidebar-item { 
+      display: flex !important; align-items: center !important; gap: 12px !important;
+      padding: 12px 18px !important; font-size: 14.5px !important; 
+      font-weight: 500 !important; color: #94a3b8 !important;
+      text-decoration: none !important; border-left: 3px solid transparent !important;
+    }
+    .sidebar-item i, .sidebar-item svg { width: 20px !important; height: 20px !important; flex-shrink: 0 !important; }
+    .sidebar-item:hover { color: white !important; background: var(--surface2) !important; }
+    .sidebar-item.active { background: var(--surface2) !important; color: #3b82f6 !important; border-left-color: #2563eb !important; }
+    
+    .user-footer { padding: 20px; border-top: 1px solid var(--border); margin-top: auto; }
+    .user-footer-name { font-size: 14px !important; font-weight: 600; color: white; }
+    .user-footer-sub { font-size: 11px !important; color: #94a3b8; }
+    .settings-link { color: #94a3b8; transition: color 0.2s; display: flex; align-items: center; }
+    .settings-link:hover { color: #3b82f6; }
+
+    .hazard-magenta-marker {
+        width: 24px; height: 24px; background-color: #d946ef; border: 3px solid white; border-radius: 50%; 
+        box-shadow: 0 0 20px rgba(217, 70, 239, 0.8); animation: pulse-magenta 2s infinite; cursor: pointer;
+>>>>>>> Stashed changes
     }
     @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239,68,68, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(239,68,68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68, 0); } }
 
@@ -40,6 +76,7 @@
 </head>
 
 <body class="h-full flex bg-[#0a0e1a]">
+<<<<<<< Updated upstream
   <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-50">
     <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
       <div class="flex items-center gap-3">
@@ -49,6 +86,24 @@
           <div class="sidebar-subtext">Department Portal</div>
         </div>
       </div>
+=======
+
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-[90] hidden lg:hidden" onclick="window.toggleSidebar()"></div>
+
+  <aside id="sidebar" class="sidebar flex flex-col h-full fixed lg:relative z-[100] transform -translate-x-full lg:translate-x-0 transition-transform duration-300 top-0 left-0 theme-border-r theme-surface">
+    <div class="h-[76px] px-5 flex items-center justify-between shrink-0 theme-border-b">
+        <div id="auth-logo" class="flex items-center gap-1.5">
+            <img src="../assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain" onerror="this.src='/assets/beat_logo2.png'">
+            <div class="flex flex-col justify-center items-start">
+                <img src="../assets/beat_text2.png" alt="BEAT" class="w-[40px] object-contain object-left mb-1" onerror="this.src='/assets/beat_text2.png'">
+                <div style="color:#94a3b8; font-size:11px" class="leading-none">Traffic Department</div>
+            </div>
+        </div>
+
+        <button type="button" class="lg:hidden text-gray-400 hover:text-white p-2" onclick="window.toggleSidebar()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+>>>>>>> Stashed changes
     </div>
     
     <nav class="flex-1 py-4 overflow-y-auto">
@@ -61,15 +116,31 @@
 
     <div class="user-footer">
         <div class="flex items-center justify-between mb-5">
+<<<<<<< Updated upstream
             <div class="flex items-center gap-3"><div id="nav-avatar" class="nav-avatar">T</div><div><div class="user-footer-name">Traffic</div><div class="user-footer-sub">Traffic Department</div></div></div>
             <a href="profile2.html" class="settings-link"><i data-lucide="settings" class="icon-md"></i></a>
         </div>
         <button type="button" onclick="doLogout()" class="btn-logout"><i data-lucide="log-out" class="icon-sm"></i> Logout</button>
+=======
+            <div class="flex items-center gap-3">
+                <div id="nav-avatar" style="background:#2563eb; width:42px; height:42px; border-radius:50%; background-size:cover;" class="flex items-center justify-center text-white font-bold text-sm shadow-lg">T</div>
+                <div>
+                  <div class="user-footer-name">Traffic</div>
+                  <div class="user-footer-sub">Traffic Department</div>
+                </div>
+            </div>
+            <a href="profile2.html" class="settings-link"><i data-lucide="settings" style="width:18px; height:18px"></i></a>
+        </div>
+        <button type="button" onclick="doLogout()" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-700 hover:bg-gray-800 transition-colors text-sm font-semibold text-white">
+            <i data-lucide="log-out" style="width:16px; height:16px"></i> Logout
+        </button>
+>>>>>>> Stashed changes
     </div>
   </aside>
 
-  <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] relative">
+  <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] relative h-full">
     
+<<<<<<< Updated upstream
     <div class="absolute top-6 left-6 z-10 w-96 flex flex-col gap-4 max-h-[90vh]">
         <div class="theme-surface border theme-border rounded-2xl p-6 shadow-2xl backdrop-blur-md bg-opacity-95 flex-shrink-0">
             <div class="flex items-center justify-between mb-1">
@@ -105,50 +176,106 @@
             </h3>
             <div id="incidents-list" class="space-y-3 overflow-y-auto pr-2 pb-2"></div>
         </div>
-    </div>
+=======
+    <header class="lg:hidden px-4 sm:px-8 h-[68px] flex items-center shrink-0 relative z-[40] theme-surface theme-border-b">
+      <button type="button" class="text-gray-400 hover:text-white mr-4 p-2 cursor-pointer z-50 relative" onclick="window.toggleSidebar()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+      </button>
+      <h1 class="text-lg font-semibold text-white flex items-center gap-2">
+        <i data-lucide="car" class="w-5 h-5 text-[#94a3b8]"></i> Traffic Control
+      </h1>
+    </header>
 
-    <div class="absolute top-6 right-6 z-10 w-64">
-        <div class="theme-surface border theme-border rounded-xl p-4 shadow-2xl backdrop-blur-md bg-opacity-95">
-            <div class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2 flex items-center gap-2">
-                <i data-lucide="map" class="w-3 h-3 text-blue-500"></i> Jump to District
+    <div class="relative flex-1 w-full h-full">
+        
+        <div class="absolute top-4 lg:top-6 left-4 lg:left-6 right-4 lg:right-auto z-10 lg:w-96 flex flex-col gap-4 max-h-[60vh] lg:max-h-[90vh] pointer-events-none">
+            <div class="theme-surface border theme-border rounded-2xl p-4 lg:p-6 shadow-2xl backdrop-blur-md bg-opacity-95 flex-shrink-0 pointer-events-auto overflow-y-auto">
+                <div class="flex items-center justify-between mb-1 hidden lg:flex">
+                    <h2 class="text-white font-bold text-lg flex items-center gap-2"><i data-lucide="shield-alert" class="text-[#d946ef]"></i> Exclusion Zone Ops</h2>
+                </div>
+                <p class="text-[11px] text-[#94a3b8] mb-4 lg:mb-6 hidden lg:block">Draw blocked roads, automatically generate solid avoidance zones, and sync them to Main HQ.</p>
+                
+                <div class="space-y-3 lg:space-y-4">
+                    <div class="p-3 lg:p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative">
+                        <div class="absolute -left-2 -top-2 lg:-left-3 lg:-top-3 w-5 h-5 lg:w-6 lg:h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">1</div>
+                        <button type="button" id="btn-draw-hazard" class="w-full bg-[#1e293b] hover:bg-gray-700 text-[#d946ef] hover:text-white text-xs lg:text-sm font-bold py-2 lg:py-2.5 rounded-lg border border-[#d946ef]/50 transition-all flex justify-center items-center gap-2">
+                            <i data-lucide="pen-tool" class="w-4 h-4"></i> Draw Blocked Road
+                        </button>
+                        <p id="draw-status" class="text-[10px] text-yellow-500 mt-2 text-center font-bold tracking-wider hidden">Click map to draw line, double click to finish.</p>
+                    </div>
+
+                    <div class="p-3 lg:p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative opacity-50 transition-opacity" id="step-2-box">
+                        <div class="absolute -left-2 -top-2 lg:-left-3 lg:-top-3 w-5 h-5 lg:w-6 lg:h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">2</div>
+                        <div class="space-y-2 lg:space-y-3">
+                            <input type="text" id="hazard-title" placeholder="Incident Title" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-1.5 lg:py-2 text-xs lg:text-sm outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
+                            <input type="text" id="hazard-desc" placeholder="Details (e.g., 2 lanes closed)" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-1.5 lg:py-2 text-xs lg:text-sm outline-none" onkeydown="if(event.key==='Enter'){event.preventDefault();}">
+                            <button type="button" id="btn-calc" disabled class="w-full bg-blue-600 text-white text-xs lg:text-sm font-bold py-2 lg:py-2.5 rounded-lg shadow-lg transition-all flex justify-center items-center gap-2 disabled:cursor-not-allowed">
+                                <i data-lucide="cpu" class="w-4 h-4"></i> Generate Solid Zone
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="p-3 lg:p-4 rounded-xl border border-gray-800 bg-[#0f172a] relative opacity-50 transition-opacity" id="step-3-box">
+                        <div class="absolute -left-2 -top-2 lg:-left-3 lg:-top-3 w-5 h-5 lg:w-6 lg:h-6 bg-gray-800 text-white rounded-full flex items-center justify-center text-[10px] font-bold border-2 border-[#0a0e1a]">3</div>
+                        <button type="button" id="btn-broadcast" disabled class="w-full bg-[#d946ef] hover:bg-[#c026d3] text-white text-xs lg:text-sm font-bold py-2 lg:py-2.5 rounded-lg shadow-lg transition-all flex justify-center items-center gap-2 disabled:cursor-not-allowed">
+                            <i data-lucide="upload-cloud" class="w-4 h-4"></i> Broadcast to HQ
+                        </button>
+                    </div>
+                </div>
             </div>
-            <select class="w-full bg-[#1e2536] border border-[#374151] text-white px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider outline-none cursor-pointer" onchange="zoomToBarangay(this.value)">
-                <option value="">-- Select Barangay --</option>
-                <option value="bagong-ilog">Bagong Ilog</option>
-                <option value="bagong-katipunan">Bagong Katipunan</option>
-                <option value="bambang">Bambang</option>
-                <option value="buting">Buting</option>
-                <option value="caniogan">Caniogan</option>
-                <option value="dela-paz">Dela Paz</option>
-                <option value="kalawaan">Kalawaan</option>
-                <option value="kapasigan">Kapasigan</option>
-                <option value="kapitolyo">Kapitolyo</option>
-                <option value="malinao">Malinao</option>
-                <option value="manggahan">Manggahan</option>
-                <option value="maybunga">Maybunga</option>
-                <option value="oranbo">Oranbo</option>
-                <option value="palatiw">Palatiw</option>
-                <option value="pinagbuhatan">Pinagbuhatan</option>
-                <option value="pineda">Pineda</option>
-                <option value="rosario">Rosario</option>
-                <option value="sagad">Sagad</option>
-                <option value="san-antonio">San Antonio</option>
-                <option value="san-joaquin">San Joaquin</option>
-                <option value="san-jose">San Jose</option>
-                <option value="san-miguel">San Miguel</option>
-                <option value="san-nicolas">San Nicolas</option>
-                <option value="santa-cruz">Santa Cruz</option>
-                <option value="santa-lucia">Santa Lucia</option>
-                <option value="santa-rosa">Santa Rosa</option>
-                <option value="santo-tomas">Santo Tomas</option>
-                <option value="santolan">Santolan</option>
-                <option value="sumilang">Sumilang</option>
-                <option value="ugong">Ugong</option>
-            </select>
-        </div>
-    </div>
 
-    <div id="map" class="w-full h-full"></div>
+            <div class="theme-surface border theme-border rounded-2xl p-4 shadow-2xl flex-1 overflow-hidden flex-col hidden pointer-events-auto" id="active-incidents-container">
+                <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-3 flex items-center justify-between">
+                    Active Operations <span id="op-count" class="bg-rose-500 text-white px-2 py-0.5 rounded-full text-[10px]">0</span>
+                </h3>
+                <div id="incidents-list" class="space-y-3 overflow-y-auto pr-2 pb-2"></div>
+            </div>
+        </div>
+
+        <div class="absolute bottom-8 lg:bottom-auto lg:top-6 right-4 lg:right-6 left-4 lg:left-auto lg:w-64 z-10 pointer-events-none">
+            <div class="theme-surface border theme-border rounded-xl p-3 lg:p-4 shadow-2xl backdrop-blur-md bg-opacity-95 pointer-events-auto">
+                <div class="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <i data-lucide="map" class="w-3 h-3 text-blue-500"></i> Jump to District
+                </div>
+                <select class="w-full bg-[#1e2536] border border-[#374151] text-white px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wider outline-none cursor-pointer" onchange="zoomToBarangay(this.value)">
+                    <option value="">-- Select Barangay --</option>
+                    <option value="bagong-ilog">Bagong Ilog</option>
+                    <option value="bagong-katipunan">Bagong Katipunan</option>
+                    <option value="bambang">Bambang</option>
+                    <option value="buting">Buting</option>
+                    <option value="caniogan">Caniogan</option>
+                    <option value="dela-paz">Dela Paz</option>
+                    <option value="kalawaan">Kalawaan</option>
+                    <option value="kapasigan">Kapasigan</option>
+                    <option value="kapitolyo">Kapitolyo</option>
+                    <option value="malinao">Malinao</option>
+                    <option value="manggahan">Manggahan</option>
+                    <option value="maybunga">Maybunga</option>
+                    <option value="oranbo">Oranbo</option>
+                    <option value="palatiw">Palatiw</option>
+                    <option value="pinagbuhatan">Pinagbuhatan</option>
+                    <option value="pineda">Pineda</option>
+                    <option value="rosario">Rosario</option>
+                    <option value="sagad">Sagad</option>
+                    <option value="san-antonio">San Antonio</option>
+                    <option value="san-joaquin">San Joaquin</option>
+                    <option value="san-jose">San Jose</option>
+                    <option value="san-miguel">San Miguel</option>
+                    <option value="san-nicolas">San Nicolas</option>
+                    <option value="santa-cruz">Santa Cruz</option>
+                    <option value="santa-lucia">Santa Lucia</option>
+                    <option value="santa-rosa">Santa Rosa</option>
+                    <option value="santo-tomas">Santo Tomas</option>
+                    <option value="santolan">Santolan</option>
+                    <option value="sumilang">Sumilang</option>
+                    <option value="ugong">Ugong</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="map" class="absolute inset-0 w-full h-full z-0"></div>
+>>>>>>> Stashed changes
+    </div>
   </main>
 
   <script src="js/app2.js"></script>
@@ -284,6 +411,18 @@
             const mainContainer = document.getElementById('active-incidents-container');
             listContainer.innerHTML = '';
             
+<<<<<<< Updated upstream
+=======
+            document.getElementById('op-count').innerText = activeHazards.length;
+            if(activeHazards.length > 0) {
+                mainContainer.classList.remove('hidden');
+                mainContainer.classList.add('flex');
+            } else {
+                mainContainer.classList.add('hidden');
+                mainContainer.classList.remove('flex');
+            }
+
+>>>>>>> Stashed changes
             Object.values(mapMarkers).forEach(m => m.remove());
             mapMarkers = {};
             let zoneFeatures = [];
