@@ -26,11 +26,7 @@
         }
         
         #map { 
-            position: absolute;
-            top: 0; 
-            bottom: 0; 
-            width: 100%; 
-            z-index: 1; 
+            position: absolute; top: 0; bottom: 0; width: 100%; z-index: 1; 
         }
 
         /* --- DESKTOP STYLES - COMPACT PANEL --- */
@@ -65,36 +61,21 @@
         }
         
         .barangay-select {
-            width: 100%;
-            background: rgba(5, 10, 20, 0.8);
-            border: 1px solid var(--blue);
-            color: white;
-            padding: 10px;
-            font-size: 0.9rem;
-            border-radius: 6px;
-            font-family: 'Barlow Condensed';
-            text-transform: uppercase;
-            outline: none;
-            margin-top: 10px;
-            cursor: pointer;
+            width: 100%; background: rgba(5, 10, 20, 0.8); border: 1px solid var(--blue); color: white; padding: 10px;
+            font-size: 0.9rem; border-radius: 6px; font-family: 'Barlow Condensed'; text-transform: uppercase; outline: none; margin-top: 10px; cursor: pointer;
         }
         
-        .legend-item {
-            display: flex; align-items: center; gap: 12px; font-size: 0.85rem; color: var(--white); font-family: 'Barlow Condensed'; font-weight: 600; text-transform: uppercase;
-        }
-        
+        .legend-item { display: flex; align-items: center; gap: 12px; font-size: 0.85rem; color: var(--white); font-family: 'Barlow Condensed'; font-weight: 600; text-transform: uppercase; }
         .dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
         .section-label { color: #94a3b8; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
         
-        .mapboxgl-popup-content {
-            padding: 12px 14px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); background: #1e293b !important; color: white !important; border: 1px solid rgba(255,255,255,0.1);
-        }
+        .mapboxgl-popup-content { padding: 12px 14px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); background: #1e293b !important; color: white !important; border: 1px solid rgba(255,255,255,0.1); }
         .mapboxgl-popup-tip { border-top-color: #1e293b !important; border-bottom-color: #1e293b !important; }
         .mapboxgl-popup-close-button { color: #94a3b8; font-size: 16px; top: 4px; right: 8px; }
         .mapboxgl-popup-close-button:hover { color: white; background: transparent; }
 
         /* Custom Toggles */
-        .layer-switch { position: relative; display: inline-block; width: 34px; height: 20px; }
+        .layer-switch { position: relative; display: inline-block; width: 34px; height: 20px; flex-shrink: 0; }
         .layer-switch input { opacity: 0; width: 0; height: 0; }
         .layer-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #374151; transition: .4s; border-radius: 34px; }
         .layer-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
@@ -108,8 +89,8 @@
         .weather-blue-marker { width: 16px; height: 16px; background-color: #3b82f6; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); animation: pulse-blue 2s infinite; cursor: pointer; }
         @keyframes pulse-blue { 0% { box-shadow: 0 0 0 0 rgba(59,130,246, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(59,130,246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59,130,246, 0); } }
 
-       .pickup-marker { width: 16px; height: 16px; background-color: #ff8513; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 15px rgba(255, 133, 19, 0.8); animation: pulse-orange 2s infinite; cursor: pointer; }
-        @keyframes pulse-orange { 0% { box-shadow: 0 0 0 0 rgba(255, 133, 19, 0.8); } 70% { box-shadow: 0 0 0 10px rgba(168,85,247, 0); } 100% { box-shadow: 0 0 0 0 rgba(168,85,247, 0); } }
+        .pickup-marker { width: 16px; height: 16px; background-color: #ff8513; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 15px rgba(255, 133, 19, 0.8); animation: pulse-orange 2s infinite; cursor: pointer; }
+        @keyframes pulse-orange { 0% { box-shadow: 0 0 0 0 rgba(255, 133, 19, 0.8); } 70% { box-shadow: 0 0 0 10px rgba(255, 133, 19, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 133, 19, 0); } }
 
         /* FACILITIES */
         .center-marker, .hospital-marker, .police-marker { width: 26px; height: 26px; border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.3s ease; }
@@ -118,9 +99,38 @@
         .police-marker { background-color: #3b82f6; }
         .center-marker.pulsing, .hospital-marker.pulsing, .police-marker.pulsing { transform: scale(1.15); z-index: 10; box-shadow: 0 0 20px currentColor; }
 
+        /* --- MOBILE RESPONSIVE STYLES (DYNAMIC LAYOUT & RETRACTABLE) --- */
+        .mobile-collapsible { transition: max-height 0.3s ease-in-out; }
+        .mobile-collapsible.collapsed { display: none !important; }
+        
+        /* --- MOBILE RESPONSIVE STYLES --- */
         @media (max-width: 768px) {
-            .map-overlay-panel { top: 10px; left: 10px; width: 280px; padding: 16px; background: rgba(10, 22, 40, 0.7); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); border: 1px solid rgba(96, 165, 250, 0.2); }
-            .map-legend { bottom: 15px; left: 10px; right: 10px; width: calc(100% - 20px); padding: 12px 16px; }
+            .mobile-collapsible.collapsed { display: none !important; }
+            
+            .map-overlay-panel { 
+                top: 10px; left: 10px; width: calc(100% - 20px); 
+                padding: 12px 16px; background: rgba(10, 22, 40, 0.95); 
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); 
+                border: 1px solid rgba(96, 165, 250, 0.3); 
+                border-radius: 8px; max-height: 55vh; overflow-y: auto; z-index: 20; 
+            }
+            .map-legend { 
+                position: absolute; bottom: 10px; left: 10px; width: calc(100% - 20px); 
+                margin: 0; padding: 12px 16px; border-radius: 8px; z-index: 20; 
+                background: rgba(10, 22, 40, 0.95); max-height: 35vh; overflow-y: auto;
+                border: 1px solid rgba(96, 165, 250, 0.3);
+            }
+            
+            /* Responsive Font Scaling */
+            .map-overlay-panel .section-title { font-size: 1.3rem !important; margin-bottom: 6px !important; }
+            .barangay-select { padding: 8px; font-size: 0.85rem; margin-top: 5px; }
+            .legend-item { font-size: 0.7rem; gap: 8px; margin-bottom: 2px; }
+            .dot { width: 10px; height: 10px; }
+            .section-label { font-size: 0.65rem; margin-bottom: 2px !important; }
+            
+            .layer-switch { transform: scale(0.8); transform-origin: right center; }
+            #btn-drop-checkpoint, #btn-dispatch { padding: 8px; font-size: 0.85rem !important; }
+            #checkpoint-name, #target-center { padding: 6px; font-size: 0.8rem !important; }
         }
     </style>
 </head>
@@ -163,139 +173,157 @@
         <div class="grid-overlay" style="z-index: 2; pointer-events: none;"></div>
 
         <div class="map-overlay-panel">
-            <div class="section-label" style="margin-bottom: 6px;">GEOSPATIAL NAVIGATOR</div>
-            <h2 class="section-title" style="font-size: 1.8rem; margin-bottom: 12px; font-family: 'Bebas Neue', sans-serif; color: white; letter-spacing: 1px;">JUMP TO DISTRICT</h2>
-   
-            <select class="barangay-select" onchange="zoomToBarangay(this.value)">
-                <option value="">-- ALL DISTRICTS --</option>
-                <option value="bagong-ilog">Bagong Ilog</option>
-                <option value="bagong-katipunan">Bagong Katipunan</option>
-                <option value="bambang">Bambang</option>
-                <option value="buting">Buting</option>
-                <option value="caniogan">Caniogan</option>
-                <option value="dela-paz">Dela Paz</option>
-                <option value="kalawaan">Kalawaan</option>
-                <option value="kapasigan">Kapasigan</option>
-                <option value="kapitolyo">Kapitolyo</option>
-                <option value="malinao">Malinao</option>
-                <option value="manggahan">Manggahan</option>
-                <option value="maybunga">Maybunga</option>
-                <option value="oranbo">Oranbo</option>
-                <option value="palatiw">Palatiw</option>
-                <option value="pinagbuhatan">Pinagbuhatan</option>
-                <option value="pineda">Pineda</option>
-                <option value="rosario">Rosario</option>
-                <option value="sagad">Sagad</option>
-                <option value="san-antonio">San Antonio</option>
-                <option value="san-joaquin">San Joaquin</option>
-                <option value="san-jose">San Jose</option>
-                <option value="san-miguel">San Miguel</option>
-                <option value="san-nicolas">San Nicolas</option>
-                <option value="santa-cruz">Santa Cruz</option>
-                <option value="santa-lucia">Santa Lucia</option>
-                <option value="santa-rosa">Santa Rosa</option>
-                <option value="santo-tomas">Santo Tomas</option>
-                <option value="santolan">Santolan</option>
-                <option value="sumilang">Sumilang</option>
-                <option value="ugong">Ugong</option>
-            </select>
-
-            <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(26, 86, 219, 0.2);">
-                <div class="flex items-center justify-between mb-3">
-                    <span style="color: white; font-family: 'Barlow Condensed'; font-weight: bold; letter-spacing: 1px; font-size: 0.9rem;">TRAFFIC DENSITY</span>
-                    <label class="layer-switch">
-                        <input type="checkbox" id="toggle-density" checked onchange="toggleLayer('density', this.checked)">
-                        <span class="layer-slider"></span>
-                    </label>
+            <div class="flex justify-between items-start cursor-pointer" onclick="toggleNav()">
+                <div>
+                    <div class="section-label" style="margin-bottom: 2px;">GEOSPATIAL NAVIGATOR</div>
+                    <h2 class="section-title" style="font-size: 1.8rem; margin-bottom: 0; font-family: 'Bebas Neue', sans-serif; color: white; letter-spacing: 1px;">JUMP TO DISTRICT</h2>
                 </div>
-                <div class="flex items-center justify-between mb-3">
-                    <span style="color: white; font-family: 'Barlow Condensed'; font-weight: bold; letter-spacing: 1px; font-size: 0.9rem;">TRAFFIC OPERATIONS</span>
-                    <label class="layer-switch">
-                        <input type="checkbox" id="toggle-ops" checked onchange="toggleLayer('ops', this.checked)">
-                        <span class="layer-slider"></span>
-                    </label>
-                </div>
-                <div class="flex items-center justify-between mb-3">
-                    <span style="color: white; font-family: 'Barlow Condensed'; font-weight: bold; letter-spacing: 1px; font-size: 0.9rem;">DRRMO CUSTOM ZONES</span>
-                    <label class="layer-switch">
-                        <input type="checkbox" id="toggle-weather" checked onchange="toggleLayer('weather', this.checked)">
-                        <span class="layer-slider"></span>
-                    </label>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span style="color: white; font-family: 'Barlow Condensed'; font-weight: bold; letter-spacing: 1px; font-size: 0.9rem;">EVACUATION FEATURES</span>
-                    <label class="layer-switch">
-                        <input type="checkbox" id="toggle-evac" checked onchange="toggleLayer('evac', this.checked)">
-                        <span class="layer-slider"></span>
-                    </label>
-                </div>
+                <button class="text-gray-400 hover:text-white transition-colors focus:outline-none mt-1">
+                    <i data-lucide="chevron-up" id="nav-chevron" class="w-6 h-6"></i>
+                </button>
             </div>
+   
+            <div id="nav-content" class="mobile-collapsible mt-3">
+                <select class="barangay-select" onchange="zoomToBarangay(this.value)">
+                    <option value="">-- ALL DISTRICTS --</option>
+                    <option value="bagong-ilog">Bagong Ilog</option>
+                    <option value="bagong-katipunan">Bagong Katipunan</option>
+                    <option value="bambang">Bambang</option>
+                    <option value="buting">Buting</option>
+                    <option value="caniogan">Caniogan</option>
+                    <option value="dela-paz">Dela Paz</option>
+                    <option value="kalawaan">Kalawaan</option>
+                    <option value="kapasigan">Kapasigan</option>
+                    <option value="kapitolyo">Kapitolyo</option>
+                    <option value="malinao">Malinao</option>
+                    <option value="manggahan">Manggahan</option>
+                    <option value="maybunga">Maybunga</option>
+                    <option value="oranbo">Oranbo</option>
+                    <option value="palatiw">Palatiw</option>
+                    <option value="pinagbuhatan">Pinagbuhatan</option>
+                    <option value="pineda">Pineda</option>
+                    <option value="rosario">Rosario</option>
+                    <option value="sagad">Sagad</option>
+                    <option value="san-antonio">San Antonio</option>
+                    <option value="san-joaquin">San Joaquin</option>
+                    <option value="san-jose">San Jose</option>
+                    <option value="san-miguel">San Miguel</option>
+                    <option value="san-nicolas">San Nicolas</option>
+                    <option value="santa-cruz">Santa Cruz</option>
+                    <option value="santa-lucia">Santa Lucia</option>
+                    <option value="santa-rosa">Santa Rosa</option>
+                    <option value="santo-tomas">Santo Tomas</option>
+                    <option value="santolan">Santolan</option>
+                    <option value="sumilang">Sumilang</option>
+                    <option value="ugong">Ugong</option>
+                </select>
 
-            <div id="corridor-tool-container" style="margin-top: 18px; border-top: 1px solid rgba(26, 86, 219, 0.2); padding-top: 14px;">
-                <div class="section-label" style="margin-bottom: 10px; letter-spacing: 0.2em;">EVACUATION ROUTING</div>
-                
-                <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <button type="button" id="btn-drop-checkpoint" style="width: 100%; background: rgba(168, 85, 247, 0.1); border: 1px solid #ff8513; color: white; padding: 10px; border-radius: 6px; font-family: 'Barlow Condensed'; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
-                        SET MOVEMENT ORIGIN
-                    </button>
-                    <p id="drop-status" style="font-size: 0.75rem; color: #ff8513; font-family: 'Barlow Condensed'; text-align: center; display: none;">Click anywhere on the map to set the origin point.</p>
+                <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(26, 86, 219, 0.2);">
+                    <div class="flex items-center justify-between mb-3">
+                        <span style="color: white; font-family: 'Barlow Condensed'; font-weight: bold; letter-spacing: 1px; font-size: 0.9rem;">TRAFFIC DENSITY</span>
+                        <label class="layer-switch">
+                            <input type="checkbox" id="toggle-density" checked onchange="toggleLayer('density', this.checked)">
+                            <span class="layer-slider"></span>
+                        </label>
+                    </div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span style="color: white; font-family: 'Barlow Condensed'; font-weight: bold; letter-spacing: 1px; font-size: 0.9rem;">TRAFFIC OPERATIONS</span>
+                        <label class="layer-switch">
+                            <input type="checkbox" id="toggle-ops" checked onchange="toggleLayer('ops', this.checked)">
+                            <span class="layer-slider"></span>
+                        </label>
+                    </div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span style="color: white; font-family: 'Barlow Condensed'; font-weight: bold; letter-spacing: 1px; font-size: 0.9rem;">DRRMO CUSTOM ZONES</span>
+                        <label class="layer-switch">
+                            <input type="checkbox" id="toggle-weather" checked onchange="toggleLayer('weather', this.checked)">
+                            <span class="layer-slider"></span>
+                        </label>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span style="color: white; font-family: 'Barlow Condensed'; font-weight: bold; letter-spacing: 1px; font-size: 0.9rem;">EVACUATION FEATURES</span>
+                        <label class="layer-switch">
+                            <input type="checkbox" id="toggle-evac" checked onchange="toggleLayer('evac', this.checked)">
+                            <span class="layer-slider"></span>
+                        </label>
+                    </div>
+                </div>
 
-                    <div id="routing-options" style="display: none; flex-direction: column; gap: 8px; margin-top: 8px;">
-                        <input type="text" id="checkpoint-name" placeholder="Origin Landmark/Street" style="width: 100%; background: rgba(5, 10, 20, 0.8); border: 1px solid #374151; color: white; padding: 8px; border-radius: 6px; font-family: 'Barlow Condensed'; font-size: 0.85rem; outline: none;">
-                        
-                        <select id="target-center" style="width: 100%; background: rgba(5, 10, 20, 0.8); border: 1px solid #374151; color: white; padding: 8px; border-radius: 6px; font-family: 'Barlow Condensed'; font-size: 0.85rem; outline: none; cursor: pointer;">
-                            <option value="" disabled selected>Select Safe Zone...</option>
-                            <optgroup label="General Evacuation Centers">
-                                <option value="1">Rizal High School Gym</option>
-                                <option value="2">Pasig City Sports Complex</option>
-                                <option value="3">Kapitolyo High School</option>
-                                <option value="4">Manggahan Elementary</option>
-                                <option value="5">Santolan Elementary School</option>
-                                <option value="6">Rosario Sports Complex</option>
-                                <option value="7">San Joaquin Brgy Hall</option>
-                                <option value="8">Pinagbuhatan High School</option>
-                                <option value="9">Ugong Barangay Hall</option>
-                                <option value="10">Maybunga Covered Court</option>
-                                <option value="11">San Antonio Village Park</option>
-                                <option value="12">Kalawaan Elementary School</option>
-                                <option value="13">Dela Paz Evacuation Center</option>
-                                <option value="14">Santa Lucia High School Gym</option>
-                                <option value="15">Buting Elementary School</option>
-                            </optgroup>
-                            <optgroup label="Hospitals & Medical">
-                                <option value="h1">Rizal Medical Center</option>
-                                <option value="h2">The Medical City</option>
-                                <option value="h3">Pasig City General Hospital</option>
-                                <option value="h4">Pasig Doctors Medical Center</option>
-                            </optgroup>
-                            <optgroup label="Police Stations & HQ">
-                                <option value="p1">Pasig City Police Headquarters</option>
-                                <option value="p2">Police Station 1 - San Antonio</option>
-                                <option value="p3">Police Station 2 - Rosario</option>
-                                <option value="p4">Police Station 3 - Kapitolyo</option>
-                            </optgroup>
-                        </select>
-
-                        <button type="button" id="btn-dispatch" disabled style="width: 100%; background: #ff8513; color: white; border: none; padding: 10px; border-radius: 6px; font-family: 'Barlow Condensed'; font-size: 0.95rem; font-weight: 700; cursor: not-allowed; opacity: 0.5; margin-top: 5px;">
-                            ESTABLISH SAFE CORRIDOR
+                <div id="corridor-tool-container" style="margin-top: 18px; border-top: 1px solid rgba(26, 86, 219, 0.2); padding-top: 14px;">
+                    <div class="section-label" style="margin-bottom: 10px; letter-spacing: 0.2em;">EVACUATION ROUTING</div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <button type="button" id="btn-drop-checkpoint" style="width: 100%; background: rgba(255, 133, 19, 0.1); border: 1px solid #ff8513; color: white; padding: 10px; border-radius: 6px; font-family: 'Barlow Condensed'; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                            SET MOVEMENT ORIGIN
                         </button>
+                        <p id="drop-status" style="font-size: 0.75rem; color: #ff8513; font-family: 'Barlow Condensed'; text-align: center; display: none;">Click anywhere on the map to set the origin point.</p>
+
+                        <div id="routing-options" style="display: none; flex-direction: column; gap: 8px; margin-top: 8px;">
+                            <input type="text" id="checkpoint-name" placeholder="Origin Landmark/Street" style="width: 100%; background: rgba(5, 10, 20, 0.8); border: 1px solid #374151; color: white; padding: 8px; border-radius: 6px; font-family: 'Barlow Condensed'; font-size: 0.85rem; outline: none;">
+                            
+                            <select id="target-center" style="width: 100%; background: rgba(5, 10, 20, 0.8); border: 1px solid #374151; color: white; padding: 8px; border-radius: 6px; font-family: 'Barlow Condensed'; font-size: 0.85rem; outline: none; cursor: pointer;">
+                                <option value="" disabled selected>Select Safe Zone...</option>
+                                <optgroup label="General Evacuation Centers">
+                                    <option value="1">Rizal High School Gym</option>
+                                    <option value="2">Pasig City Sports Complex</option>
+                                    <option value="3">Kapitolyo High School</option>
+                                    <option value="4">Manggahan Elementary</option>
+                                    <option value="5">Santolan Elementary School</option>
+                                    <option value="6">Rosario Sports Complex</option>
+                                    <option value="7">San Joaquin Brgy Hall</option>
+                                    <option value="8">Pinagbuhatan High School</option>
+                                    <option value="9">Ugong Barangay Hall</option>
+                                    <option value="10">Maybunga Covered Court</option>
+                                    <option value="11">San Antonio Village Park</option>
+                                    <option value="12">Kalawaan Elementary School</option>
+                                    <option value="13">Dela Paz Evacuation Center</option>
+                                    <option value="14">Santa Lucia High School Gym</option>
+                                    <option value="15">Buting Elementary School</option>
+                                </optgroup>
+                                <optgroup label="Hospitals & Medical">
+                                    <option value="h1">Rizal Medical Center</option>
+                                    <option value="h2">The Medical City</option>
+                                    <option value="h3">Pasig City General Hospital</option>
+                                    <option value="h4">Pasig Doctors Medical Center</option>
+                                </optgroup>
+                                <optgroup label="Police Stations & HQ">
+                                    <option value="p1">Pasig City Police Headquarters</option>
+                                    <option value="p2">Police Station 1 - San Antonio</option>
+                                    <option value="p3">Police Station 2 - Rosario</option>
+                                    <option value="p4">Police Station 3 - Kapitolyo</option>
+                                </optgroup>
+                            </select>
+
+                            <button type="button" id="btn-dispatch" disabled style="width: 100%; background: #ff8513; color: white; border: none; padding: 10px; border-radius: 6px; font-family: 'Barlow Condensed'; font-size: 0.95rem; font-weight: 700; cursor: not-allowed; opacity: 0.5; margin-top: 5px;">
+                                ESTABLISH SAFE CORRIDOR
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="map-legend">
-            <div class="section-label" style="margin-bottom: 2px;">TRAFFIC DENSITY</div>
-            <div class="legend-item"><span class="dot" style="background: #4ade80;"></span> SMOOTH</div>
-            <div class="legend-item"><span class="dot" style="background: #facc15;"></span> MODERATE</div>
-            <div class="legend-item"><span class="dot" style="background: #f87171;"></span> HEAVY</div>
+            <div class="flex justify-between items-center cursor-pointer md:cursor-default" onclick="if(window.innerWidth <= 768) toggleLegend()">
+                <div class="section-label" style="margin-bottom: 0; color: white;">MAP LEGEND</div>
+                <button class="md:hidden text-gray-400 focus:outline-none">
+                    <i data-lucide="chevron-down" id="legend-chevron" class="w-5 h-5"></i>
+                </button>
+            </div>
             
-            <div style="width: 100%; height: 1px; background-color: rgba(255,255,255,0.15); margin: 8px 0;"></div>
-            
-            <div class="section-label" style="margin-bottom: 2px;">NETWORK OPERATIONS</div>
-            <div class="legend-item"><span class="dot" style="background: transparent; border: 2px dashed #ef4444;"></span> BLOCKED AREA / AVOID</div>
-            <div class="legend-item"><span class="dot" style="background: transparent; border: 2px dashed #3b82f6;"></span> DRRMO CUSTOM ZONE</div>
-            <div class="legend-item"><span class="dot" style="background: transparent; border: 2px dashed #a855f7;"></span> EVACUATION CORRIDOR</div>
+            <div id="legend-content" class="mobile-collapsible flex flex-col gap-2 mt-2">
+                <div class="section-label" style="margin-bottom: 2px;">TRAFFIC DENSITY</div>
+                <div class="legend-item"><span class="dot" style="background: #4ade80;"></span> SMOOTH</div>
+                <div class="legend-item"><span class="dot" style="background: #facc15;"></span> MODERATE</div>
+                <div class="legend-item"><span class="dot" style="background: #f87171;"></span> HEAVY</div>
+                
+                <div style="width: 100%; height: 1px; background-color: rgba(255,255,255,0.15); margin: 6px 0;"></div>
+                
+                <div class="section-label" style="margin-bottom: 2px;">NETWORK OPERATIONS</div>
+                <div class="legend-item"><span class="dot" style="background: transparent; border: 2px dashed #ef4444;"></span> BLOCKED AREA / AVOID</div>
+                <div class="legend-item"><span class="dot" style="background: transparent; border: 2px dashed #3b82f6;"></span> DRRMO CUSTOM ZONE</div>
+                <div class="legend-item"><span class="dot" style="background: transparent; border: 2px dashed #ff8513;"></span> EVACUATION CORRIDOR</div>
+            </div>
         </div>
     </main>
 
@@ -313,6 +341,41 @@
             }
         }
 
+        // Mobile Collapse Functions
+        window.toggleNav = function() {
+            const content = document.getElementById('nav-content');
+            const icon = document.getElementById('nav-chevron');
+            if (content.classList.contains('collapsed')) {
+                content.classList.remove('collapsed');
+                icon.setAttribute('data-lucide', 'chevron-up');
+            } else {
+                content.classList.add('collapsed');
+                icon.setAttribute('data-lucide', 'chevron-down');
+            }
+            lucide.createIcons();
+        };
+
+        window.toggleLegend = function() {
+            const content = document.getElementById('legend-content');
+            const icon = document.getElementById('legend-chevron');
+            if (content.classList.contains('collapsed')) {
+                content.classList.remove('collapsed');
+                icon.setAttribute('data-lucide', 'chevron-up'); // point up to close on bottom
+            } else {
+                content.classList.add('collapsed');
+                icon.setAttribute('data-lucide', 'chevron-down');
+            }
+            lucide.createIcons();
+        };
+
+        // Initialize as Collapsed on Mobile
+        if(window.innerWidth <= 768) {
+            document.getElementById('nav-content').classList.add('collapsed');
+            document.getElementById('legend-content').classList.add('collapsed');
+            document.getElementById('nav-chevron').setAttribute('data-lucide', 'chevron-down');
+            document.getElementById('legend-chevron').setAttribute('data-lucide', 'chevron-down');
+        }
+
         mapboxgl.accessToken = 'pk.eyJ1IjoicmFmYWVsMDQxNiIsImEiOiJjbW5rZnJkbmUweTJ0MnZwcmx5OG5kaW5jIn0.uwnBow8wYc1idVnUbZEkag';
         
         const map = new mapboxgl.Map({
@@ -320,21 +383,18 @@
             style: 'mapbox://styles/mapbox/dark-v11', 
             center: [121.0825, 14.5764], 
             zoom: 12.5,
-            pitch: 60, // Set default pitch high for 3D effect
-            bearing: -17.6 // Tilted bearing for dynamic view
+            pitch: 60,
+            bearing: -17.6
         });
 
-        // Add Navigation Control with visualizePitch enabled
         map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), 'top-right');
 
-        // Storage for Markers to toggle
         let trafficMapObjects = {};
         let weatherMapObjects = {};
         let mapObjectsRescues = {};
         let evacMarkersDOM = {};
         let activeFacilityMarkers = [];
 
-        // Corridor Mapping Tool Variables
         let tempPickupMarker = null;
         let tempPickupCoords = null;
 
@@ -365,77 +425,58 @@
         ];
 
         map.on('load', () => {
-            // Live Traffic Layer
-map.addLayer({ 'id': 'synced-rescue-routes-highlight', 'type': 'line', 'source': 'synced-admin-rescues', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#ff8513', 'line-width': 12, 'line-opacity': 0.3 } });
+            // Aggressive Error Handling to protect the script execution
+            try {
+                map.addSource('live-traffic', { type: 'vector', url: 'mapbox://mapbox.mapbox-traffic-v1' });
+                map.addLayer({
+                    'id': 'traffic-lines', 'type': 'line', 'source': 'live-traffic', 'source-layer': 'traffic',
+                    'paint': {
+                        'line-width': 3,
+                        'line-color': [ 'match', ['get', 'congestion'], 'low', '#4ade80', 'moderate', '#facc15', 'heavy', '#f87171', 'severe', '#334155', 'transparent' ]
+                    }
+                });
+            } catch(e) { console.warn("Traffic source error:", e); }
 
-map.addLayer({ 'id': 'synced-rescue-routes-line', 'type': 'line', 'source': 'synced-admin-rescues', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#ff8513', 'line-width': 4, 'line-dasharray': [2, 2] } });
-
-map.addLayer({ 'id': 'local-rescue-routes-highlight', 'type': 'line', 'source': 'local-rescue-routes', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#ff8513', 'line-width': 12, 'line-opacity': 0.3 } });
-
-map.addLayer({ 'id': 'local-rescue-routes-line', 'type': 'line', 'source': 'local-rescue-routes', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#ff8513', 'line-width': 4, 'line-dasharray': [2, 2] } });
-
-            // 3D Buildings (Placed below labels for clean UI, and slightly lighter for visibility)
-            const layers = map.getStyle().layers;
-            let labelLayerId;
-            for (let i = 0; i < layers.length; i++) {
-                if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
-                    labelLayerId = layers[i].id;
-                    break;
+            try {
+                const layers = map.getStyle().layers;
+                let labelLayerId;
+                for (let i = 0; i < layers.length; i++) {
+                    if (layers[i].type === 'symbol' && layers[i].layout['text-field']) { labelLayerId = layers[i].id; break; }
                 }
-            }
+                map.addLayer({
+                    'id': '3d-buildings', 'source': 'composite', 'source-layer': 'building', 'filter': ['==', 'extrude', 'true'], 'type': 'fill-extrusion', 'minzoom': 13.5, 
+                    'paint': { 'fill-extrusion-color': '#334155', 'fill-extrusion-height': ['get', 'height'], 'fill-extrusion-base': ['get', 'min_height'], 'fill-extrusion-opacity': 0.8 }
+                }, labelLayerId);
+            } catch(e) { console.warn("3D buildings error:", e); }
 
-            map.addLayer({
-                'id': '3d-buildings',
-                'source': 'composite',
-                'source-layer': 'building',
-                'filter': ['==', 'extrude', 'true'],
-                'type': 'fill-extrusion',
-                'minzoom': 13.5, 
-                'paint': {
-                    'fill-extrusion-color': '#334155', 
-                    'fill-extrusion-height': ['get', 'height'],
-                    'fill-extrusion-base': ['get', 'min_height'],
-                    'fill-extrusion-opacity': 0.8
-                }
-            }, labelLayerId);
+            try {
+                map.addSource('pasig-barangays', { type: 'geojson', data: './pasig_boundaries.geojson' });
+                map.addLayer({ 'id': 'barangay-highlight', 'type': 'fill', 'source': 'pasig-barangays', 'paint': { 'fill-color': '#d946ef', 'fill-opacity': 0.25 }, 'filter': ['==', 'name', ''] });
+                map.addLayer({ 'id': 'barangay-borders', 'type': 'line', 'source': 'pasig-barangays', 'paint': { 'line-color': '#06b6d4', 'line-width': 2.5, 'line-opacity': 0.8 } });
+            } catch(e) { console.warn("Boundary error:", e); }
 
-            // Pasig Boundary Highlight (Ensure it sits above 3d buildings)
-            map.addSource('pasig-barangays', { type: 'geojson', data: './pasig_boundaries.geojson' });
-            map.addLayer({
-                'id': 'barangay-highlight',
-                'type': 'fill',
-                'source': 'pasig-barangays',
-                'paint': { 'fill-color': '#d946ef', 'fill-opacity': 0.25 },
-                'filter': ['==', 'name', ''] 
-            });
-            map.addLayer({
-                'id': 'barangay-borders',
-                'type': 'line',
-                'source': 'pasig-barangays',
-                'paint': { 'line-color': '#06b6d4', 'line-width': 2.5, 'line-opacity': 0.8 }
-            });
+            try {
+                map.addSource('synced-blocked-lines', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+                map.addLayer({ 'id': 'synced-blocked-stroke', 'type': 'line', 'source': 'synced-blocked-lines', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#ef4444', 'line-width': 6, 'line-dasharray': [2, 2] } });
 
-            // Admin Synced Sources & Layers
-            map.addSource('synced-blocked-lines', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
-            map.addLayer({ 'id': 'synced-blocked-stroke', 'type': 'line', 'source': 'synced-blocked-lines', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#ef4444', 'line-width': 6, 'line-dasharray': [2, 2] } });
+                map.addSource('synced-danger-zones', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+                map.addLayer({ 'id': 'synced-danger-fill', 'type': 'fill', 'source': 'synced-danger-zones', 'paint': { 'fill-color': '#ef4444', 'fill-opacity': 0.25 } });
+                map.addLayer({ 'id': 'synced-danger-stroke', 'type': 'line', 'source': 'synced-danger-zones', 'paint': { 'line-color': '#ef4444', 'line-width': 3, 'line-dasharray': [2, 2] } });
 
-            map.addSource('synced-danger-zones', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
-            map.addLayer({ 'id': 'synced-danger-fill', 'type': 'fill', 'source': 'synced-danger-zones', 'paint': { 'fill-color': '#ef4444', 'fill-opacity': 0.25 } });
-            map.addLayer({ 'id': 'synced-danger-stroke', 'type': 'line', 'source': 'synced-danger-zones', 'paint': { 'line-color': '#ef4444', 'line-width': 3, 'line-dasharray': [2, 2] } });
+                map.addSource('synced-drrmo-drawn', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+                map.addLayer({ 'id': 'synced-drrmo-drawn-fill', 'type': 'fill', 'source': 'synced-drrmo-drawn', 'paint': { 'fill-color': '#3b82f6', 'fill-opacity': 0.3 } });
+                map.addLayer({ 'id': 'synced-drrmo-drawn-stroke', 'type': 'line', 'source': 'synced-drrmo-drawn', 'paint': { 'line-color': '#3b82f6', 'line-width': 3, 'line-dasharray': [2, 2] } });
+            } catch(e) { console.warn("Admin sync sources error:", e); }
 
-            map.addSource('synced-drrmo-drawn', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
-            map.addLayer({ 'id': 'synced-drrmo-drawn-fill', 'type': 'fill', 'source': 'synced-drrmo-drawn', 'paint': { 'fill-color': '#3b82f6', 'fill-opacity': 0.3 } });
-            map.addLayer({ 'id': 'synced-drrmo-drawn-stroke', 'type': 'line', 'source': 'synced-drrmo-drawn', 'paint': { 'line-color': '#3b82f6', 'line-width': 3, 'line-dasharray': [2, 2] } });
+            try {
+                map.addSource('synced-admin-rescues', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+                map.addLayer({ 'id': 'synced-rescue-routes-highlight', 'type': 'line', 'source': 'synced-admin-rescues', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#ff8513', 'line-width': 12, 'line-opacity': 0.3 } });
+                map.addLayer({ 'id': 'synced-rescue-routes-line', 'type': 'line', 'source': 'synced-admin-rescues', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#ff8513', 'line-width': 4, 'line-dasharray': [2, 2] } });
 
-            // Synced Admin Rescues (Purple)
-            map.addSource('synced-admin-rescues', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
-            map.addLayer({ 'id': 'synced-rescue-routes-highlight', 'type': 'line', 'source': 'synced-admin-rescues', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#a855f7', 'line-width': 12, 'line-opacity': 0.3 } });
-            map.addLayer({ 'id': 'synced-rescue-routes-line', 'type': 'line', 'source': 'synced-admin-rescues', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#a855f7', 'line-width': 4, 'line-dasharray': [2, 2] } });
-
-            // Local Tool Rescues (Purple)
-            map.addSource('local-rescue-routes', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
-            map.addLayer({ 'id': 'local-rescue-routes-highlight', 'type': 'line', 'source': 'local-rescue-routes', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#a855f7', 'line-width': 12, 'line-opacity': 0.3 } });
-            map.addLayer({ 'id': 'local-rescue-routes-line', 'type': 'line', 'source': 'local-rescue-routes', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#a855f7', 'line-width': 4, 'line-dasharray': [2, 2] } });
+                map.addSource('local-rescue-routes', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+                map.addLayer({ 'id': 'local-rescue-routes-highlight', 'type': 'line', 'source': 'local-rescue-routes', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#ff8513', 'line-width': 12, 'line-opacity': 0.3 } });
+                map.addLayer({ 'id': 'local-rescue-routes-line', 'type': 'line', 'source': 'local-rescue-routes', 'layout': { 'line-join': 'round', 'line-cap': 'round' }, 'paint': { 'line-color': '#ff8513', 'line-width': 4, 'line-dasharray': [2, 2] } });
+            } catch(e) { console.warn("Rescue routes error:", e); }
 
 
             // Render Interactive Facilities
@@ -488,33 +529,65 @@ map.addLayer({ 'id': 'local-rescue-routes-line', 'type': 'line', 'source': 'loca
         });
 
         // -----------------------------------------------------
-        // TOGGLE LOGIC
+        // ROBUST TOGGLE LOGIC
         // -----------------------------------------------------
         window.toggleLayer = function(type, isVisible) {
             const displayStyle = isVisible ? 'block' : 'none';
-            if (type === 'density') {
-                map.setLayoutProperty('traffic-lines', 'visibility', isVisible ? 'visible' : 'none');
-            } else if (type === 'ops') {
-                map.setLayoutProperty('synced-blocked-stroke', 'visibility', isVisible ? 'visible' : 'none');
-                map.setLayoutProperty('synced-danger-fill', 'visibility', isVisible ? 'visible' : 'none');
-                map.setLayoutProperty('synced-danger-stroke', 'visibility', isVisible ? 'visible' : 'none');
-                Object.values(trafficMapObjects).forEach(obj => { if (obj.marker) obj.marker.getElement().style.display = displayStyle; });
-            } else if (type === 'weather') {
-                map.setLayoutProperty('synced-drrmo-drawn-fill', 'visibility', isVisible ? 'visible' : 'none');
-                map.setLayoutProperty('synced-drrmo-drawn-stroke', 'visibility', isVisible ? 'visible' : 'none');
-                Object.values(weatherMapObjects).forEach(obj => { if (obj.marker) obj.marker.getElement().style.display = displayStyle; });
-            } else if (type === 'evac') {
-                map.setLayoutProperty('synced-rescue-routes-highlight', 'visibility', isVisible ? 'visible' : 'none');
-                map.setLayoutProperty('synced-rescue-routes-line', 'visibility', isVisible ? 'visible' : 'none');
-                if (map.getLayer('local-rescue-routes-highlight')) map.setLayoutProperty('local-rescue-routes-highlight', 'visibility', isVisible ? 'visible' : 'none');
-                if (map.getLayer('local-rescue-routes-line')) map.setLayoutProperty('local-rescue-routes-line', 'visibility', isVisible ? 'visible' : 'none');
-                
-                activeFacilityMarkers.forEach(marker => { marker.getElement().style.display = isVisible ? 'flex' : 'none'; });
-                Object.values(mapObjectsRescues).forEach(obj => { if (obj.marker) obj.marker.getElement().style.display = displayStyle; });
-                if (tempPickupMarker) tempPickupMarker.getElement().style.display = displayStyle;
-                
-                // Hide routing tools if evac is turned off
-                document.getElementById('corridor-tool-container').style.display = isVisible ? 'block' : 'none';
+            
+            try {
+                if (!map.isStyleLoaded()) return; // Prevent crashes if map hasn't finished loading
+
+                if (type === 'density') {
+                    if (map.getLayer('traffic-lines')) {
+                        map.setLayoutProperty('traffic-lines', 'visibility', isVisible ? 'visible' : 'none');
+                    }
+                } else if (type === 'ops') {
+                    if (map.getLayer('synced-blocked-stroke')) map.setLayoutProperty('synced-blocked-stroke', 'visibility', isVisible ? 'visible' : 'none');
+                    if (map.getLayer('synced-danger-fill')) map.setLayoutProperty('synced-danger-fill', 'visibility', isVisible ? 'visible' : 'none');
+                    if (map.getLayer('synced-danger-stroke')) map.setLayoutProperty('synced-danger-stroke', 'visibility', isVisible ? 'visible' : 'none');
+                    
+                    Object.values(trafficMapObjects).forEach(obj => { 
+                        if (obj.marker && obj.marker.getElement()) {
+                            obj.marker.getElement().style.display = displayStyle; 
+                        }
+                    });
+                } else if (type === 'weather') {
+                    if (map.getLayer('synced-drrmo-drawn-fill')) map.setLayoutProperty('synced-drrmo-drawn-fill', 'visibility', isVisible ? 'visible' : 'none');
+                    if (map.getLayer('synced-drrmo-drawn-stroke')) map.setLayoutProperty('synced-drrmo-drawn-stroke', 'visibility', isVisible ? 'visible' : 'none');
+                    
+                    Object.values(weatherMapObjects).forEach(obj => { 
+                        if (obj.marker && obj.marker.getElement()) {
+                            obj.marker.getElement().style.display = displayStyle; 
+                        }
+                    });
+                } else if (type === 'evac') {
+                    if (map.getLayer('synced-rescue-routes-highlight')) map.setLayoutProperty('synced-rescue-routes-highlight', 'visibility', isVisible ? 'visible' : 'none');
+                    if (map.getLayer('synced-rescue-routes-line')) map.setLayoutProperty('synced-rescue-routes-line', 'visibility', isVisible ? 'visible' : 'none');
+                    if (map.getLayer('local-rescue-routes-highlight')) map.setLayoutProperty('local-rescue-routes-highlight', 'visibility', isVisible ? 'visible' : 'none');
+                    if (map.getLayer('local-rescue-routes-line')) map.setLayoutProperty('local-rescue-routes-line', 'visibility', isVisible ? 'visible' : 'none');
+                    
+                    const flexStyle = isVisible ? 'flex' : 'none';
+                    activeFacilityMarkers.forEach(marker => { 
+                        if (marker.getElement()) {
+                            marker.getElement().style.display = flexStyle; 
+                        }
+                    });
+                    
+                    Object.values(mapObjectsRescues).forEach(obj => { 
+                        if (obj.marker && obj.marker.getElement()) {
+                            obj.marker.getElement().style.display = displayStyle; 
+                        }
+                    });
+                    
+                    if (tempPickupMarker && tempPickupMarker.getElement()) {
+                        tempPickupMarker.getElement().style.display = displayStyle;
+                    }
+                    
+                    const toolContainer = document.getElementById('corridor-tool-container');
+                    if(toolContainer) toolContainer.style.display = isVisible ? 'block' : 'none';
+                }
+            } catch (err) {
+                console.error("Toggle error caught safely: ", err);
             }
         };
 
@@ -588,7 +661,7 @@ map.addLayer({ 'id': 'local-rescue-routes-line', 'type': 'line', 'source': 'loca
                 const el = document.createElement('div'); el.className = `pickup-marker`;
                 if (!isEvacVisible) el.style.display = 'none';
 
-                const popupHTML = `<div style="color:white; font-family:'Barlow Condensed';"><h3 style="font-weight:bold; font-size:16px; margin-bottom:4px; text-transform:uppercase;">${op.name}</h3><p style="font-size:13px; color:#cbd5e1;">Evacuating ~${op.evacuees} people to ${op.targetName}.</p><span style="display:inline-block; margin-top:8px; font-weight:bold; font-size:11px; background:rgba(168,85,247,0.2); border:1px solid #a855f7; color:#d8b4fe; padding:2px 8px; border-radius:4px;">ACTIVE CORRIDOR</span></div>`;
+                const popupHTML = `<div style="color:white; font-family:'Barlow Condensed';"><h3 style="font-weight:bold; font-size:16px; margin-bottom:4px; text-transform:uppercase;">${op.name}</h3><p style="font-size:13px; color:#cbd5e1;">Evacuating ~${op.evacuees} people to ${op.targetName}.</p><span style="display:inline-block; margin-top:8px; font-weight:bold; font-size:11px; background:rgba(255,133,19,0.2); border:1px solid #ff8513; color:#fdba74; padding:2px 8px; border-radius:4px;">ACTIVE CORRIDOR</span></div>`;
                 const popup = new mapboxgl.Popup({ offset: 25, closeButton: false }).setHTML(popupHTML);
                 const marker = new mapboxgl.Marker(el).setLngLat(op.pickupCoords).setPopup(popup).addTo(map);
                 
@@ -737,38 +810,37 @@ map.addLayer({ 'id': 'local-rescue-routes-line', 'type': 'line', 'source': 'loca
             map.fitBounds(bounds, { padding: 50, pitch: 45 });
         });
 
-        // Jump to District Configuration (Full 30 Barangays)
         const barangayData = {
-            'bagong-ilog': { name: 'Bagong Ilog', center: [121.0669, 14.5670], zoom: 15 },
+            'bagong-ilog': { name: 'Bagong Ilog', center: [121.0689, 14.5652], zoom: 14.5 },
+            'kapasigan': { name: 'Kapasigan', center: [121.0741, 14.5644], zoom: 15 },
+            'kapitolyo': { name: 'Kapitolyo', center: [121.0592, 14.5712], zoom: 14.5 },
+            'manggahan': { name: 'Manggahan', center: [121.0992, 14.6038], zoom: 14 },
+            'pinagbuhatan': { name: 'Pinagbuhatan', center: [121.0909, 14.5572], zoom: 13.5 },
+            'rosario': { name: 'Rosario', center: [121.0882, 14.5904], zoom: 14 },
+            'san-joaquin': { name: 'San Joaquin', center: [121.0757, 14.5522], zoom: 15 },
+            'ugong': { name: 'Ugong', center: [121.0732, 14.5841], zoom: 14 },
+            'pineda': { name: 'Pineda', center: [121.0595, 14.5640], zoom: 15 },
+            'santa-lucia': { name: 'Santa Lucia', center: [121.1010, 14.5840], zoom: 15 },
+            'caniogan': { name: 'Caniogan', center: [121.0810, 14.5680], zoom: 15 },
             'bagong-katipunan': { name: 'Bagong Katipunan', center: [121.0760, 14.5610], zoom: 15.5 },
             'bambang': { name: 'Bambang', center: [121.0820, 14.5570], zoom: 15.5 },
             'buting': { name: 'Buting', center: [121.0680, 14.5550], zoom: 15.5 },
-            'caniogan': { name: 'Caniogan', center: [121.0810, 14.5680], zoom: 15 },
             'dela-paz': { name: 'Dela Paz', center: [121.1000, 14.6180], zoom: 15 },
             'kalawaan': { name: 'Kalawaan', center: [121.0830, 14.5500], zoom: 15 },
-            'kapasigan': { name: 'Kapasigan', center: [121.0770, 14.5630], zoom: 15.5 },
-            'kapitolyo': { name: 'Kapitolyo', center: [121.0590, 14.5710], zoom: 15.5 },
             'malinao': { name: 'Malinao', center: [121.0780, 14.5600], zoom: 15.5 },
-            'manggahan': { name: 'Manggahan', center: [121.0960, 14.6060], zoom: 14.5 },
             'maybunga': { name: 'Maybunga', center: [121.0880, 14.5800], zoom: 15 },
             'oranbo': { name: 'Oranbo', center: [121.0620, 14.5760], zoom: 15.5 },
             'palatiw': { name: 'Palatiw', center: [121.0860, 14.5620], zoom: 15.5 },
-            'pinagbuhatan': { name: 'Pinagbuhatan', center: [121.0920, 14.5520], zoom: 14.5 },
-            'pineda': { name: 'Pineda', center: [121.0600, 14.5640], zoom: 15.5 },
-            'rosario': { name: 'Rosario', center: [121.0880, 14.5900], zoom: 14.5 },
             'sagad': { name: 'Sagad', center: [121.0780, 14.5660], zoom: 15.5 },
             'san-antonio': { name: 'San Antonio', center: [121.0630, 14.5830], zoom: 15.5 },
-            'san-joaquin': { name: 'San Joaquin', center: [121.0760, 14.5510], zoom: 15.5 },
             'san-jose': { name: 'San Jose', center: [121.0750, 14.5630], zoom: 15.5 },
             'san-miguel': { name: 'San Miguel', center: [121.0930, 14.5730], zoom: 15.5 },
             'san-nicolas': { name: 'San Nicolas', center: [121.0780, 14.5580], zoom: 15.5 },
             'santa-cruz': { name: 'Santa Cruz', center: [121.0790, 14.5600], zoom: 15.5 },
-            'santa-lucia': { name: 'Santa Lucia', center: [121.1010, 14.5840], zoom: 15 },
             'santa-rosa': { name: 'Santa Rosa', center: [121.0730, 14.5600], zoom: 15.5 },
             'santo-tomas': { name: 'Santo Tomas', center: [121.0800, 14.5580], zoom: 15.5 },
             'santolan': { name: 'Santolan', center: [121.0850, 14.6150], zoom: 15 },
-            'sumilang': { name: 'Sumilang', center: [121.0730, 14.5580], zoom: 15.5 },
-            'ugong': { name: 'Ugong', center: [121.0750, 14.5850], zoom: 14.5 }
+            'sumilang': { name: 'Sumilang', center: [121.0730, 14.5580], zoom: 15.5 }
         };
 
         window.zoomToBarangay = function(val) {
