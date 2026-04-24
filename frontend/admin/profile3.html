@@ -2,30 +2,35 @@
 <html lang="en" class="h-full">
 <head>
   <script>
-    (function() {
-        const session = localStorage.getItem('activeDepartment');
-       if (!session || session !== 'DRRMO') {
-            window.location.replace('admin.html?error=unauthorized'); 
-        }
-   })();
+//    (function() {
+//        const session = localStorage.getItem('activeDepartment');
+//        if (!session || session !== 'DRRMO') {
+//            window.location.replace('admin.html?error=unauthorized'); 
+//        }
+//   })();
   </script>
 
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>BEAT - Dept Profile</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles2.css">
+  <style>
+    .modal-overlay { position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.85); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+  </style>
 </head>
-<body class="h-full flex bg-[#0a0e1a]">
+<body class="h-full flex bg-[#0a0e1a] overflow-hidden">
   
-  <div id="confirm-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-yellow"><i data-lucide="alert-circle"></i></div><h2 class="text-white font-bold text-xl mb-2">Update Account?</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Confirm changes to your profile or password? Verification is required.</p><div class="flex gap-3"><button onclick="closeModal('confirm-modal')" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="proceedToVerify()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Proceed</button></div></div></div>
-  <div id="verify-modal" class="modal-overlay hidden"><div class="border theme-border w-[420px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-blue"><i data-lucide="shield-check"></i></div><h2 class="text-white font-bold text-xl mb-2">Security Verification</h2><p class="text-[#94a3b8] text-xs mb-6">Enter the 6-digit code sent to your email</p><div class="flex justify-between gap-2 mb-2"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 0)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 1)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 2)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 3)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 4)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 5)"></div><p id="otp-error" class="text-red-500 text-xs hidden mb-6">Enter all 6 digits</p><button onclick="confirmChanges()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg">Confirm Updates</button></div></div>
-  <div id="success-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-green"><i data-lucide="check-circle"></i></div><h2 class="text-white font-bold text-xl mb-4">Changes Successful</h2><button onclick="closeModal('success-modal')" class="w-full bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Got it</button></div></div>
-  <div id="no-changes-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] text-center p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-yellow"><i data-lucide="info"></i></div><h2 class="text-white font-bold text-xl mb-4">No Changes Detected</h2><button onclick="closeModal('no-changes-modal')" class="w-full bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Dismiss</button></div></div>
+  <div id="confirm-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] max-w-[90%] text-center p-6 md:p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-yellow"><i data-lucide="alert-circle"></i></div><h2 class="text-white font-bold text-xl mb-2">Update Account?</h2><p class="text-[#94a3b8] text-sm mb-8 leading-relaxed">Confirm changes to your profile or password? Verification is required.</p><div class="flex gap-3"><button onclick="closeModal('confirm-modal')" class="flex-1 bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-colors">Cancel</button><button onclick="proceedToVerify()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Proceed</button></div></div></div>
+  <div id="verify-modal" class="modal-overlay hidden"><div class="border theme-border w-[420px] max-w-[90%] text-center p-6 md:p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-blue"><i data-lucide="shield-check"></i></div><h2 class="text-white font-bold text-xl mb-2">Security Verification</h2><p class="text-[#94a3b8] text-xs mb-6">Enter the 6-digit code sent to your email</p><div class="flex justify-between gap-1.5 md:gap-2 mb-2"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 0)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 1)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 2)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 3)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 4)"><input type="text" maxlength="1" class="otp-input" oninput="handleOtp(this, 5)"></div><p id="otp-error" class="text-red-500 text-xs hidden mb-6">Enter all 6 digits</p><button onclick="confirmChanges()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-lg mt-4">Confirm Updates</button></div></div>
+  <div id="success-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] max-w-[90%] text-center p-6 md:p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-green"><i data-lucide="check-circle"></i></div><h2 class="text-white font-bold text-xl mb-4">Changes Successful</h2><button onclick="closeModal('success-modal')" class="w-full bg-transparent border border-blue-500 hover:bg-blue-500/10 text-blue-500 font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Got it</button></div></div>
+  <div id="no-changes-modal" class="modal-overlay hidden"><div class="border theme-border w-[400px] max-w-[90%] text-center p-6 md:p-8 rounded-2xl shadow-2xl theme-surface"><div class="modal-icon-circle modal-icon-bg-yellow"><i data-lucide="info"></i></div><h2 class="text-white font-bold text-xl mb-4">No Changes Detected</h2><button onclick="closeModal('no-changes-modal')" class="w-full bg-[#1e2536] border theme-border hover:bg-gray-800 text-white font-bold py-3 rounded-xl text-sm transition-all shadow-sm">Dismiss</button></div></div>
 
-  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-50">
+  <div id="mobile-overlay" class="fixed inset-0 bg-black/60 z-[55] hidden md:hidden backdrop-blur-sm transition-opacity" onclick="toggleSidebar()"></div>
+
+  <aside id="sidebar" class="sidebar flex flex-col h-full theme-border-r theme-surface z-[60] fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 w-64 bg-[#0a0e1a]">
     <div class="h-[76px] px-5 flex items-center shrink-0 theme-border-b">
         <div id="auth-logo" class="flex items-center gap-1.5">
             <img src="/assets/beat_logo2.png" alt="BEAT Logo" class="w-[52px] h-14 object-contain">
@@ -47,13 +52,13 @@
     <div class="user-footer">
         <div class="flex items-center justify-between mb-5">
             <div class="flex items-center gap-3">
-                <div id="nav-avatar" class="nav-avatar">T</div>
+                <div id="nav-avatar" class="nav-avatar bg-orange-600">D</div>
                 <div>
                   <div class="user-footer-name">DRRMO</div>
-                  <div class="user-footer-sub">Disaster Department</div>
+                  <div class="user-footer-sub">Disaster Management</div>
                 </div>
             </div>
-            <a href="profile2.html" class="settings-link active"><i data-lucide="settings" class="icon-md"></i></a>
+            <a href="profile3.html" class="settings-link active"><i data-lucide="settings" class="icon-md"></i></a>
         </div>
         <button onclick="doLogout()" class="btn-logout">
             <i data-lucide="log-out" class="icon-sm"></i> Logout
@@ -61,75 +66,92 @@
     </div>
   </aside>
 
-
-  <main class="flex-1 overflow-y-auto flex flex-col items-center relative">
-    <header class="w-full px-8 h-[76px] flex items-center shrink-0 theme-surface theme-border-b">
-      <h1 class="text-xl font-semibold text-white flex items-center gap-2"><i data-lucide="user" class="icon-lg"></i> Department Profile</h1>
+  <main class="flex-1 flex flex-col min-w-0 bg-[#0a0e1a] h-full overflow-hidden relative">
+    
+    <header class="px-5 md:px-8 h-[76px] flex items-center shrink-0 theme-surface theme-border-b">
+      <div class="flex items-center gap-3">
+        <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white transition-colors p-1">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+        <h1 class="text-lg md:text-xl font-semibold text-white flex items-center gap-2">
+            <i data-lucide="user" class="icon-lg hidden md:inline-block"></i> Department Profile
+        </h1>
+      </div>
     </header>
 
-    <div class="p-8 animate-in w-full max-w-2xl">
-      <div class="profile-card rounded-2xl p-10 flex flex-col items-center shadow-lg relative">
-        
-        <div class="relative group mb-6">
-          <div id="profile-display" class="profile-display-circle">T</div>
-          <label for="avatar-input" class="absolute bottom-1 right-1 bg-blue-600 p-2.5 rounded-full cursor-pointer border-2 border-[#1e2536] hover:bg-blue-700 transition-colors">
-            <i data-lucide="camera" class="text-white icon-sm"></i>
-            <input type="file" id="avatar-input" class="hidden" accept="image/*" onchange="previewAvatar(this)">
-          </label>
-        </div>
-
-        <div class="text-center mb-10">
-          <h2 id="display-name" class="text-white text-2xl font-bold">DRRMO</h2>
+    <div class="flex-1 overflow-y-auto p-5 md:p-8 animate-in flex justify-center">
+      <div class="w-full max-w-2xl">
+        <div class="profile-card rounded-2xl p-6 md:p-10 flex flex-col items-center shadow-lg relative bg-[#0f172a] border border-gray-800">
           
-          <div class="badge-stack">
-            <span id="display-dept" class="text-[11px] font-bold tracking-widest bg-blue-600/20 text-blue-400 px-3 py-1.5 rounded-full uppercase w-max border border-blue-500/20">DEPT: DISASTER RISK</span>
-            <span id="display-id" class="text-[11px] font-bold tracking-widest bg-gray-700/50 text-[#94a3b8] px-3 py-1.5 rounded-full uppercase w-max border border-gray-600/50">ID: 202499112</span>
-            <span id="display-email" class="text-[11px] font-bold tracking-widest bg-gray-800/30 text-[#94a3b8] px-3 py-1.5 rounded-full lowercase w-max">admin@beat.gov.ph</span>
+          <div class="relative group mb-6">
+            <div id="profile-display" class="profile-display-circle bg-orange-600 text-white font-bold text-4xl flex items-center justify-center w-24 h-24 rounded-full border-4 border-[#0a0e1a] shadow-xl bg-cover bg-center">D</div>
+            <label for="avatar-input" class="absolute bottom-0 right-0 bg-blue-600 p-2 rounded-full cursor-pointer border-2 border-[#1e2536] hover:bg-blue-700 transition-colors shadow-lg">
+              <i data-lucide="camera" class="text-white w-4 h-4"></i>
+              <input type="file" id="avatar-input" class="hidden" accept="image/*" onchange="previewAvatar(this)">
+            </label>
           </div>
+
+          <div class="text-center mb-8 md:mb-10 w-full">
+            <h2 id="display-name" class="text-white text-2xl md:text-3xl font-bold mb-3">DRRMO</h2>
+            
+            <div class="flex flex-wrap justify-center gap-2">
+              <span id="display-dept" class="text-[10px] md:text-[11px] font-bold tracking-widest bg-blue-600/20 text-blue-400 px-3 py-1.5 rounded-full uppercase border border-blue-500/20">DEPT: DISASTER RISK</span>
+              <span id="display-id" class="text-[10px] md:text-[11px] font-bold tracking-widest bg-gray-700/50 text-[#94a3b8] px-3 py-1.5 rounded-full uppercase border border-gray-600/50">ID: 202499112</span>
+              <span id="display-email" class="text-[10px] md:text-[11px] font-bold tracking-widest bg-gray-800/30 text-[#94a3b8] px-3 py-1.5 rounded-full lowercase w-full sm:w-auto mt-1 sm:mt-0">admin@beat.gov.ph</span>
+            </div>
+          </div>
+  
+          <form id="profile-form" onsubmit="handleInitialSave(event)" class="w-full space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+              <div>
+                <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">Full Name</label>
+                <input type="text" id="prof-username" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500 transition-colors" value="DRRMO" data-original="DRRMO">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">Email Address (Read-Only)</label>
+                <input type="email" id="prof-email" class="w-full bg-[#1e2536] text-gray-500 border border-[#374151] rounded-lg px-3 py-2.5 text-sm outline-none cursor-not-allowed" value="admin@beat.gov.ph" readonly>
+              </div>
+            </div>
+
+            <hr class="border-gray-800 my-6">
+
+            <div class="space-y-4">
+              <h3 class="text-white font-bold text-sm flex items-center gap-2"><i data-lucide="lock" class="w-4 h-4 text-blue-500"></i> Password Updates</h3>
+              <div>
+                <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">Current Password</label>
+                <input type="password" id="curr-pass" placeholder="Verify with current password" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500 transition-colors">
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                <div>
+                  <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">New Password</label>
+                  <input type="password" id="new-pass" placeholder="New password" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500 transition-colors">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">Confirm Password</label>
+                  <input type="password" id="conf-pass" placeholder="Confirm password" class="w-full bg-[#1e2536] text-white border border-[#374151] rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500 transition-colors">
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all mt-4 md:mt-8">
+              Update Profile
+            </button>
+          </form>
         </div>
- 
-        <form id="profile-form" onsubmit="handleInitialSave(event)" class="w-full space-y-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">Full Name</label>
-              <input type="text" id="prof-username" class="modal-input text-sm" value="DRRMO" data-original="DRRMO">
-            </div>
-            <div>
-              <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">Email Address (Read-Only)</label>
-              <input type="email" id="prof-email" class="modal-input text-sm" value="admin@beat.gov.ph" readonly>
-            </div>
-          </div>
-
-          <hr class="theme-border my-6 border-t">
-
-          <div class="space-y-4">
-            <h3 class="text-white font-bold text-sm flex items-center gap-2"><i data-lucide="lock" class="icon-sm text-blue-500"></i> Password Updates</h3>
-            <div>
-              <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">Current Password</label>
-              <input type="password" id="curr-pass" placeholder="Verify with current password" class="modal-input text-sm">
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">New Password</label>
-                <input type="password" id="new-pass" placeholder="New password" class="modal-input text-sm">
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold mb-2 tracking-wider text-[#94a3b8] uppercase">Confirm Password</label>
-                <input type="password" id="conf-pass" placeholder="Confirm password" class="modal-input text-sm">
-              </div>
-            </div>
-          </div>
-
-          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all mt-4">
-            Update Profile
-          </button>
-        </form>
       </div>
     </div>
   </main>
 
   <script src="js/app2.js"></script>
   <script>
+    // 🚨 Mobile Sidebar Toggle Function 🚨
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobile-overlay');
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('hidden');
+    }
+
     document.addEventListener('DOMContentLoaded', () => { 
         if(window.lucide) lucide.createIcons(); 
         
@@ -245,7 +267,6 @@
       }
     }
 
-    // 🚨 Added Logout Logic 🚨
     function doLogout() {
         localStorage.removeItem('activeDepartment'); // Wipe the session
         window.location.href = 'admin.html'; // Kick back to login
